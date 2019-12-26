@@ -192,7 +192,7 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
 
 ```
 通过这一个类看一下，action里就是你的耗时操作，begin就是任务开始执行时的回调，result就是worker执行完毕后的回调。当你组合了多个执行单元时，每一步的执行，都在掌控之内。失败了，还会有自定义的默认值。这是CompleteableFuture无法做到的。
-![输入图片说明](https://images.gitee.com/uploads/images/2019/1225/133828_0c76624c_303698.png "屏幕截图.png")
+
 
 #### 安装教程
 
@@ -201,6 +201,8 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
 #### 使用说明
 
 1.  3个任务并行
+
+![输入图片说明](https://images.gitee.com/uploads/images/2019/1226/140256_8c015621_303698.png "屏幕截图.png")
 
 ```
         ParWorker w = new ParWorker();
@@ -229,6 +231,8 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
 
 
 2.  1个执行完毕后，开启另外两个，另外两个执行完毕后，开始第4个
+
+![输入图片说明](https://images.gitee.com/uploads/images/2019/1226/140405_93800bc7_303698.png "屏幕截图.png")
 
 ```
         ParWorker w = new ParWorker();
@@ -263,8 +267,15 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
         Async.shutDown();
 ```
 
+3. 复杂点的
 
-3.  其他的详见test包下的测试类，支持各种形式的组合、编排。
+![输入图片说明](https://images.gitee.com/uploads/images/2019/1226/140445_8d52e4d6_303698.png "屏幕截图.png")
+
+做测试类里能找到，下图是执行结果。看时间戳，就知道执行的顺序。每个执行单元都是睡1秒。
+
+![输入图片说明](https://images.gitee.com/uploads/images/2019/1225/133828_0c76624c_303698.png "屏幕截图.png")
+
+4.  其他的详见test包下的测试类，支持各种形式的组合、编排。
 
 
 
