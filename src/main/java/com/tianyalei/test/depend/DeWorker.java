@@ -9,7 +9,7 @@ import com.tianyalei.async.worker.WorkResult;
 /**
  * @author wuweifeng wrote on 2019-11-20.
  */
-public class ParWorker implements IWorker<String, User>, ICallback<String, User> {
+public class DeWorker implements IWorker<String, User>, ICallback<String, User> {
 
     @Override
     public User action(String object) {

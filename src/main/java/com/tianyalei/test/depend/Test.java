@@ -15,9 +15,9 @@ import java.util.concurrent.ExecutionException;
 public class Test {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        ParWorker w = new ParWorker();
-        ParWorker1 w1 = new ParWorker1();
-        ParWorker2 w2 = new ParWorker2();
+        DeWorker w = new DeWorker();
+        DeWorker1 w1 = new DeWorker1();
+        DeWorker2 w2 = new DeWorker2();
 
         WorkerWrapper<String, User> workerWrapper = new WorkerWrapper<>(w, "0", w);
         //虽然尚未执行，但是也可以先取得结果的引用，作为下一个任务的入参
