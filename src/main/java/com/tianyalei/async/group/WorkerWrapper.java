@@ -1,6 +1,5 @@
 package com.tianyalei.async.group;
 
-
 import com.tianyalei.async.callback.DefaultCallback;
 import com.tianyalei.async.callback.ICallback;
 import com.tianyalei.async.callback.IWorker;
@@ -56,7 +55,7 @@ public class WorkerWrapper<T, V> {
     /**
      * 也是个钩子变量，用来存临时的结果
      */
-    private volatile WorkResult<V> workResult;
+    private volatile WorkResult<V> workResult = WorkResult.defaultResult();
 
     private static final int FINISH = 1;
     private static final int ERROR = 2;
@@ -205,7 +204,7 @@ public class WorkerWrapper<T, V> {
             WorkerWrapper workerWrapper = dependWrapper.getDependWrapper();
             WorkResult tempWorkResult = workerWrapper.getWorkResult();
             //为null或者isWorking，说明它依赖的某个任务还没执行到或没执行完
-            if (tempWorkResult == null || workerWrapper.getState() == WORKING) {
+            if (workerWrapper.getState() == INIT || workerWrapper.getState() == WORKING) {
                 existNoFinish = true;
                 break;
             }
@@ -276,7 +275,8 @@ public class WorkerWrapper<T, V> {
             return false;
         }
 
-        if (workResult == null) {
+        //尚未处理过结果
+        if (checkIsNullResult()) {
             if (e == null) {
                 workResult = defaultResult();
             } else {
@@ -293,7 +293,7 @@ public class WorkerWrapper<T, V> {
      */
     private WorkResult<V> workerDoJob() {
         //避免重复执行
-        if (workResult != null) {
+        if (!checkIsNullResult()) {
             return workResult;
         }
         try {
@@ -307,25 +307,29 @@ public class WorkerWrapper<T, V> {
             //执行耗时操作
             V resultValue = worker.action(getParam());
 
-            WorkResult<V> tempResult = new WorkResult<>(resultValue, ResultState.SUCCESS);
-
             //如果状态不是在working,说明别的地方已经修改了
             if (!compareAndSetState(WORKING, FINISH)) {
                 return workResult;
             }
+
+            workResult.setResultState(ResultState.SUCCESS);
+            workResult.setResult(resultValue);
             //回调成功
-            callback.result(true, getParam(), tempResult);
-            workResult = tempResult;
+            callback.result(true, getParam(), workResult);
 
             return workResult;
         } catch (Exception e) {
             //避免重复回调
-            if (workResult != null) {
+            if (!checkIsNullResult()) {
                 return workResult;
             }
             fastFail(WORKING, e);
             return workResult;
         }
+    }
+
+    private boolean checkIsNullResult() {
+        return ResultState.DEFAULT == workResult.getResultState();
     }
 
 
@@ -385,11 +389,16 @@ public class WorkerWrapper<T, V> {
     }
 
     private WorkResult<V> defaultResult() {
-        return new WorkResult<>(getWorker().defaultValue(), ResultState.TIMEOUT);
+        workResult.setResultState(ResultState.TIMEOUT);
+        workResult.setResult(getWorker().defaultValue());
+        return workResult;
     }
 
     private WorkResult<V> defaultExResult(Exception ex) {
-        return new WorkResult<>(getWorker().defaultValue(), ResultState.EXCEPTION, ex);
+        workResult.setResultState(ResultState.EXCEPTION);
+        workResult.setResult(getWorker().defaultValue());
+        workResult.setEx(ex);
+        return workResult;
     }
 
     private WorkResult<V> getNoneNullWorkResult() {

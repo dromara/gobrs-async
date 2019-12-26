@@ -25,7 +25,7 @@ public class WorkResult<V> {
     }
 
     public static WorkResult defaultResult() {
-        return new WorkResult<>(null, ResultState.TIMEOUT);
+        return new WorkResult<>(null, ResultState.DEFAULT);
     }
 
     @Override

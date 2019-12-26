@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutionException;
 import static com.tianyalei.async.executor.Async.getThreadCount;
 
 /**
- * 串行测试
+ * 并行测试
  *
  * @author wuweifeng wrote on 2019-11-20.
  */

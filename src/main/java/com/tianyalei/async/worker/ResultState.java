@@ -7,5 +7,6 @@ package com.tianyalei.async.worker;
 public enum ResultState {
     SUCCESS,
     TIMEOUT,
-    EXCEPTION
+    EXCEPTION,
+    DEFAULT  //默认状态
 }
