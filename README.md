@@ -271,7 +271,7 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2019/1226/140445_8d52e4d6_303698.png "屏幕截图.png")
 
-做测试类里能找到，下图是执行结果。看时间戳，就知道执行的顺序。每个执行单元都是睡1秒。
+在测试类里能找到，下图是执行结果。看时间戳，就知道执行的顺序。每个执行单元都是睡1秒。
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2019/1225/133828_0c76624c_303698.png "屏幕截图.png")
 
