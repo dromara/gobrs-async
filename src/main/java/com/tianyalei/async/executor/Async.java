@@ -24,6 +24,9 @@ public class Async {
                     new LinkedBlockingQueue<>(),
                     (ThreadFactory) Thread::new);
 
+    /**
+     * 如果想自定义线程池，请传pool。不自定义的话，就走默认的COMMON_POOL
+     */
     public static boolean beginWork(long timeout, ThreadPoolExecutor pool, WorkerWrapper... workerWrapper) throws ExecutionException, InterruptedException {
         if(workerWrapper == null || workerWrapper.length == 0) {
             return false;
