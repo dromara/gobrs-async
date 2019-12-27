@@ -38,7 +38,8 @@ public class WorkerWrapper<T, V> {
      */
     private List<WorkerWrapper<?, ?>> nextWrappers;
     /**
-     * 依赖的wrappers，必须依赖的全部完成后，才能执行自己
+     * 依赖的wrappers，有2种情况，1:必须依赖的全部完成后，才能执行自己 2:依赖的任何一个、多个完成了，就可以执行自己
+     * 通过must字段来控制是否依赖项必须完成
      * 1
      * -------3
      * 2
