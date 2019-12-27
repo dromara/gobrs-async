@@ -24,9 +24,9 @@ public class Async {
                     new LinkedBlockingQueue<>(),
                     (ThreadFactory) Thread::new);
 
-    public static void beginWork(long timeout, ThreadPoolExecutor pool, WorkerWrapper... workerWrapper) throws ExecutionException, InterruptedException {
+    public static boolean beginWork(long timeout, ThreadPoolExecutor pool, WorkerWrapper... workerWrapper) throws ExecutionException, InterruptedException {
         if(workerWrapper == null || workerWrapper.length == 0) {
-            return;
+            return false;
         }
         List<WorkerWrapper> workerWrappers =  Arrays.stream(workerWrapper).collect(Collectors.toList());
 
@@ -37,20 +37,22 @@ public class Async {
         }
         try {
             CompletableFuture.allOf(futures).get(timeout, TimeUnit.MILLISECONDS);
+            return true;
         } catch (TimeoutException e) {
             Set<WorkerWrapper> set = new HashSet<>();
             totalWorkers(workerWrappers, set);
             for (WorkerWrapper wrapper : set) {
                 wrapper.stopNow();
             }
+            return false;
         }
     }
 
     /**
      * 同步阻塞,直到所有都完成,或失败
      */
-    public static void beginWork(long timeout, WorkerWrapper... workerWrapper) throws ExecutionException, InterruptedException {
-        beginWork(timeout, COMMON_POOL, workerWrapper);
+    public static boolean beginWork(long timeout, WorkerWrapper... workerWrapper) throws ExecutionException, InterruptedException {
+        return beginWork(timeout, COMMON_POOL, workerWrapper);
     }
 
     /**
@@ -63,8 +65,12 @@ public class Async {
         IGroupCallback finalGroupCallback = groupCallback;
         CompletableFuture.runAsync(() -> {
             try {
-                beginWork(timeout, COMMON_POOL, workerWrapper);
-                finalGroupCallback.success(Arrays.asList(workerWrapper));
+                boolean success = beginWork(timeout, COMMON_POOL, workerWrapper);
+                if (success) {
+                    finalGroupCallback.success(Arrays.asList(workerWrapper));
+                } else {
+                    finalGroupCallback.failure(Arrays.asList(workerWrapper), new TimeoutException());
+                }
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
                 finalGroupCallback.failure(Arrays.asList(workerWrapper), e);
