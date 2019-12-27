@@ -33,7 +33,7 @@ public class Async {
         CompletableFuture[] futures = new CompletableFuture[workerWrappers.size()];
         for (int i = 0; i < workerWrappers.size(); i++) {
             WorkerWrapper wrapper = workerWrappers.get(i);
-            futures[i] = CompletableFuture.runAsync(() -> wrapper.work(COMMON_POOL, timeout), COMMON_POOL);
+            futures[i] = CompletableFuture.runAsync(() -> wrapper.work(COMMON_POOL, timeout), pool);
         }
         try {
             CompletableFuture.allOf(futures).get(timeout, TimeUnit.MILLISECONDS);
