@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * 最终要执行时，都要放到一个group里，group集合会并发所有的Wrapper
+ * 暂时用不上
  * @author wuweifeng wrote on 2019-11-19.
  */
 public class WorkerGroup {
@@ -53,31 +53,6 @@ public class WorkerGroup {
         return this;
     }
 
-    /**
-     * 添加需要串行执行的worker集合。一个wrapper可能只有一个worker，也可能是个要串行的worker集合
-     *
-     * @param workerWrapper workerWrapper
-     */
-    public WorkerGroup addWrapper(WorkerWrapper workerWrapper) {
-        if (workerWrapper == null) {
-            throw new NullPointerException("workerWrapper cannot be null");
-        }
-        workerWrapperList.add(workerWrapper);
-        return this;
-    }
-
-    /**
-     * 添加一个需要并行执行的worker
-     *
-     * @param iWorker iWorker
-     */
-    public <T, V> WorkerGroup addWrapper(IWorker<T, V> iWorker, T param, ICallback<T, V> iCallback) {
-        synchronized (this) {
-            WorkerWrapper<?, ?> workerWrapper = new WorkerWrapper<>(iWorker, param, iCallback);
-            workerWrapperList.add(workerWrapper);
-        }
-        return this;
-    }
 
     public WorkerGroup addWrappers(List<WorkerWrapper<?, ?>> workerWrappers) {
         if (workerWrappers == null) {
@@ -92,24 +67,6 @@ public class WorkerGroup {
             throw new NullPointerException("workers cannot be null");
         }
         return addWrappers(Arrays.asList(workerWrappers));
-    }
-
-    /**
-     * 添加一个不需要回调的worker
-     *
-     * @param iWorker async.worker
-     */
-    public <T, V> WorkerGroup addWrapper(IWorker<T, V> iWorker, T param) {
-        return this.addWrapper(iWorker, param, null);
-    }
-
-    /**
-     * 添加一个不需要回调的worker
-     *
-     * @param iWorker async.worker
-     */
-    public <T, V> WorkerGroup addWrapper(IWorker<T, V> iWorker) {
-        return this.addWrapper(iWorker, null);
     }
 
     /**

@@ -1,6 +1,8 @@
 package com.tianyalei.async.executor;
 
 
+import com.tianyalei.async.callback.DefaultGroupCallback;
+import com.tianyalei.async.callback.IGroupCallback;
 import com.tianyalei.async.group.WorkerWrapper;
 
 import java.util.Arrays;
@@ -11,6 +13,7 @@ import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
+ * 类入口，可以根据自己情况调整core线程的数量
  * @author wuweifeng wrote on 2019-12-18
  * @version 1.0
  */
@@ -48,6 +51,25 @@ public class Async {
      */
     public static void beginWork(long timeout, WorkerWrapper... workerWrapper) throws ExecutionException, InterruptedException {
         beginWork(timeout, COMMON_POOL, workerWrapper);
+    }
+
+    /**
+     * 异步执行,直到所有都完成,或失败后，发起回调
+     */
+    public static void beginWorkAsync(long timeout, IGroupCallback groupCallback, WorkerWrapper... workerWrapper) {
+        if (groupCallback == null) {
+            groupCallback = new DefaultGroupCallback();
+        }
+        IGroupCallback finalGroupCallback = groupCallback;
+        CompletableFuture.runAsync(() -> {
+            try {
+                beginWork(timeout, COMMON_POOL, workerWrapper);
+                finalGroupCallback.success(Arrays.asList(workerWrapper));
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+                finalGroupCallback.failure(Arrays.asList(workerWrapper), e);
+            }
+        });
     }
 
     /**
