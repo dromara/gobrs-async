@@ -24,7 +24,7 @@ public class WorkResult<V> {
         this.ex = ex;
     }
 
-    public static WorkResult defaultResult() {
+    public static <V> WorkResult<V> defaultResult() {
         return new WorkResult<>(null, ResultState.DEFAULT);
     }
 

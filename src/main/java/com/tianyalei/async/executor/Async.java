@@ -84,6 +84,7 @@ public class Async {
     /**
      * 总共多少个执行单元
      */
+    @SuppressWarnings("unchecked")
     private static void totalWorkers(List<WorkerWrapper> workerWrappers, Set<WorkerWrapper> set) {
         set.addAll(workerWrappers);
         for (WorkerWrapper wrapper : workerWrappers) {
