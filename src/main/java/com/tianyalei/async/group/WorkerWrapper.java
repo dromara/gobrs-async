@@ -78,7 +78,7 @@ public class WorkerWrapper<T, V> {
 
     /**
      * 开始工作
-     * fatherWrapper代表这次work是由哪个上游wrapper发起的
+     * fromWrapper代表这次work是由哪个上游wrapper发起的
      */
     private void work(ThreadPoolExecutor poolExecutor, WorkerWrapper fromWrapper, long remainTime) {
         long now = SystemClock.now();
@@ -88,7 +88,8 @@ public class WorkerWrapper<T, V> {
             beginNext(poolExecutor, now, remainTime);
             return;
         }
-        //如果自己已经执行过了。（可能有多个依赖，其中的一个依赖已经执行完了，并且自己也执行完了。当另一个依赖过来时，就不重复处理了）
+        //如果自己已经执行过了。
+        //可能有多个依赖，其中的一个依赖已经执行完了，并且自己也已开始执行或执行完毕。当另一个依赖执行完毕，又进来该方法时，就不重复处理了
         if (getState() != INIT) {
             beginNext(poolExecutor, now, remainTime);
             return;
@@ -101,17 +102,20 @@ public class WorkerWrapper<T, V> {
             return;
         }
 
-        //如果有前方依赖，存在两种情况
-        // 一种是前面只有一个wrapper。即 A  ->  B
-        //一种是前面有多个wrapper。A C D ->   B。需要A、C、D都完成了才能轮到B。但是无论是A执行完，还是C执行完，都会去唤醒B。
-        //所以需要B来做判断，必须A、C、D都完成，自己才能执行
+        /*如果有前方依赖，存在两种情况
+         一种是前面只有一个wrapper。即 A  ->  B
+        一种是前面有多个wrapper。A C D ->   B。需要A、C、D都完成了才能轮到B。但是无论是A执行完，还是C执行完，都会去唤醒B。
+        所以需要B来做判断，必须A、C、D都完成，自己才能执行 */
+
+        //只有一个依赖
         if (dependWrappers.size() == 1) {
             doDependsOneJob(fromWrapper);
             beginNext(poolExecutor, now, remainTime);
-            return;
+        } else {
+            //有多个依赖时
+            doDependsJobs(poolExecutor, dependWrappers, fromWrapper, now, remainTime);
         }
 
-        doDependsJobs(poolExecutor, dependWrappers, fromWrapper, now, remainTime);
     }
 
 
@@ -278,7 +282,7 @@ public class WorkerWrapper<T, V> {
             return workResult;
         }
         try {
-            //如果已经不是init状态了
+            //如果已经不是init状态了，说明正在被执行或已执行完毕。这一步很重要，可以保证任务不被重复执行
             if (!compareAndSetState(INIT, WORKING)) {
                 return workResult;
             }
