@@ -343,6 +343,17 @@ public class WorkerWrapper<T, V> {
     }
 
     /**
+     * 直接set Next
+     */
+    public WorkerWrapper setNext(WorkerWrapper<?, ?>... workerWrapper) {
+        if (nextWrappers != null) {
+            nextWrappers.clear();
+        }
+
+        return addNext(workerWrapper);
+    }
+
+    /**
      * 设置这几个依赖的wrapper不是must执行完毕才能执行自己
      */
     public void setDependNotMust(WorkerWrapper<?, ?>... workerWrapper) {
@@ -369,6 +380,12 @@ public class WorkerWrapper<T, V> {
     private void addDepend(WorkerWrapper<?, ?> workerWrapper, boolean must) {
         if (dependWrappers == null) {
             dependWrappers = new ArrayList<>();
+        }
+        //如果依赖的是重复的同一个，就不重复添加了
+        for (DependWrapper dependWrapper : dependWrappers) {
+            if (workerWrapper.equals(dependWrapper.getDependWrapper())) {
+                return;
+            }
         }
         dependWrappers.add(new DependWrapper(workerWrapper, must));
     }
