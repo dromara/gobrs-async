@@ -90,7 +90,7 @@ public class WorkerWrapper<T, V> {
         }
         //如果自己已经执行过了。
         //可能有多个依赖，其中的一个依赖已经执行完了，并且自己也已开始执行或执行完毕。当另一个依赖执行完毕，又进来该方法时，就不重复处理了
-        if (getState() != INIT) {
+        if (getState() == FINISH || getState() == ERROR) {
             beginNext(poolExecutor, now, remainTime);
             return;
         }
@@ -172,7 +172,7 @@ public class WorkerWrapper<T, V> {
         }
     }
 
-    private void doDependsJobs(ThreadPoolExecutor poolExecutor, List<DependWrapper> dependWrappers, WorkerWrapper fromWrapper, long now, long remainTime) {
+    private synchronized void doDependsJobs(ThreadPoolExecutor poolExecutor, List<DependWrapper> dependWrappers, WorkerWrapper fromWrapper, long now, long remainTime) {
         boolean nowDependIsMust = false;
         //创建必须完成的上游wrapper集合
         Set<DependWrapper> mustWrapper = new HashSet<>();
@@ -232,6 +232,7 @@ public class WorkerWrapper<T, V> {
             return;
         }
 
+        System.out.println(Thread.currentThread().getName()+"---" + existNoFinish);
         //如果上游都没有失败，分为两种情况，一种是都finish了，一种是有的在working
         //都finish的话
         if (!existNoFinish) {

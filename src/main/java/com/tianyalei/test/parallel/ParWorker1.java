@@ -10,11 +10,16 @@ import com.tianyalei.async.worker.WorkResult;
  * @author wuweifeng wrote on 2019-11-20.
  */
 public class ParWorker1 implements IWorker<String, String>, ICallback<String, String> {
+    private long sleepTime = 1000;
+
+    public void setSleepTime(long sleepTime) {
+        this.sleepTime = sleepTime;
+    }
 
     @Override
     public String action(String object) {
         try {
-            Thread.sleep(1000);
+            Thread.sleep(sleepTime);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
