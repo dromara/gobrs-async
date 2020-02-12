@@ -1,4 +1,4 @@
-package com.tianyalei.async.group;
+package com.tianyalei.async.wrapper;
 
 import com.tianyalei.async.callback.DefaultCallback;
 import com.tianyalei.async.callback.ICallback;
@@ -57,10 +57,20 @@ public class WorkerWrapper<T, V> {
      * 也是个钩子变量，用来存临时的结果
      */
     private volatile WorkResult<V> workResult = WorkResult.defaultResult();
+    /**
+     * 是否在执行自己前，去校验nextWrapper的执行结果<p>
+     *  1
+     *   -------3
+     *  2
+     * 如这种在2执行前，可能3已经执行完毕了（被1执行完后触发的），那么2就没必要执行了。
+     * 注意，该属性仅在nextWrapper数量<=1时有效，>1时的情况是不存在的
+     */
+    private volatile boolean checkNextWrapperResult;
 
     private static final int FINISH = 1;
     private static final int ERROR = 2;
     private static final int WORKING = 3;
+    private static final int SKIPPED = 4;
     private static final int INIT = 0;
 
     public WorkerWrapper(IWorker<T, V> worker, T param, ICallback<T, V> callback) {
@@ -93,6 +103,18 @@ public class WorkerWrapper<T, V> {
         if (getState() == FINISH || getState() == ERROR) {
             beginNext(poolExecutor, now, remainTime);
             return;
+        }
+
+        //如果在执行前需要校验nextWrapper的状态
+        if (checkNextWrapperResult) {
+            if (nextWrappers != null && nextWrappers.size() == 1) {
+                WorkerWrapper nextWrapper = nextWrappers.get(0);
+                if (nextWrapper.getState() == FINISH || nextWrapper.getState() == ERROR) {
+                    compareAndSetState(INIT, SKIPPED);
+                    beginNext(poolExecutor, now, remainTime);
+                    return;
+                }
+            }
         }
 
         //如果没有任何依赖，说明自己就是第一批要执行的
@@ -455,4 +477,11 @@ public class WorkerWrapper<T, V> {
         this.workResult = workResult;
     }
 
+    public boolean isCheckNextWrapperResult() {
+        return checkNextWrapperResult;
+    }
+
+    public void setCheckNextWrapperResult(boolean checkNextWrapperResult) {
+        this.checkNextWrapperResult = checkNextWrapperResult;
+    }
 }

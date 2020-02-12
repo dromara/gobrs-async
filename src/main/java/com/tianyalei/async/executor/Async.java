@@ -3,7 +3,7 @@ package com.tianyalei.async.executor;
 
 import com.tianyalei.async.callback.DefaultGroupCallback;
 import com.tianyalei.async.callback.IGroupCallback;
-import com.tianyalei.async.group.WorkerWrapper;
+import com.tianyalei.async.wrapper.WorkerWrapper;
 
 import java.util.Arrays;
 import java.util.HashSet;

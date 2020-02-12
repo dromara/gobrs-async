@@ -1,6 +1,6 @@
 package com.tianyalei.async.callback;
 
-import com.tianyalei.async.group.WorkerWrapper;
+import com.tianyalei.async.wrapper.WorkerWrapper;
 
 import java.util.List;
 

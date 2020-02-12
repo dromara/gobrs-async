@@ -1,7 +1,7 @@
 package com.tianyalei.test.depend;
 
 import com.tianyalei.async.executor.Async;
-import com.tianyalei.async.group.WorkerWrapper;
+import com.tianyalei.async.wrapper.WorkerWrapper;
 import com.tianyalei.async.worker.WorkResult;
 
 import java.util.concurrent.ExecutionException;

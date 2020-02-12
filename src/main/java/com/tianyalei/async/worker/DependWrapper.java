@@ -1,7 +1,7 @@
 package com.tianyalei.async.worker;
 
 
-import com.tianyalei.async.group.WorkerWrapper;
+import com.tianyalei.async.wrapper.WorkerWrapper;
 
 /**
  * 对依赖的wrapper的封装

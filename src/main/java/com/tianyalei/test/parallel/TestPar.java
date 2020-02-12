@@ -3,7 +3,7 @@ package com.tianyalei.test.parallel;
 
 import com.tianyalei.async.executor.Async;
 import com.tianyalei.async.executor.timer.SystemClock;
-import com.tianyalei.async.group.WorkerWrapper;
+import com.tianyalei.async.wrapper.WorkerWrapper;
 
 import java.util.concurrent.ExecutionException;
 

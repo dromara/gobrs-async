@@ -1,8 +1,5 @@
-package com.tianyalei.async.group;
+package com.tianyalei.async.wrapper;
 
-
-import com.tianyalei.async.callback.ICallback;
-import com.tianyalei.async.callback.IWorker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
