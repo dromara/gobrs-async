@@ -3,6 +3,7 @@ package com.tianyalei.async.wrapper;
 import com.tianyalei.async.callback.DefaultCallback;
 import com.tianyalei.async.callback.ICallback;
 import com.tianyalei.async.callback.IWorker;
+import com.tianyalei.async.exception.SkippedException;
 import com.tianyalei.async.executor.timer.SystemClock;
 import com.tianyalei.async.worker.DependWrapper;
 import com.tianyalei.async.worker.ResultState;
@@ -59,18 +60,17 @@ public class WorkerWrapper<T, V> {
     private volatile WorkResult<V> workResult = WorkResult.defaultResult();
     /**
      * 是否在执行自己前，去校验nextWrapper的执行结果<p>
-     *  1
-     *   -------3
-     *  2
-     * 如这种在2执行前，可能3已经执行完毕了（被1执行完后触发的），那么2就没必要执行了。
+     * 1   4
+     * -------3
+     * 2
+     * 如这种在4执行前，可能3已经执行完毕了（被2执行完后触发的），那么4就没必要执行了。
      * 注意，该属性仅在nextWrapper数量<=1时有效，>1时的情况是不存在的
      */
-    private volatile boolean checkNextWrapperResult;
+    private volatile boolean needCheckNextWrapperResult = true;
 
     private static final int FINISH = 1;
     private static final int ERROR = 2;
     private static final int WORKING = 3;
-    private static final int SKIPPED = 4;
     private static final int INIT = 0;
 
     public WorkerWrapper(IWorker<T, V> worker, T param, ICallback<T, V> callback) {
@@ -106,14 +106,12 @@ public class WorkerWrapper<T, V> {
         }
 
         //如果在执行前需要校验nextWrapper的状态
-        if (checkNextWrapperResult) {
-            if (nextWrappers != null && nextWrappers.size() == 1) {
-                WorkerWrapper nextWrapper = nextWrappers.get(0);
-                if (nextWrapper.getState() == FINISH || nextWrapper.getState() == ERROR) {
-                    compareAndSetState(INIT, SKIPPED);
-                    beginNext(poolExecutor, now, remainTime);
-                    return;
-                }
+        if (needCheckNextWrapperResult) {
+            //如果自己的next链上有已经出结果或已经开始执行的任务了，自己就不用继续了
+            if (!checkNextWrapperResult()) {
+                fastFail(INIT, new SkippedException());
+                beginNext(poolExecutor, now, remainTime);
+                return;
             }
         }
 
@@ -152,6 +150,21 @@ public class WorkerWrapper<T, V> {
         if (getState() == INIT || getState() == WORKING) {
             fastFail(getState(), null);
         }
+    }
+
+    /**
+     * 判断自己下游链路上，是否存在已经出结果的或已经开始执行的
+     * 如果没有返回true，如果有返回false
+     */
+    private boolean checkNextWrapperResult() {
+        //如果自己就是最后一个，或者后面有并行的多个，就返回true
+        if (nextWrappers == null || nextWrappers.size() != 1) {
+            return getState() == INIT;
+        }
+        WorkerWrapper nextWrapper = nextWrappers.get(0);
+        boolean state = nextWrapper.getState() == INIT;
+        //继续校验自己的next的状态
+        return state && nextWrapper.checkNextWrapperResult();
     }
 
     /**
@@ -254,7 +267,7 @@ public class WorkerWrapper<T, V> {
             return;
         }
 
-        System.out.println(Thread.currentThread().getName()+"---" + existNoFinish);
+        System.out.println(Thread.currentThread().getName() + "---" + existNoFinish);
         //如果上游都没有失败，分为两种情况，一种是都finish了，一种是有的在working
         //都finish的话
         if (!existNoFinish) {
@@ -279,7 +292,7 @@ public class WorkerWrapper<T, V> {
     private boolean fastFail(int expect, Exception e) {
         //试图将它从expect状态,改成Error
         if (!compareAndSetState(expect, ERROR)) {
-            System.out.println("compareAndSetState----------fail");
+//            System.out.println("compareAndSetState----------fail");
             return false;
         }
 
@@ -477,11 +490,11 @@ public class WorkerWrapper<T, V> {
         this.workResult = workResult;
     }
 
-    public boolean isCheckNextWrapperResult() {
-        return checkNextWrapperResult;
+    public boolean isNeedCheckNextWrapperResult() {
+        return needCheckNextWrapperResult;
     }
 
-    public void setCheckNextWrapperResult(boolean checkNextWrapperResult) {
-        this.checkNextWrapperResult = checkNextWrapperResult;
+    public void setNeedCheckNextWrapperResult(boolean needCheckNextWrapperResult) {
+        this.needCheckNextWrapperResult = needCheckNextWrapperResult;
     }
 }

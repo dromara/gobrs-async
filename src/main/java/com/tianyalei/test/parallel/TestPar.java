@@ -28,7 +28,8 @@ public class TestPar {
 //        testMulti5();
 //        testMulti6();
 //        testMulti7();
-        testMulti8();
+//        testMulti8();
+        testMulti9();
     }
 
     /**
@@ -376,6 +377,41 @@ public class TestPar {
         workerWrapper1.addNext(workerWrapper2);
 
         workerWrapper2.addNext(workerWrapper3);
+
+        Async.beginWork(6000, workerWrapper, workerWrapper1);
+        Async.shutDown();
+    }
+
+    /**
+     * w1 -> w2 -> w3
+     *            ---  last
+     * w
+     * w1和w并行，w执行完后就执行last，此时b、c还没开始，b、c就不需要执行了
+     */
+    private static void testMulti9() throws ExecutionException, InterruptedException {
+        ParWorker1 w1 = new ParWorker1();
+        //注意这里，如果w1的执行时间比w长，那么w2和w3肯定不走。 如果w1和w执行时间一样长，多运行几次，会发现w2有时走有时不走
+//        w1.setSleepTime(1100);
+
+        ParWorker w = new ParWorker();
+        ParWorker2 w2 = new ParWorker2();
+        ParWorker3 w3 = new ParWorker3();
+        ParWorker4 w4 = new ParWorker4();
+
+        WorkerWrapper<String, String> workerWrapper = new WorkerWrapper<>(w, "w", w);
+        WorkerWrapper<String, String> workerWrapper1 = new WorkerWrapper<>(w1, "w1", w1);
+        WorkerWrapper<String, String> workerWrapper2 = new WorkerWrapper<>(w2, "w2", w2);
+        WorkerWrapper<String, String> workerWrapper3 = new WorkerWrapper<>(w3, "w3", w3);
+        WorkerWrapper<String, String> last = new WorkerWrapper<>(w3, "last", w4);
+
+        workerWrapper1.addNext(workerWrapper2);
+        workerWrapper2.addNext(workerWrapper3);
+        workerWrapper3.addNext(last);
+
+        workerWrapper.addNext(last);
+
+        last.setDependNotMust(workerWrapper);
+        last.setDependNotMust(workerWrapper3);
 
         Async.beginWork(6000, workerWrapper, workerWrapper1);
         Async.shutDown();
