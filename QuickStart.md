@@ -132,9 +132,24 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
         ParWorker1 w1 = new ParWorker1();
         ParWorker2 w2 = new ParWorker2();
 
-        WorkerWrapper<String, String> workerWrapper = new WorkerWrapper<>(w, "0", w);
-        WorkerWrapper<String, String> workerWrapper1 = new WorkerWrapper<>(w1, "1", w1);
-        WorkerWrapper<String, String> workerWrapper2 = new WorkerWrapper<>(w2, "2", w2);
+        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w2)
+                .callback(w2)
+                .param("2")
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w1)
+                .callback(w1)
+                .param("1")
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+                .worker(w)
+                .callback(w)
+                .param("0")
+                .build();
+
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
@@ -144,11 +159,11 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
-        System.out.println(getThreadCount());
+        System.out.println(Async.getThreadCount());
 
         System.out.println(workerWrapper.getWorkResult());
-//        System.out.println(getThreadCount());
         Async.shutDown();
+       
 ```
 
 
@@ -161,32 +176,46 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
         ParWorker w = new ParWorker();
         ParWorker1 w1 = new ParWorker1();
         ParWorker2 w2 = new ParWorker2();
-        w2.setSleepTime(2000);
         ParWorker3 w3 = new ParWorker3();
 
-        WorkerWrapper<String, String> workerWrapper = new WorkerWrapper<>(w, "0", w);
-        WorkerWrapper<String, String> workerWrapper1 = new WorkerWrapper<>(w1, "1", w1);
-        WorkerWrapper<String, String> workerWrapper2 = new WorkerWrapper<>(w2, "2", w2);
-        WorkerWrapper<String, String> workerWrapper3 = new WorkerWrapper<>(w3, "3", w3);
+        WorkerWrapper<String, String> workerWrapper3 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w3)
+                .callback(w3)
+                .param("3")
+                .build();
 
-        workerWrapper.addNext(workerWrapper1, workerWrapper2);
-        workerWrapper1.addNext(workerWrapper3);
-        workerWrapper2.addNext(workerWrapper3);
+        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w2)
+                .callback(w2)
+                .param("2")
+                .next(workerWrapper3)
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w1)
+                .callback(w1)
+                .param("1")
+                .next(workerWrapper3)
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+                .worker(w)
+                .callback(w)
+                .param("0")
+                .next(workerWrapper1, workerWrapper2)
+                .build();
+
 
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        //正常完毕
-        Async.beginWork(4100, workerWrapper);
-        //3会超时
-//        Async.beginWork(3100, workerWrapper);
-        //2,3会超时
-//        Async.beginWork(2900, workerWrapper);
+        Async.beginWork(3100, workerWrapper);
+//        Async.beginWork(2100, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
 
-        System.out.println(getThreadCount());
+        System.out.println(Async.getThreadCount());
         Async.shutDown();
 ```
 
