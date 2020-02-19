@@ -24,7 +24,7 @@
  
  
  
- 2 many tasks in the form of Workflow
+ 2. Many tasks in the form of Workflow
  
  
  
