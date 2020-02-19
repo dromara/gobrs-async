@@ -12,27 +12,37 @@ import java.util.concurrent.ExecutionException;
  * @author wuweifeng wrote on 2019-11-20.
  */
 public class TestSequential {
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, ExecutionException {
 
 
         SeqWorker w = new SeqWorker();
         SeqWorker1 w1 = new SeqWorker1();
         SeqWorker2 w2 = new SeqWorker2();
 
-        SeqTimeoutWorker t = new SeqTimeoutWorker();
-        WorkerWrapper<String, String> workerWrapper = new WorkerWrapper<>(w, "0", w);
-        WorkerWrapper<String, String> workerWrapper1 = new WorkerWrapper<>(w1, "1", w1);
-        WorkerWrapper<String, String> workerWrapper2 = new WorkerWrapper<>(w2, "2", w2);
+        //顺序0-1-2
+        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w2)
+                .callback(w2)
+                .param("2")
+                .build();
 
-        //1在0后面串行
-        workerWrapper.addNext(workerWrapper1);
-        //2在1后面串行
-        workerWrapper1.addNext(workerWrapper2);
+        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w1)
+                .callback(w1)
+                .param("1")
+                .next(workerWrapper2)
+                .build();
 
+        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+                .worker(w)
+                .callback(w)
+                .param("0")
+                .next(workerWrapper1)
+                .build();
 
 //        testNormal(workerWrapper);
-//        testGroupTimeout(workerWrapper);
 
+        testGroupTimeout(workerWrapper);
     }
 
     private static void testNormal(WorkerWrapper<String, String> workerWrapper) throws ExecutionException, InterruptedException {

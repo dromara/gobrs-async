@@ -19,17 +19,29 @@ public class Test {
         DeWorker1 w1 = new DeWorker1();
         DeWorker2 w2 = new DeWorker2();
 
-        WorkerWrapper<String, User> workerWrapper = new WorkerWrapper<>(w, "0", w);
+        WorkerWrapper<WorkResult<User>, String> workerWrapper2 =  new WorkerWrapper.Builder<WorkResult<User>, String>()
+                .worker(w2)
+                .callback(w2)
+                .build();
+
+        WorkerWrapper<WorkResult<User>, User> workerWrapper1 = new WorkerWrapper.Builder<WorkResult<User>, User>()
+                .worker(w1)
+                .callback(w1)
+                .next(workerWrapper2)
+                .build();
+
+        WorkerWrapper<String, User> workerWrapper = new WorkerWrapper.Builder<String, User>()
+                .worker(w)
+                .param("0")
+                .next(workerWrapper1)
+                .callback(w)
+                .build();
         //虽然尚未执行，但是也可以先取得结果的引用，作为下一个任务的入参
         WorkResult<User> result = workerWrapper.getWorkResult();
-
-        WorkerWrapper<WorkResult<User>, User> workerWrapper1 = new WorkerWrapper<>(w1, result, w1);
         WorkResult<User> result1 = workerWrapper1.getWorkResult();
 
-        WorkerWrapper<WorkResult<User>, String> workerWrapper2 = new WorkerWrapper<>(w2, result1, w2);
-
-        workerWrapper.addNext(workerWrapper1);
-        workerWrapper1.addNext(workerWrapper2);
+        workerWrapper1.setParam(result);
+        workerWrapper2.setParam(result1);
 
         Async.beginWork(3500, workerWrapper);
 
