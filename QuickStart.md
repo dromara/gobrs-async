@@ -61,9 +61,6 @@ wrapper的泛型和worker的一样，决定了入参和结果的类型。
         WorkerWrapper<String, String> workerWrapper2 = new WorkerWrapper<>(w2, "2", w2);
         WorkerWrapper<String, String> workerWrapper3 = new WorkerWrapper<>(w3, "3", w3);
 
-        workerWrapper.addNext(workerWrapper1, workerWrapper2);
-        workerWrapper1.addNext(workerWrapper3);
-        workerWrapper2.addNext(workerWrapper3);
 ```
 
 如
@@ -72,7 +69,7 @@ wrapper的泛型和worker的一样，决定了入参和结果的类型。
     
   0执行完,同时1和2, 1\2都完成后3。3会等待2完成
   
-譬如，你可以定义一个 **worker** 
+此时，你可以定义一个 **worker** 
 
 ```
 /**
@@ -167,7 +164,6 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
 ```
 
 
-
 2.  1个执行完毕后，开启另外两个，另外两个执行完毕后，开始第4个
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2019/1226/140405_93800bc7_303698.png "屏幕截图.png")
@@ -218,6 +214,40 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
         System.out.println(Async.getThreadCount());
         Async.shutDown();
 ```
+
+如果觉得这样不符合左右的顺序，也可以用这种方式：
+
+```
+        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+                .worker(w)
+                .callback(w)
+                .param("0")
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper3 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w3)
+                .callback(w3)
+                .param("3")
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w2)
+                .callback(w2)
+                .param("2")
+                .depend(workerWrapper)
+                .next(workerWrapper3)
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w1)
+                .callback(w1)
+                .param("1")
+                .depend(workerWrapper)
+                .next(workerWrapper3)
+                .build();
+```
+
+
 
 3. 复杂点的
 
