@@ -25,11 +25,12 @@ public class TestPar {
 //        testMulti4();
 //        testMulti4Reverse();
 //        testMulti5();
-        testMulti5Reverse();
+//        testMulti5Reverse();
 //        testMulti6();
 //        testMulti7();
 //        testMulti8();
 //        testMulti9();
+        testMulti9Reverse();
     }
 
     /**
@@ -806,6 +807,60 @@ public class TestPar {
                 .callback(w1)
                 .param("w1")
                 .next(wrapperW2)
+                .build();
+
+        Async.beginWork(6000, wrapperW, wrapperW1);
+        Async.shutDown();
+    }
+
+    /**
+     * w1 -> w2 -> w3
+     *            ---  last
+     * w
+     * w1和w并行，w执行完后就执行last，此时b、c还没开始，b、c就不需要执行了
+     */
+    private static void testMulti9Reverse() throws ExecutionException, InterruptedException {
+        ParWorker1 w1 = new ParWorker1();
+        //注意这里，如果w1的执行时间比w长，那么w2和w3肯定不走。 如果w1和w执行时间一样长，多运行几次，会发现w2有时走有时不走
+//        w1.setSleepTime(1100);
+
+        ParWorker w = new ParWorker();
+        ParWorker2 w2 = new ParWorker2();
+        ParWorker3 w3 = new ParWorker3();
+        ParWorker4 w4 = new ParWorker4();
+
+        WorkerWrapper<String, String> wrapperW1 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w1)
+                .callback(w1)
+                .param("w1")
+                .build();
+
+        WorkerWrapper<String, String> wrapperW =  new WorkerWrapper.Builder<String, String>()
+                .worker(w)
+                .callback(w)
+                .param("w")
+                .build();
+
+        WorkerWrapper<String, String> last =  new WorkerWrapper.Builder<String, String>()
+                .worker(w1)
+                .callback(w1)
+                .param("last")
+                .depend(wrapperW)
+                .build();
+
+        WorkerWrapper<String, String> wrapperW2 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w2)
+                .callback(w2)
+                .param("w2")
+                .depend(wrapperW1)
+                .build();
+
+        WorkerWrapper<String, String> wrapperW3 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w3)
+                .callback(w3)
+                .param("w3")
+                .depend(wrapperW2)
+                .next(last, false)
                 .build();
 
         Async.beginWork(6000, wrapperW, wrapperW1);

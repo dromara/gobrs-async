@@ -542,9 +542,11 @@ public class WorkerWrapper<T, V> {
             }
             if (nextWrappers != null) {
                 for (WorkerWrapper<?, ?> workerWrapper : nextWrappers) {
-                    if (selfIsMustSet != null) {
-                        workerWrapper.addDepend(wrapper, selfIsMustSet.contains(workerWrapper));
+                    boolean must = false;
+                    if (selfIsMustSet != null && selfIsMustSet.contains(workerWrapper)) {
+                        must = true;
                     }
+                    workerWrapper.addDepend(wrapper, must);
                     wrapper.addNext(workerWrapper);
                 }
             }
