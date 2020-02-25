@@ -9,10 +9,7 @@ import com.jd.platform.async.worker.ResultState;
 import com.jd.platform.async.exception.SkippedException;
 import com.jd.platform.async.worker.WorkResult;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -171,7 +168,6 @@ public class WorkerWrapper<T, V> {
      * 进行下一个任务
      */
     private void beginNext(ThreadPoolExecutor poolExecutor, long now, long remainTime) {
-//        System.out.println("now is " + SystemClock.now() + " and thread count : " + getThreadCount());
         //花费的时间
         long costTime = SystemClock.now() - now;
         if (nextWrappers == null) {
@@ -291,7 +287,6 @@ public class WorkerWrapper<T, V> {
     private boolean fastFail(int expect, Exception e) {
         //试图将它从expect状态,改成Error
         if (!compareAndSetState(expect, ERROR)) {
-//            System.out.println("compareAndSetState----------fail");
             return false;
         }
 
@@ -365,16 +360,51 @@ public class WorkerWrapper<T, V> {
     }
 
     private void addDepend(WorkerWrapper<?, ?> workerWrapper, boolean must) {
+        addDepend(new DependWrapper(workerWrapper, must));
+    }
+
+    private void addDepend(DependWrapper dependWrapper) {
         if (dependWrappers == null) {
             dependWrappers = new ArrayList<>();
         }
         //如果依赖的是重复的同一个，就不重复添加了
-        for (DependWrapper dependWrapper : dependWrappers) {
-            if (workerWrapper.equals(dependWrapper.getDependWrapper())) {
+        for (DependWrapper wrapper : dependWrappers) {
+            if (wrapper.equals(dependWrapper)) {
                 return;
             }
         }
-        dependWrappers.add(new DependWrapper(workerWrapper, must));
+        dependWrappers.add(dependWrapper);
+    }
+
+    private void addNext(WorkerWrapper<?, ?> workerWrapper) {
+        if (nextWrappers == null) {
+            nextWrappers = new ArrayList<>();
+        }
+        //避免添加重复
+        for (WorkerWrapper wrapper : nextWrappers) {
+            if (workerWrapper.equals(wrapper)) {
+                return;
+            }
+        }
+        nextWrappers.add(workerWrapper);
+    }
+
+    private void addNextWrappers(List<WorkerWrapper<?, ?>> wrappers) {
+        if (wrappers == null) {
+            return;
+        }
+        for (WorkerWrapper<?, ?> wrapper : wrappers) {
+            addNext(wrapper);
+        }
+    }
+
+    private void addDependWrappers(List<DependWrapper> dependWrappers) {
+        if (dependWrappers == null) {
+            return;
+        }
+        for (DependWrapper wrapper : dependWrappers) {
+            addDepend(wrapper);
+        }
     }
 
     private WorkResult<V> defaultResult() {
@@ -403,11 +433,6 @@ public class WorkerWrapper<T, V> {
         this.needCheckNextWrapperResult = needCheckNextWrapperResult;
     }
 
-    private void setNextWrappers(List<WorkerWrapper<?, ?>> wrappers) {
-        this.nextWrappers = wrappers;
-    }
-
-
     public static class Builder<W, C> {
         /**
          * worker将来要处理的param
@@ -419,6 +444,10 @@ public class WorkerWrapper<T, V> {
          * 自己后面的所有
          */
         private List<WorkerWrapper<?, ?>> nextWrappers;
+        /**
+         * 自己依赖的所有
+         */
+        private List<DependWrapper> dependWrappers;
         /**
          * 存储强依赖于自己的wrapper集合
          */
@@ -443,6 +472,32 @@ public class WorkerWrapper<T, V> {
 
         public Builder<W, C> callback(ICallback<W, C> callback) {
             this.callback = callback;
+            return this;
+        }
+
+        public Builder<W, C> depend(WorkerWrapper<?, ?>... wrappers) {
+            if (wrappers == null) {
+                return this;
+            }
+            for (WorkerWrapper<?, ?> wrapper : wrappers) {
+                depend(wrapper);
+            }
+            return this;
+        }
+
+        public Builder<W, C> depend(WorkerWrapper<?, ?> wrapper) {
+            return depend(wrapper, true);
+        }
+
+        public Builder<W, C> depend(WorkerWrapper<?, ?> wrapper, boolean isMust) {
+            if (wrapper == null) {
+                return this;
+            }
+            DependWrapper dependWrapper = new DependWrapper(wrapper, isMust);
+            if (dependWrappers == null) {
+                dependWrappers = new ArrayList<>();
+            }
+            dependWrappers.add(dependWrapper);
             return this;
         }
 
@@ -471,24 +526,31 @@ public class WorkerWrapper<T, V> {
                 return this;
             }
             for (WorkerWrapper<?, ?> wrapper : wrappers) {
-                next(wrapper, true);
+                next(wrapper);
             }
             return this;
         }
 
-
         public WorkerWrapper<W, C> build() {
             WorkerWrapper<W, C> wrapper = new WorkerWrapper<>(worker, param, callback);
             wrapper.setNeedCheckNextWrapperResult(needCheckNextWrapperResult);
-            wrapper.setNextWrappers(nextWrappers);
-            if (nextWrappers != null && nextWrappers.size() > 0) {
+            if (dependWrappers != null) {
+                for (DependWrapper workerWrapper : dependWrappers) {
+                    workerWrapper.getDependWrapper().addNext(wrapper);
+                    wrapper.addDepend(workerWrapper);
+                }
+            }
+            if (nextWrappers != null) {
                 for (WorkerWrapper<?, ?> workerWrapper : nextWrappers) {
                     if (selfIsMustSet != null) {
                         workerWrapper.addDepend(wrapper, selfIsMustSet.contains(workerWrapper));
                     }
+                    wrapper.addNext(workerWrapper);
                 }
             }
+
             return wrapper;
         }
+
     }
 }

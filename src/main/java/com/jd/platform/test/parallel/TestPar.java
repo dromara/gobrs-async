@@ -18,10 +18,14 @@ public class TestPar {
 
 //        testNormal();
 //        testMulti();
+//        testMultiReverse();
 //        testMultiError2();
 //        testMulti3();
-        testMulti4();
+//        testMulti3Reverse();
+//        testMulti4();
+//        testMulti4Reverse();
 //        testMulti5();
+        testMulti5Reverse();
 //        testMulti6();
 //        testMulti7();
 //        testMulti8();
@@ -97,6 +101,47 @@ public class TestPar {
                 .param("0")
                 .next(workerWrapper1)
                 .build();
+
+        long now = SystemClock.now();
+        System.out.println("begin-" + now);
+
+        Async.beginWork(2500, workerWrapper, workerWrapper2);
+
+        System.out.println("end-" + SystemClock.now());
+        System.err.println("cost-" + (SystemClock.now() - now));
+
+        Async.shutDown();
+    }
+
+    /**
+     * 0,2同时开启,1在0后面
+     * 0---1
+     * 2
+     */
+    private static void testMultiReverse() throws ExecutionException, InterruptedException {
+        ParWorker w = new ParWorker();
+        ParWorker1 w1 = new ParWorker1();
+        ParWorker2 w2 = new ParWorker2();
+
+        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+                .worker(w)
+                .callback(w)
+                .param("0")
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w1)
+                .callback(w1)
+                .param("1")
+                .depend(workerWrapper)
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w2)
+                .callback(w2)
+                .param("2")
+                .build();
+
 
         long now = SystemClock.now();
         System.out.println("begin-" + now);
@@ -204,6 +249,60 @@ public class TestPar {
     }
 
     /**
+     * 0执行完,同时1和2, 1\2都完成后3
+     *     1
+     * 0       3
+     *     2
+     */
+    private static void testMulti3Reverse() throws ExecutionException, InterruptedException {
+        ParWorker w = new ParWorker();
+        ParWorker1 w1 = new ParWorker1();
+        ParWorker2 w2 = new ParWorker2();
+        ParWorker3 w3 = new ParWorker3();
+
+        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+                .worker(w)
+                .callback(w)
+                .param("0")
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w2)
+                .callback(w2)
+                .param("2")
+                .depend(workerWrapper)
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w1)
+                .callback(w1)
+                .param("1")
+                .depend(workerWrapper)
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper3 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w3)
+                .callback(w3)
+                .param("3")
+                .depend(workerWrapper1, workerWrapper2)
+                .build();
+
+
+        long now = SystemClock.now();
+        System.out.println("begin-" + now);
+
+        Async.beginWork(3100, workerWrapper);
+//        Async.beginWork(2100, workerWrapper);
+
+        System.out.println("end-" + SystemClock.now());
+        System.err.println("cost-" + (SystemClock.now() - now));
+
+        System.out.println(Async.getThreadCount());
+        Async.shutDown();
+    }
+
+
+    /**
      * 0执行完,同时1和2, 1\2都完成后3，2耗时2秒，1耗时1秒。3会等待2完成
      *     1
      * 0       3
@@ -245,6 +344,68 @@ public class TestPar {
                 .callback(w)
                 .param("0")
                 .next(workerWrapper1, workerWrapper2)
+                .build();
+
+        long now = SystemClock.now();
+        System.out.println("begin-" + now);
+
+        //正常完毕
+        Async.beginWork(4100, workerWrapper);
+        //3会超时
+//        Async.beginWork(3100, workerWrapper);
+        //2,3会超时
+//        Async.beginWork(2900, workerWrapper);
+
+        System.out.println("end-" + SystemClock.now());
+        System.err.println("cost-" + (SystemClock.now() - now));
+
+        System.out.println(Async.getThreadCount());
+        Async.shutDown();
+    }
+
+    /**
+     * 0执行完,同时1和2, 1\2都完成后3，2耗时2秒，1耗时1秒。3会等待2完成
+     *     1
+     * 0       3
+     *     2
+     *
+     * 执行结果0，1，2，3
+     */
+    private static void testMulti4Reverse() throws ExecutionException, InterruptedException {
+        ParWorker w = new ParWorker();
+        ParWorker1 w1 = new ParWorker1();
+
+        ParWorker2 w2 = new ParWorker2();
+        w2.setSleepTime(2000);
+
+        ParWorker3 w3 = new ParWorker3();
+
+        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+                .worker(w)
+                .callback(w)
+                .param("0")
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper3 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w3)
+                .callback(w3)
+                .param("3")
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w2)
+                .callback(w2)
+                .param("2")
+                .depend(workerWrapper)
+                .next(workerWrapper3)
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w1)
+                .callback(w1)
+                .param("1")
+                .depend(workerWrapper)
+                .next(workerWrapper3)
                 .build();
 
         long now = SystemClock.now();
@@ -310,6 +471,70 @@ public class TestPar {
                 .param("0")
                 .next(workerWrapper1, workerWrapper2)
                 .build();
+
+        long now = SystemClock.now();
+        System.out.println("begin-" + now);
+
+        //正常完毕
+        Async.beginWork(4100, workerWrapper);
+
+        System.out.println("end-" + SystemClock.now());
+        System.err.println("cost-" + (SystemClock.now() - now));
+
+        System.out.println(Async.getThreadCount());
+        Async.shutDown();
+    }
+
+
+    /**
+     * 0执行完,同时1和2, 1\2 任何一个执行完后，都执行3
+     *     1
+     * 0       3
+     *     2
+     *
+     * 则结果是：
+     * 0，2，3，1
+     * 2，3分别是500、400.3执行完毕后，1才执行完
+     */
+    private static void testMulti5Reverse() throws ExecutionException, InterruptedException {
+        ParWorker w = new ParWorker();
+        ParWorker1 w1 = new ParWorker1();
+
+        ParWorker2 w2 = new ParWorker2();
+        w2.setSleepTime(500);
+
+        ParWorker3 w3 = new ParWorker3();
+        w3.setSleepTime(400);
+
+        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+                .worker(w)
+                .callback(w)
+                .param("0")
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper3 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w3)
+                .callback(w3)
+                .param("3")
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w2)
+                .callback(w2)
+                .param("2")
+                .depend(workerWrapper, true)
+                .next(workerWrapper3, false)
+                .build();
+
+        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+                .worker(w1)
+                .callback(w1)
+                .param("1")
+                .depend(workerWrapper, true)
+                .next(workerWrapper3, false)
+                .build();
+
+
 
         long now = SystemClock.now();
         System.out.println("begin-" + now);
