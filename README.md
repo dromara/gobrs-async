@@ -105,7 +105,6 @@
 
  **该框架支持后面的执行单元以前面的执行单元的结果为自己的入参** 。譬如你的执行单元B的入参是ResultA，ResultA就是A的执行结果，那也可以支持。在编排时，就可以预先设定B或C的入参为A的result，即便此时A尚未开始执行。当A执行完毕后，自然会把结果传递到B的入参去。
 
- **该框架全程无锁。** 
 
 ## 快速开始
 [点此开启实战](https://gitee.com/tianyalei/asyncTool/blob/master/QuickStart.md)
