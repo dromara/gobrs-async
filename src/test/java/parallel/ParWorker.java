@@ -1,4 +1,4 @@
-package com.jd.platform.test.parallel;
+package parallel;
 
 
 import com.jd.platform.async.callback.ICallback;
@@ -9,27 +9,22 @@ import com.jd.platform.async.worker.WorkResult;
 /**
  * @author wuweifeng wrote on 2019-11-20.
  */
-public class ParWorker2 implements IWorker<String, String>, ICallback<String, String> {
-    private long sleepTime = 1000;
-
-    public void setSleepTime(long sleepTime) {
-        this.sleepTime = sleepTime;
-    }
+public class ParWorker implements IWorker<String, String>, ICallback<String, String> {
 
     @Override
     public String action(String object) {
         try {
-            Thread.sleep(sleepTime);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return "result = " + SystemClock.now() + "---param = " + object + " from 2";
+        return "result = " + SystemClock.now() + "---param = " + object + " from 0";
     }
 
 
     @Override
     public String defaultValue() {
-        return "worker2--default";
+        return "worker0--default";
     }
 
     @Override
@@ -40,10 +35,10 @@ public class ParWorker2 implements IWorker<String, String>, ICallback<String, St
     @Override
     public void result(boolean success, String param, WorkResult<String> workResult) {
         if (success) {
-            System.out.println("callback worker2 success--" + SystemClock.now() + "----" + workResult.getResult()
+            System.out.println("callback worker0 success--" + SystemClock.now() + "----" + workResult.getResult()
                     + "-threadName:" +Thread.currentThread().getName());
         } else {
-            System.err.println("callback worker2 failure--" + SystemClock.now() + "----"  + workResult.getResult()
+            System.err.println("callback worker0 failure--" + SystemClock.now() + "----"  + workResult.getResult()
                     + "-threadName:" +Thread.currentThread().getName());
         }
     }

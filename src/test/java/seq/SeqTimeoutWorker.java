@@ -1,4 +1,4 @@
-package com.jd.platform.test.parallel;
+package seq;
 
 
 import com.jd.platform.async.callback.ICallback;
@@ -9,7 +9,7 @@ import com.jd.platform.async.worker.WorkResult;
 /**
  * @author wuweifeng wrote on 2019-11-20.
  */
-public class ParWorker implements IWorker<String, String>, ICallback<String, String> {
+public class SeqTimeoutWorker implements IWorker<String, String>, ICallback<String, String> {
 
     @Override
     public String action(String object) {
@@ -20,7 +20,6 @@ public class ParWorker implements IWorker<String, String>, ICallback<String, Str
         }
         return "result = " + SystemClock.now() + "---param = " + object + " from 0";
     }
-
 
     @Override
     public String defaultValue() {

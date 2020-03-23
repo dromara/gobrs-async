@@ -1,4 +1,4 @@
-package com.jd.platform.test.seq;
+package seq;
 
 
 import com.jd.platform.async.callback.ICallback;

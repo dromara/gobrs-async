@@ -1,8 +1,8 @@
-package com.jd.platform.test.depend;
+package depend;
 
 import com.jd.platform.async.executor.Async;
-import com.jd.platform.async.wrapper.WorkerWrapper;
 import com.jd.platform.async.worker.WorkResult;
+import com.jd.platform.async.wrapper.WorkerWrapper;
 
 import java.util.concurrent.ExecutionException;
 

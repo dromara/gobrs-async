@@ -1,4 +1,4 @@
-package com.jd.platform.test.parallel;
+package parallel;
 
 
 import com.jd.platform.async.executor.Async;

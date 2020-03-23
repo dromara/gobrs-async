@@ -1,4 +1,4 @@
-package com.jd.platform.test.seq;
+package seq;
 
 
 import com.jd.platform.async.callback.ICallback;
@@ -9,7 +9,7 @@ import com.jd.platform.async.worker.WorkResult;
 /**
  * @author wuweifeng wrote on 2019-11-20.
  */
-public class SeqTimeoutWorker implements IWorker<String, String>, ICallback<String, String> {
+public class SeqWorker1 implements IWorker<String, String>, ICallback<String, String> {
 
     @Override
     public String action(String object) {
@@ -23,7 +23,7 @@ public class SeqTimeoutWorker implements IWorker<String, String>, ICallback<Stri
 
     @Override
     public String defaultValue() {
-        return "worker0--default";
+        return "worker1--default";
     }
 
     @Override
@@ -34,10 +34,10 @@ public class SeqTimeoutWorker implements IWorker<String, String>, ICallback<Stri
     @Override
     public void result(boolean success, String param, WorkResult<String> workResult) {
         if (success) {
-            System.out.println("callback worker0 success--" + SystemClock.now() + "----" + workResult.getResult()
+            System.out.println("callback worker1 success--" + SystemClock.now() + "----" + workResult.getResult()
                     + "-threadName:" +Thread.currentThread().getName());
         } else {
-            System.err.println("callback worker0 failure--" + SystemClock.now() + "----"  + workResult.getResult()
+            System.err.println("callback worker1 failure--" + SystemClock.now() + "----"  + workResult.getResult()
                     + "-threadName:" +Thread.currentThread().getName());
         }
     }

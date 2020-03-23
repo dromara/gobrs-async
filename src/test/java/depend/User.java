@@ -1,4 +1,4 @@
-package com.jd.platform.test.depend;
+package depend;
 
 /**
  * 一个包装类

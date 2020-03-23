@@ -1,4 +1,4 @@
-package com.jd.platform.test.depend;
+package depend;
 
 
 import com.jd.platform.async.callback.ICallback;
@@ -8,17 +8,16 @@ import com.jd.platform.async.worker.WorkResult;
 /**
  * @author wuweifeng wrote on 2019-11-20.
  */
-public class DeWorker1 implements IWorker<WorkResult<User>, User>, ICallback<WorkResult<User>, User> {
+public class DeWorker implements IWorker<String, User>, ICallback<String, User> {
 
     @Override
-    public User action(WorkResult<User> result) {
-        System.out.println("par1的入参来自于par0： " + result.getResult());
+    public User action(String object) {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return new User("user1");
+        return new User("user0");
     }
 
 
@@ -33,8 +32,8 @@ public class DeWorker1 implements IWorker<WorkResult<User>, User>, ICallback<Wor
     }
 
     @Override
-    public void result(boolean success, WorkResult<User> param, WorkResult<User> workResult) {
-        System.out.println("worker1 的结果是：" + workResult.getResult());
+    public void result(boolean success, String param, WorkResult<User> workResult) {
+        System.out.println("worker0 的结果是：" + workResult.getResult());
     }
 
 }
