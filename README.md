@@ -1,3 +1,5 @@
+注意，该框架我已转移到公司账号：https://gitee.com/jd-platform-opensource/asyncTool  下。更新时会优先更新公司账号，本账号会不定期同步。
+
 # 并行框架说明
 有问题、或者有特定的场景需求可以给作者发邮件说明，感谢您的意见。wuweifeng10@jd.com, liwangyang@jd.com
 
