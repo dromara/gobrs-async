@@ -106,6 +106,6 @@
 
 
 ## 快速开始
-[点此开启实战](https://gitee.com/tianyalei/asyncTool/blob/master/QuickStart.md)
+[点此开启实战](https://gitee.com/jd-platform-opensource/asyncTool/blob/master/QuickStart.md)
 
 
