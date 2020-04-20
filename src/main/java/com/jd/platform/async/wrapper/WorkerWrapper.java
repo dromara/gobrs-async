@@ -433,6 +433,30 @@ public class WorkerWrapper<T, V> {
         this.needCheckNextWrapperResult = needCheckNextWrapperResult;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)  {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        WorkerWrapper<?, ?> that = (WorkerWrapper<?, ?>) o;
+        return needCheckNextWrapperResult == that.needCheckNextWrapperResult &&
+                Objects.equals(param, that.param) &&
+                Objects.equals(worker, that.worker) &&
+                Objects.equals(callback, that.callback) &&
+                Objects.equals(nextWrappers, that.nextWrappers) &&
+                Objects.equals(dependWrappers, that.dependWrappers) &&
+                Objects.equals(state, that.state) &&
+                Objects.equals(workResult, that.workResult);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(param, worker, callback, nextWrappers, dependWrappers, state, workResult, needCheckNextWrapperResult);
+    }
+
     public static class Builder<W, C> {
         /**
          * worker将来要处理的param
