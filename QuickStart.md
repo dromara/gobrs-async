@@ -9,7 +9,29 @@
                 <version>1.3.1-SNAPSHOT</version>
             </dependency>
 ```
-外网不可访问，可通过下载代码打jar包的形式引用
+外网请使用jitpack.io上打的包
+先添加repositories节点
+
+```
+        <repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+```
+然后添加如下maven依赖
+
+```
+        <dependency>
+	    <groupId>com.gitee.jd-platform-opensource</groupId>
+	    <artifactId>asyncTool</artifactId>
+	    <version>V1.2-SNAPSHOT</version>
+	</dependency>
+```
+
+
+
 
 #### 基本组件
 worker：  一个最小的任务执行单元。通常是一个网络调用，或一段耗时操作。
