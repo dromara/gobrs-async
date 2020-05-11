@@ -292,7 +292,12 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
 
 ![输入图片说明](https://images.gitee.com/uploads/images/2019/1225/133828_0c76624c_303698.png "屏幕截图.png")
 
-4.  其他的详见test包下的测试类，支持各种形式的组合、编排。
+4. 依赖别的worker执行结果作为入参
+
+可以从action的参数中根据wrapper的id获取任意一个执行单元的执行结果，但请注意执行顺序，如果尚未执行，则在调用WorkerResult.getResult()会得到null！
+![输入图片说明](https://images.gitee.com/uploads/images/2020/0511/215924_28af8655_303698.png "屏幕截图.png")![输入图片说明](https://images.gitee.com/uploads/images/2020/0511/215933_12e13dba_303698.png "屏幕截图.png")
+
+5.  其他的详见test包下的测试类，支持各种形式的组合、编排。
 
 
 
