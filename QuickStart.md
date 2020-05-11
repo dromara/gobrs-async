@@ -26,7 +26,7 @@
         <dependency>
 	    <groupId>com.gitee.jd-platform-opensource</groupId>
 	    <artifactId>asyncTool</artifactId>
-	    <version>V1.2-SNAPSHOT</version>
+	    <version>V1.3-SNAPSHOT</version>
 	</dependency>
 ```
 
@@ -54,7 +54,7 @@ public interface IWorker<T, V> {
      * @param object
      *         object
      */
-    V action(T object);
+    V action(T object, Map<String, WorkerWrapper> allWrappers);
 
     /**
      * 超时、异常时，返回的默认值
