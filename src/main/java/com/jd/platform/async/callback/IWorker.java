@@ -1,5 +1,9 @@
 package com.jd.platform.async.callback;
 
+import com.jd.platform.async.wrapper.WorkerWrapper;
+
+import java.util.Map;
+
 /**
  * 每个最小执行单元需要实现该接口
  * @author wuweifeng wrote on 2019-11-19.
@@ -11,7 +15,7 @@ public interface IWorker<T, V> {
      * @param object
      *         object
      */
-    V action(T object);
+    V action(T object, Map<String, WorkerWrapper> allWrappers);
 
     /**
      * 超时、异常时，返回的默认值

@@ -3,10 +3,10 @@ package com.jd.platform.async.wrapper;
 import com.jd.platform.async.callback.DefaultCallback;
 import com.jd.platform.async.callback.ICallback;
 import com.jd.platform.async.callback.IWorker;
+import com.jd.platform.async.exception.SkippedException;
 import com.jd.platform.async.executor.timer.SystemClock;
 import com.jd.platform.async.worker.DependWrapper;
 import com.jd.platform.async.worker.ResultState;
-import com.jd.platform.async.exception.SkippedException;
 import com.jd.platform.async.worker.WorkResult;
 
 import java.util.*;
@@ -21,6 +21,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author wuweifeng wrote on 2019-11-19.
  */
 public class WorkerWrapper<T, V> {
+    /**
+     * 该wrapper的唯一标识
+     */
+    private String id;
     /**
      * worker将来要处理的param
      */
@@ -52,6 +56,10 @@ public class WorkerWrapper<T, V> {
      */
     private AtomicInteger state = new AtomicInteger(0);
     /**
+     * 该map存放所有wrapper的id和wrapper映射
+     */
+    private Map<String, WorkerWrapper> forParamUseWrappers;
+    /**
      * 也是个钩子变量，用来存临时的结果
      */
     private volatile WorkResult<V> workResult = WorkResult.defaultResult();
@@ -70,12 +78,13 @@ public class WorkerWrapper<T, V> {
     private static final int WORKING = 3;
     private static final int INIT = 0;
 
-    private WorkerWrapper(IWorker<T, V> worker, T param, ICallback<T, V> callback) {
+    private WorkerWrapper(String id, IWorker<T, V> worker, T param, ICallback<T, V> callback) {
         if (worker == null) {
             throw new NullPointerException("async.worker is null");
         }
         this.worker = worker;
         this.param = param;
+        this.id = id;
         //允许不设置回调
         if (callback == null) {
             callback = new DefaultCallback<>();
@@ -87,7 +96,10 @@ public class WorkerWrapper<T, V> {
      * 开始工作
      * fromWrapper代表这次work是由哪个上游wrapper发起的
      */
-    private void work(ThreadPoolExecutor poolExecutor, WorkerWrapper fromWrapper, long remainTime) {
+    private void work(ThreadPoolExecutor poolExecutor, WorkerWrapper fromWrapper, long remainTime, Map<String, WorkerWrapper> forParamUseWrappers) {
+        this.forParamUseWrappers = forParamUseWrappers;
+        //将自己放到所有wrapper的集合里去
+        forParamUseWrappers.put(id, this);
         long now = SystemClock.now();
         //总的已经超时了，就快速失败，进行下一个
         if (remainTime <= 0) {
@@ -136,8 +148,8 @@ public class WorkerWrapper<T, V> {
     }
 
 
-    public void work(ThreadPoolExecutor poolExecutor, long remainTime) {
-        work(poolExecutor, null, remainTime);
+    public void work(ThreadPoolExecutor poolExecutor, long remainTime, Map<String, WorkerWrapper> forParamUseWrappers) {
+        work(poolExecutor, null, remainTime, forParamUseWrappers);
     }
 
     /**
@@ -174,14 +186,14 @@ public class WorkerWrapper<T, V> {
             return;
         }
         if (nextWrappers.size() == 1) {
-            nextWrappers.get(0).work(poolExecutor, WorkerWrapper.this, remainTime - costTime);
+            nextWrappers.get(0).work(poolExecutor, WorkerWrapper.this, remainTime - costTime, forParamUseWrappers);
             return;
         }
         CompletableFuture[] futures = new CompletableFuture[nextWrappers.size()];
         for (int i = 0; i < nextWrappers.size(); i++) {
             int finalI = i;
             futures[i] = CompletableFuture.runAsync(() -> nextWrappers.get(finalI)
-                    .work(poolExecutor, WorkerWrapper.this, remainTime - costTime), poolExecutor);
+                    .work(poolExecutor, WorkerWrapper.this, remainTime - costTime, forParamUseWrappers), poolExecutor);
         }
         try {
             CompletableFuture.allOf(futures).get();
@@ -320,7 +332,7 @@ public class WorkerWrapper<T, V> {
             callback.begin();
 
             //执行耗时操作
-            V resultValue = worker.action(param);
+            V resultValue = worker.action(param, forParamUseWrappers);
 
             //如果状态不是在working,说明别的地方已经修改了
             if (!compareAndSetState(WORKING, FINISH)) {
@@ -425,6 +437,10 @@ public class WorkerWrapper<T, V> {
         return state.get();
     }
 
+    public String getId() {
+        return id;
+    }
+
     private boolean compareAndSetState(int expect, int update) {
         return this.state.compareAndSet(expect, update);
     }
@@ -459,6 +475,10 @@ public class WorkerWrapper<T, V> {
 
     public static class Builder<W, C> {
         /**
+         * 该wrapper的唯一标识
+         */
+        private String id = UUID.randomUUID().toString();
+        /**
          * worker将来要处理的param
          */
         private W param;
@@ -486,6 +506,13 @@ public class WorkerWrapper<T, V> {
 
         public Builder<W, C> param(W w) {
             this.param = w;
+            return this;
+        }
+
+        public Builder<W, C> id(String id) {
+            if (id != null) {
+                this.id = id;
+            }
             return this;
         }
 
@@ -556,7 +583,7 @@ public class WorkerWrapper<T, V> {
         }
 
         public WorkerWrapper<W, C> build() {
-            WorkerWrapper<W, C> wrapper = new WorkerWrapper<>(worker, param, callback);
+            WorkerWrapper<W, C> wrapper = new WorkerWrapper<>(id, worker, param, callback);
             wrapper.setNeedCheckNextWrapperResult(needCheckNextWrapperResult);
             if (dependWrappers != null) {
                 for (DependWrapper workerWrapper : dependWrappers) {
