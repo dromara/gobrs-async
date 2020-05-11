@@ -1,5 +1,38 @@
 如果只是需要用这个框架，请往下看即可。如果需要深入了解这个框架是如何一步一步实现的，从接到需求，到每一步的思考，每个类为什么这么设计，为什么有这些方法，也就是如何从0到1开发出这个框架，作者在[csdn开了专栏](https://blog.csdn.net/tianyaleixiaowu/category_9637010.html)专门讲中间件如何从0开发，包括并不限于这个小框架。京东内部同事可在cf上搜索erp也能看到。
 
+京东同事通过引用如下maven来使用。
+
+```
+            <dependency>
+                <groupId>com.jd.platform</groupId>
+                <artifactId>asyncTool</artifactId>
+                <version>1.3.1-SNAPSHOT</version>
+            </dependency>
+```
+外网请使用jitpack.io上打的包
+先添加repositories节点
+
+```
+        <repositories>
+		<repository>
+		    <id>jitpack.io</id>
+		    <url>https://jitpack.io</url>
+		</repository>
+	</repositories>
+```
+然后添加如下maven依赖
+
+```
+        <dependency>
+	    <groupId>com.gitee.jd-platform-opensource</groupId>
+	    <artifactId>asyncTool</artifactId>
+	    <version>V1.2-SNAPSHOT</version>
+	</dependency>
+```
+
+
+
+
 #### 基本组件
 worker：  一个最小的任务执行单元。通常是一个网络调用，或一段耗时操作。
 
