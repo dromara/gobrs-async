@@ -36,7 +36,7 @@ public class Test {
                 .worker(w)
                 .param("0")
                 .id("first")
-                .next(workerWrapper1)
+                .next(workerWrapper1, true)
                 .callback(w)
                 .build();
 
@@ -46,9 +46,6 @@ public class Test {
         WorkResult<User> result1 = workerWrapper1.getWorkResult();
         workerWrapper1.setParam(result);
         workerWrapper2.setParam(result1);
-
-
-
 
         Async.beginWork(3500, workerWrapper);
 
