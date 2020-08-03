@@ -7,7 +7,7 @@
 
 有对区块链感兴趣的，可以参考项目作者另一个[GVP项目](https://gitee.com/tianyalei/md_blockchain)，java区块链底层入门。
 
-有对高并发场景下，被热key打爆存储层，秒杀等场景中热数据本地缓存、热数据（刷子用户）限流等需要热key探测的，可关注[京东热key探测缓存框架](http://https://gitee.com/jd-platform-opensource/hotkey)。热key框架正在灰度内测期，已上线3000台服务器进行灰度。
+有对高并发场景下，被热key打爆存储层，秒杀等场景中热数据本地缓存、热数据（刷子用户）限流等需要热key探测的，可关注[京东热key探测缓存框架](http://https://gitee.com/jd-platform-opensource/hotkey)。热key框架正在灰度内测期，各项指标优异。
 
 
 ## 并行常见的场景

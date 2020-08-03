@@ -281,7 +281,6 @@ public class WorkerWrapper<T, V> {
             //上游都finish了，进行自己
             fire();
             beginNext(poolExecutor, now, remainTime);
-            return;
         }
     }
 
