@@ -71,7 +71,7 @@ public class Async {
             groupCallback = new DefaultGroupCallback();
         }
         IGroupCallback finalGroupCallback = groupCallback;
-        CompletableFuture.runAsync(() -> {
+        COMMON_POOL.submit(() -> {
             try {
                 boolean success = beginWork(timeout, COMMON_POOL, workerWrapper);
                 if (success) {
