@@ -6,7 +6,7 @@
             <dependency>
                 <groupId>com.jd.platform</groupId>
                 <artifactId>asyncTool</artifactId>
-                <version>1.3.1-SNAPSHOT</version>
+                <version>1.4.1-SNAPSHOT</version>
             </dependency>
 ```
 外网请使用jitpack.io上打的包
@@ -26,7 +26,7 @@
         <dependency>
 	    <groupId>com.gitee.jd-platform-opensource</groupId>
 	    <artifactId>asyncTool</artifactId>
-	    <version>V1.3-SNAPSHOT</version>
+	    <version>V1.4-SNAPSHOT</version>
 	</dependency>
 ```
 
