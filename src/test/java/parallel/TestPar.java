@@ -6,6 +6,7 @@ import com.jd.platform.async.executor.timer.SystemClock;
 import com.jd.platform.async.wrapper.WorkerWrapper;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 
 /**
  * 并行测试
@@ -863,7 +864,7 @@ public class TestPar {
                 .next(last, false)
                 .build();
 
-        Async.beginWork(6000, wrapperW, wrapperW1);
+        Async.beginWork(6000,Executors.newCachedThreadPool(),  wrapperW, wrapperW1);
         Async.shutDown();
     }
 }
