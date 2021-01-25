@@ -20,7 +20,9 @@ public class Async {
                     15L, TimeUnit.SECONDS,
                     new LinkedBlockingQueue<>(),
                     (ThreadFactory) Thread::new);
-
+    /**
+     * 注意，这里是个static，也就是只能有一个线程池。用户自定义线程池时，也只能定义一个
+     */
     private static ExecutorService executorService;
 
     /**
@@ -130,6 +132,13 @@ public class Async {
      * 关闭线程池
      */
     public static void shutDown() {
+        shutDown(executorService);
+    }
+
+    /**
+     * 关闭线程池
+     */
+    public static void shutDown(ExecutorService executorService) {
         if (executorService != null) {
             executorService.shutdown();
         } else {
