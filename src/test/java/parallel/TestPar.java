@@ -578,19 +578,19 @@ public class TestPar {
                 .param("3")
                 .build();
 
-        //设置2不是必须，1是必须的
+        //设置2不是必须
         WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("2")
-                .next(workerWrapper3)
+                .next(workerWrapper3, false)
                 .build();
-
+        // 设置1是必须的
         WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("1")
-                .next(workerWrapper3)
+                .next(workerWrapper3, true)
                 .build();
 
         WorkerWrapper<String, String> workerWrapper0 =  new WorkerWrapper.Builder<String, String>()
