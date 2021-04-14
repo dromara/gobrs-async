@@ -15,6 +15,9 @@ import java.util.stream.Collectors;
  * @version 1.0
  */
 public class Async {
+    /**
+     * 默认线程池
+     */
     private static final ThreadPoolExecutor COMMON_POOL =
             new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors() * 2, 1024,
                     15L, TimeUnit.SECONDS,
@@ -72,10 +75,14 @@ public class Async {
         return beginWork(timeout, COMMON_POOL, workerWrapper);
     }
 
+    public static void beginWorkAsync(long timeout, IGroupCallback groupCallback, WorkerWrapper... workerWrapper) {
+        beginWorkAsync(timeout, COMMON_POOL, groupCallback, workerWrapper);
+    }
+
     /**
      * 异步执行,直到所有都完成,或失败后，发起回调
      */
-    public static void beginWorkAsync(long timeout, IGroupCallback groupCallback, WorkerWrapper... workerWrapper) {
+    public static void beginWorkAsync(long timeout, ExecutorService executorService, IGroupCallback groupCallback, WorkerWrapper... workerWrapper) {
         if (groupCallback == null) {
             groupCallback = new DefaultGroupCallback();
         }
@@ -83,7 +90,7 @@ public class Async {
         if (executorService != null) {
             executorService.submit(() -> {
                 try {
-                    boolean success = beginWork(timeout, COMMON_POOL, workerWrapper);
+                    boolean success = beginWork(timeout, executorService, workerWrapper);
                     if (success) {
                         finalGroupCallback.success(Arrays.asList(workerWrapper));
                     } else {
