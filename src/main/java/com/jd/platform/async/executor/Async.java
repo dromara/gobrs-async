@@ -15,11 +15,10 @@ import java.util.stream.Collectors;
  * @version 1.0
  */
 public class Async {
-    private static final ThreadPoolExecutor COMMON_POOL =
-            new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors() * 2, 1024,
-                    15L, TimeUnit.SECONDS,
-                    new LinkedBlockingQueue<>(),
-                    (ThreadFactory) Thread::new);
+    /**
+     * 默认不定长线程池
+     */
+    private static final ThreadPoolExecutor COMMON_POOL = (ThreadPoolExecutor) Executors.newCachedThreadPool();
     /**
      * 注意，这里是个static，也就是只能有一个线程池。用户自定义线程池时，也只能定义一个
      */
