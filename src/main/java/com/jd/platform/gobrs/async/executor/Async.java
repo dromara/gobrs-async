@@ -27,7 +27,7 @@ public class Async {
     /**
      * 出发点
      */
-    public static boolean beginPlan(long timeout, ExecutorService executorService, List<TaskWrapper> taskWrappers) throws ExecutionException, InterruptedException {
+    public static boolean beginTaskFlow(long timeout, ExecutorService executorService, List<TaskWrapper> taskWrappers) throws ExecutionException, InterruptedException {
         if(taskWrappers == null || taskWrappers.size() == 0) {
             return false;
         }
@@ -56,29 +56,29 @@ public class Async {
     /**
      * 如果想自定义线程池，请传pool。不自定义的话，就走默认的COMMON_POOL
      */
-    public static boolean beginPlan(long timeout, ExecutorService executorService, TaskWrapper... workerWrapper) throws ExecutionException, InterruptedException {
+    public static boolean beginTaskFlow(long timeout, ExecutorService executorService, TaskWrapper... workerWrapper) throws ExecutionException, InterruptedException {
         if(workerWrapper == null || workerWrapper.length == 0) {
             return false;
         }
         List<TaskWrapper> taskWrappers =  Arrays.stream(workerWrapper).collect(Collectors.toList());
-        return beginPlan(timeout, executorService, taskWrappers);
+        return beginTaskFlow(timeout, executorService, taskWrappers);
     }
 
     /**
      * 同步阻塞,直到所有都完成,或失败
      */
-    public static boolean beginPlan(long timeout, TaskWrapper... workerWrapper) throws ExecutionException, InterruptedException {
-        return beginPlan(timeout, COMMON_POOL, workerWrapper);
+    public static boolean beginTaskFlow(long timeout, TaskWrapper... workerWrapper) throws ExecutionException, InterruptedException {
+        return beginTaskFlow(timeout, COMMON_POOL, workerWrapper);
     }
 
-    public static void beginPlanAsync(long timeout, IGroupCallback groupCallback, TaskWrapper... workerWrapper) {
-        beginPlanAsync(timeout, COMMON_POOL, groupCallback, workerWrapper);
+    public static void beginTaskFlowAsync(long timeout, IGroupCallback groupCallback, TaskWrapper... workerWrapper) {
+        beginTaskFlowAsync(timeout, COMMON_POOL, groupCallback, workerWrapper);
     }
 
     /**
      * 异步执行,直到所有都完成,或失败后，发起回调
      */
-    public static void beginPlanAsync(long timeout, ExecutorService executorService, IGroupCallback groupCallback, TaskWrapper... workerWrapper) {
+    public static void beginTaskFlowAsync(long timeout, ExecutorService executorService, IGroupCallback groupCallback, TaskWrapper... workerWrapper) {
         if (groupCallback == null) {
             groupCallback = new DefaultGroupCallback();
         }
@@ -86,7 +86,7 @@ public class Async {
         if (executorService != null) {
             executorService.submit(() -> {
                 try {
-                    boolean success = beginPlan(timeout, executorService, workerWrapper);
+                    boolean success = beginTaskFlow(timeout, executorService, workerWrapper);
                     if (success) {
                         finalGroupCallback.success(Arrays.asList(workerWrapper));
                     } else {
@@ -100,7 +100,7 @@ public class Async {
         } else {
             COMMON_POOL.submit(() -> {
                 try {
-                    boolean success = beginPlan(timeout, COMMON_POOL, workerWrapper);
+                    boolean success = beginTaskFlow(timeout, COMMON_POOL, workerWrapper);
                     if (success) {
                         finalGroupCallback.success(Arrays.asList(workerWrapper));
                     } else {

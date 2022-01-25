@@ -185,9 +185,9 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginPlan(1500, workerWrapper, workerWrapper1, workerWrapper2);
-//        Async.beginPlan(800, workerWrapper, workerWrapper1, workerWrapper2);
-//        Async.beginPlan(1000, workerWrapper, workerWrapper1, workerWrapper2);
+        Async.beginTaskFlow(1500, workerWrapper, workerWrapper1, workerWrapper2);
+//        Async.beginTaskFlow(800, workerWrapper, workerWrapper1, workerWrapper2);
+//        Async.beginTaskFlow(1000, workerWrapper, workerWrapper1, workerWrapper2);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -240,8 +240,8 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginPlan(3100, workerWrapper);
-//        Async.beginPlan(2100, workerWrapper);
+        Async.beginTaskFlow(3100, workerWrapper);
+//        Async.beginTaskFlow(2100, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));

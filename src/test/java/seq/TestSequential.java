@@ -49,7 +49,7 @@ public class TestSequential {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginPlan(3500, workerWrapper);
+        Async.beginTaskFlow(3500, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -61,7 +61,7 @@ public class TestSequential {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginPlan(2500, workerWrapper);
+        Async.beginTaskFlow(2500, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));

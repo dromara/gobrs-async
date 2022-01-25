@@ -40,7 +40,7 @@ public class Test {
 
         //V1.3后，不用给wrapper setParam了，直接在worker的action里自行根据id获取即可
 
-        Async.beginPlan(3500, workerWrapper);
+        Async.beginTaskFlow(3500, workerWrapper);
 
         System.out.println(workerWrapper2.getWorkResult());
         Async.shutDown();

@@ -27,4 +27,15 @@ public interface IWorker<T, V> {
     default V defaultValue() {
         return null;
     }
+
+    /**
+     * 根据业务实现 判断是否需要执行当前task
+     * @param t
+     * @return
+     */
+    default boolean nessary(T t) {
+        return true;
+    }
+
+
 }

@@ -56,7 +56,7 @@ public class TestSequentialTimeout {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginPlan(5000, workerWrapperT);
+        Async.beginTaskFlow(5000, workerWrapperT);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));

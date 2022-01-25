@@ -103,7 +103,7 @@ public class TaskWrapper<T, V> {
         long now = SystemClock.now();
         //总的已经超时了，就快速失败，进行下一个
         if (remainTime <= 0) {
-            fastFail(INIT, null);
+            taskFail(INIT, null);
             nextTask(executorService, now, remainTime);
             return;
         }
@@ -118,7 +118,7 @@ public class TaskWrapper<T, V> {
         if (needCheckNextWrapperResult) {
             //如果自己的next链上有已经出结果或已经开始执行的任务了，自己就不用继续了 ，有结果返回fales 直接进行下一个task  并return
             if (!checkNextWrapperResult()) {
-                fastFail(INIT, new SkippedException());
+                taskFail(INIT, new SkippedException());
                 nextTask(executorService, now, remainTime);
                 return;
             }
@@ -126,7 +126,7 @@ public class TaskWrapper<T, V> {
 
         //如果没有任何依赖，说明自己就是第一批要执行的
         if (dependWrappers == null || dependWrappers.size() == 0) {
-            fire();
+            doTask();
             nextTask(executorService, now, remainTime);
             return;
         }
@@ -157,7 +157,7 @@ public class TaskWrapper<T, V> {
      */
     public void stopNow() {
         if (getState() == INIT || getState() == WORKING) {
-            fastFail(getState(), null);
+            taskFail(getState(), null);
         }
     }
 
@@ -205,13 +205,13 @@ public class TaskWrapper<T, V> {
     private void doDependsOneJob(TaskWrapper dependWrapper) {
         if (ResultState.TIMEOUT == dependWrapper.getWorkResult().getResultState()) {
             workResult = defaultResult();
-            fastFail(INIT, null);
+            taskFail(INIT, null);
         } else if (ResultState.EXCEPTION == dependWrapper.getWorkResult().getResultState()) {
             workResult = defaultExResult(dependWrapper.getWorkResult().getEx());
-            fastFail(INIT, null);
+            taskFail(INIT, null);
         } else {
             //前面任务正常完毕了，该自己了
-            fire();
+            doTask();
         }
     }
 
@@ -231,9 +231,9 @@ public class TaskWrapper<T, V> {
         //如果全部是不必须的条件，那么只要到了这里，就执行自己。
         if (mustWrapper.size() == 0) {
             if (ResultState.TIMEOUT == fromWrapper.getWorkResult().getResultState()) {
-                fastFail(INIT, null);
+                taskFail(INIT, null);
             } else {
-                fire();
+                doTask();
             }
             nextTask(executorService, now, remainTime);
             return;
@@ -270,7 +270,7 @@ public class TaskWrapper<T, V> {
         }
         //只要有失败的
         if (hasError) {
-            fastFail(INIT, null);
+            taskFail(INIT, null);
             nextTask(executorService, now, remainTime);
             return;
         }
@@ -279,7 +279,7 @@ public class TaskWrapper<T, V> {
         //都finish的话
         if (!existNoFinish) {
             //上游都finish了，进行自己
-            fire();
+            doTask();
             nextTask(executorService, now, remainTime);
             return;
         }
@@ -288,16 +288,17 @@ public class TaskWrapper<T, V> {
     /**
      * 执行自己的job.具体的执行是在另一个线程里,但判断阻塞超时是在work线程
      */
-    private void fire() {
+    private void doTask() {
         //阻塞取结果
-        workResult = workerDoJob();
+        workResult = doTaskDep();
     }
 
     /**
-     * 快速失败
+     * taskFail
+     * 任务失败
      */
-    private boolean fastFail(int expect, Exception e) {
-        //试图将它从expect状态,改成Error
+    private boolean taskFail(int expect, Exception e) {
+        //试图将它从expect状态,改成Error CAS 无锁设置
         if (!compareAndSetState(expect, ERROR)) {
             return false;
         }
@@ -316,9 +317,15 @@ public class TaskWrapper<T, V> {
     }
 
     /**
-     * 具体的单个worker执行任务
+     * 真正的的单个task执行任务 action
      */
-    private TaskResult<V> workerDoJob() {
+    private TaskResult<V> doTaskDep() {
+        //  先判断自己是否需要执行
+        if (!worker.nessary(param)) {
+            workResult.setResultState(ResultState.SUCCESS);
+            workResult.setResult(null);
+            return workResult;
+        }
         //避免重复执行
         if (!checkIsNullResult()) {
             return workResult;
@@ -350,7 +357,7 @@ public class TaskWrapper<T, V> {
             if (!checkIsNullResult()) {
                 return workResult;
             }
-            fastFail(WORKING, e);
+            taskFail(WORKING, e);
             return workResult;
         }
     }
@@ -451,7 +458,7 @@ public class TaskWrapper<T, V> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)  {
+        if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {

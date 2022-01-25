@@ -63,9 +63,9 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginPlan(1500, workerWrapper, workerWrapper1, workerWrapper2);
-//        Async.beginPlan(800, workerWrapper, workerWrapper1, workerWrapper2);
-//        Async.beginPlan(1000, workerWrapper, workerWrapper1, workerWrapper2);
+        Async.beginTaskFlow(1500, workerWrapper, workerWrapper1, workerWrapper2);
+//        Async.beginTaskFlow(800, workerWrapper, workerWrapper1, workerWrapper2);
+//        Async.beginTaskFlow(1000, workerWrapper, workerWrapper1, workerWrapper2);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -107,7 +107,7 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginPlan(2500, workerWrapper, workerWrapper2);
+        Async.beginTaskFlow(2500, workerWrapper, workerWrapper2);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -148,7 +148,7 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginPlan(2500, workerWrapper, workerWrapper2);
+        Async.beginTaskFlow(2500, workerWrapper, workerWrapper2);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -189,7 +189,7 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginPlan(1500, workerWrapper, workerWrapper2);
+        Async.beginTaskFlow(1500, workerWrapper, workerWrapper2);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -240,8 +240,9 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginPlan(3100, workerWrapper);
-//        Async.beginPlan(2100, workerWrapper);
+        Async.beginTaskFlow(3100, workerWrapper);
+        workerWrapper.getWorkResult().getResult();
+//        Async.beginTaskFlow(2100, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -293,8 +294,8 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginPlan(3100, workerWrapper);
-//        Async.beginPlan(2100, workerWrapper);
+        Async.beginTaskFlow(3100, workerWrapper);
+//        Async.beginTaskFlow(2100, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -352,11 +353,11 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginPlan(4100, workerWrapper);
+        Async.beginTaskFlow(4100, workerWrapper);
         //3会超时
-//        Async.beginPlan(3100, workerWrapper);
+//        Async.beginTaskFlow(3100, workerWrapper);
         //2,3会超时
-//        Async.beginPlan(2900, workerWrapper);
+//        Async.beginTaskFlow(2900, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -414,11 +415,11 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginPlan(4100, workerWrapper);
+        Async.beginTaskFlow(4100, workerWrapper);
         //3会超时
-//        Async.beginPlan(3100, workerWrapper);
+//        Async.beginTaskFlow(3100, workerWrapper);
         //2,3会超时
-//        Async.beginPlan(2900, workerWrapper);
+//        Async.beginTaskFlow(2900, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -478,7 +479,7 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginPlan(4100, workerWrapper);
+        Async.beginTaskFlow(4100, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -542,7 +543,7 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginPlan(4100, workerWrapper);
+        Async.beginTaskFlow(4100, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -605,7 +606,7 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginPlan(4100, workerWrapper0);
+        Async.beginTaskFlow(4100, workerWrapper0);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -704,7 +705,7 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginPlan(4100, workerWrapper00, workerWrapper0);
+        Async.beginTaskFlow(4100, workerWrapper00, workerWrapper0);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -756,7 +757,7 @@ public class TestPar {
                 .build();
 
 
-        Async.beginPlan(6000, workerWrappera1, workerWrappera2);
+        Async.beginTaskFlow(6000, workerWrappera1, workerWrappera2);
         Async.shutDown();
     }
 
@@ -810,7 +811,7 @@ public class TestPar {
                 .next(wrapperW2)
                 .build();
 
-        Async.beginPlan(6000, wrapperW, wrapperW1);
+        Async.beginTaskFlow(6000, wrapperW, wrapperW1);
         Async.shutDown();
     }
 
@@ -864,7 +865,7 @@ public class TestPar {
                 .next(last, false)
                 .build();
 
-        Async.beginPlan(6000,Executors.newCachedThreadPool(),  wrapperW, wrapperW1);
+        Async.beginTaskFlow(6000,Executors.newCachedThreadPool(),  wrapperW, wrapperW1);
         Async.shutDown();
     }
 }

@@ -47,7 +47,7 @@ public class Test {
         workerWrapper1.setParam(result);
         workerWrapper2.setParam(result1);
 
-        Async.beginPlan(3500, workerWrapper);
+        Async.beginTaskFlow(3500, workerWrapper);
 
         System.out.println(workerWrapper2.getWorkResult());
         Async.shutDown();
