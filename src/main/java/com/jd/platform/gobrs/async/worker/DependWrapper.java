@@ -1,15 +1,15 @@
-package com.jd.platform.async.worker;
+package com.jd.platform.gobrs.async.worker;
 
 
-import com.jd.platform.async.wrapper.WorkerWrapper;
+import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
 
 /**
  * 对依赖的wrapper的封装
- * @author wuweifeng wrote on 2019-12-20
+ * @author sizegang wrote on 2019-12-20
  * @version 1.0
  */
 public class DependWrapper {
-    private WorkerWrapper<?, ?> dependWrapper;
+    private TaskWrapper<?, ?> dependWrapper;
     /**
      * 是否该依赖必须完成后才能执行自己.<p>
      * 因为存在一个任务，依赖于多个任务，是让这多个任务全部完成后才执行自己，还是某几个执行完毕就可以执行自己
@@ -25,7 +25,7 @@ public class DependWrapper {
      */
     private boolean must = true;
 
-    public DependWrapper(WorkerWrapper<?, ?> dependWrapper, boolean must) {
+    public DependWrapper(TaskWrapper<?, ?> dependWrapper, boolean must) {
         this.dependWrapper = dependWrapper;
         this.must = must;
     }
@@ -33,11 +33,11 @@ public class DependWrapper {
     public DependWrapper() {
     }
 
-    public WorkerWrapper<?, ?> getDependWrapper() {
+    public TaskWrapper<?, ?> getDependWrapper() {
         return dependWrapper;
     }
 
-    public void setDependWrapper(WorkerWrapper<?, ?> dependWrapper) {
+    public void setDependWrapper(TaskWrapper<?, ?> dependWrapper) {
         this.dependWrapper = dependWrapper;
     }
 

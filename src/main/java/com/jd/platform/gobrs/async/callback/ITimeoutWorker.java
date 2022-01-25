@@ -1,7 +1,7 @@
-package com.jd.platform.async.callback;
+package com.jd.platform.gobrs.async.callback;
 
 /**
- * @author wuweifeng wrote on 2019-12-20
+ * @author sizegang wrote on 2019-12-20
  * @version 1.0
  */
 public interface ITimeoutWorker<T, V> extends IWorker<T, V> {

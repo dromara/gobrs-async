@@ -1,13 +1,13 @@
-package com.jd.platform.async.callback;
+package com.jd.platform.gobrs.async.callback;
 
 import java.util.Map;
 
-import com.jd.platform.async.wrapper.WorkerWrapper;
+import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
 
 /**
  * 每个最小执行单元需要实现该接口
  *
- * @author wuweifeng wrote on 2019-11-19.
+ * @author sizegang wrote on 2019-11-19.
  */
 @FunctionalInterface
 public interface IWorker<T, V> {
@@ -17,7 +17,7 @@ public interface IWorker<T, V> {
      * @param object      object
      * @param allWrappers 任务包装
      */
-    V action(T object, Map<String, WorkerWrapper> allWrappers);
+    V action(T object, Map<String, TaskWrapper> allWrappers);
 
     /**
      * 超时、异常时，返回的默认值

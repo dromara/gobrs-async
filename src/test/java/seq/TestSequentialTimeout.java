@@ -1,15 +1,15 @@
 package seq;
 
 
-import com.jd.platform.async.executor.Async;
-import com.jd.platform.async.executor.timer.SystemClock;
-import com.jd.platform.async.wrapper.WorkerWrapper;
+import com.jd.platform.gobrs.async.executor.Async;
+import com.jd.platform.gobrs.async.executor.timer.SystemClock;
+import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
 
 import java.util.concurrent.ExecutionException;
 
 /**
  * 串行测试
- * @author wuweifeng wrote on 2019-11-20.
+ * @author sizegang wrote on 2019-11-20.
  */
 @SuppressWarnings("Duplicates")
 public class TestSequentialTimeout {
@@ -30,13 +30,13 @@ public class TestSequentialTimeout {
         SeqWorker2 w2 = new SeqWorker2();
         SeqTimeoutWorker t = new SeqTimeoutWorker();
 
-        WorkerWrapper<String, String> workerWrapper2 = new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper2 = new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("2")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper1 = new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper1 = new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("1")
@@ -45,7 +45,7 @@ public class TestSequentialTimeout {
 
         //2在1后面串行
         //T会超时
-        WorkerWrapper<String, String> workerWrapperT = new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapperT = new TaskWrapper.Builder<String, String>()
                 .worker(t)
                 .callback(t)
                 .param("t")
@@ -56,7 +56,7 @@ public class TestSequentialTimeout {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginWork(5000, workerWrapperT);
+        Async.beginPlan(5000, workerWrapperT);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));

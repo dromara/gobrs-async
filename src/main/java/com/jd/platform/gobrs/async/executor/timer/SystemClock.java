@@ -1,8 +1,7 @@
-package com.jd.platform.async.executor.timer;
+package com.jd.platform.gobrs.async.executor.timer;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 

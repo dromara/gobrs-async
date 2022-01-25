@@ -1,8 +1,8 @@
-package com.jd.platform.async.worker;
+package com.jd.platform.gobrs.async.worker;
 
 /**
  * 结果状态
- * @author wuweifeng wrote on 2019-11-19.
+ * @author sizegang wrote on 2019-11-19.
  */
 public enum ResultState {
     SUCCESS,

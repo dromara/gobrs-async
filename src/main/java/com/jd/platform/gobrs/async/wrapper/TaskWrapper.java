@@ -1,13 +1,13 @@
-package com.jd.platform.async.wrapper;
+package com.jd.platform.gobrs.async.wrapper;
 
-import com.jd.platform.async.callback.DefaultCallback;
-import com.jd.platform.async.callback.ICallback;
-import com.jd.platform.async.callback.IWorker;
-import com.jd.platform.async.exception.SkippedException;
-import com.jd.platform.async.executor.timer.SystemClock;
-import com.jd.platform.async.worker.DependWrapper;
-import com.jd.platform.async.worker.ResultState;
-import com.jd.platform.async.worker.WorkResult;
+import com.jd.platform.gobrs.async.callback.DefaultCallback;
+import com.jd.platform.gobrs.async.callback.ICallback;
+import com.jd.platform.gobrs.async.callback.IWorker;
+import com.jd.platform.gobrs.async.exception.SkippedException;
+import com.jd.platform.gobrs.async.executor.timer.SystemClock;
+import com.jd.platform.gobrs.async.worker.DependWrapper;
+import com.jd.platform.gobrs.async.worker.ResultState;
+import com.jd.platform.gobrs.async.worker.TaskResult;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -18,9 +18,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 对每个worker及callback进行包装，一对一
  *
- * @author wuweifeng wrote on 2019-11-19.
+ * @author sizegang wrote on 2019-11-19.
  */
-public class WorkerWrapper<T, V> {
+public class TaskWrapper<T, V> {
     /**
      * 该wrapper的唯一标识
      */
@@ -38,7 +38,7 @@ public class WorkerWrapper<T, V> {
      * -------3
      * 如1后面有2、3
      */
-    private List<WorkerWrapper<?, ?>> nextWrappers;
+    private List<TaskWrapper<?, ?>> nextWrappers;
     /**
      * 依赖的wrappers，有2种情况，1:必须依赖的全部完成后，才能执行自己 2:依赖的任何一个、多个完成了，就可以执行自己
      * 通过must字段来控制是否依赖项必须完成
@@ -58,11 +58,11 @@ public class WorkerWrapper<T, V> {
     /**
      * 该map存放所有wrapper的id和wrapper映射
      */
-    private Map<String, WorkerWrapper> forParamUseWrappers;
+    private Map<String, TaskWrapper> forParamUseWrappers;
     /**
      * 也是个钩子变量，用来存临时的结果
      */
-    private volatile WorkResult<V> workResult = WorkResult.defaultResult();
+    private volatile TaskResult<V> workResult = TaskResult.defaultResult();
     /**
      * 是否在执行自己前，去校验nextWrapper的执行结果<p>
      * 1   4
@@ -78,7 +78,7 @@ public class WorkerWrapper<T, V> {
     private static final int WORKING = 3;
     private static final int INIT = 0;
 
-    private WorkerWrapper(String id, IWorker<T, V> worker, T param, ICallback<T, V> callback) {
+    private TaskWrapper(String id, IWorker<T, V> worker, T param, ICallback<T, V> callback) {
         if (worker == null) {
             throw new NullPointerException("async.worker is null");
         }
@@ -96,7 +96,7 @@ public class WorkerWrapper<T, V> {
      * 开始工作
      * fromWrapper代表这次work是由哪个上游wrapper发起的
      */
-    private void work(ExecutorService executorService, WorkerWrapper fromWrapper, long remainTime, Map<String, WorkerWrapper> forParamUseWrappers) {
+    private void task(ExecutorService executorService, TaskWrapper fromWrapper, long remainTime, Map<String, TaskWrapper> forParamUseWrappers) {
         this.forParamUseWrappers = forParamUseWrappers;
         //将自己放到所有wrapper的集合里去
         forParamUseWrappers.put(id, this);
@@ -104,22 +104,22 @@ public class WorkerWrapper<T, V> {
         //总的已经超时了，就快速失败，进行下一个
         if (remainTime <= 0) {
             fastFail(INIT, null);
-            beginNext(executorService, now, remainTime);
+            nextTask(executorService, now, remainTime);
             return;
         }
         //如果自己已经执行过了。
         //可能有多个依赖，其中的一个依赖已经执行完了，并且自己也已开始执行或执行完毕。当另一个依赖执行完毕，又进来该方法时，就不重复处理了
         if (getState() == FINISH || getState() == ERROR) {
-            beginNext(executorService, now, remainTime);
+            nextTask(executorService, now, remainTime);
             return;
         }
 
-        //如果在执行前需要校验nextWrapper的状态
+        //如果在执行前需要校验nextWrapper的状态  默认true
         if (needCheckNextWrapperResult) {
-            //如果自己的next链上有已经出结果或已经开始执行的任务了，自己就不用继续了
+            //如果自己的next链上有已经出结果或已经开始执行的任务了，自己就不用继续了 ，有结果返回fales 直接进行下一个task  并return
             if (!checkNextWrapperResult()) {
                 fastFail(INIT, new SkippedException());
-                beginNext(executorService, now, remainTime);
+                nextTask(executorService, now, remainTime);
                 return;
             }
         }
@@ -127,7 +127,7 @@ public class WorkerWrapper<T, V> {
         //如果没有任何依赖，说明自己就是第一批要执行的
         if (dependWrappers == null || dependWrappers.size() == 0) {
             fire();
-            beginNext(executorService, now, remainTime);
+            nextTask(executorService, now, remainTime);
             return;
         }
 
@@ -139,7 +139,7 @@ public class WorkerWrapper<T, V> {
         //只有一个依赖
         if (dependWrappers.size() == 1) {
             doDependsOneJob(fromWrapper);
-            beginNext(executorService, now, remainTime);
+            nextTask(executorService, now, remainTime);
         } else {
             //有多个依赖时
             doDependsJobs(executorService, dependWrappers, fromWrapper, now, remainTime);
@@ -148,8 +148,8 @@ public class WorkerWrapper<T, V> {
     }
 
 
-    public void work(ExecutorService executorService, long remainTime, Map<String, WorkerWrapper> forParamUseWrappers) {
-        work(executorService, null, remainTime, forParamUseWrappers);
+    public void task(ExecutorService executorService, long remainTime, Map<String, TaskWrapper> forParamUseWrappers) {
+        task(executorService, null, remainTime, forParamUseWrappers);
     }
 
     /**
@@ -170,7 +170,7 @@ public class WorkerWrapper<T, V> {
         if (nextWrappers == null || nextWrappers.size() != 1) {
             return getState() == INIT;
         }
-        WorkerWrapper nextWrapper = nextWrappers.get(0);
+        TaskWrapper nextWrapper = nextWrappers.get(0);
         boolean state = nextWrapper.getState() == INIT;
         //继续校验自己的next的状态
         return state && nextWrapper.checkNextWrapperResult();
@@ -179,21 +179,21 @@ public class WorkerWrapper<T, V> {
     /**
      * 进行下一个任务
      */
-    private void beginNext(ExecutorService executorService, long now, long remainTime) {
+    private void nextTask(ExecutorService executorService, long now, long remainTime) {
         //花费的时间
         long costTime = SystemClock.now() - now;
         if (nextWrappers == null) {
             return;
         }
         if (nextWrappers.size() == 1) {
-            nextWrappers.get(0).work(executorService, WorkerWrapper.this, remainTime - costTime, forParamUseWrappers);
+            nextWrappers.get(0).task(executorService, TaskWrapper.this, remainTime - costTime, forParamUseWrappers);
             return;
         }
         CompletableFuture[] futures = new CompletableFuture[nextWrappers.size()];
         for (int i = 0; i < nextWrappers.size(); i++) {
             int finalI = i;
             futures[i] = CompletableFuture.runAsync(() -> nextWrappers.get(finalI)
-                    .work(executorService, WorkerWrapper.this, remainTime - costTime, forParamUseWrappers), executorService);
+                    .task(executorService, TaskWrapper.this, remainTime - costTime, forParamUseWrappers), executorService);
         }
         try {
             CompletableFuture.allOf(futures).get();
@@ -202,7 +202,7 @@ public class WorkerWrapper<T, V> {
         }
     }
 
-    private void doDependsOneJob(WorkerWrapper dependWrapper) {
+    private void doDependsOneJob(TaskWrapper dependWrapper) {
         if (ResultState.TIMEOUT == dependWrapper.getWorkResult().getResultState()) {
             workResult = defaultResult();
             fastFail(INIT, null);
@@ -215,7 +215,7 @@ public class WorkerWrapper<T, V> {
         }
     }
 
-    private synchronized void doDependsJobs(ExecutorService executorService, List<DependWrapper> dependWrappers, WorkerWrapper fromWrapper, long now, long remainTime) {
+    private synchronized void doDependsJobs(ExecutorService executorService, List<DependWrapper> dependWrappers, TaskWrapper fromWrapper, long now, long remainTime) {
         boolean nowDependIsMust = false;
         //创建必须完成的上游wrapper集合
         Set<DependWrapper> mustWrapper = new HashSet<>();
@@ -235,7 +235,7 @@ public class WorkerWrapper<T, V> {
             } else {
                 fire();
             }
-            beginNext(executorService, now, remainTime);
+            nextTask(executorService, now, remainTime);
             return;
         }
 
@@ -249,8 +249,8 @@ public class WorkerWrapper<T, V> {
         boolean hasError = false;
         //先判断前面必须要执行的依赖任务的执行结果，如果有任何一个失败，那就不用走action了，直接给自己设置为失败，进行下一步就是了
         for (DependWrapper dependWrapper : mustWrapper) {
-            WorkerWrapper workerWrapper = dependWrapper.getDependWrapper();
-            WorkResult tempWorkResult = workerWrapper.getWorkResult();
+            TaskWrapper workerWrapper = dependWrapper.getDependWrapper();
+            TaskResult tempWorkResult = workerWrapper.getWorkResult();
             //为null或者isWorking，说明它依赖的某个任务还没执行到或没执行完
             if (workerWrapper.getState() == INIT || workerWrapper.getState() == WORKING) {
                 existNoFinish = true;
@@ -271,7 +271,7 @@ public class WorkerWrapper<T, V> {
         //只要有失败的
         if (hasError) {
             fastFail(INIT, null);
-            beginNext(executorService, now, remainTime);
+            nextTask(executorService, now, remainTime);
             return;
         }
 
@@ -280,7 +280,7 @@ public class WorkerWrapper<T, V> {
         if (!existNoFinish) {
             //上游都finish了，进行自己
             fire();
-            beginNext(executorService, now, remainTime);
+            nextTask(executorService, now, remainTime);
             return;
         }
     }
@@ -318,7 +318,7 @@ public class WorkerWrapper<T, V> {
     /**
      * 具体的单个worker执行任务
      */
-    private WorkResult<V> workerDoJob() {
+    private TaskResult<V> workerDoJob() {
         //避免重复执行
         if (!checkIsNullResult()) {
             return workResult;
@@ -355,11 +355,11 @@ public class WorkerWrapper<T, V> {
         }
     }
 
-    public WorkResult<V> getWorkResult() {
+    public TaskResult<V> getWorkResult() {
         return workResult;
     }
 
-    public List<WorkerWrapper<?, ?>> getNextWrappers() {
+    public List<TaskWrapper<?, ?>> getNextWrappers() {
         return nextWrappers;
     }
 
@@ -371,7 +371,7 @@ public class WorkerWrapper<T, V> {
         return ResultState.DEFAULT == workResult.getResultState();
     }
 
-    private void addDepend(WorkerWrapper<?, ?> workerWrapper, boolean must) {
+    private void addDepend(TaskWrapper<?, ?> workerWrapper, boolean must) {
         addDepend(new DependWrapper(workerWrapper, must));
     }
 
@@ -388,12 +388,12 @@ public class WorkerWrapper<T, V> {
         dependWrappers.add(dependWrapper);
     }
 
-    private void addNext(WorkerWrapper<?, ?> workerWrapper) {
+    private void addNext(TaskWrapper<?, ?> workerWrapper) {
         if (nextWrappers == null) {
             nextWrappers = new ArrayList<>();
         }
         //避免添加重复
-        for (WorkerWrapper wrapper : nextWrappers) {
+        for (TaskWrapper wrapper : nextWrappers) {
             if (workerWrapper.equals(wrapper)) {
                 return;
             }
@@ -401,11 +401,11 @@ public class WorkerWrapper<T, V> {
         nextWrappers.add(workerWrapper);
     }
 
-    private void addNextWrappers(List<WorkerWrapper<?, ?>> wrappers) {
+    private void addNextWrappers(List<TaskWrapper<?, ?>> wrappers) {
         if (wrappers == null) {
             return;
         }
-        for (WorkerWrapper<?, ?> wrapper : wrappers) {
+        for (TaskWrapper<?, ?> wrapper : wrappers) {
             addNext(wrapper);
         }
     }
@@ -419,13 +419,13 @@ public class WorkerWrapper<T, V> {
         }
     }
 
-    private WorkResult<V> defaultResult() {
+    private TaskResult<V> defaultResult() {
         workResult.setResultState(ResultState.TIMEOUT);
         workResult.setResult(worker.defaultValue());
         return workResult;
     }
 
-    private WorkResult<V> defaultExResult(Exception ex) {
+    private TaskResult<V> defaultExResult(Exception ex) {
         workResult.setResultState(ResultState.EXCEPTION);
         workResult.setResult(worker.defaultValue());
         workResult.setEx(ex);
@@ -457,7 +457,7 @@ public class WorkerWrapper<T, V> {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        WorkerWrapper<?, ?> that = (WorkerWrapper<?, ?>) o;
+        TaskWrapper<?, ?> that = (TaskWrapper<?, ?>) o;
         return needCheckNextWrapperResult == that.needCheckNextWrapperResult &&
                 Objects.equals(param, that.param) &&
                 Objects.equals(worker, that.worker) &&
@@ -487,7 +487,7 @@ public class WorkerWrapper<T, V> {
         /**
          * 自己后面的所有
          */
-        private List<WorkerWrapper<?, ?>> nextWrappers;
+        private List<TaskWrapper<?, ?>> nextWrappers;
         /**
          * 自己依赖的所有
          */
@@ -495,8 +495,9 @@ public class WorkerWrapper<T, V> {
         /**
          * 存储强依赖于自己的wrapper集合
          */
-        private Set<WorkerWrapper<?, ?>> selfIsMustSet;
+        private Set<TaskWrapper<?, ?>> selfIsMustSet;
 
+        // 默认true 需要检查 next  wrapper
         private boolean needCheckNextWrapperResult = true;
 
         public Builder<W, C> worker(IWorker<W, C> worker) {
@@ -526,21 +527,21 @@ public class WorkerWrapper<T, V> {
             return this;
         }
 
-        public Builder<W, C> depend(WorkerWrapper<?, ?>... wrappers) {
+        public Builder<W, C> depend(TaskWrapper<?, ?>... wrappers) {
             if (wrappers == null) {
                 return this;
             }
-            for (WorkerWrapper<?, ?> wrapper : wrappers) {
+            for (TaskWrapper<?, ?> wrapper : wrappers) {
                 depend(wrapper);
             }
             return this;
         }
 
-        public Builder<W, C> depend(WorkerWrapper<?, ?> wrapper) {
+        public Builder<W, C> depend(TaskWrapper<?, ?> wrapper) {
             return depend(wrapper, true);
         }
 
-        public Builder<W, C> depend(WorkerWrapper<?, ?> wrapper, boolean isMust) {
+        public Builder<W, C> depend(TaskWrapper<?, ?> wrapper, boolean isMust) {
             if (wrapper == null) {
                 return this;
             }
@@ -552,11 +553,11 @@ public class WorkerWrapper<T, V> {
             return this;
         }
 
-        public Builder<W, C> next(WorkerWrapper<?, ?> wrapper) {
+        public Builder<W, C> next(TaskWrapper<?, ?> wrapper) {
             return next(wrapper, true);
         }
 
-        public Builder<W, C> next(WorkerWrapper<?, ?> wrapper, boolean selfIsMust) {
+        public Builder<W, C> next(TaskWrapper<?, ?> wrapper, boolean selfIsMust) {
             if (nextWrappers == null) {
                 nextWrappers = new ArrayList<>();
             }
@@ -572,18 +573,18 @@ public class WorkerWrapper<T, V> {
             return this;
         }
 
-        public Builder<W, C> next(WorkerWrapper<?, ?>... wrappers) {
+        public Builder<W, C> next(TaskWrapper<?, ?>... wrappers) {
             if (wrappers == null) {
                 return this;
             }
-            for (WorkerWrapper<?, ?> wrapper : wrappers) {
+            for (TaskWrapper<?, ?> wrapper : wrappers) {
                 next(wrapper);
             }
             return this;
         }
 
-        public WorkerWrapper<W, C> build() {
-            WorkerWrapper<W, C> wrapper = new WorkerWrapper<>(id, worker, param, callback);
+        public TaskWrapper<W, C> build() {
+            TaskWrapper<W, C> wrapper = new TaskWrapper<>(id, worker, param, callback);
             wrapper.setNeedCheckNextWrapperResult(needCheckNextWrapperResult);
             if (dependWrappers != null) {
                 for (DependWrapper workerWrapper : dependWrappers) {
@@ -592,7 +593,7 @@ public class WorkerWrapper<T, V> {
                 }
             }
             if (nextWrappers != null) {
-                for (WorkerWrapper<?, ?> workerWrapper : nextWrappers) {
+                for (TaskWrapper<?, ?> workerWrapper : nextWrappers) {
                     boolean must = false;
                     if (selfIsMustSet != null && selfIsMustSet.contains(workerWrapper)) {
                         must = true;

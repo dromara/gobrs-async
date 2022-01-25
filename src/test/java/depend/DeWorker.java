@@ -1,20 +1,20 @@
 package depend;
 
 
-import com.jd.platform.async.callback.ICallback;
-import com.jd.platform.async.callback.IWorker;
-import com.jd.platform.async.worker.WorkResult;
-import com.jd.platform.async.wrapper.WorkerWrapper;
+import com.jd.platform.gobrs.async.callback.ICallback;
+import com.jd.platform.gobrs.async.callback.IWorker;
+import com.jd.platform.gobrs.async.worker.TaskResult;
+import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
 
 import java.util.Map;
 
 /**
- * @author wuweifeng wrote on 2019-11-20.
+ * @author sizegang wrote on 2019-11-20.
  */
 public class DeWorker implements IWorker<String, User>, ICallback<String, User> {
 
     @Override
-    public User action(String object, Map<String, WorkerWrapper> allWrappers) {
+    public User action(String object, Map<String, TaskWrapper> allWrappers) {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -35,7 +35,7 @@ public class DeWorker implements IWorker<String, User>, ICallback<String, User> 
     }
 
     @Override
-    public void result(boolean success, String param, WorkResult<User> workResult) {
+    public void result(boolean success, String param, TaskResult<User> workResult) {
         System.out.println("worker0 的结果是：" + workResult.getResult());
     }
 

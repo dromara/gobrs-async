@@ -1,21 +1,21 @@
 package seq;
 
 
-import com.jd.platform.async.callback.ICallback;
-import com.jd.platform.async.callback.IWorker;
-import com.jd.platform.async.executor.timer.SystemClock;
-import com.jd.platform.async.worker.WorkResult;
-import com.jd.platform.async.wrapper.WorkerWrapper;
+import com.jd.platform.gobrs.async.callback.ICallback;
+import com.jd.platform.gobrs.async.callback.IWorker;
+import com.jd.platform.gobrs.async.executor.timer.SystemClock;
+import com.jd.platform.gobrs.async.worker.TaskResult;
+import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
 
 import java.util.Map;
 
 /**
- * @author wuweifeng wrote on 2019-11-20.
+ * @author sizegang wrote on 2019-11-20.
  */
 public class SeqWorker2 implements IWorker<String, String>, ICallback<String, String> {
 
     @Override
-    public String action(String object, Map<String, WorkerWrapper> allWrappers) {
+    public String action(String object, Map<String, TaskWrapper> allWrappers) {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -35,7 +35,7 @@ public class SeqWorker2 implements IWorker<String, String>, ICallback<String, St
     }
 
     @Override
-    public void result(boolean success, String param, WorkResult<String> workResult) {
+    public void result(boolean success, String param, TaskResult<String> workResult) {
         if (success) {
             System.out.println("callback worker2 success--" + SystemClock.now() + "----" + workResult.getResult()
                     + "-threadName:" +Thread.currentThread().getName());

@@ -1,9 +1,9 @@
 package parallel;
 
 
-import com.jd.platform.async.executor.Async;
-import com.jd.platform.async.executor.timer.SystemClock;
-import com.jd.platform.async.wrapper.WorkerWrapper;
+import com.jd.platform.gobrs.async.executor.Async;
+import com.jd.platform.gobrs.async.executor.timer.SystemClock;
+import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 /**
  * 并行测试
  *
- * @author wuweifeng wrote on 2019-11-20.
+ * @author sizegang wrote on 2019-11-20.
  */
 @SuppressWarnings("ALL")
 public class TestPar {
@@ -42,19 +42,19 @@ public class TestPar {
         ParWorker1 w1 = new ParWorker1();
         ParWorker2 w2 = new ParWorker2();
 
-        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("2")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper1 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("1")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
                 .callback(w)
                 .param("0")
@@ -63,9 +63,9 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginWork(1500, workerWrapper, workerWrapper1, workerWrapper2);
-//        Async.beginWork(800, workerWrapper, workerWrapper1, workerWrapper2);
-//        Async.beginWork(1000, workerWrapper, workerWrapper1, workerWrapper2);
+        Async.beginPlan(1500, workerWrapper, workerWrapper1, workerWrapper2);
+//        Async.beginPlan(800, workerWrapper, workerWrapper1, workerWrapper2);
+//        Async.beginPlan(1000, workerWrapper, workerWrapper1, workerWrapper2);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -85,19 +85,19 @@ public class TestPar {
         ParWorker1 w1 = new ParWorker1();
         ParWorker2 w2 = new ParWorker2();
 
-        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("2")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper1 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("1")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
                 .callback(w)
                 .param("0")
@@ -107,7 +107,7 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginWork(2500, workerWrapper, workerWrapper2);
+        Async.beginPlan(2500, workerWrapper, workerWrapper2);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -125,20 +125,20 @@ public class TestPar {
         ParWorker1 w1 = new ParWorker1();
         ParWorker2 w2 = new ParWorker2();
 
-        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
                 .callback(w)
                 .param("0")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper1 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("1")
                 .depend(workerWrapper)
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("2")
@@ -148,7 +148,7 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginWork(2500, workerWrapper, workerWrapper2);
+        Async.beginPlan(2500, workerWrapper, workerWrapper2);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -167,19 +167,19 @@ public class TestPar {
         ParWorker1 w1 = new ParWorker1();
         ParWorker2 w2 = new ParWorker2();
 
-        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("2")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper1 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("1")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
                 .callback(w)
                 .param("0")
@@ -189,7 +189,7 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginWork(1500, workerWrapper, workerWrapper2);
+        Async.beginPlan(1500, workerWrapper, workerWrapper2);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -209,27 +209,27 @@ public class TestPar {
         ParWorker2 w2 = new ParWorker2();
         ParWorker3 w3 = new ParWorker3();
 
-        WorkerWrapper<String, String> workerWrapper3 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper3 =  new TaskWrapper.Builder<String, String>()
                 .worker(w3)
                 .callback(w3)
                 .param("3")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("2")
                 .next(workerWrapper3)
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper1 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("1")
                 .next(workerWrapper3)
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
                 .callback(w)
                 .param("0")
@@ -240,8 +240,8 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginWork(3100, workerWrapper);
-//        Async.beginWork(2100, workerWrapper);
+        Async.beginPlan(3100, workerWrapper);
+//        Async.beginPlan(2100, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -262,27 +262,27 @@ public class TestPar {
         ParWorker2 w2 = new ParWorker2();
         ParWorker3 w3 = new ParWorker3();
 
-        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
                 .callback(w)
                 .param("0")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("2")
                 .depend(workerWrapper)
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper1 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("1")
                 .depend(workerWrapper)
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper3 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper3 =  new TaskWrapper.Builder<String, String>()
                 .worker(w3)
                 .callback(w3)
                 .param("3")
@@ -293,8 +293,8 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginWork(3100, workerWrapper);
-//        Async.beginWork(2100, workerWrapper);
+        Async.beginPlan(3100, workerWrapper);
+//        Async.beginPlan(2100, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -321,27 +321,27 @@ public class TestPar {
 
         ParWorker3 w3 = new ParWorker3();
 
-        WorkerWrapper<String, String> workerWrapper3 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper3 =  new TaskWrapper.Builder<String, String>()
                 .worker(w3)
                 .callback(w3)
                 .param("3")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("2")
                 .next(workerWrapper3)
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper1 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("1")
                 .next(workerWrapper3)
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
                 .callback(w)
                 .param("0")
@@ -352,11 +352,11 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginWork(4100, workerWrapper);
+        Async.beginPlan(4100, workerWrapper);
         //3会超时
-//        Async.beginWork(3100, workerWrapper);
+//        Async.beginPlan(3100, workerWrapper);
         //2,3会超时
-//        Async.beginWork(2900, workerWrapper);
+//        Async.beginPlan(2900, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -382,19 +382,19 @@ public class TestPar {
 
         ParWorker3 w3 = new ParWorker3();
 
-        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
                 .callback(w)
                 .param("0")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper3 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper3 =  new TaskWrapper.Builder<String, String>()
                 .worker(w3)
                 .callback(w3)
                 .param("3")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("2")
@@ -402,7 +402,7 @@ public class TestPar {
                 .next(workerWrapper3)
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper1 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("1")
@@ -414,11 +414,11 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginWork(4100, workerWrapper);
+        Async.beginPlan(4100, workerWrapper);
         //3会超时
-//        Async.beginWork(3100, workerWrapper);
+//        Async.beginPlan(3100, workerWrapper);
         //2,3会超时
-//        Async.beginWork(2900, workerWrapper);
+//        Async.beginPlan(2900, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -447,27 +447,27 @@ public class TestPar {
         ParWorker3 w3 = new ParWorker3();
         w3.setSleepTime(400);
 
-        WorkerWrapper<String, String> workerWrapper3 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper3 =  new TaskWrapper.Builder<String, String>()
                 .worker(w3)
                 .callback(w3)
                 .param("3")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("2")
                 .next(workerWrapper3, false)
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper1 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("1")
                 .next(workerWrapper3, false)
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
                 .callback(w)
                 .param("0")
@@ -478,7 +478,7 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginWork(4100, workerWrapper);
+        Async.beginPlan(4100, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -508,19 +508,19 @@ public class TestPar {
         ParWorker3 w3 = new ParWorker3();
         w3.setSleepTime(400);
 
-        WorkerWrapper<String, String> workerWrapper =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
                 .callback(w)
                 .param("0")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper3 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper3 =  new TaskWrapper.Builder<String, String>()
                 .worker(w3)
                 .callback(w3)
                 .param("3")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("2")
@@ -528,7 +528,7 @@ public class TestPar {
                 .next(workerWrapper3, false)
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper1 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("1")
@@ -542,7 +542,7 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginWork(4100, workerWrapper);
+        Async.beginPlan(4100, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -572,28 +572,28 @@ public class TestPar {
         ParWorker3 w3 = new ParWorker3();
         w3.setSleepTime(400);
 
-        WorkerWrapper<String, String> workerWrapper3 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper3 =  new TaskWrapper.Builder<String, String>()
                 .worker(w3)
                 .callback(w3)
                 .param("3")
                 .build();
 
         //设置2不是必须
-        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("2")
                 .next(workerWrapper3, false)
                 .build();
         // 设置1是必须的
-        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper1 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("1")
                 .next(workerWrapper3, true)
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper0 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper0 =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
                 .callback(w)
                 .param("0")
@@ -605,7 +605,7 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginWork(4100, workerWrapper0);
+        Async.beginPlan(4100, workerWrapper0);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -639,13 +639,13 @@ public class TestPar {
         ParWorker3 w3 = new ParWorker3();
         ParWorker4 w4 = new ParWorker4();
 
-        WorkerWrapper<String, String> workerWrapper4 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper4 =  new TaskWrapper.Builder<String, String>()
                 .worker(w4)
                 .callback(w4)
                 .param("4")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper3 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper3 =  new TaskWrapper.Builder<String, String>()
                 .worker(w3)
                 .callback(w3)
                 .param("3")
@@ -653,7 +653,7 @@ public class TestPar {
                 .build();
 
         //下面的2
-        WorkerWrapper<String, String> workerWrapper22 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper22 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("22")
@@ -661,7 +661,7 @@ public class TestPar {
                 .build();
 
         //下面的1
-        WorkerWrapper<String, String> workerWrapper11 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper11 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("11")
@@ -669,7 +669,7 @@ public class TestPar {
                 .build();
 
         //下面的0
-        WorkerWrapper<String, String> workerWrapper00 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper00 =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
                 .callback(w)
                 .param("00")
@@ -677,7 +677,7 @@ public class TestPar {
                 .build();
 
         //上面的1
-        WorkerWrapper<String, String> workerWrapper1 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper1 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("1")
@@ -685,7 +685,7 @@ public class TestPar {
                 .build();
 
         //上面的2
-        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("2")
@@ -693,7 +693,7 @@ public class TestPar {
                 .build();
 
         //上面的0
-        WorkerWrapper<String, String> workerWrapper0 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper0 =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
                 .callback(w)
                 .param("0")
@@ -704,7 +704,7 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginWork(4100, workerWrapper00, workerWrapper0);
+        Async.beginPlan(4100, workerWrapper00, workerWrapper0);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -729,26 +729,26 @@ public class TestPar {
         ParWorker3 w3 = new ParWorker3();
         w3.setSleepTime(1000);
 
-        WorkerWrapper<String, String> workerWrapper3 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper3 =  new TaskWrapper.Builder<String, String>()
                 .worker(w3)
                 .callback(w3)
                 .param("c")
                 .build();
 
-        WorkerWrapper<String, String> workerWrapper2 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("b")
                 .next(workerWrapper3)
                 .build();
 
-        WorkerWrapper<String, String> workerWrappera1 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrappera1 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("a1")
                 .next(workerWrapper2)
                 .build();
-        WorkerWrapper<String, String> workerWrappera2 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> workerWrappera2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("a2")
@@ -756,7 +756,7 @@ public class TestPar {
                 .build();
 
 
-        Async.beginWork(6000, workerWrappera1, workerWrappera2);
+        Async.beginPlan(6000, workerWrappera1, workerWrappera2);
         Async.shutDown();
     }
 
@@ -776,41 +776,41 @@ public class TestPar {
         ParWorker3 w3 = new ParWorker3();
         ParWorker4 w4 = new ParWorker4();
 
-        WorkerWrapper<String, String> last =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> last =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("last")
                 .build();
 
-        WorkerWrapper<String, String> wrapperW =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> wrapperW =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
                 .callback(w)
                 .param("w")
                 .next(last, false)
                 .build();
 
-        WorkerWrapper<String, String> wrapperW3 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> wrapperW3 =  new TaskWrapper.Builder<String, String>()
                 .worker(w3)
                 .callback(w3)
                 .param("w3")
                 .next(last, false)
                 .build();
 
-        WorkerWrapper<String, String> wrapperW2 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> wrapperW2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("w2")
                 .next(wrapperW3)
                 .build();
 
-        WorkerWrapper<String, String> wrapperW1 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> wrapperW1 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("w1")
                 .next(wrapperW2)
                 .build();
 
-        Async.beginWork(6000, wrapperW, wrapperW1);
+        Async.beginPlan(6000, wrapperW, wrapperW1);
         Async.shutDown();
     }
 
@@ -830,33 +830,33 @@ public class TestPar {
         ParWorker3 w3 = new ParWorker3();
         ParWorker4 w4 = new ParWorker4();
 
-        WorkerWrapper<String, String> wrapperW1 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> wrapperW1 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("w1")
                 .build();
 
-        WorkerWrapper<String, String> wrapperW =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> wrapperW =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
                 .callback(w)
                 .param("w")
                 .build();
 
-        WorkerWrapper<String, String> last =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> last =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
                 .callback(w1)
                 .param("last")
                 .depend(wrapperW)
                 .build();
 
-        WorkerWrapper<String, String> wrapperW2 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> wrapperW2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
                 .callback(w2)
                 .param("w2")
                 .depend(wrapperW1)
                 .build();
 
-        WorkerWrapper<String, String> wrapperW3 =  new WorkerWrapper.Builder<String, String>()
+        TaskWrapper<String, String> wrapperW3 =  new TaskWrapper.Builder<String, String>()
                 .worker(w3)
                 .callback(w3)
                 .param("w3")
@@ -864,7 +864,7 @@ public class TestPar {
                 .next(last, false)
                 .build();
 
-        Async.beginWork(6000,Executors.newCachedThreadPool(),  wrapperW, wrapperW1);
+        Async.beginPlan(6000,Executors.newCachedThreadPool(),  wrapperW, wrapperW1);
         Async.shutDown();
     }
 }

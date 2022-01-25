@@ -45,7 +45,7 @@ T，V两个泛型，分别是入参和出参类型。
 ```
 /**
  * 每个最小执行单元需要实现该接口
- * @author wuweifeng wrote on 2019-11-19.
+ * @author sizegang wrote on 2019-11-19.
  */
 public interface IWorker<T, V> {
     /**
@@ -71,7 +71,7 @@ callBack：对每个worker的回调。worker执行完毕后，会回调该接口
 /**
  * 每个执行单元执行完毕后，会回调该接口</p>
  * 需要监听执行结果的，实现该接口即可
- * @author wuweifeng wrote on 2019-11-19.
+ * @author sizegang wrote on 2019-11-19.
  */
 public interface ICallback<T, V> {
 
@@ -108,7 +108,7 @@ wrapper的泛型和worker的一样，决定了入参和结果的类型。
 
 ```
 /**
- * @author wuweifeng wrote on 2019-11-20.
+ * @author sizegang wrote on 2019-11-20.
  */
 public class ParWorker1 implements IWorker<String, String>, ICallback<String, String> {
 
@@ -185,9 +185,9 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginWork(1500, workerWrapper, workerWrapper1, workerWrapper2);
-//        Async.beginWork(800, workerWrapper, workerWrapper1, workerWrapper2);
-//        Async.beginWork(1000, workerWrapper, workerWrapper1, workerWrapper2);
+        Async.beginPlan(1500, workerWrapper, workerWrapper1, workerWrapper2);
+//        Async.beginPlan(800, workerWrapper, workerWrapper1, workerWrapper2);
+//        Async.beginPlan(1000, workerWrapper, workerWrapper1, workerWrapper2);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -240,8 +240,8 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginWork(3100, workerWrapper);
-//        Async.beginWork(2100, workerWrapper);
+        Async.beginPlan(3100, workerWrapper);
+//        Async.beginPlan(2100, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));

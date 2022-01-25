@@ -2,7 +2,7 @@ package dependnew;
 
 /**
  * 一个包装类
- * @author wuweifeng wrote on 2019-12-26
+ * @author sizegang wrote on 2019-12-26
  * @version 1.0
  */
 public class User {
