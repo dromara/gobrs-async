@@ -6,6 +6,7 @@ import com.jd.platform.gobrs.async.rule.Rule;
 import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @program: gobrs-async
@@ -24,6 +25,9 @@ import java.util.*;
 */
 public abstract class AbstractEngine<T, R> implements Engine {
 
+
+    public static  Map<String, List<TaskWrapper>> taskWrappers = new ConcurrentHashMap();
+
     @Override
     public Map<String, List<TaskWrapper>> parse(String rule) {
         return Optional.ofNullable(rule).map((ru) -> {
@@ -35,22 +39,15 @@ public abstract class AbstractEngine<T, R> implements Engine {
                 listMap.put(r.getName(), parsing);
             }
             return listMap;
-        }).orElse(null);
+        }).orElse(Collections.emptyMap());
     }
 
 
-    public static void main(String[] args) {
-        String s = "A -> B,C; B->D; C->E; D->F:must; E->F:must;";
 
-        String[] split = s.split(";");
 
-        for (String s1 : split) {
-            String[] split1 = s1.split("->");
-            for (String s2 : split1) {
-                String[] split2 = s2.split(",");
-                Arrays.stream(split2).forEach(System.out::println);
-            }
-        }
-    }
+
+
+
+
 
 }

@@ -1,5 +1,6 @@
 package com.jd.platform.gobrs.async.spring;
 
+import com.jd.platform.gobrs.async.TaskBean;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -12,13 +13,13 @@ import org.springframework.context.ApplicationContextAware;
  * @create: 2022-01-26 01:57
  * @Version 1.0
  **/
-public class GobrsSpringUtil implements ApplicationContextAware {
+public class GobrsSpring implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        if (GobrsSpringUtil.applicationContext == null) {
-            GobrsSpringUtil.applicationContext = applicationContext;
+        if (GobrsSpring.applicationContext == null) {
+            GobrsSpring.applicationContext = applicationContext;
         }
     }
 

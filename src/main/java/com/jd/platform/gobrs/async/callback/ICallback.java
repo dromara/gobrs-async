@@ -1,6 +1,7 @@
 package com.jd.platform.gobrs.async.callback;
 
 
+import com.jd.platform.gobrs.async.gobrs.GobrsBean;
 import com.jd.platform.gobrs.async.worker.TaskResult;
 
 /**
@@ -10,7 +11,7 @@ import com.jd.platform.gobrs.async.worker.TaskResult;
  * @author sizegang wrote on 2019-11-19.
  */
 @FunctionalInterface
-public interface ICallback<T, V> {
+public interface ICallback<T, V> extends GobrsBean {
 
     /**
      * 任务开始的监听

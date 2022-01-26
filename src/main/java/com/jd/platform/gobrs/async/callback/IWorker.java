@@ -2,6 +2,7 @@ package com.jd.platform.gobrs.async.callback;
 
 import java.util.Map;
 
+import com.jd.platform.gobrs.async.gobrs.GobrsBean;
 import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
 
 /**
@@ -10,7 +11,7 @@ import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
  * @author sizegang wrote on 2019-11-19.
  */
 @FunctionalInterface
-public interface IWorker<T, V> {
+public interface IWorker<T, V> extends GobrsBean {
     /**
      * 在这里做耗时操作，如rpc请求、IO等
      *

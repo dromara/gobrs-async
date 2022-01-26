@@ -480,7 +480,9 @@ public class TaskWrapper<T, V> {
         return Objects.hash(param, worker, callback, nextWrappers, dependWrappers, state, workResult, needCheckNextWrapperResult);
     }
 
+
     public static class Builder<W, C> {
+
         /**
          * 该wrapper的唯一标识
          */
