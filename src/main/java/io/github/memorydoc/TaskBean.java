@@ -3,7 +3,7 @@ package io.github.memorydoc;
 import io.github.memorydoc.callback.ICallback;
 import io.github.memorydoc.callback.ITask;
 import io.github.memorydoc.gobrs.GobrsTaskFlow;
-import io.github.memorydoc.worker.TaskResult;
+import io.github.memorydoc.task.TaskResult;
 
 import java.util.Map;
 

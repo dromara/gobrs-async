@@ -1,10 +1,12 @@
 package parallel;
 
 
+import dependnew.User;
 import io.github.memorydoc.callback.ICallback;
 import io.github.memorydoc.callback.ITask;
 import io.github.memorydoc.executor.timer.SystemClock;
-import io.github.memorydoc.worker.TaskResult;
+import io.github.memorydoc.task.AsyncTask;
+import io.github.memorydoc.task.TaskResult;
 import io.github.memorydoc.wrapper.TaskWrapper;
 
 import java.util.Map;
@@ -12,7 +14,7 @@ import java.util.Map;
 /**
  * @author sizegang wrote on 2019-11-20.
  */
-public class ParTask1 implements ITask<String, String>, ICallback<String, String> {
+public class ParTask1 implements AsyncTask<String,String> {
     private long sleepTime = 1000;
 
     public void setSleepTime(long sleepTime) {
@@ -35,10 +37,14 @@ public class ParTask1 implements ITask<String, String>, ICallback<String, String
     }
 
     @Override
+    public boolean nessary(String s) {
+        return true;
+    }
+
+    @Override
     public void begin() {
         //System.out.println(Thread.currentThread().getName() + "- start --" + System.currentTimeMillis());
     }
-
     @Override
     public void result(boolean success, String param, TaskResult<String> workResult) {
         if (success) {

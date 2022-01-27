@@ -1,8 +1,7 @@
 package io.github.memorydoc.callback;
 
 
-import io.github.memorydoc.gobrs.GobrsBean;
-import io.github.memorydoc.worker.TaskResult;
+import io.github.memorydoc.task.TaskResult;
 
 /**
  * 每个执行单元执行完毕后，会回调该接口</p>
@@ -11,13 +10,12 @@ import io.github.memorydoc.worker.TaskResult;
  * @author sizegang wrote on 2019-11-19.
  */
 @FunctionalInterface
-public interface ICallback<T, V> extends GobrsBean {
+public interface ICallback<T, V> {
 
     /**
      * 任务开始的监听
      */
     default void begin() {
-
     }
 
     /**

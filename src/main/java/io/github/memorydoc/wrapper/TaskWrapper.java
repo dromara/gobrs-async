@@ -1,13 +1,14 @@
 package io.github.memorydoc.wrapper;
 
 import io.github.memorydoc.callback.DefaultCallback;
+import io.github.memorydoc.callback.ITask;
 import io.github.memorydoc.exception.SkippedException;
 import io.github.memorydoc.callback.ICallback;
-import io.github.memorydoc.callback.ITask;
 import io.github.memorydoc.executor.timer.SystemClock;
-import io.github.memorydoc.worker.DependWrapper;
-import io.github.memorydoc.worker.ResultState;
-import io.github.memorydoc.worker.TaskResult;
+import io.github.memorydoc.task.AsyncTask;
+import io.github.memorydoc.task.DependWrapper;
+import io.github.memorydoc.task.ResultState;
+import io.github.memorydoc.task.TaskResult;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -593,7 +594,7 @@ public class TaskWrapper<T, V> {
         }
 
         public TaskWrapper<W, C> build() {
-            TaskWrapper<W, C> wrapper = new TaskWrapper<>(id, worker, param, callback);
+            TaskWrapper<W, C> wrapper = new TaskWrapper(id, worker, param, callback);
             wrapper.setNeedCheckNextWrapperResult(needCheckNextWrapperResult);
             if (dependWrappers != null) {
                 for (DependWrapper workerWrapper : dependWrappers) {

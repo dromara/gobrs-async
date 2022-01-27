@@ -3,7 +3,8 @@ package depend;
 
 import io.github.memorydoc.callback.ICallback;
 import io.github.memorydoc.callback.ITask;
-import io.github.memorydoc.worker.TaskResult;
+import io.github.memorydoc.task.AsyncTask;
+import io.github.memorydoc.task.TaskResult;
 import io.github.memorydoc.wrapper.TaskWrapper;
 
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.Map;
 /**
  * @author sizegang wrote on 2019-11-20.
  */
-public class DeTask2 implements ITask<TaskResult<User>, String>, ICallback<TaskResult<User>, String> {
+public class DeTask2 implements AsyncTask<TaskResult<User>, String> {
 
     @Override
     public String doTask(TaskResult<User> result, Map<String, TaskWrapper> allWrappers) {
@@ -40,4 +41,8 @@ public class DeTask2 implements ITask<TaskResult<User>, String>, ICallback<TaskR
         System.out.println("worker2 的结果是：" + workResult.getResult());
     }
 
+    @Override
+    public boolean nessary(TaskResult<User> userTaskResult) {
+        return false;
+    }
 }

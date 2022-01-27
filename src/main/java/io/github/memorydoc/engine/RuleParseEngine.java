@@ -5,6 +5,7 @@ import io.github.memorydoc.callback.ICallback;
 import io.github.memorydoc.callback.ITask;
 import io.github.memorydoc.rule.Rule;
 import io.github.memorydoc.spring.GobrsSpring;
+import io.github.memorydoc.task.AsyncTask;
 import io.github.memorydoc.wrapper.TaskWrapper;
 
 import javax.annotation.Resource;
@@ -76,7 +77,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
     public static class EngineExecutor {
         private static TaskWrapper getWrapper(String s3) {
             return new TaskWrapper.Builder()
-                    .worker((ITask) getBean(s3))
+                    .worker((AsyncTask) getBean(s3))
                     .callback((ICallback) getBean(s3)).build();
         }
 
@@ -88,7 +89,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
             return Optional.ofNullable(getBean(taskBean)).map((bean) -> {
                 return new TaskWrapper.Builder()
                         .id(taskBean)
-                        .worker((ITask) bean)
+                        .worker((AsyncTask) bean)
                         .callback((ICallback) bean)
                         .depend(taskWrapper, must)
                         .build();

@@ -1,7 +1,7 @@
 package io.github.memorydoc.callback;
 
 
-import io.github.memorydoc.worker.TaskResult;
+import io.github.memorydoc.task.TaskResult;
 
 /**
  * 默认回调类，如果不设置的话，会默认给这个回调

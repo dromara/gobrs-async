@@ -3,7 +3,8 @@ package dependnew;
 
 import io.github.memorydoc.callback.ICallback;
 import io.github.memorydoc.callback.ITask;
-import io.github.memorydoc.worker.TaskResult;
+import io.github.memorydoc.task.AsyncTask;
+import io.github.memorydoc.task.TaskResult;
 import io.github.memorydoc.wrapper.TaskWrapper;
 
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.Map;
 /**
  * @author sizegang wrote on 2019-11-20.
  */
-public class DeTask1 implements ITask<String, User>, ICallback<String, User> {
+public class DeTask1 implements AsyncTask<String,User> {
 
     @Override
     public User doTask(String object, Map<String, TaskWrapper> allWrappers) {
@@ -30,6 +31,11 @@ public class DeTask1 implements ITask<String, User>, ICallback<String, User> {
     @Override
     public User defaultValue() {
         return new User("default User");
+    }
+
+    @Override
+    public boolean nessary(String s) {
+        return true;
     }
 
     @Override

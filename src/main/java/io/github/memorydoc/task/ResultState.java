@@ -1,4 +1,4 @@
-package io.github.memorydoc.worker;
+package io.github.memorydoc.task;
 
 /**
  * 结果状态

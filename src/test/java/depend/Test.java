@@ -1,7 +1,7 @@
 package depend;
 
 import io.github.memorydoc.executor.Async;
-import io.github.memorydoc.worker.TaskResult;
+import io.github.memorydoc.task.TaskResult;
 import io.github.memorydoc.wrapper.TaskWrapper;
 
 import java.util.concurrent.ExecutionException;

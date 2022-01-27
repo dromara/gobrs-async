@@ -2,7 +2,6 @@ package io.github.memorydoc.callback;
 
 import java.util.Map;
 
-import io.github.memorydoc.gobrs.GobrsBean;
 import io.github.memorydoc.wrapper.TaskWrapper;
 
 /**
@@ -11,7 +10,7 @@ import io.github.memorydoc.wrapper.TaskWrapper;
  * @author sizegang wrote on 2019-11-19.
  */
 @FunctionalInterface
-public interface ITask<T, V> extends GobrsBean {
+public interface ITask<T, V> {
     /**
      * 在这里做耗时操作，如rpc请求、IO等
      *
@@ -28,15 +27,7 @@ public interface ITask<T, V> extends GobrsBean {
     default V defaultValue() {
         return null;
     }
-
-    /**
-     * 根据业务实现 判断是否需要执行当前task
-     * @param t
-     * @return
-     */
     default boolean nessary(T t) {
         return true;
     }
-
-
 }
