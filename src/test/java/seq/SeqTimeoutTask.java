@@ -1,8 +1,8 @@
-package parallel;
+package seq;
 
 
 import com.jd.platform.gobrs.async.callback.ICallback;
-import com.jd.platform.gobrs.async.callback.IWorker;
+import com.jd.platform.gobrs.async.callback.ITask;
 import com.jd.platform.gobrs.async.executor.timer.SystemClock;
 import com.jd.platform.gobrs.async.worker.TaskResult;
 import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
@@ -12,10 +12,10 @@ import java.util.Map;
 /**
  * @author sizegang wrote on 2019-11-20.
  */
-public class ParWorker implements IWorker<String, String>, ICallback<String, String> {
+public class SeqTimeoutTask implements ITask<String, String>, ICallback<String, String> {
 
     @Override
-    public String action(String object, Map<String, TaskWrapper> allWrappers) {
+    public String doTask(String object, Map<String, TaskWrapper> allWrappers) {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -23,7 +23,6 @@ public class ParWorker implements IWorker<String, String>, ICallback<String, Str
         }
         return "result = " + SystemClock.now() + "---param = " + object + " from 0";
     }
-
 
     @Override
     public String defaultValue() {

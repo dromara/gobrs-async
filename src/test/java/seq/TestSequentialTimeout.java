@@ -26,9 +26,9 @@ public class TestSequentialTimeout {
      * cost-862
      */
     private static void testFirstTimeout() throws ExecutionException, InterruptedException {
-        SeqWorker1 w1 = new SeqWorker1();
-        SeqWorker2 w2 = new SeqWorker2();
-        SeqTimeoutWorker t = new SeqTimeoutWorker();
+        SeqTask1 w1 = new SeqTask1();
+        SeqTask2 w2 = new SeqTask2();
+        SeqTimeoutTask t = new SeqTimeoutTask();
 
         TaskWrapper<String, String> workerWrapper2 = new TaskWrapper.Builder<String, String>()
                 .worker(w2)
@@ -56,7 +56,7 @@ public class TestSequentialTimeout {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginTaskFlow(5000, workerWrapperT);
+        Async.startTaskFlow(5000, workerWrapperT);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));

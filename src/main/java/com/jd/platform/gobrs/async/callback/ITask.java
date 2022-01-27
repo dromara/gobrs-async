@@ -11,14 +11,14 @@ import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
  * @author sizegang wrote on 2019-11-19.
  */
 @FunctionalInterface
-public interface IWorker<T, V> extends GobrsBean {
+public interface ITask<T, V> extends GobrsBean {
     /**
      * 在这里做耗时操作，如rpc请求、IO等
      *
      * @param object      object
      * @param allWrappers 任务包装
      */
-    V action(T object, Map<String, TaskWrapper> allWrappers);
+    V doTask(T object, Map<String, TaskWrapper> allWrappers);
 
     /**
      * 超时、异常时，返回的默认值

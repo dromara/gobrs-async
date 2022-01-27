@@ -2,7 +2,7 @@ package dependnew;
 
 
 import com.jd.platform.gobrs.async.callback.ICallback;
-import com.jd.platform.gobrs.async.callback.IWorker;
+import com.jd.platform.gobrs.async.callback.ITask;
 import com.jd.platform.gobrs.async.worker.TaskResult;
 import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
 
@@ -11,10 +11,10 @@ import java.util.Map;
 /**
  * @author sizegang wrote on 2019-11-20.
  */
-public class DeWorker2 implements IWorker<User, String>, ICallback<User, String> {
+public class DeTask2 implements ITask<User, String>, ICallback<User, String> {
 
     @Override
-    public String action(User object, Map<String, TaskWrapper> allWrappers) {
+    public String doTask(User object, Map<String, TaskWrapper> allWrappers) {
         System.out.println("-----------------");
         System.out.println("par1的执行结果是： " + allWrappers.get("second").getWorkResult());
         System.out.println("取par1的结果作为自己的入参，并将par1的结果加上一些东西");

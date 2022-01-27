@@ -1,7 +1,7 @@
 package com.jd.platform.gobrs.async;
 
 import com.jd.platform.gobrs.async.callback.ICallback;
-import com.jd.platform.gobrs.async.callback.IWorker;
+import com.jd.platform.gobrs.async.callback.ITask;
 import com.jd.platform.gobrs.async.gobrs.GobrsTaskFlow;
 import com.jd.platform.gobrs.async.worker.TaskResult;
 
@@ -16,7 +16,7 @@ import java.util.Map;
  * @Version 1.0
  **/
 
-public class TaskBean implements IWorker, ICallback {
+public class TaskBean implements ITask, ICallback {
     private String name;
 
     GobrsTaskFlow gobrsTaskFlow;
@@ -27,7 +27,7 @@ public class TaskBean implements IWorker, ICallback {
     }
 
     @Override
-    public Object action(Object object, Map allWrappers) {
+    public Object doTask(Object object, Map allWrappers) {
         return null;
     }
 

@@ -14,9 +14,9 @@ import java.util.concurrent.ExecutionException;
 public class Test {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        DeWorker w = new DeWorker();
-        DeWorker1 w1 = new DeWorker1();
-        DeWorker2 w2 = new DeWorker2();
+        DeTask w = new DeTask();
+        DeTask1 w1 = new DeTask1();
+        DeTask2 w2 = new DeTask2();
         TaskWrapper<User, String> workerWrapper2 =  new TaskWrapper.Builder<User, String>()
                 .worker(w2)
                 .callback(w2)
@@ -38,9 +38,9 @@ public class Test {
                 .next(workerWrapper1)
                 .build();
 
-        //V1.3后，不用给wrapper setParam了，直接在worker的action里自行根据id获取即可
+        //V1.3后，不用给wrapper setParam了，直接在worker的doTask里自行根据id获取即可
 
-        Async.beginTaskFlow(3500, workerWrapper);
+        Async.startTaskFlow(3500, workerWrapper);
 
         System.out.println(workerWrapper2.getWorkResult());
         Async.shutDown();

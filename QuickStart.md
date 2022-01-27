@@ -54,7 +54,7 @@ public interface IWorker<T, V> {
      * @param object
      *         object
      */
-    V action(T object, Map<String, WorkerWrapper> allWrappers);
+    V doTask(T object, Map<String, WorkerWrapper> allWrappers);
 
     /**
      * 超时、异常时，返回的默认值
@@ -113,7 +113,7 @@ wrapper的泛型和worker的一样，决定了入参和结果的类型。
 public class ParWorker1 implements IWorker<String, String>, ICallback<String, String> {
 
     @Override
-    public String action(String object) {
+    public String doTask(String object) {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -146,7 +146,7 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
 }
 
 ```
-通过这一个类看一下，action里就是你的耗时操作，begin就是任务开始执行时的回调，result就是worker执行完毕后的回调。当你组合了多个执行单元时，每一步的执行，都在掌控之内。失败了，还会有自定义的默认值。这是CompleteableFuture无法做到的。
+通过这一个类看一下，doTask里就是你的耗时操作，begin就是任务开始执行时的回调，result就是worker执行完毕后的回调。当你组合了多个执行单元时，每一步的执行，都在掌控之内。失败了，还会有自定义的默认值。这是CompleteableFuture无法做到的。
 
 
 #### 安装教程
@@ -185,9 +185,9 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginTaskFlow(1500, workerWrapper, workerWrapper1, workerWrapper2);
-//        Async.beginTaskFlow(800, workerWrapper, workerWrapper1, workerWrapper2);
-//        Async.beginTaskFlow(1000, workerWrapper, workerWrapper1, workerWrapper2);
+        Async.startTaskFlow(1500, workerWrapper, workerWrapper1, workerWrapper2);
+//        Async.startTaskFlow(800, workerWrapper, workerWrapper1, workerWrapper2);
+//        Async.startTaskFlow(1000, workerWrapper, workerWrapper1, workerWrapper2);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -240,8 +240,8 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginTaskFlow(3100, workerWrapper);
-//        Async.beginTaskFlow(2100, workerWrapper);
+        Async.startTaskFlow(3100, workerWrapper);
+//        Async.startTaskFlow(2100, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -294,7 +294,7 @@ public class ParWorker1 implements IWorker<String, String>, ICallback<String, St
 
 4. 依赖别的worker执行结果作为入参
 
-可以从action的参数中根据wrapper的id获取任意一个执行单元的执行结果，但请注意执行顺序，如果尚未执行，则在调用WorkerResult.getResult()会得到null！
+可以从doTask的参数中根据wrapper的id获取任意一个执行单元的执行结果，但请注意执行顺序，如果尚未执行，则在调用WorkerResult.getResult()会得到null！
 ![输入图片说明](https://images.gitee.com/uploads/images/2020/0511/215924_28af8655_303698.png "屏幕截图.png")![输入图片说明](https://images.gitee.com/uploads/images/2020/0511/215933_12e13dba_303698.png "屏幕截图.png")
 
 5.  其他的详见test包下的测试类，支持各种形式的组合、编排。

@@ -2,7 +2,7 @@ package com.jd.platform.gobrs.async.engine;
 
 import com.jd.platform.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.jd.platform.gobrs.async.callback.ICallback;
-import com.jd.platform.gobrs.async.callback.IWorker;
+import com.jd.platform.gobrs.async.callback.ITask;
 import com.jd.platform.gobrs.async.rule.Rule;
 import com.jd.platform.gobrs.async.spring.GobrsSpring;
 import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
@@ -10,6 +10,7 @@ import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * @program: gobrs-async
@@ -27,12 +28,12 @@ public class RuleParseEngine extends AbstractEngine {
     /**
      * 树形结构 折叠 taskWrapper
      */
-    private Map<String, Map<String, TaskWrapper>> taskWraMap = new ConcurrentHashMap<>();
+    public Map<String, List<TaskWrapper>> taskWraMap = new ConcurrentHashMap<>();
 
     /**
      * 保存所有的rule命名空间下的 Wrapper 平铺
      */
-    private Map<String, Map<String, TaskWrapper>> flatWrapMap = new ConcurrentHashMap<>();
+    public Map<String, Map<String, TaskWrapper>> flatWrapMap = new ConcurrentHashMap<>();
 
 
     public Object getBean(String bean) {
@@ -41,13 +42,12 @@ public class RuleParseEngine extends AbstractEngine {
         });
     }
 
+
     @Override
     public List<TaskWrapper> parsing(Rule rule) {
         String[] taskFlows = rule.getContent().replaceAll("\\s+", "").split(gobrsAsyncProperties.getSplit());
         Map<String, TaskWrapper> wrapperMap = new HashMap<>();
-
         Map<String, TaskWrapper> flatWrap = new HashMap<>();
-
         for (String taskFlow : taskFlows) {
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
             String leftTaskName = taskArr[0];
@@ -68,7 +68,8 @@ public class RuleParseEngine extends AbstractEngine {
                 flatWrap.put(taskBean, frontTaskWrapper);
             }
         }
-        taskWraMap.put(rule.getName(), wrapperMap);
+        List<TaskWrapper> collect = wrapperMap.values().stream().collect(Collectors.toList());
+        taskWraMap.put(rule.getName(), collect);
         flatWrapMap.put(rule.getName(), flatWrap);
         return null;
     }
@@ -76,7 +77,7 @@ public class RuleParseEngine extends AbstractEngine {
 
     private TaskWrapper getWrapper(String s3) {
         return new TaskWrapper.Builder()
-                .worker((IWorker) getBean(s3))
+                .worker((ITask) getBean(s3))
                 .callback((ICallback) getBean(s3)).build();
     }
 
@@ -88,7 +89,7 @@ public class RuleParseEngine extends AbstractEngine {
     private TaskWrapper getWrapperDepend(String taskBean, TaskWrapper taskWrapper, boolean must) {
         return Optional.ofNullable(getBean(taskBean)).map((bean) -> {
             return new TaskWrapper.Builder()
-                    .worker((IWorker) bean)
+                    .worker((ITask) bean)
                     .callback((ICallback) bean)
                     .depend(taskWrapper, must)
                     .build();

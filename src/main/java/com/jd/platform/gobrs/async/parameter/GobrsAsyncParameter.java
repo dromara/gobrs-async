@@ -1,9 +1,6 @@
 package com.jd.platform.gobrs.async.parameter;
 
-import com.jd.platform.gobrs.async.gobrs.GobrsAsync;
-import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
-
-import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * @program: gobrs-async
@@ -15,9 +12,9 @@ import java.util.Map;
  **/
 public class GobrsAsyncParameter extends GobrsAsyncParameterSupport {
 
-
     @Override
-    public void invoke(Map<String, TaskWrapper> taskWrapperMap) {
+    public void invoke(Supplier consumer) {
+        consumer.get();
     }
 
 }

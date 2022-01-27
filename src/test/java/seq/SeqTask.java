@@ -2,7 +2,7 @@ package seq;
 
 
 import com.jd.platform.gobrs.async.callback.ICallback;
-import com.jd.platform.gobrs.async.callback.IWorker;
+import com.jd.platform.gobrs.async.callback.ITask;
 import com.jd.platform.gobrs.async.executor.timer.SystemClock;
 import com.jd.platform.gobrs.async.worker.TaskResult;
 import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
@@ -12,10 +12,10 @@ import java.util.Map;
 /**
  * @author sizegang wrote on 2019-11-20.
  */
-public class SeqWorker2 implements IWorker<String, String>, ICallback<String, String> {
+public class SeqTask implements ITask<String, String>, ICallback<String, String> {
 
     @Override
-    public String action(String object, Map<String, TaskWrapper> allWrappers) {
+    public String doTask(String object, Map<String, TaskWrapper> allWrappers) {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -24,9 +24,10 @@ public class SeqWorker2 implements IWorker<String, String>, ICallback<String, St
         return "result = " + SystemClock.now() + "---param = " + object + " from 0";
     }
 
+
     @Override
     public String defaultValue() {
-        return "worker2--default";
+        return "worker0--default";
     }
 
     @Override
@@ -37,10 +38,10 @@ public class SeqWorker2 implements IWorker<String, String>, ICallback<String, St
     @Override
     public void result(boolean success, String param, TaskResult<String> workResult) {
         if (success) {
-            System.out.println("callback worker2 success--" + SystemClock.now() + "----" + workResult.getResult()
+            System.out.println("callback worker0 success--" + SystemClock.now() + "----" + workResult.getResult()
                     + "-threadName:" +Thread.currentThread().getName());
         } else {
-            System.err.println("callback worker2 failure--" + SystemClock.now() + "----"  + workResult.getResult()
+            System.err.println("callback worker0 failure--" + SystemClock.now() + "----"  + workResult.getResult()
                     + "-threadName:" +Thread.currentThread().getName());
         }
     }

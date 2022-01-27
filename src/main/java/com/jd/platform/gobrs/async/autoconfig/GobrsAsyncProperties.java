@@ -39,6 +39,21 @@ public class GobrsAsyncProperties {
     private String must = ":not";
 
 
+    /**
+     * 默认总任务超时时间 3s
+     * @return
+     */
+    private long timeout = 3000;
+
+
+    public long getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
+    }
+
     public String getSplit() {
 
         return split;

@@ -2,7 +2,7 @@ package com.jd.platform.gobrs.async.wrapper;
 
 import com.jd.platform.gobrs.async.callback.DefaultCallback;
 import com.jd.platform.gobrs.async.callback.ICallback;
-import com.jd.platform.gobrs.async.callback.IWorker;
+import com.jd.platform.gobrs.async.callback.ITask;
 import com.jd.platform.gobrs.async.exception.SkippedException;
 import com.jd.platform.gobrs.async.executor.timer.SystemClock;
 import com.jd.platform.gobrs.async.worker.DependWrapper;
@@ -29,7 +29,7 @@ public class TaskWrapper<T, V> {
      * worker将来要处理的param
      */
     private T param;
-    private IWorker<T, V> worker;
+    private ITask<T, V> worker;
     private ICallback<T, V> callback;
     /**
      * 在自己后面的wrapper，如果没有，自己就是末尾；如果有一个，就是串行；如果有多个，有几个就需要开几个线程</p>
@@ -78,7 +78,7 @@ public class TaskWrapper<T, V> {
     private static final int WORKING = 3;
     private static final int INIT = 0;
 
-    private TaskWrapper(String id, IWorker<T, V> worker, T param, ICallback<T, V> callback) {
+    private TaskWrapper(String id, ITask<T, V> worker, T param, ICallback<T, V> callback) {
         if (worker == null) {
             throw new NullPointerException("async.worker is null");
         }
@@ -247,7 +247,7 @@ public class TaskWrapper<T, V> {
         //如果fromWrapper是必须的
         boolean existNoFinish = false;
         boolean hasError = false;
-        //先判断前面必须要执行的依赖任务的执行结果，如果有任何一个失败，那就不用走action了，直接给自己设置为失败，进行下一步就是了
+        //先判断前面必须要执行的依赖任务的执行结果，如果有任何一个失败，那就不用走doTask了，直接给自己设置为失败，进行下一步就是了
         for (DependWrapper dependWrapper : mustWrapper) {
             TaskWrapper workerWrapper = dependWrapper.getDependWrapper();
             TaskResult tempWorkResult = workerWrapper.getWorkResult();
@@ -317,7 +317,7 @@ public class TaskWrapper<T, V> {
     }
 
     /**
-     * 真正的的单个task执行任务 action
+     * 真正的的单个task执行任务 doTask
      */
     private TaskResult<V> doTaskDep() {
         //  先判断自己是否需要执行
@@ -339,7 +339,7 @@ public class TaskWrapper<T, V> {
             callback.begin();
 
             //执行耗时操作
-            V resultValue = worker.action(param, forParamUseWrappers);
+            V resultValue = worker.doTask(param, forParamUseWrappers);
 
             //如果状态不是在working,说明别的地方已经修改了
             if (!compareAndSetState(WORKING, FINISH)) {
@@ -491,7 +491,7 @@ public class TaskWrapper<T, V> {
          * worker将来要处理的param
          */
         private W param;
-        private IWorker<W, C> worker;
+        private ITask<W, C> worker;
         private ICallback<W, C> callback;
         /**
          * 自己后面的所有
@@ -509,7 +509,7 @@ public class TaskWrapper<T, V> {
         // 默认true 需要检查 next  wrapper
         private boolean needCheckNextWrapperResult = true;
 
-        public Builder<W, C> worker(IWorker<W, C> worker) {
+        public Builder<W, C> worker(ITask<W, C> worker) {
             this.worker = worker;
             return this;
         }

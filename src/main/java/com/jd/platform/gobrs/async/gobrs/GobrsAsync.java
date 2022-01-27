@@ -1,5 +1,9 @@
 package com.jd.platform.gobrs.async.gobrs;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 /**
  * @program: gobrs-async
  * @ClassName GobrsAsync
@@ -9,5 +13,6 @@ package com.jd.platform.gobrs.async.gobrs;
  * @Version 1.0
  **/
 public interface GobrsAsync {
+
 
 }

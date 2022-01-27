@@ -4,7 +4,7 @@ package com.jd.platform.gobrs.async.callback;
  * @author sizegang wrote on 2019-12-20
  * @version 1.0
  */
-public interface ITimeoutWorker<T, V> extends IWorker<T, V> {
+public interface ITimeoutTask<T, V> extends ITask<T, V> {
     /**
      * 每个worker都可以设置超时时间
      * @return 毫秒超时时间

@@ -15,9 +15,9 @@ public class TestSequential {
     public static void main(String[] args) throws InterruptedException, ExecutionException {
 
 
-        SeqWorker w = new SeqWorker();
-        SeqWorker1 w1 = new SeqWorker1();
-        SeqWorker2 w2 = new SeqWorker2();
+        SeqTask w = new SeqTask();
+        SeqTask1 w1 = new SeqTask1();
+        SeqTask2 w2 = new SeqTask2();
 
         //顺序0-1-2
         TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
@@ -49,7 +49,7 @@ public class TestSequential {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginTaskFlow(3500, workerWrapper);
+        Async.startTaskFlow(3500, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -61,7 +61,7 @@ public class TestSequential {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginTaskFlow(2500, workerWrapper);
+        Async.startTaskFlow(2500, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));

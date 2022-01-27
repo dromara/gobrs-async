@@ -2,7 +2,7 @@ package parallel;
 
 
 import com.jd.platform.gobrs.async.callback.ICallback;
-import com.jd.platform.gobrs.async.callback.IWorker;
+import com.jd.platform.gobrs.async.callback.ITask;
 import com.jd.platform.gobrs.async.executor.timer.SystemClock;
 import com.jd.platform.gobrs.async.worker.TaskResult;
 import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
@@ -12,14 +12,14 @@ import java.util.Map;
 /**
  * @author sizegang wrote on 2019-11-20.
  */
-public class ParWorker3 implements IWorker<String, String>, ICallback<String, String> {
+public class ParTask6 implements ITask<String, String>, ICallback<String, String> {
     private long sleepTime = 1000;
 
     public void setSleepTime(long sleepTime) {
         this.sleepTime = sleepTime;
     }
     @Override
-    public String action(String object, Map<String, TaskWrapper> allWrappers) {
+    public String doTask(String object, Map<String, TaskWrapper> allWrappers) {
         try {
             Thread.sleep(sleepTime);
         } catch (InterruptedException e) {

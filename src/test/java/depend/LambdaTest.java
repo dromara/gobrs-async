@@ -60,13 +60,13 @@ public class LambdaTest {
                 .build();
 
         //虽然尚未执行，但是也可以先取得结果的引用，作为下一个任务的入参。V1.2前写法，需要手工给
-        //V1.3后，不用给wrapper setParam了，直接在worker的action里自行根据id获取即可.参考dependnew包下代码
+        //V1.3后，不用给wrapper setParam了，直接在worker的doTask里自行根据id获取即可.参考dependnew包下代码
         TaskResult<User> result = workerWrapper.getWorkResult();
         TaskResult<User> result1 = workerWrapper1.getWorkResult();
         workerWrapper1.setParam(result);
         workerWrapper2.setParam(result1);
 
-        Async.beginTaskFlow(3500, workerWrapper);
+        Async.startTaskFlow(3500, workerWrapper);
 
         System.out.println(workerWrapper2.getWorkResult());
         Async.shutDown();

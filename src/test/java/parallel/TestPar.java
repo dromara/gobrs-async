@@ -38,9 +38,9 @@ public class TestPar {
      * 3个并行，测试不同时间的超时
      */
     private static void testNormal() throws InterruptedException, ExecutionException {
-        ParWorker w = new ParWorker();
-        ParWorker1 w1 = new ParWorker1();
-        ParWorker2 w2 = new ParWorker2();
+        ParTask w = new ParTask();
+        ParTask1 w1 = new ParTask1();
+        ParTask2 w2 = new ParTask2();
 
         TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
@@ -63,9 +63,9 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginTaskFlow(1500, workerWrapper, workerWrapper1, workerWrapper2);
-//        Async.beginTaskFlow(800, workerWrapper, workerWrapper1, workerWrapper2);
-//        Async.beginTaskFlow(1000, workerWrapper, workerWrapper1, workerWrapper2);
+        Async.startTaskFlow(1500, workerWrapper, workerWrapper1, workerWrapper2);
+//        Async.startTaskFlow(800, workerWrapper, workerWrapper1, workerWrapper2);
+//        Async.startTaskFlow(1000, workerWrapper, workerWrapper1, workerWrapper2);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -81,9 +81,9 @@ public class TestPar {
      * 2
      */
     private static void testMulti() throws ExecutionException, InterruptedException {
-        ParWorker w = new ParWorker();
-        ParWorker1 w1 = new ParWorker1();
-        ParWorker2 w2 = new ParWorker2();
+        ParTask w = new ParTask();
+        ParTask1 w1 = new ParTask1();
+        ParTask2 w2 = new ParTask2();
 
         TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
@@ -107,7 +107,7 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginTaskFlow(2500, workerWrapper, workerWrapper2);
+        Async.startTaskFlow(2500, workerWrapper, workerWrapper2);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -121,9 +121,9 @@ public class TestPar {
      * 2
      */
     private static void testMultiReverse() throws ExecutionException, InterruptedException {
-        ParWorker w = new ParWorker();
-        ParWorker1 w1 = new ParWorker1();
-        ParWorker2 w2 = new ParWorker2();
+        ParTask w = new ParTask();
+        ParTask1 w1 = new ParTask1();
+        ParTask2 w2 = new ParTask2();
 
         TaskWrapper<String, String> workerWrapper =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
@@ -148,7 +148,7 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginTaskFlow(2500, workerWrapper, workerWrapper2);
+        Async.startTaskFlow(2500, workerWrapper, workerWrapper2);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -163,9 +163,9 @@ public class TestPar {
      * 2
      */
     private static void testMultiError() throws ExecutionException, InterruptedException {
-        ParWorker w = new ParWorker();
-        ParWorker1 w1 = new ParWorker1();
-        ParWorker2 w2 = new ParWorker2();
+        ParTask w = new ParTask();
+        ParTask1 w1 = new ParTask1();
+        ParTask2 w2 = new ParTask2();
 
         TaskWrapper<String, String> workerWrapper2 =  new TaskWrapper.Builder<String, String>()
                 .worker(w2)
@@ -189,7 +189,7 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginTaskFlow(1500, workerWrapper, workerWrapper2);
+        Async.startTaskFlow(1500, workerWrapper, workerWrapper2);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -204,10 +204,10 @@ public class TestPar {
      *     2
      */
     private static void testMulti3() throws ExecutionException, InterruptedException {
-        ParWorker w = new ParWorker();
-        ParWorker1 w1 = new ParWorker1();
-        ParWorker2 w2 = new ParWorker2();
-        ParWorker3 w3 = new ParWorker3();
+        ParTask w = new ParTask();
+        ParTask1 w1 = new ParTask1();
+        ParTask2 w2 = new ParTask2();
+        ParTask3 w3 = new ParTask3();
 
         TaskWrapper<String, String> workerWrapper3 =  new TaskWrapper.Builder<String, String>()
                 .worker(w3)
@@ -240,9 +240,9 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginTaskFlow(3100, workerWrapper);
+        Async.startTaskFlow(3100, workerWrapper);
         workerWrapper.getWorkResult().getResult();
-//        Async.beginTaskFlow(2100, workerWrapper);
+//        Async.startTaskFlow(2100, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -258,10 +258,10 @@ public class TestPar {
      *     2
      */
     private static void testMulti3Reverse() throws ExecutionException, InterruptedException {
-        ParWorker w = new ParWorker();
-        ParWorker1 w1 = new ParWorker1();
-        ParWorker2 w2 = new ParWorker2();
-        ParWorker3 w3 = new ParWorker3();
+        ParTask w = new ParTask();
+        ParTask1 w1 = new ParTask1();
+        ParTask2 w2 = new ParTask2();
+        ParTask3 w3 = new ParTask3();
 
         TaskWrapper<String, String> workerWrapper =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
@@ -294,8 +294,8 @@ public class TestPar {
         long now = SystemClock.now();
         System.out.println("begin-" + now);
 
-        Async.beginTaskFlow(3100, workerWrapper);
-//        Async.beginTaskFlow(2100, workerWrapper);
+        Async.startTaskFlow(3100, workerWrapper);
+//        Async.startTaskFlow(2100, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -314,13 +314,13 @@ public class TestPar {
      * 执行结果0，1，2，3
      */
     private static void testMulti4() throws ExecutionException, InterruptedException {
-        ParWorker w = new ParWorker();
-        ParWorker1 w1 = new ParWorker1();
+        ParTask w = new ParTask();
+        ParTask1 w1 = new ParTask1();
 
-        ParWorker2 w2 = new ParWorker2();
+        ParTask2 w2 = new ParTask2();
         w2.setSleepTime(2000);
 
-        ParWorker3 w3 = new ParWorker3();
+        ParTask3 w3 = new ParTask3();
 
         TaskWrapper<String, String> workerWrapper3 =  new TaskWrapper.Builder<String, String>()
                 .worker(w3)
@@ -353,11 +353,11 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginTaskFlow(4100, workerWrapper);
+        Async.startTaskFlow(4100, workerWrapper);
         //3会超时
-//        Async.beginTaskFlow(3100, workerWrapper);
+//        Async.startTaskFlow(3100, workerWrapper);
         //2,3会超时
-//        Async.beginTaskFlow(2900, workerWrapper);
+//        Async.startTaskFlow(2900, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -375,13 +375,13 @@ public class TestPar {
      * 执行结果0，1，2，3
      */
     private static void testMulti4Reverse() throws ExecutionException, InterruptedException {
-        ParWorker w = new ParWorker();
-        ParWorker1 w1 = new ParWorker1();
+        ParTask w = new ParTask();
+        ParTask1 w1 = new ParTask1();
 
-        ParWorker2 w2 = new ParWorker2();
+        ParTask2 w2 = new ParTask2();
         w2.setSleepTime(2000);
 
-        ParWorker3 w3 = new ParWorker3();
+        ParTask3 w3 = new ParTask3();
 
         TaskWrapper<String, String> workerWrapper =  new TaskWrapper.Builder<String, String>()
                 .worker(w)
@@ -415,11 +415,11 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginTaskFlow(4100, workerWrapper);
+        Async.startTaskFlow(4100, workerWrapper);
         //3会超时
-//        Async.beginTaskFlow(3100, workerWrapper);
+//        Async.startTaskFlow(3100, workerWrapper);
         //2,3会超时
-//        Async.beginTaskFlow(2900, workerWrapper);
+//        Async.startTaskFlow(2900, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -439,13 +439,13 @@ public class TestPar {
      * 2，3分别是500、400.3执行完毕后，1才执行完
      */
     private static void testMulti5() throws ExecutionException, InterruptedException {
-        ParWorker w = new ParWorker();
-        ParWorker1 w1 = new ParWorker1();
+        ParTask w = new ParTask();
+        ParTask1 w1 = new ParTask1();
 
-        ParWorker2 w2 = new ParWorker2();
+        ParTask2 w2 = new ParTask2();
         w2.setSleepTime(500);
 
-        ParWorker3 w3 = new ParWorker3();
+        ParTask3 w3 = new ParTask3();
         w3.setSleepTime(400);
 
         TaskWrapper<String, String> workerWrapper3 =  new TaskWrapper.Builder<String, String>()
@@ -479,7 +479,7 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginTaskFlow(4100, workerWrapper);
+        Async.startTaskFlow(4100, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -500,13 +500,13 @@ public class TestPar {
      * 2，3分别是500、400.3执行完毕后，1才执行完
      */
     private static void testMulti5Reverse() throws ExecutionException, InterruptedException {
-        ParWorker w = new ParWorker();
-        ParWorker1 w1 = new ParWorker1();
+        ParTask w = new ParTask();
+        ParTask1 w1 = new ParTask1();
 
-        ParWorker2 w2 = new ParWorker2();
+        ParTask2 w2 = new ParTask2();
         w2.setSleepTime(500);
 
-        ParWorker3 w3 = new ParWorker3();
+        ParTask3 w3 = new ParTask3();
         w3.setSleepTime(400);
 
         TaskWrapper<String, String> workerWrapper =  new TaskWrapper.Builder<String, String>()
@@ -543,7 +543,7 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginTaskFlow(4100, workerWrapper);
+        Async.startTaskFlow(4100, workerWrapper);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -564,13 +564,13 @@ public class TestPar {
      * 2，3分别是500、400.2执行完了，1没完，那就等着1完毕，才能3
      */
     private static void testMulti6() throws ExecutionException, InterruptedException {
-        ParWorker w = new ParWorker();
-        ParWorker1 w1 = new ParWorker1();
+        ParTask w = new ParTask();
+        ParTask1 w1 = new ParTask1();
 
-        ParWorker2 w2 = new ParWorker2();
+        ParTask2 w2 = new ParTask2();
         w2.setSleepTime(500);
 
-        ParWorker3 w3 = new ParWorker3();
+        ParTask3 w3 = new ParTask3();
         w3.setSleepTime(400);
 
         TaskWrapper<String, String> workerWrapper3 =  new TaskWrapper.Builder<String, String>()
@@ -606,7 +606,7 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginTaskFlow(4100, workerWrapper0);
+        Async.startTaskFlow(4100, workerWrapper0);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -634,11 +634,11 @@ public class TestPar {
      * callback worker4 success--1577242873980----result = 1577242873980---param = 4 from 3-threadName:Thread-2
      */
     private static void testMulti7() throws ExecutionException, InterruptedException {
-        ParWorker w = new ParWorker();
-        ParWorker1 w1 = new ParWorker1();
-        ParWorker2 w2 = new ParWorker2();
-        ParWorker3 w3 = new ParWorker3();
-        ParWorker4 w4 = new ParWorker4();
+        ParTask w = new ParTask();
+        ParTask1 w1 = new ParTask1();
+        ParTask2 w2 = new ParTask2();
+        ParTask3 w3 = new ParTask3();
+        ParTask4 w4 = new ParTask4();
 
         TaskWrapper<String, String> workerWrapper4 =  new TaskWrapper.Builder<String, String>()
                 .worker(w4)
@@ -705,7 +705,7 @@ public class TestPar {
         System.out.println("begin-" + now);
 
         //正常完毕
-        Async.beginTaskFlow(4100, workerWrapper00, workerWrapper0);
+        Async.startTaskFlow(4100, workerWrapper00, workerWrapper0);
 
         System.out.println("end-" + SystemClock.now());
         System.err.println("cost-" + (SystemClock.now() - now));
@@ -721,13 +721,13 @@ public class TestPar {
      * b、c
      */
     private static void testMulti8() throws ExecutionException, InterruptedException {
-        ParWorker w = new ParWorker();
-        ParWorker1 w1 = new ParWorker1();
+        ParTask w = new ParTask();
+        ParTask1 w1 = new ParTask1();
         w1.setSleepTime(1005);
 
-        ParWorker2 w2 = new ParWorker2();
+        ParTask2 w2 = new ParTask2();
         w2.setSleepTime(3000);
-        ParWorker3 w3 = new ParWorker3();
+        ParTask3 w3 = new ParTask3();
         w3.setSleepTime(1000);
 
         TaskWrapper<String, String> workerWrapper3 =  new TaskWrapper.Builder<String, String>()
@@ -757,7 +757,7 @@ public class TestPar {
                 .build();
 
 
-        Async.beginTaskFlow(6000, workerWrappera1, workerWrappera2);
+        Async.startTaskFlow(6000, workerWrappera1, workerWrappera2);
         Async.shutDown();
     }
 
@@ -768,14 +768,14 @@ public class TestPar {
      * w1和w并行，w执行完后就执行last，此时b、c还没开始，b、c就不需要执行了
      */
     private static void testMulti9() throws ExecutionException, InterruptedException {
-        ParWorker1 w1 = new ParWorker1();
+        ParTask1 w1 = new ParTask1();
         //注意这里，如果w1的执行时间比w长，那么w2和w3肯定不走。 如果w1和w执行时间一样长，多运行几次，会发现w2有时走有时不走
 //        w1.setSleepTime(1100);
 
-        ParWorker w = new ParWorker();
-        ParWorker2 w2 = new ParWorker2();
-        ParWorker3 w3 = new ParWorker3();
-        ParWorker4 w4 = new ParWorker4();
+        ParTask w = new ParTask();
+        ParTask2 w2 = new ParTask2();
+        ParTask3 w3 = new ParTask3();
+        ParTask4 w4 = new ParTask4();
 
         TaskWrapper<String, String> last =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
@@ -811,7 +811,7 @@ public class TestPar {
                 .next(wrapperW2)
                 .build();
 
-        Async.beginTaskFlow(6000, wrapperW, wrapperW1);
+        Async.startTaskFlow(6000, wrapperW, wrapperW1);
         Async.shutDown();
     }
 
@@ -822,14 +822,14 @@ public class TestPar {
      * w1和w并行，w执行完后就执行last，此时b、c还没开始，b、c就不需要执行了
      */
     private static void testMulti9Reverse() throws ExecutionException, InterruptedException {
-        ParWorker1 w1 = new ParWorker1();
+        ParTask1 w1 = new ParTask1();
         //注意这里，如果w1的执行时间比w长，那么w2和w3肯定不走。 如果w1和w执行时间一样长，多运行几次，会发现w2有时走有时不走
 //        w1.setSleepTime(1100);
 
-        ParWorker w = new ParWorker();
-        ParWorker2 w2 = new ParWorker2();
-        ParWorker3 w3 = new ParWorker3();
-        ParWorker4 w4 = new ParWorker4();
+        ParTask w = new ParTask();
+        ParTask2 w2 = new ParTask2();
+        ParTask3 w3 = new ParTask3();
+        ParTask4 w4 = new ParTask4();
 
         TaskWrapper<String, String> wrapperW1 =  new TaskWrapper.Builder<String, String>()
                 .worker(w1)
@@ -865,7 +865,7 @@ public class TestPar {
                 .next(last, false)
                 .build();
 
-        Async.beginTaskFlow(6000,Executors.newCachedThreadPool(),  wrapperW, wrapperW1);
+        Async.startTaskFlow(6000,Executors.newCachedThreadPool(),  wrapperW, wrapperW1);
         Async.shutDown();
     }
 }

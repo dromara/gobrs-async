@@ -1,8 +1,8 @@
-package depend;
+package dependnew;
 
 
 import com.jd.platform.gobrs.async.callback.ICallback;
-import com.jd.platform.gobrs.async.callback.IWorker;
+import com.jd.platform.gobrs.async.callback.ITask;
 import com.jd.platform.gobrs.async.worker.TaskResult;
 import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
 
@@ -11,17 +11,16 @@ import java.util.Map;
 /**
  * @author sizegang wrote on 2019-11-20.
  */
-public class DeWorker1 implements IWorker<TaskResult<User>, User>, ICallback<TaskResult<User>, User> {
+public class DeTask implements ITask<String, User>, ICallback<String, User> {
 
     @Override
-    public User action(TaskResult<User> result, Map<String, TaskWrapper> allWrappers) {
-        System.out.println("par1的入参来自于par0： " + result.getResult());
+    public User doTask(String object, Map<String, TaskWrapper> allWrappers) {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return new User("user1");
+        return new User("user0");
     }
 
 
@@ -36,8 +35,8 @@ public class DeWorker1 implements IWorker<TaskResult<User>, User>, ICallback<Tas
     }
 
     @Override
-    public void result(boolean success, TaskResult<User> param, TaskResult<User> workResult) {
-        System.out.println("worker1 的结果是：" + workResult.getResult());
+    public void result(boolean success, String param, TaskResult<User> workResult) {
+        System.out.println("worker0 的结果是：" + workResult.getResult());
     }
 
 }
