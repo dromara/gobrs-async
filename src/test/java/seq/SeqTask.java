@@ -1,11 +1,11 @@
 package seq;
 
 
-import com.jd.platform.gobrs.async.callback.ICallback;
-import com.jd.platform.gobrs.async.callback.ITask;
-import com.jd.platform.gobrs.async.executor.timer.SystemClock;
-import com.jd.platform.gobrs.async.worker.TaskResult;
-import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
+import com.gobrs.platform.async.callback.ICallback;
+import com.gobrs.platform.async.callback.ITask;
+import com.gobrs.platform.async.executor.timer.SystemClock;
+import com.gobrs.platform.async.worker.TaskResult;
+import com.gobrs.platform.async.wrapper.TaskWrapper;
 
 import java.util.Map;
 

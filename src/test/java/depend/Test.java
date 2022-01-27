@@ -1,8 +1,8 @@
 package depend;
 
-import com.jd.platform.gobrs.async.executor.Async;
-import com.jd.platform.gobrs.async.worker.TaskResult;
-import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
+import com.gobrs.platform.async.executor.Async;
+import com.gobrs.platform.async.worker.TaskResult;
+import com.gobrs.platform.async.wrapper.TaskWrapper;
 
 import java.util.concurrent.ExecutionException;
 
