@@ -9,8 +9,7 @@ import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+import java.util.function.Supplier;
 
 /**
  * @program: gobrs-async
@@ -19,81 +18,94 @@ import java.util.stream.Collectors;
  * @author: sizegang
  * @Version 1.0
  **/
-public class RuleParseEngine extends AbstractEngine {
+public class RuleParseEngine<T> extends AbstractEngine {
 
     @Resource
     private GobrsAsyncProperties gobrsAsyncProperties;
 
-    /**
-     * 树形结构 折叠 taskWrapper
-     */
-    public Map<String, List<TaskWrapper>> taskWraMap = new ConcurrentHashMap<>();
-
-    /**
-     * 保存所有的rule命名空间下的 Wrapper 平铺
-     */
-    public Map<String, Map<String, TaskWrapper>> flatWrapMap = new ConcurrentHashMap<>();
-
-
-    public Object getBean(String bean) {
-        return Optional.ofNullable(GobrsSpring.getBean(bean)).orElseThrow(() -> {
-            return null;
-        });
-    }
-
+    public static final String DEFAULT_PARAMS = "default_params";
 
     @Override
-    public List<TaskWrapper> parsing(Rule rule) {
+    public Map<String, TaskWrapper> parsing(Rule rule, Map<String, Object> parameters) {
         String[] taskFlows = rule.getContent().replaceAll("\\s+", "").split(gobrsAsyncProperties.getSplit());
         Map<String, TaskWrapper> wrapperMap = new HashMap<>();
-        Map<String, TaskWrapper> flatWrap = new HashMap<>();
         for (String taskFlow : taskFlows) {
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
             String leftTaskName = taskArr[0];
             TaskWrapper frontTaskWrapper = wrapperMap.get(leftTaskName);
             if (frontTaskWrapper == null) {
-                frontTaskWrapper = getWrapper(leftTaskName);
+                frontTaskWrapper = EngineExecutor.getWrapper(leftTaskName);
+                EngineExecutor.setParams(frontTaskWrapper, parameters);
                 wrapperMap.put(leftTaskName, frontTaskWrapper);
-                flatWrap.put(leftTaskName, frontTaskWrapper);
             }
             for (int i = 1; i < taskArr.length; i++) {
                 String taskBean = taskArr[i];
                 if (taskBean.contains(gobrsAsyncProperties.getMust())) { // 强以来上游 上游不返回 方法不执行
                     taskBean = taskBean.replace(gobrsAsyncProperties.getMust(), "");
-                    frontTaskWrapper = getWrapperDepend(taskBean, frontTaskWrapper, false);
+                    frontTaskWrapper = EngineExecutor.getWrapperDepend(taskBean, frontTaskWrapper, false);
                 } else {
-                    frontTaskWrapper = getWrapperDepend(taskBean, frontTaskWrapper);
+                    frontTaskWrapper = EngineExecutor.getWrapperDepend(taskBean, frontTaskWrapper);
                 }
-                flatWrap.put(taskBean, frontTaskWrapper);
+                EngineExecutor.setParams(frontTaskWrapper, parameters);
             }
         }
-        List<TaskWrapper> collect = wrapperMap.values().stream().collect(Collectors.toList());
-        taskWraMap.put(rule.getName(), collect);
-        flatWrapMap.put(rule.getName(), flatWrap);
+
+        return wrapperMap;
+    }
+
+    /**
+     * 参数解析
+     *
+     * @return
+     */
+    @Override
+    public Map<String, TaskWrapper> invokeParam(Map<String, TaskWrapper> wrapperMap, Object parameter) {
+
         return null;
     }
 
-
-    private TaskWrapper getWrapper(String s3) {
-        return new TaskWrapper.Builder()
-                .worker((ITask) getBean(s3))
-                .callback((ICallback) getBean(s3)).build();
+    @Override
+    public Map<String, TaskWrapper> invokeParamsSupplier(Map<String, TaskWrapper> t, Supplier<Map<String, Object>> supplier) {
+        return null;
     }
 
-
-    private TaskWrapper getWrapperDepend(String taskBean, TaskWrapper taskWrapper) {
-        return getWrapperDepend(taskBean, taskWrapper, true);
+    public Rule getRule(String key) {
+        return super.ruleMap.get(key);
     }
 
-    private TaskWrapper getWrapperDepend(String taskBean, TaskWrapper taskWrapper, boolean must) {
-        return Optional.ofNullable(getBean(taskBean)).map((bean) -> {
+    public static class EngineExecutor {
+        private static TaskWrapper getWrapper(String s3) {
             return new TaskWrapper.Builder()
-                    .id(taskBean)
-                    .worker((ITask) bean)
-                    .callback((ICallback) bean)
-                    .depend(taskWrapper, must)
-                    .build();
-        }).orElse(new TaskWrapper.Builder<>().build());
+                    .worker((ITask) getBean(s3))
+                    .callback((ICallback) getBean(s3)).build();
+        }
+
+        private static TaskWrapper getWrapperDepend(String taskBean, TaskWrapper taskWrapper) {
+            return getWrapperDepend(taskBean, taskWrapper, true);
+        }
+
+        private static TaskWrapper getWrapperDepend(String taskBean, TaskWrapper taskWrapper, boolean must) {
+            return Optional.ofNullable(getBean(taskBean)).map((bean) -> {
+                return new TaskWrapper.Builder()
+                        .id(taskBean)
+                        .worker((ITask) bean)
+                        .callback((ICallback) bean)
+                        .depend(taskWrapper, must)
+                        .build();
+            }).orElse(new TaskWrapper.Builder<>().build());
+        }
+
+        public static Object getBean(String bean) {
+            return Optional.ofNullable(GobrsSpring.getBean(bean)).orElseThrow(() -> new RuntimeException("bean not found"));
+        }
+
+        public static void setParams(TaskWrapper taskWrapper, Map<String, Object> paramMap) {
+            if (paramMap.size() == 1 && paramMap.containsKey(DEFAULT_PARAMS)) {
+                taskWrapper.setParam(paramMap.get(DEFAULT_PARAMS));
+            } else {
+                taskWrapper.setParam(paramMap.get(taskWrapper.getId()));
+            }
+        }
     }
 
 
@@ -107,13 +119,11 @@ public class RuleParseEngine extends AbstractEngine {
 
 //        String rule = "B->A;C->A:not";
         String rule = "A->B->F:must->H; A->C->F->H; D->E->G->H; c; d; f; ";
-
-
         Rule r = new Rule();
         r.setName("test");
         r.setContent(rule);
         RuleParseEngine ruleParseEngine = new RuleParseEngine();
-        ruleParseEngine.parsing(r);
+//        ruleParseEngine.parsing(r);
 //        System.out.println(JSONObject.toJSONString(taskWraMap));
     }
 

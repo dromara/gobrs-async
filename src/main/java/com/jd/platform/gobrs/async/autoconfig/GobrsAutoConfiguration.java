@@ -1,5 +1,6 @@
 package com.jd.platform.gobrs.async.autoconfig;
 
+import com.jd.platform.gobrs.async.engine.RuleEnginePostProcessor;
 import com.jd.platform.gobrs.async.engine.RuleParseEngine;
 import com.jd.platform.gobrs.async.spring.GobrsSpring;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -25,10 +26,9 @@ public class GobrsAutoConfiguration {
     public GobrsAutoConfiguration(GobrsAsyncProperties properties) {
         this.properties = properties;
     }
-
-
     /**
      * spring工具
+     *
      * @return
      */
     @Bean
@@ -38,6 +38,7 @@ public class GobrsAutoConfiguration {
 
     /**
      * 规则引擎
+     *
      * @return
      */
     @Bean
@@ -45,5 +46,9 @@ public class GobrsAutoConfiguration {
         return new RuleParseEngine();
     }
 
+    @Bean
+    public RuleEnginePostProcessor ruleEnginePostProcessor() {
+        return new RuleEnginePostProcessor();
+    }
 
 }

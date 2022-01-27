@@ -5,6 +5,7 @@ import com.jd.platform.gobrs.async.wrapper.TaskWrapper;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * @program: gobrs-async
@@ -27,7 +28,14 @@ public interface Engine {
      * @param r
      * @return
      */
-    List<TaskWrapper> parsing(Rule r);
+    Map<String, TaskWrapper> parsing(Rule r, Map<String, Object> params);
 
+
+    /**
+     * 参数解析
+     */
+    Map<String, TaskWrapper> invokeParam(Map<String, TaskWrapper> t, Object v);
+
+    Map<String, TaskWrapper> invokeParamsSupplier(Map<String, TaskWrapper> t, Supplier<Map<String, Object>> supplier);
 
 }
