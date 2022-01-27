@@ -1,9 +1,9 @@
 package seq;
 
 
-import com.gobrs.platform.async.executor.Async;
-import com.gobrs.platform.async.executor.timer.SystemClock;
-import com.gobrs.platform.async.wrapper.TaskWrapper;
+import io.github.memorydoc.executor.Async;
+import io.github.memorydoc.executor.timer.SystemClock;
+import io.github.memorydoc.wrapper.TaskWrapper;
 
 import java.util.concurrent.ExecutionException;
 

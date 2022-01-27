@@ -2,9 +2,9 @@ package depend;
 
 import java.util.Map;
 
-import com.gobrs.platform.async.executor.Async;
-import com.gobrs.platform.async.worker.TaskResult;
-import com.gobrs.platform.async.wrapper.TaskWrapper;
+import io.github.memorydoc.executor.Async;
+import io.github.memorydoc.worker.TaskResult;
+import io.github.memorydoc.wrapper.TaskWrapper;
 
 /**
  * @author sjsdfg

@@ -1,10 +1,10 @@
 package depend;
 
 
-import com.gobrs.platform.async.callback.ICallback;
-import com.gobrs.platform.async.callback.ITask;
-import com.gobrs.platform.async.worker.TaskResult;
-import com.gobrs.platform.async.wrapper.TaskWrapper;
+import io.github.memorydoc.callback.ICallback;
+import io.github.memorydoc.callback.ITask;
+import io.github.memorydoc.worker.TaskResult;
+import io.github.memorydoc.wrapper.TaskWrapper;
 
 import java.util.Map;
 
