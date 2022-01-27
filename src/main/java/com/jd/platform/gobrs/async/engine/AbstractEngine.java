@@ -13,16 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @ClassName AbstractEngine
  * @description:
  * @author: sizegang
- * @create: 2022-01-26 01:30
  * @Version 1.0
  **/
-/*[
-  {
-    "name": "xxxx"
-    "content": "A -> B,C; B->D; C->E; D->F:must; E->F:must;"
-  }
-]
-*/
 public abstract class AbstractEngine<T, R> implements Engine {
 
 

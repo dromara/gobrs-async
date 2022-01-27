@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
  * @ClassName RuleParseEngine
  * @description:
  * @author: sizegang
- * @create: 2022-01-26 01:55
  * @Version 1.0
  **/
 public class RuleParseEngine extends AbstractEngine {
@@ -89,6 +88,7 @@ public class RuleParseEngine extends AbstractEngine {
     private TaskWrapper getWrapperDepend(String taskBean, TaskWrapper taskWrapper, boolean must) {
         return Optional.ofNullable(getBean(taskBean)).map((bean) -> {
             return new TaskWrapper.Builder()
+                    .id(taskBean)
                     .worker((ITask) bean)
                     .callback((ICallback) bean)
                     .depend(taskWrapper, must)
@@ -106,7 +106,8 @@ public class RuleParseEngine extends AbstractEngine {
 //        String rule = "A->B;A->C:not";
 
 //        String rule = "B->A;C->A:not";
-        String rule = "A->B; A->C; A->D;A->F; A->H ";
+        String rule = "A->B->F:must->H; A->C->F->H; D->E->G->H; c; d; f; ";
+
 
         Rule r = new Rule();
         r.setName("test");

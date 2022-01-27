@@ -10,7 +10,6 @@ import java.util.Map;
  * @program: gobrs-async
  * @description: 规则解析引擎
  * @author: sizegang
- * @create: 2022-01-26 01:28
  **/
 public interface Engine {
 
