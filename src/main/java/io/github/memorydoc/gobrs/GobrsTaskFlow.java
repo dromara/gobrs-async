@@ -4,7 +4,7 @@ import io.github.memorydoc.autoconfig.GobrsAsyncProperties;
 import io.github.memorydoc.executor.Async;
 import io.github.memorydoc.rule.Rule;
 import io.github.memorydoc.wrapper.TaskWrapper;
-import io.github.memorydoc.engine.RuleParseEngine;
+import io.github.memorydoc.engine.RuleParse;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -14,18 +14,18 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
+ * @author sizegang1
  * @program: gobrs-async
  * @ClassName GobrsTaskFlow
  * @description:
  * @author: sizegang
  * @Version 1.0
  * @date 2022-01-27 23:56
- * @author sizegang1
  **/
 public class GobrsTaskFlow<T> implements GobrsAsync {
 
     @Resource
-    private RuleParseEngine ruleParseEngine;
+    private RuleParse ruleParseEngine;
 
     @Resource
     private GobrsAsyncProperties gobrsAsyncProperties;
@@ -51,9 +51,8 @@ public class GobrsTaskFlow<T> implements GobrsAsync {
     public boolean taskFlow(String ruleName, T t, long timeout) throws ExecutionException, InterruptedException {
         Rule rule = ruleParseEngine.getRule(ruleName);
         Map<String, Object> map = new HashMap<>();
-        map.put(RuleParseEngine.DEFAULT_PARAMS, t);
-        Map<String, TaskWrapper> wrapperMap = ruleParseEngine.parsing(rule, map);
-        ruleParseEngine.invokeParam(wrapperMap, t);
+        map.put(RuleParse.DEFAULT_PARAMS, t);
+        Map<String, TaskWrapper> wrapperMap = ruleParseEngine.doParse(rule, map);
         return Async.startTaskFlow(timeout, wrapperMap.values().parallelStream().collect(Collectors.toList()));
     }
 
@@ -66,8 +65,7 @@ public class GobrsTaskFlow<T> implements GobrsAsync {
      */
     public boolean taskFlow(String ruleName, Supplier<Map<String, T>> paramSupplier, long timeout) throws ExecutionException, InterruptedException {
         Rule rule = ruleParseEngine.getRule(ruleName);
-        Map<String, TaskWrapper> wrapperMap = ruleParseEngine.parsing(rule, paramSupplier.get());
-        ruleParseEngine.invokeParamsSupplier(wrapperMap, paramSupplier);
+        Map<String, TaskWrapper> wrapperMap = ruleParseEngine.doParse(rule, paramSupplier.get());
         return Async.startTaskFlow(timeout, wrapperMap.values().parallelStream().collect(Collectors.toList()));
     }
 }

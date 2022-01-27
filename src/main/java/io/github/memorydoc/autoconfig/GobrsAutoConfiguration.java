@@ -1,8 +1,8 @@
 package io.github.memorydoc.autoconfig;
 
-import io.github.memorydoc.engine.RuleEnginePostProcessor;
+import io.github.memorydoc.engine.RulePostProcessor;
 import io.github.memorydoc.spring.GobrsSpring;
-import io.github.memorydoc.engine.RuleParseEngine;
+import io.github.memorydoc.engine.RuleParse;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -42,13 +42,13 @@ public class GobrsAutoConfiguration {
      * @return
      */
     @Bean
-    public RuleParseEngine ruleParseEngine() {
-        return new RuleParseEngine();
+    public RuleParse ruleParseEngine() {
+        return new RuleParse();
     }
 
     @Bean
-    public RuleEnginePostProcessor ruleEnginePostProcessor() {
-        return new RuleEnginePostProcessor();
+    public RulePostProcessor ruleEnginePostProcessor() {
+        return new RulePostProcessor();
     }
 
 }

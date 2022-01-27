@@ -15,7 +15,7 @@ import java.util.*;
  * @date 2022-01-27 22:04
  * @author sizegang1
  **/
-public abstract class AbstractEngine implements Engine {
+public abstract class AbstractEngine implements RuleEngine {
     public Map<String, Rule> ruleMap = new HashMap<>();
 
     @Override
@@ -25,7 +25,7 @@ public abstract class AbstractEngine implements Engine {
             List<Rule> rules = JSONArray.parseArray(ru, Rule.class);
             for (Rule r : rules) {
                 ruleMap.put(r.getName(), r);
-                parsing(r, Collections.emptyMap());
+                doParse(r, Collections.emptyMap());
             }
             return listMap;
         }).orElse(Collections.emptyMap());

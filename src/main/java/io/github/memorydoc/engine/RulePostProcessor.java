@@ -15,7 +15,7 @@ import java.util.Optional;
  * @description:
  * @date 2022-01-27 22:05
  **/
-public class RuleEnginePostProcessor implements ApplicationListener<ContextRefreshedEvent> {
+public class RulePostProcessor implements ApplicationListener<ContextRefreshedEvent> {
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
@@ -25,7 +25,7 @@ public class RuleEnginePostProcessor implements ApplicationListener<ContextRefre
         String rules = properties.getRules();
         Optional.ofNullable(rules).map((data) -> {
             // 初始化解析规则 主要是为了检查规则是否正确
-            RuleParseEngine engine = applicationContext.getBean(RuleParseEngine.class);
+            RuleParse engine = applicationContext.getBean(RuleParse.class);
             engine.parse(data);
             return null;
         }).orElseThrow(() -> {

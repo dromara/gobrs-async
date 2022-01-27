@@ -2,7 +2,6 @@ package io.github.memorydoc.engine;
 
 import io.github.memorydoc.autoconfig.GobrsAsyncProperties;
 import io.github.memorydoc.callback.ICallback;
-import io.github.memorydoc.callback.ITask;
 import io.github.memorydoc.rule.Rule;
 import io.github.memorydoc.spring.GobrsSpring;
 import io.github.memorydoc.task.AsyncTask;
@@ -10,7 +9,6 @@ import io.github.memorydoc.wrapper.TaskWrapper;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.function.Supplier;
 
 /**
  * @program: gobrs-async
@@ -19,7 +17,7 @@ import java.util.function.Supplier;
  * @author: sizegang
  * @Version 1.0
  **/
-public class RuleParseEngine<T> extends AbstractEngine {
+public class RuleParse<T> extends AbstractEngine {
 
     @Resource
     private GobrsAsyncProperties gobrsAsyncProperties;
@@ -27,7 +25,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
     public static final String DEFAULT_PARAMS = "default_params";
 
     @Override
-    public Map<String, TaskWrapper> parsing(Rule rule, Map<String, Object> parameters) {
+    public Map<String, TaskWrapper> doParse(Rule rule, Map<String, Object> parameters) {
         String[] taskFlows = rule.getContent().replaceAll("\\s+", "").split(gobrsAsyncProperties.getSplit());
         Map<String, TaskWrapper> wrapperMap = new HashMap<>();
         for (String taskFlow : taskFlows) {
@@ -52,22 +50,6 @@ public class RuleParseEngine<T> extends AbstractEngine {
         }
 
         return wrapperMap;
-    }
-
-    /**
-     * 参数解析
-     *
-     * @return
-     */
-    @Override
-    public Map<String, TaskWrapper> invokeParam(Map<String, TaskWrapper> wrapperMap, Object parameter) {
-
-        return null;
-    }
-
-    @Override
-    public Map<String, TaskWrapper> invokeParamsSupplier(Map<String, TaskWrapper> t, Supplier<Map<String, Object>> supplier) {
-        return null;
     }
 
     public Rule getRule(String key) {
@@ -123,7 +105,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
         Rule r = new Rule();
         r.setName("test");
         r.setContent(rule);
-        RuleParseEngine ruleParseEngine = new RuleParseEngine();
+        RuleParse ruleParseEngine = new RuleParse();
 //        ruleParseEngine.parsing(r);
 //        System.out.println(JSONObject.toJSONString(taskWraMap));
     }
