@@ -1,13 +1,11 @@
 package io.github.memorydoc.enums;
 
 /**
- * @program: gobrs-async
- * @ClassName ParseEnum
- * @description:
- * @author: sizegang
- * @create: 2022-01-27 15:28
- * @Version 1.0
- **/
+ *
+ * @author sizegang1
+ * @date 2022-01-27 22:05 2022-01-27 22:05
+ */
+
 public enum ParseEnum {
 
     TREE("TREE", "树形结构"),

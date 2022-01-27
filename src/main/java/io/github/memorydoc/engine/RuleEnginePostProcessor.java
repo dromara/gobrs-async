@@ -13,7 +13,7 @@ import java.util.Optional;
  * @program: gobrs-async
  * @ClassName GobrsEngineLoading
  * @description:
- * @date 2022-01-27 15:02
+ * @date 2022-01-27 22:05
  **/
 public class RuleEnginePostProcessor implements ApplicationListener<ContextRefreshedEvent> {
 

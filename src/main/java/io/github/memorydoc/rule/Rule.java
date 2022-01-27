@@ -9,6 +9,8 @@ import java.io.Serializable;
  * @author: sizegang
  * @create: 2022-01-26 01:39
  * @Version 1.0
+ * @date 2022-01-27 22:04
+ * @author sizegang1
  **/
 
 public class Rule implements Serializable {

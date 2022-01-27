@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
  * @author: sizegang
  * @create: 2022-01-08 17:30
  * @Version 1.0
+ * @date 2022-01-27 22:04
+ * @author sizegang1
  **/
 @ConfigurationProperties(prefix = GobrsAsyncProperties.PREFIX)
 @Component

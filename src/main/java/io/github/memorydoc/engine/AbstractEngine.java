@@ -12,6 +12,8 @@ import java.util.*;
  * @description:
  * @author: sizegang
  * @Version 1.0
+ * @date 2022-01-27 22:04
+ * @author sizegang1
  **/
 public abstract class AbstractEngine implements Engine {
     public Map<String, Rule> ruleMap = new HashMap<>();
