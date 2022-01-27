@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
  * @description:
  * @author: sizegang
  * @Version 1.0
+ * @date 2022-01-27 23:56
+ * @author sizegang1
  **/
 public class GobrsTaskFlow<T> implements GobrsAsync {
 

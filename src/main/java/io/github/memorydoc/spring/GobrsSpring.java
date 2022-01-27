@@ -5,13 +5,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
- * @program: gobrs-async
- * @ClassName SpringUtil
- * @description:
- * @author: sizegang
- * @create: 2022-01-26 01:57
- * @Version 1.0
- **/
+ *
+ * @author sizegang1
+ * @date 2022-01-27 23:56 2022-01-27 23:56
+ */
 public class GobrsSpring implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
