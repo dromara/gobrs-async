@@ -25,7 +25,6 @@ public class RuleParse<T> extends AbstractEngine {
 
     public static final String DEFAULT_PARAMS = "default_params";
 
-
     @Override
     public Map<String, TaskWrapper> doParse(Rule rule, Map<String, Object> parameters) {
         String[] taskFlows = rule.getContent().replaceAll("\\s+", "").split(gobrsAsyncProperties.getSplit());
@@ -43,7 +42,7 @@ public class RuleParse<T> extends AbstractEngine {
             }
             for (int i = 1; i < arrayList.size(); i++) {
                 String taskBean = arrayList.get(i);
-                if (taskBean.contains(gobrsAsyncProperties.getMust())) { // 强以来上游 上游不返回 方法不执行
+                if (taskBean.contains(gobrsAsyncProperties.getMust())) { // 强依赖上游 上游不返回 方法不执行
                     taskBean = taskBean.replace(gobrsAsyncProperties.getMust(), "");
                     frontTaskWrapper = EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, frontTaskWrapper, false);
                 } else {
@@ -73,17 +72,18 @@ public class RuleParse<T> extends AbstractEngine {
         }
 
         private static TaskWrapper getWrapperDepend(Map<String, TaskWrapper> cacheTaskWrappers, String taskBean, TaskWrapper taskWrapper, boolean must) {
-            return Optional.ofNullable(getBean(taskBean)).map((bean) -> Optional.ofNullable(cacheTaskWrappers.get(taskBean)).map((data) -> {
-                TaskWrapper tk = cacheTaskWrappers.get(taskBean);
-                List dependWrappers = tk.getDependWrappers();
+            return Optional.ofNullable(getBean(taskBean)).map((bean) -> Optional.ofNullable(cacheTaskWrappers.get(taskBean)).map((tk) -> {
+                List<DependWrapper> dependWrappers = tk.getDependWrappers();
                 DependWrapper dependWrapper = new DependWrapper(taskWrapper, must);
                 if (dependWrappers != null) {
                     dependWrappers.add(dependWrapper);
                 } else {
                     dependWrappers = new ArrayList();
                     dependWrappers.add(dependWrapper);
+                    tk.addDepend(dependWrapper);
                 }
                 tk.setDependWrappers(dependWrappers);
+                taskWrapper.addNext(tk);
                 return tk;
             }).orElseGet(() -> {
                 TaskWrapper tk = new TaskWrapper.Builder()
@@ -109,25 +109,5 @@ public class RuleParse<T> extends AbstractEngine {
             }
         }
     }
-
-
-    public static void main(String[] args) {
-        //String rule = "A->B->F->H;A->C->F->H;D->E->G->H"
-//        String rule = "A->B:must->D->F;A->C->E->F";
-        //String rule = "A->B->F->H;A->C->F->H;D->E->G->H";
-//        String rule = "A;B;C";
-
-//        String rule = "A->B;A->C:not";
-
-//        String rule = "B->A;C->A:not";
-        String rule = "A->B->F:must->H; A->C->F->H; D->E->G->H; c; d; f; ";
-        Rule r = new Rule();
-        r.setName("test");
-        r.setContent(rule);
-        RuleParse ruleParseEngine = new RuleParse();
-//        ruleParseEngine.parsing(r);
-//        System.out.println(JSONObject.toJSONString(taskWraMap));
-    }
-
 
 }

@@ -29,6 +29,5 @@ public class RulePostProcessor implements ApplicationListener<ContextRefreshedEv
             engine.parse(data);
             return 1;
         }).orElseThrow(() ->new NotTaskRuleException("spring.gobrs.async.rules is empty"));
-
     }
 }

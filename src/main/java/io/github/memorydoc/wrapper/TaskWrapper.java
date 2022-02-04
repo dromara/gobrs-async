@@ -391,11 +391,11 @@ public class TaskWrapper<T, V> {
         return ResultState.DEFAULT == workResult.getResultState();
     }
 
-    private void addDepend(TaskWrapper<?, ?> workerWrapper, boolean must) {
+    public void addDepend(TaskWrapper<?, ?> workerWrapper, boolean must) {
         addDepend(new DependWrapper(workerWrapper, must));
     }
 
-    private void addDepend(DependWrapper dependWrapper) {
+    public void addDepend(DependWrapper dependWrapper) {
         if (dependWrappers == null) {
             dependWrappers = new ArrayList<>();
         }
@@ -408,7 +408,7 @@ public class TaskWrapper<T, V> {
         dependWrappers.add(dependWrapper);
     }
 
-    private void addNext(TaskWrapper<?, ?> workerWrapper) {
+    public void addNext(TaskWrapper<?, ?> workerWrapper) {
         if (nextWrappers == null) {
             nextWrappers = new ArrayList<>();
         }
