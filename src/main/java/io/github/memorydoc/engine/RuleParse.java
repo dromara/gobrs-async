@@ -5,11 +5,11 @@ import io.github.memorydoc.callback.ICallback;
 import io.github.memorydoc.rule.Rule;
 import io.github.memorydoc.spring.GobrsSpring;
 import io.github.memorydoc.task.AsyncTask;
+import io.github.memorydoc.task.DependWrapper;
 import io.github.memorydoc.wrapper.TaskWrapper;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @program: gobrs-async
@@ -26,12 +26,11 @@ public class RuleParse<T> extends AbstractEngine {
     public static final String DEFAULT_PARAMS = "default_params";
 
 
-
-
     @Override
     public Map<String, TaskWrapper> doParse(Rule rule, Map<String, Object> parameters) {
         String[] taskFlows = rule.getContent().replaceAll("\\s+", "").split(gobrsAsyncProperties.getSplit());
         Map<String, TaskWrapper> wrapperMap = new HashMap<>();
+        Map<String, TaskWrapper> cacheTaskWrappers = new HashMap<>();
         for (String taskFlow : taskFlows) {
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
             List<String> arrayList = Arrays.asList(taskArr);
@@ -46,9 +45,9 @@ public class RuleParse<T> extends AbstractEngine {
                 String taskBean = arrayList.get(i);
                 if (taskBean.contains(gobrsAsyncProperties.getMust())) { // 强以来上游 上游不返回 方法不执行
                     taskBean = taskBean.replace(gobrsAsyncProperties.getMust(), "");
-                    frontTaskWrapper = EngineExecutor.getWrapperDepend(taskBean, frontTaskWrapper, false);
+                    frontTaskWrapper = EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, frontTaskWrapper, false);
                 } else {
-                    frontTaskWrapper = EngineExecutor.getWrapperDepend(taskBean, frontTaskWrapper);
+                    frontTaskWrapper = EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, frontTaskWrapper);
                 }
                 EngineExecutor.setParams(frontTaskWrapper, parameters);
             }
@@ -62,24 +61,40 @@ public class RuleParse<T> extends AbstractEngine {
     }
 
     public static class EngineExecutor {
-        private static TaskWrapper getWrapper(String s3) {
+        private static TaskWrapper getWrapper(String taskName) {
             return new TaskWrapper.Builder()
-                    .id(s3)
-                    .worker((AsyncTask) getBean(s3))
-                    .callback((ICallback) getBean(s3)).build();
+                    .id(taskName)
+                    .worker((AsyncTask) getBean(taskName))
+                    .callback((ICallback) getBean(taskName)).build();
         }
 
-        private static TaskWrapper getWrapperDepend(String taskBean, TaskWrapper taskWrapper) {
-            return getWrapperDepend(taskBean, taskWrapper, true);
+        private static TaskWrapper getWrapperDepend(Map<String, TaskWrapper> cacheTaskWrappers, String taskBean, TaskWrapper taskWrapper) {
+            return getWrapperDepend(cacheTaskWrappers, taskBean, taskWrapper, true);
         }
 
-        private static TaskWrapper getWrapperDepend(String taskBean, TaskWrapper taskWrapper, boolean must) {
-            return Optional.ofNullable(getBean(taskBean)).map((bean) -> new TaskWrapper.Builder()
-                    .id(taskBean)
-                    .worker((AsyncTask) bean)
-                    .callback((ICallback) bean)
-                    .depend(taskWrapper, must)
-                    .build()).orElse(null);
+        private static TaskWrapper getWrapperDepend(Map<String, TaskWrapper> cacheTaskWrappers, String taskBean, TaskWrapper taskWrapper, boolean must) {
+            return Optional.ofNullable(getBean(taskBean)).map((bean) -> Optional.ofNullable(cacheTaskWrappers.get(taskBean)).map((data) -> {
+                TaskWrapper tk = cacheTaskWrappers.get(taskBean);
+                List dependWrappers = tk.getDependWrappers();
+                DependWrapper dependWrapper = new DependWrapper(taskWrapper, must);
+                if (dependWrappers != null) {
+                    dependWrappers.add(dependWrapper);
+                } else {
+                    dependWrappers = new ArrayList();
+                    dependWrappers.add(dependWrapper);
+                }
+                tk.setDependWrappers(dependWrappers);
+                return tk;
+            }).orElseGet(() -> {
+                TaskWrapper tk = new TaskWrapper.Builder()
+                        .id(taskBean)
+                        .worker((AsyncTask) bean)
+                        .callback((ICallback) bean)
+                        .depend(taskWrapper, must)
+                        .build();
+                cacheTaskWrappers.put(taskBean, tk);
+                return tk;
+            })).orElse(null);
         }
 
         public static Object getBean(String bean) {

@@ -49,6 +49,15 @@ public class TaskWrapper<T, V> {
      * 1、2执行完毕后才能执行3
      */
     private List<DependWrapper> dependWrappers;
+
+    public List<DependWrapper> getDependWrappers() {
+        return dependWrappers;
+    }
+
+    public void setDependWrappers(List<DependWrapper> dependWrappers) {
+        this.dependWrappers = dependWrappers;
+    }
+
     /**
      * 标记该事件是否已经被处理过了，譬如已经超时返回false了，后续rpc又收到返回值了，则不再二次回调
      * 经试验,volatile并不能保证"同一毫秒"内,多线程对该值的修改和拉取
