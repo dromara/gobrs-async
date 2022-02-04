@@ -375,6 +375,9 @@ public class TaskWrapper<T, V> {
         this.param = param;
     }
 
+
+
+
     private boolean checkIsNullResult() {
         return ResultState.DEFAULT == workResult.getResultState();
     }

@@ -9,6 +9,7 @@ import io.github.memorydoc.wrapper.TaskWrapper;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @program: gobrs-async
@@ -24,6 +25,9 @@ public class RuleParse<T> extends AbstractEngine {
 
     public static final String DEFAULT_PARAMS = "default_params";
 
+
+
+
     @Override
     public Map<String, TaskWrapper> doParse(Rule rule, Map<String, Object> parameters) {
         String[] taskFlows = rule.getContent().replaceAll("\\s+", "").split(gobrsAsyncProperties.getSplit());
@@ -31,7 +35,6 @@ public class RuleParse<T> extends AbstractEngine {
         for (String taskFlow : taskFlows) {
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
             List<String> arrayList = Arrays.asList(taskArr);
-            Collections.reverse(arrayList);
             String leftTaskName = arrayList.get(0);
             TaskWrapper frontTaskWrapper = wrapperMap.get(leftTaskName);
             if (frontTaskWrapper == null) {
@@ -61,6 +64,7 @@ public class RuleParse<T> extends AbstractEngine {
     public static class EngineExecutor {
         private static TaskWrapper getWrapper(String s3) {
             return new TaskWrapper.Builder()
+                    .id(s3)
                     .worker((AsyncTask) getBean(s3))
                     .callback((ICallback) getBean(s3)).build();
         }
@@ -70,14 +74,12 @@ public class RuleParse<T> extends AbstractEngine {
         }
 
         private static TaskWrapper getWrapperDepend(String taskBean, TaskWrapper taskWrapper, boolean must) {
-            return Optional.ofNullable(getBean(taskBean)).map((bean) -> {
-                return new TaskWrapper.Builder()
-                        .id(taskBean)
-                        .worker((AsyncTask) bean)
-                        .callback((ICallback) bean)
-                        .next(taskWrapper, must)
-                        .build();
-            }).orElse(new TaskWrapper.Builder<>().build());
+            return Optional.ofNullable(getBean(taskBean)).map((bean) -> new TaskWrapper.Builder()
+                    .id(taskBean)
+                    .worker((AsyncTask) bean)
+                    .callback((ICallback) bean)
+                    .depend(taskWrapper, must)
+                    .build()).orElse(null);
         }
 
         public static Object getBean(String bean) {

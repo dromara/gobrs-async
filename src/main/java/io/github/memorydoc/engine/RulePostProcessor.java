@@ -27,10 +27,8 @@ public class RulePostProcessor implements ApplicationListener<ContextRefreshedEv
             // 初始化解析规则 主要是为了检查规则是否正确
             RuleParse engine = applicationContext.getBean(RuleParse.class);
             engine.parse(data);
-            return null;
-        }).orElseThrow(() -> {
-            return new NotTaskRuleException("spring.gobrs.async.rules is empty");
-        });
+            return 1;
+        }).orElseThrow(() ->new NotTaskRuleException("spring.gobrs.async.rules is empty"));
 
     }
 }
