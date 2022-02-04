@@ -42,13 +42,29 @@ public class RuleParse<T> extends AbstractEngine {
             }
             for (int i = 1; i < arrayList.size(); i++) {
                 String taskBean = arrayList.get(i);
-                if (taskBean.contains(gobrsAsyncProperties.getMust())) { // 强依赖上游 上游不返回 方法不执行
-                    taskBean = taskBean.replace(gobrsAsyncProperties.getMust(), "");
-                    frontTaskWrapper = EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, frontTaskWrapper, false);
+                if (taskBean.contains(",")) {
+                    String[] beanArray = taskBean.split(",");
+                    List<String> beanList = Arrays.asList(beanArray);
+                    TaskWrapper taskWrapper = null;
+                    for (String b : beanList) {
+                        if (b.contains(gobrsAsyncProperties.getMust())) { // 强依赖上游 上游不返回 方法不执行
+                            b = b.replace(gobrsAsyncProperties.getMust(), "");
+                            taskWrapper = EngineExecutor.getWrapperDepend(cacheTaskWrappers, b, frontTaskWrapper, false);
+                        } else {
+                            taskWrapper = EngineExecutor.getWrapperDepend(cacheTaskWrappers, b, frontTaskWrapper);
+                        }
+                        EngineExecutor.setParams(taskWrapper, parameters);
+                    }
+                    frontTaskWrapper = taskWrapper;
                 } else {
-                    frontTaskWrapper = EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, frontTaskWrapper);
+                    if (taskBean.contains(gobrsAsyncProperties.getMust())) { // 强依赖上游 上游不返回 方法不执行
+                        taskBean = taskBean.replace(gobrsAsyncProperties.getMust(), "");
+                        frontTaskWrapper = EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, frontTaskWrapper, false);
+                    } else {
+                        frontTaskWrapper = EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, frontTaskWrapper);
+                    }
+                    EngineExecutor.setParams(frontTaskWrapper, parameters);
                 }
-                EngineExecutor.setParams(frontTaskWrapper, parameters);
             }
         }
 
