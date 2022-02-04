@@ -1,6 +1,7 @@
 package io.github.memorydoc.autoconfig;
 
 import io.github.memorydoc.engine.RulePostProcessor;
+import io.github.memorydoc.gobrs.GobrsTaskFlow;
 import io.github.memorydoc.spring.GobrsSpring;
 import io.github.memorydoc.engine.RuleParse;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -49,6 +50,11 @@ public class GobrsAutoConfiguration {
     @Bean
     public RulePostProcessor ruleEnginePostProcessor() {
         return new RulePostProcessor();
+    }
+
+    @Bean
+    public GobrsTaskFlow gobrsTaskFlow(){
+        return new GobrsTaskFlow();
     }
 
 }

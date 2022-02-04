@@ -30,15 +30,17 @@ public class RuleParse<T> extends AbstractEngine {
         Map<String, TaskWrapper> wrapperMap = new HashMap<>();
         for (String taskFlow : taskFlows) {
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
-            String leftTaskName = taskArr[0];
+            List<String> arrayList = Arrays.asList(taskArr);
+            Collections.reverse(arrayList);
+            String leftTaskName = arrayList.get(0);
             TaskWrapper frontTaskWrapper = wrapperMap.get(leftTaskName);
             if (frontTaskWrapper == null) {
                 frontTaskWrapper = EngineExecutor.getWrapper(leftTaskName);
                 EngineExecutor.setParams(frontTaskWrapper, parameters);
                 wrapperMap.put(leftTaskName, frontTaskWrapper);
             }
-            for (int i = 1; i < taskArr.length; i++) {
-                String taskBean = taskArr[i];
+            for (int i = 1; i < arrayList.size(); i++) {
+                String taskBean = arrayList.get(i);
                 if (taskBean.contains(gobrsAsyncProperties.getMust())) { // 强以来上游 上游不返回 方法不执行
                     taskBean = taskBean.replace(gobrsAsyncProperties.getMust(), "");
                     frontTaskWrapper = EngineExecutor.getWrapperDepend(taskBean, frontTaskWrapper, false);
@@ -73,7 +75,7 @@ public class RuleParse<T> extends AbstractEngine {
                         .id(taskBean)
                         .worker((AsyncTask) bean)
                         .callback((ICallback) bean)
-                        .depend(taskWrapper, must)
+                        .next(taskWrapper, must)
                         .build();
             }).orElse(new TaskWrapper.Builder<>().build());
         }
