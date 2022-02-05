@@ -103,7 +103,7 @@ spring:
 
 1.  3个任务并行
 
-![image-20220205131145351](/Users/sizegang1/Library/Application Support/typora-user-images/image-20220205131145351.png)
+![输入图片说明](image.png)
 
 ```sh
 A;B;C
@@ -113,8 +113,7 @@ A;B;C
 
 2. 任务串行
 
-   ![image-20220205131501390](/Users/sizegang1/Library/Application Support/typora-user-images/image-20220205131501390.png)
-
+![输入图片说明](image.png)
    ```sh
    A->B->C
    ```
@@ -125,7 +124,7 @@ A;B;C
 
 3. 1个执行完毕后，开启另外两个，另外两个执行完毕后，开始第4个
 
-![输入图片说明](https://images.gitee.com/uploads/images/2019/1226/140405_93800bc7_303698.png "屏幕截图.png")
+![输入图片说明](image.png)
 
        ```sh 
 A->B,C->F
@@ -139,7 +138,7 @@ A->B,C->F
 
 4. 复杂点的
 
-![输入图片说明](https://images.gitee.com/uploads/images/2019/1226/140445_8d52e4d6_303698.png "屏幕截图.png")
+![输入图片说明](image.png)
 
 ```sh
 A->B,C->F->H;D->E->G->H
@@ -147,7 +146,7 @@ A->B,C->F->H;D->E->G->H
 
 5. D 有两个执行通道，但是 谁最先执行完 就结束， 不全部等待两个管道全部执行完成
 
-   ![image-20220205131950740](/Users/sizegang1/Library/Application Support/typora-user-images/image-20220205131950740.png)
+![输入图片说明](image.png)
 
    ```sh
    A->B->E->D:not; A->C->D
