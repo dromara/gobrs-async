@@ -1,9 +1,9 @@
 package dependnew;
 
 
-import io.github.memorydoc.task.AsyncTask;
-import io.github.memorydoc.task.TaskResult;
-import io.github.memorydoc.wrapper.TaskWrapper;
+import com.jd.gobrs.async.task.AsyncTask;
+import com.jd.gobrs.async.task.TaskResult;
+import com.jd.gobrs.async.wrapper.TaskWrapper;
 
 import java.util.Map;
 

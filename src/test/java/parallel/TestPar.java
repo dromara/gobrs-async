@@ -1,9 +1,9 @@
 package parallel;
 
 
-import io.github.memorydoc.executor.Async;
-import io.github.memorydoc.executor.timer.SystemClock;
-import io.github.memorydoc.wrapper.TaskWrapper;
+import com.jd.gobrs.async.executor.Async;
+import com.jd.gobrs.async.executor.timer.SystemClock;
+import com.jd.gobrs.async.wrapper.TaskWrapper;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;

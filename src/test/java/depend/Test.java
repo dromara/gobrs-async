@@ -1,8 +1,8 @@
 package depend;
 
-import io.github.memorydoc.executor.Async;
-import io.github.memorydoc.task.TaskResult;
-import io.github.memorydoc.wrapper.TaskWrapper;
+import com.jd.gobrs.async.executor.Async;
+import com.jd.gobrs.async.task.TaskResult;
+import com.jd.gobrs.async.wrapper.TaskWrapper;
 
 import java.util.concurrent.ExecutionException;
 

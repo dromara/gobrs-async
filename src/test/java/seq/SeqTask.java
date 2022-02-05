@@ -1,12 +1,10 @@
 package seq;
 
 
-import io.github.memorydoc.callback.ICallback;
-import io.github.memorydoc.callback.ITask;
-import io.github.memorydoc.executor.timer.SystemClock;
-import io.github.memorydoc.task.AsyncTask;
-import io.github.memorydoc.task.TaskResult;
-import io.github.memorydoc.wrapper.TaskWrapper;
+import com.jd.gobrs.async.executor.timer.SystemClock;
+import com.jd.gobrs.async.task.AsyncTask;
+import com.jd.gobrs.async.task.TaskResult;
+import com.jd.gobrs.async.wrapper.TaskWrapper;
 
 import java.util.Map;
 
