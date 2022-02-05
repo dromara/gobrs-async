@@ -1,11 +1,10 @@
 
 
 # 并行框架说明
-有问题、或者有特定的场景需求可以给作者发邮件说明，感谢您的意见。wuweifeng10@jd.com, liwangyang@jd.com
+有问题、或者有特定的场景需求可以给作者发邮件说明，感谢您的意见。17615195790@163.com
 
-该框架目前正在 **京东App后台** 接受苛刻、高并发、海量用户等复杂场景业务的检验测试，随时会根据实际情况发布更新和bugFix。
+该框架目前是由async-tool 封装而来 正在 **京东App后台** 接受苛刻、高并发、海量用户等复杂场景业务的检验测试，随时会根据实际情况发布更新和bugFix。
 
-有对区块链感兴趣的，可以参考项目作者另一个[GVP项目](https://gitee.com/tianyalei/md_blockchain)，java区块链底层入门。
 
 有对高并发场景下，被热key打爆存储层，秒杀等场景中热数据本地缓存、热数据（刷子用户）限流等需要热key探测的，可关注京东热key探测缓存框架https://gitee.com/jd-platform-opensource/hotkey 。热key框架正在京东内部多个部门线上使用，各项指标优异，单机可为1000台业务服务器提供热key计算服务，毫秒级探测及热key推送。
 
@@ -112,6 +111,6 @@
 
 
 ## 快速开始
-[点此开启实战](https://gitee.com/jd-platform-opensource/asyncTool/blob/master/QuickStart.md)
+[点此开启实战](https://gitee.com/Memorydoc/gobrs-async/blob/master/QuickStart.md)
 
 
