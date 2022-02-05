@@ -1,0 +1,6 @@
+server:
+  port: 8888
+spring:
+  gobrs:
+    async:
+      rules: '[{name: "test", content: "AService->EService->CService,BService->DService:not;AService->DService"}]'
