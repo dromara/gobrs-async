@@ -1,4 +1,4 @@
-package com.jd.gobrs.gobrs.async.example.service;
+package com.jd.gobrs.async.example.service;
 
 import com.jd.gobrs.async.gobrs.GobrsTaskFlow;
 import org.springframework.stereotype.Service;

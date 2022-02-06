@@ -1,6 +1,6 @@
 package com.jd.gobrs.async.example.controller;
 
-import com.jd.gobrs.gobrs.async.example.service.GobrsService;
+import com.jd.gobrs.async.example.service.GobrsService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

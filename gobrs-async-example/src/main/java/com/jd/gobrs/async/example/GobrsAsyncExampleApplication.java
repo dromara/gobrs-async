@@ -1,4 +1,4 @@
-package com.jd.gobrs.gobrs.async.example;
+package com.jd.gobrs.async.example;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
