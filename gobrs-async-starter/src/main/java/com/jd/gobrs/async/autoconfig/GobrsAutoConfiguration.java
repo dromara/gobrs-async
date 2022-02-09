@@ -3,7 +3,7 @@ package com.jd.gobrs.async.autoconfig;
 import com.jd.gobrs.async.spring.GobrsSpring;
 import com.jd.gobrs.async.engine.RulePostProcessor;
 import com.jd.gobrs.async.gobrs.GobrsTaskFlow;
-import com.jd.gobrs.async.engine.RuleParse;
+import com.jd.gobrs.async.engine.RuleParseEngine;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -43,8 +43,8 @@ public class GobrsAutoConfiguration {
      * @return
      */
     @Bean
-    public RuleParse ruleParseEngine() {
-        return new RuleParse();
+    public RuleParseEngine ruleParseEngine() {
+        return new RuleParseEngine();
     }
 
     @Bean

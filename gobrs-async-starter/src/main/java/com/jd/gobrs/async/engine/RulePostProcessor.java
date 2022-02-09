@@ -28,7 +28,7 @@ public class RulePostProcessor implements ApplicationListener<ContextRefreshedEv
         String rules = properties.getRules();
         Optional.ofNullable(rules).map((data) -> {
             // 初始化解析规则 主要是为了检查规则是否正确
-            RuleParse engine = applicationContext.getBean(RuleParse.class);
+            RuleParseEngine engine = applicationContext.getBean(RuleParseEngine.class);
             engine.parse(data);
             logger.info("Gobrs Async Loading Success !!!");
             return 1;

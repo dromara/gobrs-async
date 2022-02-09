@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 /**
  * 类入口，可以根据自己情况调整core线程的数量
+ *
  * @author sizegang wrote on 2019-12-18
  * @version 1.0
  */
@@ -27,8 +28,8 @@ public class Async {
     /**
      * 出发点
      */
-    public static boolean startTaskFlow(long timeout, ExecutorService executorService, List<TaskWrapper> taskWrappers) throws ExecutionException, InterruptedException {
-        if(taskWrappers == null || taskWrappers.size() == 0) {
+    public static boolean startTaskFlow(long timeout, ExecutorService executorService, List<TaskWrapper> taskWrappers, Map<String, Object> params) throws ExecutionException, InterruptedException {
+        if (taskWrappers == null || taskWrappers.size() == 0) {
             return false;
         }
         //保存线程池变量
@@ -38,7 +39,7 @@ public class Async {
         CompletableFuture[] futures = new CompletableFuture[taskWrappers.size()];
         for (int i = 0; i < taskWrappers.size(); i++) {
             TaskWrapper wrapper = taskWrappers.get(i);
-            futures[i] = CompletableFuture.runAsync(() -> wrapper.task(executorService, timeout, forParamUseWrappers), executorService);
+            futures[i] = CompletableFuture.runAsync(() -> wrapper.task(executorService, timeout, forParamUseWrappers, params), executorService);
         }
         try {
             CompletableFuture.allOf(futures).get(timeout, TimeUnit.MILLISECONDS);
@@ -56,34 +57,34 @@ public class Async {
     /**
      * 如果想自定义线程池，请传pool。不自定义的话，就走默认的COMMON_POOL
      */
-    public static boolean startTaskFlow(long timeout, ExecutorService executorService, TaskWrapper... workerWrapper) throws ExecutionException, InterruptedException {
-        if(workerWrapper == null || workerWrapper.length == 0) {
+    public static boolean startTaskFlow(long timeout, ExecutorService executorService, Map<String, Object> parameters, TaskWrapper... workerWrapper) throws ExecutionException, InterruptedException {
+        if (workerWrapper == null || workerWrapper.length == 0) {
             return false;
         }
-        List<TaskWrapper> taskWrappers =  Arrays.stream(workerWrapper).collect(Collectors.toList());
-        return startTaskFlow(timeout, executorService, taskWrappers);
+        List<TaskWrapper> taskWrappers = Arrays.stream(workerWrapper).collect(Collectors.toList());
+        return startTaskFlow(timeout, executorService, taskWrappers, parameters);
     }
 
     /**
      * 同步阻塞,直到所有都完成,或失败
      */
-    public static boolean startTaskFlow(long timeout, TaskWrapper... workerWrapper) throws ExecutionException, InterruptedException {
-        return startTaskFlow(timeout, COMMON_POOL, workerWrapper);
+    public static boolean startTaskFlow(long timeout, Map<String, Object> parameters, TaskWrapper... workerWrapper) throws ExecutionException, InterruptedException {
+        return startTaskFlow(timeout, COMMON_POOL, parameters, workerWrapper);
     }
 
-    public static boolean startTaskFlow(long timeout, List<TaskWrapper> workerWrapper) throws ExecutionException, InterruptedException {
-        return startTaskFlow(timeout, COMMON_POOL, workerWrapper);
+    public static boolean startTaskFlow(long timeout, List<TaskWrapper> workerWrapper, Map<String, Object> params) throws ExecutionException, InterruptedException {
+        return startTaskFlow(timeout, COMMON_POOL, workerWrapper, params);
     }
 
 
-    public static void startTaskFlowAsync(long timeout, IGroupCallback groupCallback, TaskWrapper... workerWrapper) {
-        startTaskFlowAsync(timeout, COMMON_POOL, groupCallback, workerWrapper);
+    public static void startTaskFlowAsync(long timeout, IGroupCallback groupCallback, Map<String, Object> params, TaskWrapper... workerWrapper) {
+        startTaskFlowAsync(timeout, COMMON_POOL, groupCallback, params, workerWrapper);
     }
 
     /**
      * 异步执行,直到所有都完成,或失败后，发起回调
      */
-    public static void startTaskFlowAsync(long timeout, ExecutorService executorService, IGroupCallback groupCallback, TaskWrapper... workerWrapper) {
+    public static void startTaskFlowAsync(long timeout, ExecutorService executorService, IGroupCallback groupCallback, Map<String, Object> params, TaskWrapper... workerWrapper) {
         if (groupCallback == null) {
             groupCallback = new DefaultGroupCallback();
         }
@@ -91,7 +92,7 @@ public class Async {
         if (executorService != null) {
             executorService.submit(() -> {
                 try {
-                    boolean success = startTaskFlow(timeout, executorService, workerWrapper);
+                    boolean success = startTaskFlow(timeout, executorService, params, workerWrapper);
                     if (success) {
                         finalGroupCallback.success(Arrays.asList(workerWrapper));
                     } else {
@@ -105,7 +106,7 @@ public class Async {
         } else {
             COMMON_POOL.submit(() -> {
                 try {
-                    boolean success = startTaskFlow(timeout, COMMON_POOL, workerWrapper);
+                    boolean success = startTaskFlow(timeout, COMMON_POOL, params, workerWrapper);
                     if (success) {
                         finalGroupCallback.success(Arrays.asList(workerWrapper));
                     } else {

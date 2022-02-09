@@ -2,6 +2,7 @@ package com.jd.gobrs.async.engine;
 
 import com.jd.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.jd.gobrs.async.callback.ICallback;
+import com.jd.gobrs.async.executor.Async;
 import com.jd.gobrs.async.spring.GobrsSpring;
 import com.jd.gobrs.async.task.DependWrapper;
 import com.jd.gobrs.async.rule.Rule;
@@ -10,7 +11,9 @@ import com.jd.gobrs.async.wrapper.TaskWrapper;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * @author sizegang1
@@ -21,7 +24,8 @@ import java.util.function.Supplier;
  * @Version 1.0
  * @date 2022-02-05 12:07
  **/
-public class RuleParse<T> extends AbstractEngine {
+public class RuleParseEngine<T> extends AbstractEngine {
+
 
     @Resource
     private GobrsAsyncProperties gobrsAsyncProperties;
@@ -42,7 +46,6 @@ public class RuleParse<T> extends AbstractEngine {
             TaskWrapper frontTaskWrapper = wrapperMap.get(leftTaskName);
             if (frontTaskWrapper == null) {
                 frontTaskWrapper = EngineExecutor.getWrapper(leftTaskName);
-                EngineExecutor.setParams(frontTaskWrapper, parameters);
                 wrapperMap.put(leftTaskName, frontTaskWrapper);
             }
             for (int i = 1; i < arrayList.size(); i++) {
@@ -58,7 +61,6 @@ public class RuleParse<T> extends AbstractEngine {
                         } else {
                             taskWrapper = EngineExecutor.getWrapperDepend(cacheTaskWrappers, b, frontTaskWrapper);
                         }
-                        EngineExecutor.setParams(taskWrapper, parameters);
                     }
                     frontTaskWrapper = taskWrapper;
                 } else {
@@ -68,7 +70,6 @@ public class RuleParse<T> extends AbstractEngine {
                     } else {
                         frontTaskWrapper = EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, frontTaskWrapper);
                     }
-                    EngineExecutor.setParams(frontTaskWrapper, parameters);
                 }
             }
         }
@@ -77,11 +78,10 @@ public class RuleParse<T> extends AbstractEngine {
     }
 
     @Override
-    public Map<String, TaskWrapper> exec(String ruleName, Supplier<Map<String, Object>> supplier) {
-        Rule rule = getRule(ruleName);
-        return doParse(rule, supplier.get());
+    public boolean exec(String ruleName, Supplier<Map<String, Object>> supplier, long timeout) throws ExecutionException, InterruptedException {
+        return Async.startTaskFlow(timeout,
+                taskRuleMap.get(ruleName).values().parallelStream().collect(Collectors.toList()), supplier.get());
     }
-
 
     public Rule getRule(String key) {
         return super.ruleMap.get(key);
@@ -129,13 +129,13 @@ public class RuleParse<T> extends AbstractEngine {
             return Optional.ofNullable(GobrsSpring.getBean(bean)).orElseThrow(() -> new RuntimeException("bean not found"));
         }
 
-        public static void setParams(TaskWrapper taskWrapper, Map<String, Object> paramMap) {
-            if (paramMap.size() == 1 && paramMap.containsKey(DEFAULT_PARAMS)) {
-                taskWrapper.setParam(paramMap.get(DEFAULT_PARAMS));
-            } else {
-                taskWrapper.setParam(paramMap.get(taskWrapper.getId()));
-            }
-        }
+//        public static void setParams(TaskWrapper taskWrapper, Map<String, Object> paramMap) {
+//            if (paramMap.size() == 1 && paramMap.containsKey(DEFAULT_PARAMS)) {
+//                taskWrapper.setParam(paramMap.get(DEFAULT_PARAMS));
+//            } else {
+//                taskWrapper.setParam(paramMap.get(taskWrapper.getId()));
+//            }
+//        }
     }
 
 }

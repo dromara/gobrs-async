@@ -5,6 +5,7 @@ import com.jd.gobrs.async.wrapper.TaskWrapper;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 
 /**
@@ -29,7 +30,7 @@ public interface RuleEngine extends Engine {
      */
     Map<String, TaskWrapper> doParse(Rule r, Map<String, Object> params);
 
-    Map<String, TaskWrapper> exec(String ruleName, Supplier<Map<String, Object>> supplier);
+    boolean exec(String ruleName, Supplier<Map<String, Object>> supplier,  long timeout) throws ExecutionException, InterruptedException;
 
 
 }

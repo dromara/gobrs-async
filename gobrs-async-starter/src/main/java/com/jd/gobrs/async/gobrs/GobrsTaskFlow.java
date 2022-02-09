@@ -4,7 +4,7 @@ import com.jd.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.jd.gobrs.async.executor.Async;
 import com.jd.gobrs.async.rule.Rule;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
-import com.jd.gobrs.async.engine.RuleParse;
+import com.jd.gobrs.async.engine.RuleParseEngine;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class GobrsTaskFlow<T> implements GobrsAsync {
 
     @Resource
-    private RuleParse ruleParseEngine;
+    private RuleParseEngine ruleParseEngine;
 
     @Resource
     private GobrsAsyncProperties gobrsAsyncProperties;
@@ -67,11 +67,11 @@ public class GobrsTaskFlow<T> implements GobrsAsync {
      * @throws InterruptedException
      */
     public boolean taskFlow(String ruleName, T t, long timeout) throws ExecutionException, InterruptedException {
-        Rule rule = ruleParseEngine.getRule(ruleName);
-        Map<String, Object> map = new HashMap<>();
-        map.put(RuleParse.DEFAULT_PARAMS, t);
-        Map<String, TaskWrapper> wrapperMap = ruleParseEngine.doParse(rule, map);
-        return Async.startTaskFlow(timeout, wrapperMap.values().parallelStream().collect(Collectors.toList()));
+        return ruleParseEngine.exec(ruleName, () -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put(RuleParseEngine.DEFAULT_PARAMS, t);
+            return map;
+        }, timeout);
     }
 
     /**
@@ -82,7 +82,6 @@ public class GobrsTaskFlow<T> implements GobrsAsync {
      * @return
      */
     public boolean taskFlow(String ruleName, Supplier<Map<String, T>> paramSupplier, long timeout) throws ExecutionException, InterruptedException {
-        Map<String, TaskWrapper> wrapperMap = ruleParseEngine.exec(ruleName, paramSupplier);
-        return Async.startTaskFlow(timeout, wrapperMap.values().parallelStream().collect(Collectors.toList()));
+        return ruleParseEngine.exec(ruleName, paramSupplier, timeout);
     }
 }
