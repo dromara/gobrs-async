@@ -2,6 +2,7 @@ package com.jd.gobrs.async.wrapper;
 
 import com.jd.gobrs.async.callback.DefaultCallback;
 import com.jd.gobrs.async.callback.ICallback;
+import com.jd.gobrs.async.constant.GobrsAsyncConstant;
 import com.jd.gobrs.async.exception.SkippedException;
 import com.jd.gobrs.async.task.DependWrapper;
 import com.jd.gobrs.async.task.ResultState;
@@ -71,7 +72,8 @@ public class TaskWrapper<T, V> {
     /**
      * 也是个钩子变量，用来存临时的结果
      */
-    private volatile TaskResult<V> workResult = TaskResult.defaultResult();
+    private ThreadLocal<TaskResult<V>> workResult = new ThreadLocal<>();
+//    private volatile TaskResult<V> workResult = TaskResult.defaultResult();
     /**
      * 是否在执行自己前，去校验nextWrapper的执行结果<p>
      * 1   4
@@ -214,10 +216,10 @@ public class TaskWrapper<T, V> {
 
     private void doDependsOneJob(TaskWrapper dependWrapper, Map<String, Object> params) {
         if (ResultState.TIMEOUT == dependWrapper.getWorkResult().getResultState()) {
-            workResult = defaultResult();
+            workResult.set(defaultResult());
             taskFail(INIT, null);
         } else if (ResultState.EXCEPTION == dependWrapper.getWorkResult().getResultState()) {
-            workResult = defaultExResult(dependWrapper.getWorkResult().getEx());
+            workResult.set(defaultExResult(dependWrapper.getWorkResult().getEx()));
             taskFail(INIT, null);
         } else {
             //前面任务正常完毕了，该自己了
@@ -268,12 +270,12 @@ public class TaskWrapper<T, V> {
                 break;
             }
             if (ResultState.TIMEOUT == tempWorkResult.getResultState()) {
-                workResult = defaultResult();
+                workResult.set(tempWorkResult);
                 hasError = true;
                 break;
             }
             if (ResultState.EXCEPTION == tempWorkResult.getResultState()) {
-                workResult = defaultExResult(workerWrapper.getWorkResult().getEx());
+                workResult.set(defaultExResult(workerWrapper.getWorkResult().getEx()));
                 hasError = true;
                 break;
             }
@@ -301,7 +303,7 @@ public class TaskWrapper<T, V> {
      */
     private void doTask(Map<String, Object> params) {
         //阻塞取结果
-        workResult = doTaskDep(params);
+        workResult.set(doTaskDep(params));
     }
 
     /**
@@ -317,13 +319,13 @@ public class TaskWrapper<T, V> {
         //尚未处理过结果
         if (checkIsNullResult()) {
             if (e == null) {
-                workResult = defaultResult();
+                workResult.set(defaultResult());
             } else {
-                workResult = defaultExResult(e);
+                workResult.set(defaultExResult(e));
             }
         }
 
-        callback.result(false, param, workResult);
+        callback.result(false, param, workResult.get());
         return true;
     }
 
@@ -331,21 +333,29 @@ public class TaskWrapper<T, V> {
      * 真正的的单个task执行任务 doTask
      */
     private TaskResult<V> doTaskDep(Map<String, Object> params) {
-        T param = (T) params.get(id);
+        T param = null;
+        if (params.containsKey(GobrsAsyncConstant.DEFAULT_PARAMS)) {
+            param = (T) params.get(GobrsAsyncConstant.DEFAULT_PARAMS);
+        } else {
+            param = (T) params.get(id);
+        }
+        TaskResult<V> objectTaskResult = TaskResult.defaultResult();
         //  先判断自己是否需要执行
         if (!worker.nessary(param)) {
-            workResult.setResultState(ResultState.SUCCESS);
-            workResult.setResult(null);
-            return workResult;
+
+            objectTaskResult.setResultState(ResultState.SUCCESS);
+            objectTaskResult.setResult(null);
+            workResult.set(objectTaskResult);
+            return objectTaskResult;
         }
         //避免重复执行
         if (!checkIsNullResult()) {
-            return workResult;
+            return objectTaskResult;
         }
         try {
             //如果已经不是init状态了，说明正在被执行或已执行完毕。这一步很重要，可以保证任务不被重复执行
             if (!compareAndSetState(INIT, WORKING)) {
-                return workResult;
+                return objectTaskResult;
             }
 
             callback.begin();
@@ -355,27 +365,28 @@ public class TaskWrapper<T, V> {
 
             //如果状态不是在working,说明别的地方已经修改了
             if (!compareAndSetState(WORKING, FINISH)) {
-                return workResult;
+                return objectTaskResult;
             }
 
-            workResult.setResultState(ResultState.SUCCESS);
-            workResult.setResult(resultValue);
+            objectTaskResult.setResultState(ResultState.SUCCESS);
+            objectTaskResult.setResult(resultValue);
+            workResult.set(objectTaskResult);
             //回调成功
-            callback.result(true, param, workResult);
+            callback.result(true, param, objectTaskResult);
 
-            return workResult;
+            return objectTaskResult;
         } catch (Exception e) {
             //避免重复回调
             if (!checkIsNullResult()) {
-                return workResult;
+                return objectTaskResult;
             }
             taskFail(WORKING, e);
-            return workResult;
+            return objectTaskResult;
         }
     }
 
     public TaskResult<V> getWorkResult() {
-        return workResult;
+        return workResult.get();
     }
 
     public List<TaskWrapper<?, ?>> getNextWrappers() {
@@ -388,7 +399,10 @@ public class TaskWrapper<T, V> {
 
 
     private boolean checkIsNullResult() {
-        return ResultState.DEFAULT == workResult.getResultState();
+        if (workResult.get() == null) {
+            return true;
+        }
+        return false;
     }
 
     public void addDepend(TaskWrapper<?, ?> workerWrapper, boolean must) {
@@ -440,16 +454,18 @@ public class TaskWrapper<T, V> {
     }
 
     private TaskResult<V> defaultResult() {
-        workResult.setResultState(ResultState.TIMEOUT);
-        workResult.setResult(worker.defaultValue());
-        return workResult;
+        TaskResult<V> vTaskResult = workResult.get();
+        vTaskResult.setResultState(ResultState.TIMEOUT);
+        vTaskResult.setResult(worker.defaultValue());
+        return vTaskResult;
     }
 
     private TaskResult<V> defaultExResult(Exception ex) {
-        workResult.setResultState(ResultState.EXCEPTION);
-        workResult.setResult(worker.defaultValue());
-        workResult.setEx(ex);
-        return workResult;
+        TaskResult<V> vTaskResult = workResult.get();
+        vTaskResult.setResultState(ResultState.EXCEPTION);
+        vTaskResult.setResult(worker.defaultValue());
+        vTaskResult.setEx(ex);
+        return vTaskResult;
     }
 
 

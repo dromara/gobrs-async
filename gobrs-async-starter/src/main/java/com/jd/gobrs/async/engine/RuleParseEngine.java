@@ -30,7 +30,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
     @Resource
     private GobrsAsyncProperties gobrsAsyncProperties;
 
-    public static final String DEFAULT_PARAMS = "default_params";
+
 
     public static final String sp = ",";
 

@@ -1,6 +1,7 @@
 package com.jd.gobrs.async.gobrs;
 
 import com.jd.gobrs.async.autoconfig.GobrsAsyncProperties;
+import com.jd.gobrs.async.constant.GobrsAsyncConstant;
 import com.jd.gobrs.async.executor.Async;
 import com.jd.gobrs.async.rule.Rule;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
@@ -69,7 +70,7 @@ public class GobrsTaskFlow<T> implements GobrsAsync {
     public boolean taskFlow(String ruleName, T t, long timeout) throws ExecutionException, InterruptedException {
         return ruleParseEngine.exec(ruleName, () -> {
             Map<String, Object> map = new HashMap<>();
-            map.put(RuleParseEngine.DEFAULT_PARAMS, t);
+            map.put(GobrsAsyncConstant.DEFAULT_PARAMS, t);
             return map;
         }, timeout);
     }
