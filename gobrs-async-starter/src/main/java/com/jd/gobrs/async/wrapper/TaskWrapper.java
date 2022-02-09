@@ -243,7 +243,7 @@ public class TaskWrapper<T, V> {
 
         //如果全部是不必须的条件，那么只要到了这里，就执行自己。
         if (mustWrapper.size() == 0) {
-            if (ResultState.TIMEOUT == fromWrapper.getWorkResult().getResultState()) {
+            if ( fromWrapper.getWorkResult() != null && ResultState.TIMEOUT == fromWrapper.getWorkResult().getResultState()) {
                 taskFail(INIT, null);
             } else {
                 doTask(params);
@@ -269,12 +269,12 @@ public class TaskWrapper<T, V> {
                 existNoFinish = true;
                 break;
             }
-            if (ResultState.TIMEOUT == tempWorkResult.getResultState()) {
+            if (tempWorkResult != null && ResultState.TIMEOUT == tempWorkResult.getResultState()) {
                 workResult.set(tempWorkResult);
                 hasError = true;
                 break;
             }
-            if (ResultState.EXCEPTION == tempWorkResult.getResultState()) {
+            if (tempWorkResult != null && ResultState.EXCEPTION == tempWorkResult.getResultState()) {
                 workResult.set(defaultExResult(workerWrapper.getWorkResult().getEx()));
                 hasError = true;
                 break;
@@ -399,10 +399,7 @@ public class TaskWrapper<T, V> {
 
 
     private boolean checkIsNullResult() {
-        if (workResult.get() == null) {
-            return true;
-        }
-        return false;
+        return workResult.get() == null;
     }
 
     public void addDepend(TaskWrapper<?, ?> workerWrapper, boolean must) {
@@ -454,14 +451,14 @@ public class TaskWrapper<T, V> {
     }
 
     private TaskResult<V> defaultResult() {
-        TaskResult<V> vTaskResult = workResult.get();
+        TaskResult<V> vTaskResult = TaskResult.defaultResult();
         vTaskResult.setResultState(ResultState.TIMEOUT);
         vTaskResult.setResult(worker.defaultValue());
         return vTaskResult;
     }
 
     private TaskResult<V> defaultExResult(Exception ex) {
-        TaskResult<V> vTaskResult = workResult.get();
+        TaskResult<V> vTaskResult = TaskResult.defaultResult();
         vTaskResult.setResultState(ResultState.EXCEPTION);
         vTaskResult.setResult(worker.defaultValue());
         vTaskResult.setEx(ex);
