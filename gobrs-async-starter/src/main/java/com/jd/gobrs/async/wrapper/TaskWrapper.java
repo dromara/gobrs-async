@@ -12,6 +12,7 @@ import com.jd.gobrs.async.task.TaskResult;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -64,7 +65,7 @@ public class TaskWrapper<T, V> {
      * <p>
      * 1-finish, 2-error, 3-working
      */
-    private AtomicInteger state = new AtomicInteger(0);
+    public volatile ConcurrentHashMap<Long, AtomicInteger> state = new ConcurrentHashMap<Long, AtomicInteger>();
     /**
      * 该map存放所有wrapper的id和wrapper映射
      */
@@ -72,7 +73,7 @@ public class TaskWrapper<T, V> {
     /**
      * 也是个钩子变量，用来存临时的结果
      */
-    private ThreadLocal<TaskResult<V>> workResult = new ThreadLocal<>();
+    public volatile ConcurrentHashMap<Long, TaskResult<V>> workResult = new ConcurrentHashMap<Long, TaskResult<V>>();
 //    private volatile TaskResult<V> workResult = TaskResult.defaultResult();
     /**
      * 是否在执行自己前，去校验nextWrapper的执行结果<p>
@@ -105,41 +106,41 @@ public class TaskWrapper<T, V> {
 
     /**
      * 开始工作
-     * fromWrapper代表这次work是由哪个上游wrapper发起的
+     * fromWrapper 代表这次work是由哪个上游wrapper发起的
      */
     private void task(ExecutorService executorService, TaskWrapper fromWrapper, long remainTime, Map<String, TaskWrapper> forParamUseWrappers,
-                      Map<String, Object> params) {
+                      Map<String, Object> params, Long businessId) {
         this.forParamUseWrappers = forParamUseWrappers;
         //将自己放到所有wrapper的集合里去
         forParamUseWrappers.put(id, this);
         long now = SystemClock.now();
         //总的已经超时了，就快速失败，进行下一个
         if (remainTime <= 0) {
-            taskFail(INIT, null);
-            nextTask(executorService, now, remainTime, params);
+            taskFail(INIT, null, businessId);
+            nextTask(executorService, now, remainTime, params, businessId);
             return;
         }
         //如果自己已经执行过了。
         //可能有多个依赖，其中的一个依赖已经执行完了，并且自己也已开始执行或执行完毕。当另一个依赖执行完毕，又进来该方法时，就不重复处理了
-        if (getState() == FINISH || getState() == ERROR) {
-            nextTask(executorService, now, remainTime, params);
+        if (getState(businessId) == FINISH || getState(businessId) == ERROR) {
+            nextTask(executorService, now, remainTime, params, businessId);
             return;
         }
 
         //如果在执行前需要校验nextWrapper的状态  默认true
         if (needCheckNextWrapperResult) {
             //如果自己的next链上有已经出结果或已经开始执行的任务了，自己就不用继续了 ，有结果返回fales 直接进行下一个task  并return
-            if (!checkNextWrapperResult()) {
-                taskFail(INIT, new SkippedException());
-                nextTask(executorService, now, remainTime, params);
+            if (!checkNextWrapperResult(businessId)) {
+                taskFail(INIT, new SkippedException(), businessId);
+                nextTask(executorService, now, remainTime, params, businessId);
                 return;
             }
         }
 
         //如果没有任何依赖，说明自己就是第一批要执行的
         if (dependWrappers == null || dependWrappers.size() == 0) {
-            doTask(params);
-            nextTask(executorService, now, remainTime, params);
+            doTask(params, businessId);
+            nextTask(executorService, now, remainTime, params, businessId);
             return;
         }
 
@@ -150,26 +151,26 @@ public class TaskWrapper<T, V> {
 
         //只有一个依赖
         if (dependWrappers.size() == 1) {
-            doDependsOneJob(fromWrapper, params);
-            nextTask(executorService, now, remainTime, params);
+            doDependsOneJob(fromWrapper, params, businessId);
+            nextTask(executorService, now, remainTime, params, businessId);
         } else {
             //有多个依赖时
-            doDependsJobs(executorService, dependWrappers, fromWrapper, now, remainTime, params);
+            doDependsJobs(executorService, dependWrappers, fromWrapper, now, remainTime, params, businessId);
         }
 
     }
 
 
-    public void task(ExecutorService executorService, long remainTime, Map<String, TaskWrapper> forParamUseWrappers, Map<String, Object> params) {
-        task(executorService, null, remainTime, forParamUseWrappers, params);
+    public void task(ExecutorService executorService, long remainTime, Map<String, TaskWrapper> forParamUseWrappers, Map<String, Object> params, Long businessId) {
+        task(executorService, null, remainTime, forParamUseWrappers, params, businessId);
     }
 
     /**
      * 总控制台超时，停止所有任务
      */
-    public void stopNow() {
-        if (getState() == INIT || getState() == WORKING) {
-            taskFail(getState(), null);
+    public void stopNow(Long businessId) {
+        if (getState(businessId) == INIT || getState(businessId) == WORKING) {
+            taskFail(getState(businessId), null, businessId);
         }
     }
 
@@ -177,35 +178,36 @@ public class TaskWrapper<T, V> {
      * 判断自己下游链路上，是否存在已经出结果的或已经开始执行的
      * 如果没有返回true，如果有返回false
      */
-    private boolean checkNextWrapperResult() {
+    private boolean checkNextWrapperResult(Long businessId) {
         //如果自己就是最后一个，或者后面有并行的多个，就返回true
         if (nextWrappers == null || nextWrappers.size() != 1) {
-            return getState() == INIT;
+            return getState(businessId) == INIT;
         }
         TaskWrapper nextWrapper = nextWrappers.get(0);
-        boolean state = nextWrapper.getState() == INIT;
+        boolean state = nextWrapper.getState(businessId) == INIT;
         //继续校验自己的next的状态
-        return state && nextWrapper.checkNextWrapperResult();
+        return state && nextWrapper.checkNextWrapperResult(businessId);
     }
 
     /**
      * 进行下一个任务
      */
-    private void nextTask(ExecutorService executorService, long now, long remainTime, Map<String, Object> params) {
+    private void nextTask(ExecutorService executorService, long now, long remainTime, Map<String, Object> params, Long businessId) {
         //花费的时间
         long costTime = SystemClock.now() - now;
         if (nextWrappers == null) {
             return;
         }
         if (nextWrappers.size() == 1) {
-            nextWrappers.get(0).task(executorService, TaskWrapper.this, remainTime - costTime, forParamUseWrappers, params);
+            nextWrappers.get(0).task(executorService, nextWrappers.get(0), remainTime - costTime, forParamUseWrappers, params, businessId);
             return;
         }
         CompletableFuture[] futures = new CompletableFuture[nextWrappers.size()];
         for (int i = 0; i < nextWrappers.size(); i++) {
             int finalI = i;
             futures[i] = CompletableFuture.runAsync(() -> nextWrappers.get(finalI)
-                    .task(executorService, TaskWrapper.this, remainTime - costTime, forParamUseWrappers, params), executorService);
+                    .task(executorService, nextWrappers.get(finalI),
+                            remainTime - costTime, forParamUseWrappers, params, businessId), executorService);
         }
         try {
             CompletableFuture.allOf(futures).get();
@@ -214,48 +216,49 @@ public class TaskWrapper<T, V> {
         }
     }
 
-    private void doDependsOneJob(TaskWrapper dependWrapper, Map<String, Object> params) {
-        if (ResultState.TIMEOUT == dependWrapper.getWorkResult().getResultState()) {
-            workResult.set(defaultResult());
-            taskFail(INIT, null);
-        } else if (ResultState.EXCEPTION == dependWrapper.getWorkResult().getResultState()) {
-            workResult.set(defaultExResult(dependWrapper.getWorkResult().getEx()));
-            taskFail(INIT, null);
+    private void doDependsOneJob(TaskWrapper dependWrapper, Map<String, Object> params, Long businessId) {
+        if (ResultState.TIMEOUT == dependWrapper.workResult.get(businessId)) {
+            workResult.put(businessId, defaultResult());
+            taskFail(INIT, null, businessId);
+        } else if (ResultState.EXCEPTION == dependWrapper.workResult.get(businessId)) {
+            workResult.put(businessId, defaultExResult(dependWrapper.getWorkResult(businessId).getEx()));
+            taskFail(INIT, null, businessId);
         } else {
             //前面任务正常完毕了，该自己了
-            doTask(params);
+            doTask(params, businessId);
         }
     }
 
     private synchronized void doDependsJobs(ExecutorService executorService, List<DependWrapper> dependWrappers, TaskWrapper fromWrapper,
-                                            long now, long remainTime, Map<String, Object> params) {
-        boolean nowDependIsMust = false;
+                                            long now, long remainTime, Map<String, Object> params, Long businessId) {
+//        boolean nowDependIsMust = false;
         //创建必须完成的上游wrapper集合
         Set<DependWrapper> mustWrapper = new HashSet<>();
         for (DependWrapper dependWrapper : dependWrappers) {
             if (dependWrapper.isMust()) {
                 mustWrapper.add(dependWrapper);
             }
-            if (dependWrapper.getDependWrapper().equals(fromWrapper)) {
-                nowDependIsMust = dependWrapper.isMust();
-            }
+//            if (dependWrapper.getDependWrapper().equals(fromWrapper)) {
+//                nowDependIsMust = dependWrapper.isMust();
+//            }
         }
 
         //如果全部是不必须的条件，那么只要到了这里，就执行自己。
         if (mustWrapper.size() == 0) {
-            if ( fromWrapper.getWorkResult() != null && ResultState.TIMEOUT == fromWrapper.getWorkResult().getResultState()) {
-                taskFail(INIT, null);
+            if (fromWrapper.getWorkResult(businessId) != null && ResultState.TIMEOUT == fromWrapper.getWorkResult(businessId).getResultState()) {
+                taskFail(INIT, null, businessId);
             } else {
-                doTask(params);
+                doTask(params, businessId);
             }
-            nextTask(executorService, now, remainTime, params);
+            nextTask(executorService, now, remainTime, params, businessId);
             return;
         }
 
+
         //如果存在需要必须完成的，且fromWrapper不是必须的，就什么也不干
-        if (!nowDependIsMust) {
-            return;
-        }
+//        if (!nowDependIsMust) {
+//            return;
+//        }
 
         //如果fromWrapper是必须的
         boolean existNoFinish = false;
@@ -263,19 +266,19 @@ public class TaskWrapper<T, V> {
         //先判断前面必须要执行的依赖任务的执行结果，如果有任何一个失败，那就不用走doTask了，直接给自己设置为失败，进行下一步就是了
         for (DependWrapper dependWrapper : mustWrapper) {
             TaskWrapper workerWrapper = dependWrapper.getDependWrapper();
-            TaskResult tempWorkResult = workerWrapper.getWorkResult();
+            TaskResult tempWorkResult = workerWrapper.getWorkResult(businessId);
             //为null或者isWorking，说明它依赖的某个任务还没执行到或没执行完
-            if (workerWrapper.getState() == INIT || workerWrapper.getState() == WORKING) {
+            if (workerWrapper.getState(businessId) == INIT || workerWrapper.getState(businessId) == WORKING) {
                 existNoFinish = true;
                 break;
             }
             if (tempWorkResult != null && ResultState.TIMEOUT == tempWorkResult.getResultState()) {
-                workResult.set(tempWorkResult);
+                workResult.put(businessId, tempWorkResult);
                 hasError = true;
                 break;
             }
             if (tempWorkResult != null && ResultState.EXCEPTION == tempWorkResult.getResultState()) {
-                workResult.set(defaultExResult(workerWrapper.getWorkResult().getEx()));
+                workResult.put(businessId, defaultExResult(workerWrapper.getWorkResult(businessId).getEx()));
                 hasError = true;
                 break;
             }
@@ -283,8 +286,8 @@ public class TaskWrapper<T, V> {
         }
         //只要有失败的
         if (hasError) {
-            taskFail(INIT, null);
-            nextTask(executorService, now, remainTime, params);
+            taskFail(INIT, null, businessId);
+            nextTask(executorService, now, remainTime, params, businessId);
             return;
         }
 
@@ -292,8 +295,8 @@ public class TaskWrapper<T, V> {
         //都finish的话
         if (!existNoFinish) {
             //上游都finish了，进行自己
-            doTask(params);
-            nextTask(executorService, now, remainTime, params);
+            doTask(params, businessId);
+            nextTask(executorService, now, remainTime, params, businessId);
             return;
         }
     }
@@ -301,38 +304,39 @@ public class TaskWrapper<T, V> {
     /**
      * 执行自己的job.具体的执行是在另一个线程里,但判断阻塞超时是在work线程
      */
-    private void doTask(Map<String, Object> params) {
-        //阻塞取结果
-        workResult.set(doTaskDep(params));
+    private void doTask(Map<String, Object> params, long businessId) {
+        //执行结果
+        doTaskDep(params, businessId);
+
     }
 
     /**
      * taskFail
      * 任务失败
      */
-    private boolean taskFail(int expect, Exception e) {
+    private boolean taskFail(int expect, Exception e, Long businessId) {
         //试图将它从expect状态,改成Error CAS 无锁设置
-        if (!compareAndSetState(expect, ERROR)) {
+        if (!compareAndSetState(expect, ERROR, businessId)) {
             return false;
         }
 
         //尚未处理过结果
-        if (checkIsNullResult()) {
+        if (checkIsNullResult(businessId)) {
             if (e == null) {
-                workResult.set(defaultResult());
+                workResult.put(businessId, defaultResult());
             } else {
-                workResult.set(defaultExResult(e));
+                workResult.put(businessId, defaultExResult(e));
             }
         }
 
-        callback.result(false, param, workResult.get());
+        callback.result(false, param, workResult.get(businessId));
         return true;
     }
 
     /**
      * 真正的的单个task执行任务 doTask
      */
-    private TaskResult<V> doTaskDep(Map<String, Object> params) {
+    private TaskResult<V> doTaskDep(Map<String, Object> params, Long businessId) {
         T param = null;
         if (params.containsKey(GobrsAsyncConstant.DEFAULT_PARAMS)) {
             param = (T) params.get(GobrsAsyncConstant.DEFAULT_PARAMS);
@@ -345,16 +349,16 @@ public class TaskWrapper<T, V> {
 
             objectTaskResult.setResultState(ResultState.SUCCESS);
             objectTaskResult.setResult(null);
-            workResult.set(objectTaskResult);
+            workResult.put(businessId, objectTaskResult);
             return objectTaskResult;
         }
         //避免重复执行
-        if (!checkIsNullResult()) {
+        if (!checkIsNullResult(businessId)) {
             return objectTaskResult;
         }
         try {
             //如果已经不是init状态了，说明正在被执行或已执行完毕。这一步很重要，可以保证任务不被重复执行
-            if (!compareAndSetState(INIT, WORKING)) {
+            if (!compareAndSetState(INIT, WORKING, businessId)) {
                 return objectTaskResult;
             }
 
@@ -364,29 +368,29 @@ public class TaskWrapper<T, V> {
             V resultValue = worker.doTask(param, forParamUseWrappers);
 
             //如果状态不是在working,说明别的地方已经修改了
-            if (!compareAndSetState(WORKING, FINISH)) {
+            if (!compareAndSetState(WORKING, FINISH, businessId)) {
                 return objectTaskResult;
             }
 
             objectTaskResult.setResultState(ResultState.SUCCESS);
             objectTaskResult.setResult(resultValue);
-            workResult.set(objectTaskResult);
+            workResult.put(businessId, objectTaskResult);
             //回调成功
             callback.result(true, param, objectTaskResult);
 
             return objectTaskResult;
         } catch (Exception e) {
             //避免重复回调
-            if (!checkIsNullResult()) {
+            if (!checkIsNullResult(businessId)) {
                 return objectTaskResult;
             }
-            taskFail(WORKING, e);
+            taskFail(WORKING, e, businessId);
             return objectTaskResult;
         }
     }
 
-    public TaskResult<V> getWorkResult() {
-        return workResult.get();
+    public TaskResult<V> getWorkResult(Long businessId) {
+        return workResult.get(businessId);
     }
 
     public List<TaskWrapper<?, ?>> getNextWrappers() {
@@ -398,8 +402,8 @@ public class TaskWrapper<T, V> {
     }
 
 
-    private boolean checkIsNullResult() {
-        return workResult.get() == null;
+    private boolean checkIsNullResult(Long businessId) {
+        return workResult.get(businessId) == null;
     }
 
     public void addDepend(TaskWrapper<?, ?> workerWrapper, boolean must) {
@@ -466,45 +470,53 @@ public class TaskWrapper<T, V> {
     }
 
 
-    private int getState() {
-        return state.get();
+    private int getState(Long businessId) {
+        AtomicInteger st = state.get(businessId);
+        return st == null ? INIT : st.get();
     }
 
     public String getId() {
         return id;
     }
 
-    private boolean compareAndSetState(int expect, int update) {
-        return this.state.compareAndSet(expect, update);
+    private boolean compareAndSetState(int expect, int update, long businessId) {
+        AtomicInteger st = this.state.get(businessId);
+        if (st == null) {
+            st = new AtomicInteger(INIT);
+            boolean b = st.compareAndSet(expect, update);
+            this.state.put(businessId, st);
+            return b;
+        }
+        return st.compareAndSet(expect, update);
     }
 
     private void setNeedCheckNextWrapperResult(boolean needCheckNextWrapperResult) {
         this.needCheckNextWrapperResult = needCheckNextWrapperResult;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        TaskWrapper<?, ?> that = (TaskWrapper<?, ?>) o;
-        return needCheckNextWrapperResult == that.needCheckNextWrapperResult &&
-                Objects.equals(param, that.param) &&
-                Objects.equals(worker, that.worker) &&
-                Objects.equals(callback, that.callback) &&
-                Objects.equals(nextWrappers, that.nextWrappers) &&
-                Objects.equals(dependWrappers, that.dependWrappers) &&
-                Objects.equals(state, that.state) &&
-                Objects.equals(workResult, that.workResult);
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) {
+//            return true;
+//        }
+//        if (o == null || getClass() != o.getClass()) {
+//            return false;
+//        }
+//        TaskWrapper<?, ?> that = (TaskWrapper<?, ?>) o;
+//        return needCheckNextWrapperResult == that.needCheckNextWrapperResult &&
+//                Objects.equals(param, that.param) &&
+//                Objects.equals(worker, that.worker) &&
+//                Objects.equals(callback, that.callback) &&
+//                Objects.equals(nextWrappers, that.nextWrappers) &&
+//                Objects.equals(dependWrappers, that.dependWrappers) &&
+//                Objects.equals(state.get(businessId), that.state.get(businessId)) &&
+//                Objects.equals(workResult, that.workResult);
+//    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(param, worker, callback, nextWrappers, dependWrappers, state, workResult, needCheckNextWrapperResult);
-    }
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(param, worker, callback, nextWrappers, dependWrappers, state.get(), workResult, needCheckNextWrapperResult);
+//    }
 
 
     public static class Builder<W, C> {

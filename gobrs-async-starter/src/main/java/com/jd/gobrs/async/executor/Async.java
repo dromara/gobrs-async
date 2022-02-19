@@ -3,6 +3,7 @@ package com.jd.gobrs.async.executor;
 
 import com.jd.gobrs.async.callback.DefaultGroupCallback;
 import com.jd.gobrs.async.callback.IGroupCallback;
+import com.jd.gobrs.async.util.SnowflakeId;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
 
 import java.util.*;
@@ -25,10 +26,14 @@ public class Async {
      */
     private static ExecutorService executorService;
 
+    private static SnowflakeId snowflakeId = new SnowflakeId(0, 0);
+
     /**
      * 出发点
      */
     public static boolean startTaskFlow(long timeout, ExecutorService executorService, List<TaskWrapper> taskWrappers, Map<String, Object> params) throws ExecutionException, InterruptedException {
+
+        long businessId = snowflakeId.nextId();
         if (taskWrappers == null || taskWrappers.size() == 0) {
             return false;
         }
@@ -39,7 +44,7 @@ public class Async {
         CompletableFuture[] futures = new CompletableFuture[taskWrappers.size()];
         for (int i = 0; i < taskWrappers.size(); i++) {
             TaskWrapper wrapper = taskWrappers.get(i);
-            futures[i] = CompletableFuture.runAsync(() -> wrapper.task(executorService, timeout, forParamUseWrappers, params), executorService);
+            futures[i] = CompletableFuture.runAsync(() -> wrapper.task(executorService, timeout, forParamUseWrappers, params, businessId), executorService);
         }
         try {
             CompletableFuture.allOf(futures).get(timeout, TimeUnit.MILLISECONDS);
@@ -48,10 +53,29 @@ public class Async {
             Set<TaskWrapper> set = new HashSet<>();
             totalWorkers(taskWrappers, set);
             for (TaskWrapper wrapper : set) {
-                wrapper.stopNow();
+                wrapper.stopNow(businessId);
             }
             return false;
+        } finally {
+            // 释放资源
+            release(taskWrappers, businessId);
         }
+    }
+
+    private static void release(List<TaskWrapper> taskWrappers, Long businessId) {
+        taskWrappers.parallelStream().forEach(x -> {
+            doRelease(x.getNextWrappers(), businessId);
+        });
+    }
+
+    private static void doRelease(List<TaskWrapper> taskWrappers, Long businessId) {
+        if (taskWrappers == null) {
+            return;
+        }
+        taskWrappers.parallelStream().forEach(x -> {
+            x.workResult.remove(businessId);
+            doRelease(x.getNextWrappers(), businessId);
+        });
     }
 
     /**

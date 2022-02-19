@@ -1,5 +1,6 @@
 package com.jd.gobrs.async.example.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jd.gobrs.async.task.AsyncTask;
 import com.jd.gobrs.async.task.TaskResult;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
@@ -25,13 +26,13 @@ public class DService implements AsyncTask<String, Map> {
             System.out.println("开始执行D");
 //            Object result = map.get("AService").getWorkResult().getResult();
 //            System.out.println("Aservice result : " + result.toString());
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Thread.sleep(100);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
             HashMap<Object, Object> objectObjectHashMap = new HashMap<>();
-            objectObjectHashMap.put("result", "I am is DService");
+            objectObjectHashMap.put("result", "我是D的结果");
             return objectObjectHashMap;
         }catch (Exception ex){
             ex.printStackTrace();
@@ -47,7 +48,7 @@ public class DService implements AsyncTask<String, Map> {
     @Override
     public void result(boolean b, String s, TaskResult<Map> taskResult) {
         if(b){
-            System.out.println("DService success");
+            System.out.println("DService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
         }else{
             System.out.println("DService fail");
         }

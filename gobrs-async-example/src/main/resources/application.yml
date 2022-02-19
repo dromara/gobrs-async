@@ -3,4 +3,4 @@ server:
 spring:
   gobrs:
     async:
-      rules: '[{name: "test", content: "AService->EService->CService,BService->DService:not;AService->DService"}]'
+      rules: '[{name: "test", content: "AService->EService->CService->DService:not;AService->BService->DService"}]'
