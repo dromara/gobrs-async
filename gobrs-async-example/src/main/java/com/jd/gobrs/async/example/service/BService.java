@@ -18,32 +18,30 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class BService implements AsyncTask<Integer, Map> {
+public class BService implements AsyncTask<String, Map> {
 
     @Override
-    public Map doTask(Integer integer, Map<String, TaskWrapper> map) {
-        System.out.println("开始执行B");
-//        Object result = map.get("AService").getWorkResult().getResult();
-//        System.out.println("A result is" + result.toString());
-//        try {
-//            Thread.sleep(400);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+    public Map doTask(String integer, Map<String, TaskWrapper> map) {
+//        System.out.println("开始执行B");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         HashMap<Object, Object> objectObjectHashMap = new HashMap<>();
         objectObjectHashMap.put("result", "我是B的结果");
         return objectObjectHashMap;
     }
 
     @Override
-    public boolean nessary(Integer integer) {
+    public boolean nessary(String integer) {
         return true;
     }
 
     @Override
-    public void result(boolean b, Integer integer, TaskResult<Map> taskResult) {
+    public void result(boolean b, String integer, TaskResult<Map> taskResult) {
         if(b){
-            System.out.println("BService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
+//            System.out.println("BService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
         }else{
             System.out.println("BService fail");
         }

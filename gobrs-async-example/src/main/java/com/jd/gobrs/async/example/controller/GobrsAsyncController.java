@@ -24,7 +24,28 @@ public class GobrsAsyncController {
 
     @RequestMapping("test1")
     public String test1() {
+        long start = System.currentTimeMillis();
         gobrsService.testGobrs();
+        long end = System.currentTimeMillis() - start;
+        System.out.println("总耗时" + end);
         return "success";
     }
+
+
+    @RequestMapping("test2")
+    public String test2() {
+        long start = System.currentTimeMillis();
+        gobrsService.testGobrs2();
+        long end = System.currentTimeMillis() - start;
+
+        System.out.println("总耗时" + end);
+        return "success";
+    }
+
+    @RequestMapping("test3")
+    public String test3() {
+        gobrsService.testGobrs3();
+        return "success";
+    }
+
 }

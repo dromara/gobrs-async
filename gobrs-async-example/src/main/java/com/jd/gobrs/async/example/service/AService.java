@@ -22,12 +22,12 @@ public class AService implements AsyncTask<String, Map> {
 
     @Override
     public Map doTask(String s, Map<String, TaskWrapper> map) {
-        System.out.println("开始执行A");
-//        try {
-//            Thread.sleep(300);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+//        System.out.println("开始执行A");
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         HashMap<Object, Object> objectObjectHashMap = new HashMap<>();
         objectObjectHashMap.put("result", "我是A的结果");
         return objectObjectHashMap;
@@ -41,7 +41,7 @@ public class AService implements AsyncTask<String, Map> {
     @Override
     public void result(boolean b, String s, TaskResult<Map> taskResult) {
         if (b) {
-            System.out.println("AService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
+//            System.out.println("AService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
         } else {
             System.out.println("AService fail");
         }

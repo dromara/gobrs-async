@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.memorydoc</groupId>
   <artifactId>gobrs-async-starter</artifactId>
-  <version>1.0.4-RELEASE</version>
+  <version>1.0.5-RELEASE</version>
   <name>${project.artifactId}</name>
   <description>🔥 强大异步任务编排工具（没有依赖中间件）</description>
   <url>https://github.com/Memorydoc/gobrs-async-starter</url>
@@ -51,9 +51,9 @@
     <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.javadoc.plugin.version>3.0.0</maven.javadoc.plugin.version>
-    <revision>1.0.0-beta.3</revision>
     <logback.version>1.2.3</logback.version>
+    <revision>1.0.0-beta.3</revision>
+    <maven.javadoc.plugin.version>3.0.0</maven.javadoc.plugin.version>
     <maven.compiler.plugin.version>3.6.1</maven.compiler.plugin.version>
   </properties>
   <dependencyManagement>

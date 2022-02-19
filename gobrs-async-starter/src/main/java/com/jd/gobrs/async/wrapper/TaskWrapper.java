@@ -1,20 +1,22 @@
 package com.jd.gobrs.async.wrapper;
 
+import com.jd.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.jd.gobrs.async.callback.DefaultCallback;
 import com.jd.gobrs.async.callback.ICallback;
 import com.jd.gobrs.async.constant.GobrsAsyncConstant;
+import com.jd.gobrs.async.exception.AsyncExceptionInterceptor;
 import com.jd.gobrs.async.exception.SkippedException;
+import com.jd.gobrs.async.gobrs.GobrsFlowState;
+import com.jd.gobrs.async.spring.GobrsSpring;
 import com.jd.gobrs.async.task.DependWrapper;
 import com.jd.gobrs.async.task.ResultState;
 import com.jd.gobrs.async.callback.ITask;
 import com.jd.gobrs.async.executor.timer.SystemClock;
 import com.jd.gobrs.async.task.TaskResult;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -51,9 +53,15 @@ public class TaskWrapper<T, V> {
      */
     private List<DependWrapper> dependWrappers;
 
+    private AsyncExceptionInterceptor asyncExceptionInterceptor = GobrsSpring.getBean(AsyncExceptionInterceptor.class);
+
+
+    private GobrsAsyncProperties gobrsAsyncProperties = GobrsSpring.getBean(GobrsAsyncProperties.class);
+
     public List<DependWrapper> getDependWrappers() {
         return dependWrappers;
     }
+
 
     public void setDependWrappers(List<DependWrapper> dependWrappers) {
         this.dependWrappers = dependWrappers;
@@ -65,7 +73,7 @@ public class TaskWrapper<T, V> {
      * <p>
      * 1-finish, 2-error, 3-working
      */
-    public volatile ConcurrentHashMap<Long, AtomicInteger> state = new ConcurrentHashMap<Long, AtomicInteger>();
+    public volatile ConcurrentHashMap<Long, Integer> state = new ConcurrentHashMap<Long, Integer>();
     /**
      * 该map存放所有wrapper的id和wrapper映射
      */
@@ -108,7 +116,7 @@ public class TaskWrapper<T, V> {
      * 开始工作
      * fromWrapper 代表这次work是由哪个上游wrapper发起的
      */
-    private void task(ExecutorService executorService, TaskWrapper fromWrapper, long remainTime, Map<String, TaskWrapper> forParamUseWrappers,
+    private void task(ThreadPoolTaskExecutor executorService, TaskWrapper fromWrapper, long remainTime, Map<String, TaskWrapper> forParamUseWrappers,
                       Map<String, Object> params, Long businessId) {
         this.forParamUseWrappers = forParamUseWrappers;
         //将自己放到所有wrapper的集合里去
@@ -161,7 +169,7 @@ public class TaskWrapper<T, V> {
     }
 
 
-    public void task(ExecutorService executorService, long remainTime, Map<String, TaskWrapper> forParamUseWrappers, Map<String, Object> params, Long businessId) {
+    public void task(ThreadPoolTaskExecutor executorService, long remainTime, Map<String, TaskWrapper> forParamUseWrappers, Map<String, Object> params, Long businessId) {
         task(executorService, null, remainTime, forParamUseWrappers, params, businessId);
     }
 
@@ -192,28 +200,29 @@ public class TaskWrapper<T, V> {
     /**
      * 进行下一个任务
      */
-    private void nextTask(ExecutorService executorService, long now, long remainTime, Map<String, Object> params, Long businessId) {
+    private void nextTask(ThreadPoolTaskExecutor executorService, long now, long remainTime, Map<String, Object> params, Long businessId) {
         //花费的时间
         long costTime = SystemClock.now() - now;
         if (nextWrappers == null) {
             return;
         }
         if (nextWrappers.size() == 1) {
-            nextWrappers.get(0).task(executorService, nextWrappers.get(0), remainTime - costTime, forParamUseWrappers, params, businessId);
+            nextWrappers.get(0).task(executorService, TaskWrapper.this, remainTime - costTime, forParamUseWrappers, params, businessId);
             return;
         }
         CompletableFuture[] futures = new CompletableFuture[nextWrappers.size()];
         for (int i = 0; i < nextWrappers.size(); i++) {
             int finalI = i;
             futures[i] = CompletableFuture.runAsync(() -> nextWrappers.get(finalI)
-                    .task(executorService, nextWrappers.get(finalI),
-                            remainTime - costTime, forParamUseWrappers, params, businessId), executorService);
+                            .task(executorService, TaskWrapper.this,
+                                    remainTime - costTime, forParamUseWrappers, params, businessId), executorService)
+                    .exceptionally((ex) -> {
+                        boolean state = gobrsAsyncProperties.isTaskInterrupt() &&
+                                GobrsFlowState.compareAndSetState(GobrsFlowState.WORKING, GobrsFlowState.ERROR, businessId);
+                        throw asyncExceptionInterceptor.exception(ex, state);
+                    });
         }
-        try {
-            CompletableFuture.allOf(futures).get();
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
+        CompletableFuture.allOf(futures).join();
     }
 
     private void doDependsOneJob(TaskWrapper dependWrapper, Map<String, Object> params, Long businessId) {
@@ -229,18 +238,18 @@ public class TaskWrapper<T, V> {
         }
     }
 
-    private synchronized void doDependsJobs(ExecutorService executorService, List<DependWrapper> dependWrappers, TaskWrapper fromWrapper,
+    private synchronized void doDependsJobs(ThreadPoolTaskExecutor executorService, List<DependWrapper> dependWrappers, TaskWrapper fromWrapper,
                                             long now, long remainTime, Map<String, Object> params, Long businessId) {
-//        boolean nowDependIsMust = false;
+        boolean nowDependIsMust = false;
         //创建必须完成的上游wrapper集合
         Set<DependWrapper> mustWrapper = new HashSet<>();
         for (DependWrapper dependWrapper : dependWrappers) {
             if (dependWrapper.isMust()) {
                 mustWrapper.add(dependWrapper);
             }
-//            if (dependWrapper.getDependWrapper().equals(fromWrapper)) {
-//                nowDependIsMust = dependWrapper.isMust();
-//            }
+            if (dependWrapper.getDependWrapper().equals(fromWrapper)) {
+                nowDependIsMust = dependWrapper.isMust();
+            }
         }
 
         //如果全部是不必须的条件，那么只要到了这里，就执行自己。
@@ -256,9 +265,9 @@ public class TaskWrapper<T, V> {
 
 
         //如果存在需要必须完成的，且fromWrapper不是必须的，就什么也不干
-//        if (!nowDependIsMust) {
-//            return;
-//        }
+        if (!nowDependIsMust) {
+            return;
+        }
 
         //如果fromWrapper是必须的
         boolean existNoFinish = false;
@@ -305,9 +314,12 @@ public class TaskWrapper<T, V> {
      * 执行自己的job.具体的执行是在另一个线程里,但判断阻塞超时是在work线程
      */
     private void doTask(Map<String, Object> params, long businessId) {
+        if (gobrsAsyncProperties.isTaskInterrupt() &&
+                GobrsFlowState.compareAndSetState(GobrsFlowState.ERROR, GobrsFlowState.FINISH, businessId)) {
+            return;
+        }
         //执行结果
         doTaskDep(params, businessId);
-
     }
 
     /**
@@ -357,6 +369,7 @@ public class TaskWrapper<T, V> {
             return objectTaskResult;
         }
         try {
+
             //如果已经不是init状态了，说明正在被执行或已执行完毕。这一步很重要，可以保证任务不被重复执行
             if (!compareAndSetState(INIT, WORKING, businessId)) {
                 return objectTaskResult;
@@ -471,8 +484,8 @@ public class TaskWrapper<T, V> {
 
 
     private int getState(Long businessId) {
-        AtomicInteger st = state.get(businessId);
-        return st == null ? INIT : st.get();
+        Integer st = state.get(businessId);
+        return st == null ? INIT : st;
     }
 
     public String getId() {
@@ -480,14 +493,22 @@ public class TaskWrapper<T, V> {
     }
 
     private boolean compareAndSetState(int expect, int update, long businessId) {
-        AtomicInteger st = this.state.get(businessId);
+        Integer st = this.state.get(businessId);
         if (st == null) {
-            st = new AtomicInteger(INIT);
-            boolean b = st.compareAndSet(expect, update);
-            this.state.put(businessId, st);
-            return b;
+            if (expect == INIT) {
+                st = update;
+                this.state.put(businessId, st);
+                return true;
+            }
+            return false;
         }
-        return st.compareAndSet(expect, update);
+
+        if (st == expect) {
+            st = update;
+            this.state.put(businessId, st);
+            return true;
+        }
+        return false;
     }
 
     private void setNeedCheckNextWrapperResult(boolean needCheckNextWrapperResult) {

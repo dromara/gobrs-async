@@ -40,12 +40,17 @@ public class GobrsAsyncProperties {
      */
     private String must = ":not";
 
+    /**
+     * 执行异常是否打断 工作流程
+     */
+    private boolean taskInterrupt = false;
 
     /**
      * 默认总任务超时时间 3s
      * @return
      */
     private long timeout = 3000;
+
 
 
     public long getTimeout() {
@@ -87,5 +92,13 @@ public class GobrsAsyncProperties {
 
     public void setRules(String rules) {
         this.rules = rules;
+    }
+
+    public boolean isTaskInterrupt() {
+        return taskInterrupt;
+    }
+
+    public void setTaskInterrupt(boolean taskInterrupt) {
+        this.taskInterrupt = taskInterrupt;
     }
 }
