@@ -31,7 +31,6 @@ public class RuleParseEngine<T> extends AbstractEngine {
     private GobrsAsyncProperties gobrsAsyncProperties;
 
 
-
     public static final String sp = ",";
 
     @Override

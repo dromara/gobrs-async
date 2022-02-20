@@ -13,20 +13,28 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @Version 1.0
  **/
 public class GobrsFlowState {
-    public static Map<Long, AtomicInteger> gobrsFlowState = new ConcurrentHashMap<>();
+    public static Map<Long, Integer> gobrsFlowState = new ConcurrentHashMap<>();
     public static final int FINISH = 2;
     public static final int ERROR = 1;
     public static final int WORKING = 0;
 
     public static boolean compareAndSetState(int expect, int update, long businessId) {
-        AtomicInteger st = gobrsFlowState.get(businessId);
+        Integer st = gobrsFlowState.get(businessId);
         if (st == null) {
-            st = new AtomicInteger(WORKING);
-            boolean b = st.compareAndSet(expect, update);
-            gobrsFlowState.put(businessId, st);
-            return b;
+            st = WORKING;
+            if (expect == st) {
+                st = update;
+                gobrsFlowState.put(businessId, st);
+                return true;
+            }
+            return false;
         }
-        return st.compareAndSet(expect, update);
+        if (expect == st) {
+            st = update;
+            gobrsFlowState.put(businessId, st);
+            return true;
+        }
+        return false;
     }
 
 }
