@@ -16,8 +16,9 @@ public interface ITask<T, V> {
      *
      * @param object      object
      * @param allWrappers 任务包装
+     * @param businessId 业务ID
      */
-    V doTask(T object, Map<String, TaskWrapper> allWrappers);
+    V doTask(T object, Map<String, TaskWrapper> dataSources, Long businessId);
 
     /**
      * 超时、异常时，返回的默认值
@@ -27,7 +28,12 @@ public interface ITask<T, V> {
     default V defaultValue() {
         return null;
     }
+
     default boolean nessary(T t) {
         return true;
     }
+
+
+
+
 }

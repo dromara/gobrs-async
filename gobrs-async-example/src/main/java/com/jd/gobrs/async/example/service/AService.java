@@ -20,9 +20,10 @@ import java.util.Map;
 @Service
 public class AService implements AsyncTask<String, Map> {
 
+
     @Override
-    public Map doTask(String s, Map<String, TaskWrapper> map) {
-//        System.out.println("开始执行A");
+    public Map doTask(String object, Map<String, TaskWrapper> allWrappers, Long businessId) {
+        //        System.out.println("开始执行A");
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {

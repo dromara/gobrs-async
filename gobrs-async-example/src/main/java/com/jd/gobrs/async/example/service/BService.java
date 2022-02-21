@@ -21,7 +21,7 @@ import java.util.Map;
 public class BService implements AsyncTask<String, Map> {
 
     @Override
-    public Map doTask(String integer, Map<String, TaskWrapper> map) {
+    public Map doTask(String object, Map<String, TaskWrapper> allWrappers, Long businessId) {
 //        System.out.println("开始执行B");
         try {
             Thread.sleep(1000);

@@ -20,10 +20,13 @@ import java.util.Map;
 @Service
 public class DService implements AsyncTask<String, Map> {
 
+
     @Override
-    public Map doTask(String parameter, Map<String, TaskWrapper> map) {
+    public Map doTask(String object, Map<String, TaskWrapper> datasources, Long businessId) {
+
         try {
-//            System.out.println("开始执行D");
+            Object data = getData(datasources, businessId, EService.class);
+            System.out.println(JSONObject.toJSONString(data));
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -32,7 +35,7 @@ public class DService implements AsyncTask<String, Map> {
             HashMap<Object, Object> objectObjectHashMap = new HashMap<>();
             objectObjectHashMap.put("result", "我是D的结果");
             return objectObjectHashMap;
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return null;
@@ -45,9 +48,9 @@ public class DService implements AsyncTask<String, Map> {
 
     @Override
     public void result(boolean b, String s, TaskResult<Map> taskResult) {
-        if(b){
+        if (b) {
 //            System.out.println("DService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
-        }else{
+        } else {
             System.out.println("DService fail");
         }
     }

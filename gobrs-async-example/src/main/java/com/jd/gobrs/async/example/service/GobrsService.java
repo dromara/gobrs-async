@@ -2,6 +2,7 @@ package com.jd.gobrs.async.example.service;
 
 import com.jd.gobrs.async.gobrs.GobrsTaskFlow;
 import com.jd.gobrs.async.task.AsyncTask;
+import com.jd.gobrs.async.task.TaskResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
@@ -50,7 +51,7 @@ public class GobrsService {
                 Map<String, Object> params = new HashMap<>();
                 params.put("AService", "AService param");
                 return params;
-            }, 3000);
+            }, 100000);
         } catch (Exception ex) {
             System.out.println("异常了" + ex);
         }
@@ -60,7 +61,7 @@ public class GobrsService {
         List<Future> list = new ArrayList<>();
         for (AsyncTask asyncTask : asyncTasks) {
             Future<?> submit = gobrsThreadPoolExecutor.submit(() -> {
-                asyncTask.doTask("", new HashMap<>());
+//                asyncTask.doTask("", new TaskResult());
                 long cost = System.currentTimeMillis();
             });
             list.add(submit);
@@ -81,7 +82,7 @@ public class GobrsService {
 
         for (AsyncTask asyncTask : asyncTasks) {
             CompletableFuture<Void> runAsync = CompletableFuture.runAsync(() -> {
-                asyncTask.doTask("", new HashMap<>());
+//                asyncTask.doTask("", new HashMap<>());
             }, gobrsThreadPoolExecutor);
             list.add(runAsync);
         }
