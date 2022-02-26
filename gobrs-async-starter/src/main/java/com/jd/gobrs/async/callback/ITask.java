@@ -18,7 +18,7 @@ public interface ITask<T, V> {
      * @param allWrappers 任务包装
      * @param businessId 业务ID
      */
-    V doTask(T object, Map<String, TaskWrapper> dataSources, Long businessId);
+    V task(T object, Map<String, TaskWrapper> dataSources, Long businessId);
 
     /**
      * 超时、异常时，返回的默认值

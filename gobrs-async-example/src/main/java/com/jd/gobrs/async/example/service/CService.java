@@ -18,10 +18,11 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class CService implements AsyncTask<String, Map> {
+public class CService implements AsyncTask<String, Map, Object> {
+
 
     @Override
-    public Map doTask(String object, Map<String, TaskWrapper> allWrappers, Long businessId) {
+    public Map task(String object, Map<String, TaskWrapper> dataSources, Long businessId) {
 
 //        System.out.println("开始执行C");
         try {

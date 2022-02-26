@@ -378,7 +378,7 @@ public class TaskWrapper<T, V> {
             callback.begin();
 
             //执行耗时操作
-            V resultValue = worker.doTask(param, forParamUseWrappers,businessId);
+            V resultValue = worker.task(param, forParamUseWrappers,businessId);
 
             //如果状态不是在working,说明别的地方已经修改了
             if (!compareAndSetState(WORKING, FINISH, businessId)) {

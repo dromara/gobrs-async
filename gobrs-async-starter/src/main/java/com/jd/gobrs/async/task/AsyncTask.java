@@ -14,7 +14,7 @@ import java.util.Map;
  * @create: 2022-01-28 00:16
  * @Version 1.0
  **/
-public interface AsyncTask<T, V> extends ITask<T, V>, ICallback<T, V> {
+public interface AsyncTask<T, V,P> extends ITask<T, V>, ICallback<T, V> {
     /**
      * 根据业务实现 判断是否需要执行当前task
      *
@@ -39,7 +39,7 @@ public interface AsyncTask<T, V> extends ITask<T, V>, ICallback<T, V> {
      * @param businessId  业务id
      * @return
      */
-    default Object getData(Map<String, TaskWrapper> datasources, Long businessId, Class clazz) {
+    default P getData(Map<String, TaskWrapper> datasources, Long businessId, Class clazz) {
         TaskWrapper taskWrapper;
         if (datasources.get(clazz.getSimpleName()) != null) {
             taskWrapper = datasources.get(clazz.getSimpleName());
@@ -49,6 +49,6 @@ public interface AsyncTask<T, V> extends ITask<T, V>, ICallback<T, V> {
         if (taskWrapper == null) {
             return null;
         }
-        return taskWrapper.getWorkResult(businessId);
+        return (P)taskWrapper.getWorkResult(businessId);
     }
 }

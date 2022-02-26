@@ -18,14 +18,14 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class DService implements AsyncTask<String, Map> {
+public class DService implements AsyncTask<String, Map, Object> {
 
 
     @Override
-    public Map doTask(String object, Map<String, TaskWrapper> datasources, Long businessId) {
+    public Map task(String object, Map<String, TaskWrapper> dataSources, Long businessId) {
 
         try {
-            Object data = getData(datasources, businessId, EService.class);
+            Object data = getData(dataSources, businessId, EService.class);
             System.out.println(JSONObject.toJSONString(data));
             try {
                 Thread.sleep(1000);

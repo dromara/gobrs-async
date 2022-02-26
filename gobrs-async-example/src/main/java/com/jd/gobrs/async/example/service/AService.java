@@ -18,11 +18,11 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class AService implements AsyncTask<String, Map> {
+public class AService implements AsyncTask<String, Map,Object> {
 
 
     @Override
-    public Map doTask(String object, Map<String, TaskWrapper> allWrappers, Long businessId) {
+    public Map doTask(String object, Map<String, TaskWrapper> dataSources, Long businessId) {
         //        System.out.println("开始执行A");
         try {
             Thread.sleep(1000);
