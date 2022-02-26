@@ -26,7 +26,7 @@ public class BService implements AsyncTask<String, Map, Object>, SerExector {
         //        System.out.println("开始执行A");
 //        System.out.println(1/0);
         try {
-            System.out.println(1 / 0);
+//            System.out.println(1 / 0);
             Thread.sleep(500);
         } catch (Exception e) {
             stopTaskFlow(dataSources, businessId, 100);

@@ -3,6 +3,7 @@ package com.jd.gobrs.async.task;
 import com.jd.gobrs.async.callback.ICallback;
 import com.jd.gobrs.async.callback.ITask;
 import com.jd.gobrs.async.constant.GobrsAsyncConstant;
+import com.jd.gobrs.async.constant.StateConstant;
 import com.jd.gobrs.async.gobrs.GobrsFlowState;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
 
@@ -50,7 +51,13 @@ public interface AsyncTask<T, V, P> extends ITask<T, V>, ICallback<T, V> {
         return (P) taskWrapper.getWorkResult(businessId);
     }
 
-
+    /**
+     * The caller closes the workflow
+     * @param datasources
+     * @param businessId
+     * @param capCode
+     * @return
+     */
     default boolean stopTaskFlow(Map<String, TaskWrapper> datasources, Long businessId, Integer capCode) {
         Class<? extends AsyncTask> aClass = this.getClass();
         TaskWrapper taskWrapper = datasources.get(aClass.getSimpleName()) != null
@@ -58,7 +65,12 @@ public interface AsyncTask<T, V, P> extends ITask<T, V>, ICallback<T, V> {
         if (taskWrapper == null) {
             return false;
         }
-        return taskWrapper.compareAndSetState(GobrsFlowState.WORKING, GobrsFlowState.ERROR, businessId);
+
+        boolean b = GobrsFlowState.compareAndSetState(StateConstant.WORKING, StateConstant.STOP, businessId);
+        if (b) {
+            GobrsFlowState.gobrsFlowState.get(businessId).setCapCode(capCode);
+        }
+        return b;
     }
 
 

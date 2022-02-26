@@ -219,7 +219,7 @@ public class TaskWrapper<T, V> {
                                     remainTime - costTime, forParamUseWrappers, params, businessId), executorService)
                     .exceptionally((ex) -> {
                         boolean state = gobrsAsyncProperties.isTaskInterrupt() &&
-                                GobrsFlowState.compareAndSetState(GobrsFlowState.WORKING, GobrsFlowState.ERROR, businessId);
+                                GobrsFlowState.compareAndSetState(StateConstant.WORKING, StateConstant.ERROR, businessId);
                         throw asyncExceptionInterceptor.exception(ex, state);
                     });
         }
@@ -314,9 +314,11 @@ public class TaskWrapper<T, V> {
      * 执行自己的job.具体的执行是在另一个线程里,但判断阻塞超时是在work线程
      */
     private void doTask(Map<String, Object> params, long businessId) {
+        if (GobrsFlowState.assertState(StateConstant.STOP, businessId)) {
+            return;
+        }
         if (gobrsAsyncProperties.isTaskInterrupt() &&
-                (GobrsFlowState.compareAndSetState(GobrsFlowState.ERROR, GobrsFlowState.FINISH, businessId)
-                || GobrsFlowState.compareAndSetState(GobrsFlowState.STOP,GobrsFlowState.FINISH, businessId ))) {
+                GobrsFlowState.assertState(StateConstant.STOP, businessId)) {
             return;
         }
         //执行结果
@@ -492,7 +494,7 @@ public class TaskWrapper<T, V> {
         return id;
     }
 
-    public boolean compareAndSetState(int expect, int update, long businessId) {
+    public synchronized boolean compareAndSetState(int expect, int update, long businessId) {
         Integer st = this.state.get(businessId);
         if (st == null) {
             if (expect == INIT) {
