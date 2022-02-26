@@ -49,7 +49,7 @@ public class GobrsFlowState {
         }
 
         private int state;
-        private int capCode;
+        private int expCode;
 
         public Integer getState() {
             return state;
@@ -59,12 +59,12 @@ public class GobrsFlowState {
             this.state = state;
         }
 
-        public Integer getCapCode() {
-            return capCode;
+        public int getExpCode() {
+            return expCode;
         }
 
-        public void setCapCode(Integer capCode) {
-            this.capCode = capCode;
+        public void setExpCode(int expCode) {
+            this.expCode = expCode;
         }
     }
 

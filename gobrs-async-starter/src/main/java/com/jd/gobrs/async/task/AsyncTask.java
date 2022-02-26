@@ -68,14 +68,14 @@ public interface AsyncTask<T, V, P> extends ITask<T, V>, ICallback<T, V> {
 
         boolean b = GobrsFlowState.compareAndSetState(StateConstant.WORKING, StateConstant.STOP, businessId);
         if (b) {
-            GobrsFlowState.gobrsFlowState.get(businessId).setCapCode(capCode);
+            GobrsFlowState.gobrsFlowState.get(businessId).setExpCode(capCode);
         }
         return b;
     }
 
 
     default void stopTaskFlow(Map<String, TaskWrapper> datasources, Long businessId) {
-        stopTaskFlow(datasources, businessId, GobrsAsyncConstant.DEFAULT_CATCODE);
+        stopTaskFlow(datasources, businessId, GobrsAsyncConstant.DEFAULT_EXPECTION_CODE);
     }
 
 }
