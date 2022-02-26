@@ -65,13 +65,13 @@ public class GobrsService {
                 return params;
             }, 5000);
         } catch (Exception e) {
-            System.out.println("异常了 " + e);
+            System.out.println("异常 " + e);
         }
         Map<String, Object> data = asyncResult.getData();
         System.out.println(JSONObject.toJSONString(data));
     }
 
-    public void testGobrs2() {
+    public void testFuture() {
         List<Future> list = new ArrayList<>();
         for (AsyncTask asyncTask : paraExectors) {
             Future<?> submit = gobrsThreadPoolExecutor.submit(() -> {
@@ -107,7 +107,7 @@ public class GobrsService {
         }
     }
 
-    public void testGobrs3() {
+    public void testGobrsGener() {
         List<Future> list = new ArrayList<>();
 
         for (AsyncTask asyncTask : asyncTasks) {

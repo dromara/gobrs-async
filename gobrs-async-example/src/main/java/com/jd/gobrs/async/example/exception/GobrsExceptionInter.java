@@ -18,7 +18,7 @@ public class GobrsExceptionInter implements AsyncExceptionInterceptor {
 
     @Override
     public CompletionException exception(Throwable throwable, Boolean state) {
-        System.out.println("自定义的exceptor Interceptor");
+        System.out.println("自定义全局异常 exceptor Interceptor");
         return new CompletionException(throwable);
     }
 }

@@ -24,7 +24,7 @@ public class BService implements AsyncTask<String, Map, Object>, SerExector {
     @Override
     public Map task(String object, Map<String, TaskWrapper> dataSources, Long businessId) {
         //        System.out.println("开始执行A");
-        System.out.println(1/0);
+//        System.out.println(1/0);
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
