@@ -1,9 +1,11 @@
 package com.jd.gobrs.async.result;
 
+import com.jd.gobrs.async.task.TaskResult;
 import com.jd.gobrs.async.util.CommonUtils;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -33,8 +35,18 @@ public class AsyncResult<P> implements Serializable {
     }
 
 
-    public Map<String, TaskWrapper> getData() {
-        return datasources;
+    public Map<String, P> getData() {
+        Map<String, P> result = new HashMap<>();
+        for (Map.Entry<String, TaskWrapper> dt : datasources.entrySet()) {
+            TaskResult workResult = dt.getValue().getWorkResult(businessId);
+            if (workResult == null) {
+                continue;
+            }
+            if (workResult.getResult() != null) {
+                result.put(dt.getKey(),(P)workResult.getResult());
+            }
+        }
+        return result;
     }
 
     public Long getBusinessId() {

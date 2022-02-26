@@ -26,7 +26,7 @@ public class CService implements AsyncTask<String, Map, Object> {
 
 //        System.out.println("开始执行C");
         try {
-            Thread.sleep(1000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

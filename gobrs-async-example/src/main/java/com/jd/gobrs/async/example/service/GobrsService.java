@@ -59,7 +59,7 @@ public class GobrsService {
         } catch (Exception e) {
             System.out.println("异常了 " + e);
         }
-        Map<String, TaskWrapper> data = asyncResult.getData();
+        Map<String, Object> data = asyncResult.getData();
         System.out.println(JSONObject.toJSONString(data));
     }
 
