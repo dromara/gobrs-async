@@ -1,6 +1,7 @@
 package com.jd.gobrs.async.example.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jd.gobrs.async.example.executor.SerExector;
 import com.jd.gobrs.async.task.AsyncTask;
 import com.jd.gobrs.async.task.TaskResult;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
@@ -18,14 +19,14 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class BService implements AsyncTask<String, Map, Object> {
+public class BService implements AsyncTask<String, Map, Object>, SerExector {
 
     @Override
     public Map task(String object, Map<String, TaskWrapper> dataSources, Long businessId) {
         //        System.out.println("开始执行A");
         System.out.println(1/0);
         try {
-            Thread.sleep(1000);
+            Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

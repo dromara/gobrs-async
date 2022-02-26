@@ -1,6 +1,7 @@
 package com.jd.gobrs.async.example.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jd.gobrs.async.example.executor.ParaExector;
 import com.jd.gobrs.async.task.AsyncTask;
 import com.jd.gobrs.async.task.TaskResult;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
@@ -18,7 +19,7 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class AService implements AsyncTask<String, Map, Object> {
+public class AService implements AsyncTask<String, Map, Object> , ParaExector {
 
 
     @Override

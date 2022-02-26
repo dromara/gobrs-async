@@ -1,6 +1,8 @@
 package com.jd.gobrs.async.example.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jd.gobrs.async.example.executor.ParaExector;
+import com.jd.gobrs.async.example.executor.SerExector;
 import com.jd.gobrs.async.gobrs.GobrsTaskFlow;
 import com.jd.gobrs.async.result.AsyncResult;
 import com.jd.gobrs.async.task.AsyncTask;
@@ -44,6 +46,12 @@ public class GobrsService {
     @Resource
     List<AsyncTask> asyncTasks;
 
+    @Resource
+    List<ParaExector> paraExectors;
+
+    @Resource
+    List<SerExector> serExectors;
+
     @Autowired
     private ThreadPoolTaskExecutor gobrsThreadPoolExecutor;
 
@@ -55,7 +63,7 @@ public class GobrsService {
                 Map<String, Object> params = new HashMap<>();
                 params.put("AService", "AService param");
                 return params;
-            }, 100000);
+            }, 5000);
         } catch (Exception e) {
             System.out.println("异常了 " + e);
         }
@@ -65,14 +73,30 @@ public class GobrsService {
 
     public void testGobrs2() {
         List<Future> list = new ArrayList<>();
-        for (AsyncTask asyncTask : asyncTasks) {
+        for (AsyncTask asyncTask : paraExectors) {
             Future<?> submit = gobrsThreadPoolExecutor.submit(() -> {
-//                asyncTask.doTask("", new TaskResult());
-                long cost = System.currentTimeMillis();
+                asyncTask.task("", null, 0L);
             });
             list.add(submit);
         }
         for (Future future : list) {
+            try {
+                future.get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+
+        List<Future> ser = new ArrayList<>();
+        for (AsyncTask asyncTask : serExectors) {
+            Future<?> submit = gobrsThreadPoolExecutor.submit(() -> {
+                asyncTask.task("", null, 0L);
+            });
+            ser.add(submit);
+        }
+        for (Future future : ser) {
             try {
                 future.get();
             } catch (InterruptedException e) {
