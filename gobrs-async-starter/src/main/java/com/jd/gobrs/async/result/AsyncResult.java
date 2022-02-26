@@ -20,6 +20,9 @@ public class AsyncResult<P> implements Serializable {
 
     private Long businessId;
     Map<String, TaskWrapper> datasources;
+    private Integer capCode;
+
+
 
     public P getData(Class clazz) {
         TaskWrapper taskWrapper;
@@ -65,5 +68,11 @@ public class AsyncResult<P> implements Serializable {
         this.datasources = datasources;
     }
 
+    public Integer getCapCode() {
+        return capCode;
+    }
 
+    public void setCapCode(Integer capCode) {
+        this.capCode = capCode;
+    }
 }

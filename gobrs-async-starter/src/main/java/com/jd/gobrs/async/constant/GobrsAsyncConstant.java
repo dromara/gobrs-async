@@ -10,4 +10,5 @@ package com.jd.gobrs.async.constant;
  **/
 public class GobrsAsyncConstant {
     public static final String DEFAULT_PARAMS = "default_params";
+    public static final Integer DEFAULT_CATCODE = -1;
 }

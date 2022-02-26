@@ -2,6 +2,8 @@ package com.jd.gobrs.async.task;
 
 import com.jd.gobrs.async.callback.ICallback;
 import com.jd.gobrs.async.callback.ITask;
+import com.jd.gobrs.async.constant.GobrsAsyncConstant;
+import com.jd.gobrs.async.gobrs.GobrsFlowState;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
 
 import java.util.Map;
@@ -14,7 +16,7 @@ import java.util.Map;
  * @create: 2022-01-28 00:16
  * @Version 1.0
  **/
-public interface AsyncTask<T, V,P> extends ITask<T, V>, ICallback<T, V> {
+public interface AsyncTask<T, V, P> extends ITask<T, V>, ICallback<T, V> {
     /**
      * 根据业务实现 判断是否需要执行当前task
      *
@@ -40,15 +42,28 @@ public interface AsyncTask<T, V,P> extends ITask<T, V>, ICallback<T, V> {
      * @return
      */
     default P getData(Map<String, TaskWrapper> datasources, Long businessId, Class clazz) {
-        TaskWrapper taskWrapper;
-        if (datasources.get(clazz.getSimpleName()) != null) {
-            taskWrapper = datasources.get(clazz.getSimpleName());
-        } else {
-            taskWrapper = datasources.get(depKey(clazz));
-        }
+        TaskWrapper taskWrapper = datasources.get(clazz.getSimpleName()) != null
+                ? datasources.get(clazz.getSimpleName()) : datasources.get(depKey(clazz));
         if (taskWrapper == null) {
             return null;
         }
-        return (P)taskWrapper.getWorkResult(businessId);
+        return (P) taskWrapper.getWorkResult(businessId);
     }
+
+
+    default boolean stopTaskFlow(Map<String, TaskWrapper> datasources, Long businessId, Integer capCode) {
+        Class<? extends AsyncTask> aClass = this.getClass();
+        TaskWrapper taskWrapper = datasources.get(aClass.getSimpleName()) != null
+                ? datasources.get(aClass.getSimpleName()) : datasources.get(depKey(aClass));
+        if (taskWrapper == null) {
+            return false;
+        }
+        return taskWrapper.compareAndSetState(GobrsFlowState.WORKING, GobrsFlowState.ERROR, businessId);
+    }
+
+
+    default void stopTaskFlow(Map<String, TaskWrapper> datasources, Long businessId) {
+        stopTaskFlow(datasources, businessId, GobrsAsyncConstant.DEFAULT_CATCODE);
+    }
+
 }

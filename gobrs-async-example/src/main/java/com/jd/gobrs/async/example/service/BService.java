@@ -26,9 +26,10 @@ public class BService implements AsyncTask<String, Map, Object>, SerExector {
         //        System.out.println("开始执行A");
 //        System.out.println(1/0);
         try {
+            System.out.println(1 / 0);
             Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            stopTaskFlow(dataSources, businessId, 100);
         }
         HashMap<Object, Object> objectObjectHashMap = new HashMap<>();
         objectObjectHashMap.put("result", "我是B的结果");

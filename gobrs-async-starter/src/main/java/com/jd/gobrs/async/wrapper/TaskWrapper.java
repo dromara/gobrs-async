@@ -4,6 +4,7 @@ import com.jd.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.jd.gobrs.async.callback.DefaultCallback;
 import com.jd.gobrs.async.callback.ICallback;
 import com.jd.gobrs.async.constant.GobrsAsyncConstant;
+import com.jd.gobrs.async.constant.StateConstant;
 import com.jd.gobrs.async.exception.AsyncExceptionInterceptor;
 import com.jd.gobrs.async.exception.SkippedException;
 import com.jd.gobrs.async.gobrs.GobrsFlowState;
@@ -73,7 +74,7 @@ public class TaskWrapper<T, V> {
      * <p>
      * 1-finish, 2-error, 3-working
      */
-    public volatile ConcurrentHashMap<Long, Integer> state = new ConcurrentHashMap<Long, Integer>();
+    public volatile ConcurrentHashMap<Long, Integer> state = new ConcurrentHashMap<>();
     /**
      * 该map存放所有wrapper的id和wrapper映射
      */
@@ -81,7 +82,7 @@ public class TaskWrapper<T, V> {
     /**
      * 也是个钩子变量，用来存临时的结果
      */
-    public volatile ConcurrentHashMap<Long, TaskResult<V>> workResult = new ConcurrentHashMap<Long, TaskResult<V>>();
+    public volatile ConcurrentHashMap<Long, TaskResult<V>> workResult = new ConcurrentHashMap<>();
 //    private volatile TaskResult<V> workResult = TaskResult.defaultResult();
     /**
      * 是否在执行自己前，去校验nextWrapper的执行结果<p>
@@ -93,10 +94,10 @@ public class TaskWrapper<T, V> {
      */
     private volatile boolean needCheckNextWrapperResult = true;
 
-    private static final int FINISH = 1;
-    private static final int ERROR = 2;
-    private static final int WORKING = 3;
-    private static final int INIT = 0;
+    private static final int FINISH = StateConstant.FINISH;
+    private static final int ERROR = StateConstant.ERROR;
+    private static final int WORKING = StateConstant.WORKING;
+    private static final int INIT = StateConstant.INIT;
 
     private TaskWrapper(String id, ITask<T, V> worker, T param, ICallback<T, V> callback) {
         if (worker == null) {
@@ -314,7 +315,8 @@ public class TaskWrapper<T, V> {
      */
     private void doTask(Map<String, Object> params, long businessId) {
         if (gobrsAsyncProperties.isTaskInterrupt() &&
-                GobrsFlowState.compareAndSetState(GobrsFlowState.ERROR, GobrsFlowState.FINISH, businessId)) {
+                (GobrsFlowState.compareAndSetState(GobrsFlowState.ERROR, GobrsFlowState.FINISH, businessId)
+                || GobrsFlowState.compareAndSetState(GobrsFlowState.STOP,GobrsFlowState.FINISH, businessId ))) {
             return;
         }
         //执行结果
@@ -393,7 +395,7 @@ public class TaskWrapper<T, V> {
                 return objectTaskResult;
             }
             taskFail(WORKING, e, businessId);
-            if(gobrsAsyncProperties.isTaskInterrupt()){
+            if (gobrsAsyncProperties.isTaskInterrupt()) {
                 throw e;
             }
             return objectTaskResult;
@@ -490,7 +492,7 @@ public class TaskWrapper<T, V> {
         return id;
     }
 
-    private boolean compareAndSetState(int expect, int update, long businessId) {
+    public boolean compareAndSetState(int expect, int update, long businessId) {
         Integer st = this.state.get(businessId);
         if (st == null) {
             if (expect == INIT) {

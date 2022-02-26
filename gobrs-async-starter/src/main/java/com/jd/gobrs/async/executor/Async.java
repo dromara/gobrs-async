@@ -55,7 +55,7 @@ public class Async {
         CompletableFuture[] futures = new CompletableFuture[taskWrappers.size()];
         for (int i = 0; i < taskWrappers.size(); i++) {
             TaskWrapper wrapper = taskWrappers.get(i);
-            futures[i] = CompletableFuture.runAsync(() ->   wrapper.task(executorService, timeout, dataSource, params, businessId), executorService);
+            futures[i] = CompletableFuture.runAsync(() -> wrapper.task(executorService, timeout, dataSource, params, businessId), executorService);
         }
         try {
             CompletableFuture.allOf(futures).get(timeout, TimeUnit.MILLISECONDS);
@@ -79,6 +79,10 @@ public class Async {
         AsyncResult asyncResult = new AsyncResult();
         asyncResult.setDatasources(dataSource);
         asyncResult.setBusinessId(businessId);
+        GobrsFlowState.GobrsState gobrsState = GobrsFlowState.gobrsFlowState.get(businessId);
+        if (gobrsState != null) {
+            asyncResult.setCapCode(gobrsState.getCapCode());
+        }
         return asyncResult;
     }
 
@@ -94,8 +98,9 @@ public class Async {
         }
         taskWrappers.parallelStream().forEach(x -> {
             x.workResult.remove(businessId);
-            doRelease(x.getNextWrappers(), businessId);
+            x.state.remove(businessId);
             GobrsFlowState.gobrsFlowState.remove(businessId);
+            doRelease(x.getNextWrappers(), businessId);
         });
     }
 

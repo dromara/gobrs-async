@@ -67,6 +67,7 @@ public class GobrsService {
         } catch (Exception e) {
             System.out.println("异常 " + e);
         }
+        System.out.println(asyncResult.getCapCode());
         Map<String, Object> data = asyncResult.getData();
         System.out.println(JSONObject.toJSONString(data));
     }
