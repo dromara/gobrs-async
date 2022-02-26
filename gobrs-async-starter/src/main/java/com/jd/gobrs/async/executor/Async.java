@@ -5,6 +5,7 @@ import com.jd.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.jd.gobrs.async.callback.DefaultGroupCallback;
 import com.jd.gobrs.async.callback.IGroupCallback;
 import com.jd.gobrs.async.gobrs.GobrsFlowState;
+import com.jd.gobrs.async.result.AsyncResult;
 import com.jd.gobrs.async.spring.GobrsSpring;
 import com.jd.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
 import com.jd.gobrs.async.util.SnowflakeId;
@@ -41,39 +42,44 @@ public class Async {
     /**
      * 出发点
      */
-    public static boolean startTaskFlow(long timeout, ThreadPoolTaskExecutor executorService, List<TaskWrapper> taskWrappers, Map<String, Object> params) throws ExecutionException, InterruptedException {
+    public static AsyncResult startTaskFlow(long timeout, ThreadPoolTaskExecutor executorService, List<TaskWrapper> taskWrappers, Map<String, Object> params) throws ExecutionException, InterruptedException {
 
         long businessId = snowflakeId.nextId();
         if (taskWrappers == null || taskWrappers.size() == 0) {
-            return false;
+            return null;
         }
         //保存线程池变量
         Async.executorService = executorService;
         //定义一个map，存放所有的wrapper，key为wrapper的唯一id，value是该wrapper，可以从value中获取wrapper的result
-        Map<String, TaskWrapper> forParamUseWrappers = new ConcurrentHashMap<>();
+        Map<String, TaskWrapper> dataSource = new ConcurrentHashMap<>();
         CompletableFuture[] futures = new CompletableFuture[taskWrappers.size()];
         for (int i = 0; i < taskWrappers.size(); i++) {
             TaskWrapper wrapper = taskWrappers.get(i);
-            futures[i] = CompletableFuture.runAsync(() ->{
-                wrapper.task(executorService, timeout, forParamUseWrappers, params, businessId);
-            }, executorService);
+            futures[i] = CompletableFuture.runAsync(() ->   wrapper.task(executorService, timeout, dataSource, params, businessId), executorService);
         }
         try {
             CompletableFuture.allOf(futures).get(timeout, TimeUnit.MILLISECONDS);
-            return true;
-        } catch (TimeoutException e) {
+            return buildResult(dataSource, businessId);
+        } catch (Exception e) {
             Set<TaskWrapper> set = new HashSet<>();
             totalWorkers(taskWrappers, set);
             for (TaskWrapper wrapper : set) {
                 wrapper.stopNow(businessId);
             }
-            return false;
+            return buildResult(dataSource, businessId);
         } finally {
             // 释放资源
-            RELEASE_THREADPOOL.execute(()->{
+            RELEASE_THREADPOOL.execute(() -> {
                 release(taskWrappers, businessId);
             });
         }
+    }
+
+    private static AsyncResult buildResult(Map<String, TaskWrapper> dataSource, Long businessId) {
+        AsyncResult asyncResult = new AsyncResult();
+        asyncResult.setDatasources(dataSource);
+        asyncResult.setBusinessId(businessId);
+        return asyncResult;
     }
 
     private static void release(List<TaskWrapper> taskWrappers, Long businessId) {
@@ -96,9 +102,9 @@ public class Async {
     /**
      * 如果想自定义线程池，请传pool。不自定义的话，就走默认的COMMON_POOL
      */
-    public static boolean startTaskFlow(long timeout, ThreadPoolTaskExecutor executorService, Map<String, Object> parameters, TaskWrapper... workerWrapper) throws ExecutionException, InterruptedException {
+    public static AsyncResult startTaskFlow(long timeout, ThreadPoolTaskExecutor executorService, Map<String, Object> parameters, TaskWrapper... workerWrapper) throws ExecutionException, InterruptedException {
         if (workerWrapper == null || workerWrapper.length == 0) {
-            return false;
+            return null;
         }
         List<TaskWrapper> taskWrappers = Arrays.stream(workerWrapper).collect(Collectors.toList());
         return startTaskFlow(timeout, executorService, taskWrappers, parameters);
@@ -107,11 +113,11 @@ public class Async {
     /**
      * 同步阻塞,直到所有都完成,或失败
      */
-    public static boolean startTaskFlow(long timeout, Map<String, Object> parameters, TaskWrapper... workerWrapper) throws ExecutionException, InterruptedException {
+    public static AsyncResult startTaskFlow(long timeout, Map<String, Object> parameters, TaskWrapper... workerWrapper) throws ExecutionException, InterruptedException {
         return startTaskFlow(timeout, COMMON_POOL, parameters, workerWrapper);
     }
 
-    public static boolean startTaskFlow(long timeout, List<TaskWrapper> workerWrapper, Map<String, Object> params) throws ExecutionException, InterruptedException {
+    public static AsyncResult startTaskFlow(long timeout, List<TaskWrapper> workerWrapper, Map<String, Object> params) throws ExecutionException, InterruptedException {
         return startTaskFlow(timeout, COMMON_POOL, workerWrapper, params);
     }
 
@@ -131,8 +137,8 @@ public class Async {
         if (executorService != null) {
             executorService.submit(() -> {
                 try {
-                    boolean success = startTaskFlow(timeout, executorService, params, workerWrapper);
-                    if (success) {
+                    AsyncResult asyncResult = startTaskFlow(timeout, executorService, params, workerWrapper);
+                    if (Objects.nonNull(asyncResult)) {
                         finalGroupCallback.success(Arrays.asList(workerWrapper));
                     } else {
                         finalGroupCallback.failure(Arrays.asList(workerWrapper), new TimeoutException());
@@ -145,8 +151,8 @@ public class Async {
         } else {
             COMMON_POOL.submit(() -> {
                 try {
-                    boolean success = startTaskFlow(timeout, COMMON_POOL, params, workerWrapper);
-                    if (success) {
+                    AsyncResult asyncResult = startTaskFlow(timeout, COMMON_POOL, params, workerWrapper);
+                    if (Objects.nonNull(asyncResult)) {
                         finalGroupCallback.success(Arrays.asList(workerWrapper));
                     } else {
                         finalGroupCallback.failure(Arrays.asList(workerWrapper), new TimeoutException());

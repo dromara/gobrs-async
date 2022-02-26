@@ -3,6 +3,7 @@ package com.jd.gobrs.async.engine;
 import com.jd.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.jd.gobrs.async.callback.ICallback;
 import com.jd.gobrs.async.executor.Async;
+import com.jd.gobrs.async.result.AsyncResult;
 import com.jd.gobrs.async.spring.GobrsSpring;
 import com.jd.gobrs.async.task.DependWrapper;
 import com.jd.gobrs.async.rule.Rule;
@@ -77,7 +78,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
     }
 
     @Override
-    public boolean exec(String ruleName, Supplier<Map<String, Object>> supplier, long timeout) throws ExecutionException, InterruptedException {
+    public AsyncResult exec(String ruleName, Supplier<Map<String, Object>> supplier, long timeout) throws ExecutionException, InterruptedException {
         return Async.startTaskFlow(timeout,
                 taskRuleMap.get(ruleName).values().parallelStream().collect(Collectors.toList()), supplier.get());
     }

@@ -3,6 +3,7 @@ package com.jd.gobrs.async.gobrs;
 import com.jd.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.jd.gobrs.async.constant.GobrsAsyncConstant;
 import com.jd.gobrs.async.executor.Async;
+import com.jd.gobrs.async.result.AsyncResult;
 import com.jd.gobrs.async.rule.Rule;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
 import com.jd.gobrs.async.engine.RuleParseEngine;
@@ -40,7 +41,7 @@ public class GobrsTaskFlow<T> implements GobrsAsync {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public boolean taskFlow(String ruleName, T t) throws ExecutionException, InterruptedException {
+    public AsyncResult taskFlow(String ruleName, T t) throws ExecutionException, InterruptedException {
         return taskFlow(ruleName, t, gobrsAsyncProperties.getTimeout());
     }
 
@@ -53,7 +54,7 @@ public class GobrsTaskFlow<T> implements GobrsAsync {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public boolean taskFlow(String ruleName, Supplier<Map<String, T>> paramSupplier) throws ExecutionException, InterruptedException {
+    public AsyncResult taskFlow(String ruleName, Supplier<Map<String, T>> paramSupplier) throws ExecutionException, InterruptedException {
         return taskFlow(ruleName, paramSupplier, gobrsAsyncProperties.getTimeout());
     }
 
@@ -67,7 +68,7 @@ public class GobrsTaskFlow<T> implements GobrsAsync {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public boolean taskFlow(String ruleName, T t, long timeout) throws ExecutionException, InterruptedException {
+    public AsyncResult taskFlow(String ruleName, T t, long timeout) throws ExecutionException, InterruptedException {
         return ruleParseEngine.exec(ruleName, () -> {
             Map<String, Object> map = new HashMap<>();
             map.put(GobrsAsyncConstant.DEFAULT_PARAMS, t);
@@ -82,7 +83,7 @@ public class GobrsTaskFlow<T> implements GobrsAsync {
      * @param paramSupplier
      * @return
      */
-    public boolean taskFlow(String ruleName, Supplier<Map<String, T>> paramSupplier, long timeout) throws ExecutionException, InterruptedException {
+    public AsyncResult taskFlow(String ruleName, Supplier<Map<String, T>> paramSupplier, long timeout) throws ExecutionException, InterruptedException {
         return ruleParseEngine.exec(ruleName, paramSupplier, timeout);
     }
 }

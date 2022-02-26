@@ -1,8 +1,11 @@
 package com.jd.gobrs.async.example.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jd.gobrs.async.gobrs.GobrsTaskFlow;
+import com.jd.gobrs.async.result.AsyncResult;
 import com.jd.gobrs.async.task.AsyncTask;
 import com.jd.gobrs.async.task.TaskResult;
+import com.jd.gobrs.async.wrapper.TaskWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
@@ -46,15 +49,18 @@ public class GobrsService {
 
 
     public void testGobrs() {
+        AsyncResult<Object> asyncResult = null;
         try {
-            taskFlow.taskFlow("test", () -> {
+            asyncResult = taskFlow.taskFlow("test", () -> {
                 Map<String, Object> params = new HashMap<>();
                 params.put("AService", "AService param");
                 return params;
             }, 100000);
-        } catch (Exception ex) {
-            System.out.println("异常了" + ex);
+        } catch (Exception e) {
+            System.out.println("异常了 " + e);
         }
+        Map<String, TaskWrapper> data = asyncResult.getData();
+        System.out.println(JSONObject.toJSONString(data));
     }
 
     public void testGobrs2() {

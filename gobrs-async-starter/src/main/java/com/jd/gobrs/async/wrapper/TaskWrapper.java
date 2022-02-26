@@ -238,8 +238,8 @@ public class TaskWrapper<T, V> {
         }
     }
 
-    private synchronized void doDependsJobs(ThreadPoolTaskExecutor executorService, List<DependWrapper> dependWrappers, TaskWrapper fromWrapper,
-                                            long now, long remainTime, Map<String, Object> params, Long businessId) {
+    private void doDependsJobs(ThreadPoolTaskExecutor executorService, List<DependWrapper> dependWrappers, TaskWrapper fromWrapper,
+                               long now, long remainTime, Map<String, Object> params, Long businessId) {
         boolean nowDependIsMust = false;
         //创建必须完成的上游wrapper集合
         Set<DependWrapper> mustWrapper = new HashSet<>();
@@ -262,7 +262,6 @@ public class TaskWrapper<T, V> {
             nextTask(executorService, now, remainTime, params, businessId);
             return;
         }
-
 
         //如果存在需要必须完成的，且fromWrapper不是必须的，就什么也不干
         if (!nowDependIsMust) {
@@ -349,12 +348,8 @@ public class TaskWrapper<T, V> {
      * 真正的的单个task执行任务 doTask
      */
     private TaskResult<V> doTaskDep(Map<String, Object> params, Long businessId) {
-        T param = null;
-        if (params.containsKey(GobrsAsyncConstant.DEFAULT_PARAMS)) {
-            param = (T) params.get(GobrsAsyncConstant.DEFAULT_PARAMS);
-        } else {
-            param = (T) params.get(id);
-        }
+        T param = params.containsKey(GobrsAsyncConstant.DEFAULT_PARAMS) == true
+                ? (T) params.get(GobrsAsyncConstant.DEFAULT_PARAMS) : (T) params.get(id);
         TaskResult<V> objectTaskResult = TaskResult.defaultResult();
         //  先判断自己是否需要执行
         if (!worker.nessary(param)) {
@@ -378,7 +373,7 @@ public class TaskWrapper<T, V> {
             callback.begin();
 
             //执行耗时操作
-            V resultValue = worker.task(param, forParamUseWrappers,businessId);
+            V resultValue = worker.task(param, forParamUseWrappers, businessId);
 
             //如果状态不是在working,说明别的地方已经修改了
             if (!compareAndSetState(WORKING, FINISH, businessId)) {
@@ -398,6 +393,9 @@ public class TaskWrapper<T, V> {
                 return objectTaskResult;
             }
             taskFail(WORKING, e, businessId);
+            if(gobrsAsyncProperties.isTaskInterrupt()){
+                throw e;
+            }
             return objectTaskResult;
         }
     }

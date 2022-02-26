@@ -15,7 +15,7 @@ public interface ITask<T, V> {
      * 在这里做耗时操作，如rpc请求、IO等
      *
      * @param object      object
-     * @param allWrappers 任务包装
+     * @param dataSources 任务包装
      * @param businessId 业务ID
      */
     V task(T object, Map<String, TaskWrapper> dataSources, Long businessId);

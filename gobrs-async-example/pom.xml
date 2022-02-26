@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.jd.gobrs</groupId>
     <artifactId>gobrs-async-example</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <name>gobrs-async-example</name>
     <description>gobrs-async-example</description>
     <properties>

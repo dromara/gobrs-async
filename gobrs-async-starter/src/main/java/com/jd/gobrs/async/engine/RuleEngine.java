@@ -1,5 +1,6 @@
 package com.jd.gobrs.async.engine;
 
+import com.jd.gobrs.async.result.AsyncResult;
 import com.jd.gobrs.async.rule.Rule;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
 
@@ -30,7 +31,7 @@ public interface RuleEngine extends Engine {
      */
     Map<String, TaskWrapper> doParse(Rule r, Map<String, Object> params);
 
-    boolean exec(String ruleName, Supplier<Map<String, Object>> supplier,  long timeout) throws ExecutionException, InterruptedException;
+    AsyncResult exec(String ruleName, Supplier<Map<String, Object>> supplier, long timeout) throws ExecutionException, InterruptedException;
 
 
 }

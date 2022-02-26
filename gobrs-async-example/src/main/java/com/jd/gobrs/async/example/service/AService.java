@@ -1,5 +1,6 @@
 package com.jd.gobrs.async.example.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jd.gobrs.async.task.AsyncTask;
 import com.jd.gobrs.async.task.TaskResult;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
@@ -41,7 +42,8 @@ public class AService implements AsyncTask<String, Map, Object> {
     @Override
     public void result(boolean b, String s, TaskResult<Map> taskResult) {
         if (b) {
-//            System.out.println("AService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
+            // 这里taskResult 返回的是 自己的task() 执行结果
+            System.out.println("AService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
         } else {
             System.out.println("AService fail");
         }

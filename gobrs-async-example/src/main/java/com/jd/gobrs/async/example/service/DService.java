@@ -25,7 +25,7 @@ public class DService implements AsyncTask<String, Map, Object> {
     public Map task(String object, Map<String, TaskWrapper> dataSources, Long businessId) {
 
         try {
-            Object data = getData(dataSources, businessId, EService.class);
+            Object data = getData(dataSources, businessId, AService.class);
             System.out.println(JSONObject.toJSONString(data));
             try {
                 Thread.sleep(1000);
@@ -49,7 +49,7 @@ public class DService implements AsyncTask<String, Map, Object> {
     @Override
     public void result(boolean b, String s, TaskResult<Map> taskResult) {
         if (b) {
-//            System.out.println("DService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
+            System.out.println("DService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
         } else {
             System.out.println("DService fail");
         }
