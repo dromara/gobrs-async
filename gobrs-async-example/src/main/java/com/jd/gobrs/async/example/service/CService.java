@@ -44,7 +44,7 @@ public class CService implements AsyncTask<String, Map, Object>, SerExector {
     @Override
     public void result(boolean b, String aBoolean, TaskResult<Map> taskResult) {
         if(b){
-            System.out.println("CService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
+//            System.out.println("CService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
         }else{
             System.out.println("CService fail" );
 //            throw new RuntimeException(taskResult.getEx());

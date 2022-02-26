@@ -50,7 +50,7 @@ public class DService implements AsyncTask<String, Map, Object> , SerExector {
     @Override
     public void result(boolean b, String s, TaskResult<Map> taskResult) {
         if (b) {
-            System.out.println("DService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
+//            System.out.println("DService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
         } else {
             System.out.println("DService fail");
         }

@@ -23,19 +23,38 @@ import java.util.concurrent.Executors;
 @ContextConfiguration(classes = GobrsAsyncExampleApplication.class)
 public class GobrsTest {
 
+    private static int cyc = 1000;
+
+
     private static int th = 100;
     @Autowired
     private GobrsService gobrsService;
-    CountDownLatch countDownLatch = new CountDownLatch(th);
+
 
     public ExecutorService executorService = Executors.newCachedThreadPool();
 
     @Test
-    public void testGobrsAsync(){
+    public void testGobrsAsync() {
+        for (int i = 0; i < cyc; i++) {
+            CountDownLatch countDownLatch = new CountDownLatch(th);
+            doAsync(countDownLatch);
+        }
+    }
+
+
+    @Test
+    public void testFutures() {
+        for (int i = 0; i < cyc; i++) {
+            CountDownLatch countDownLatch = new CountDownLatch(th);
+            doFutures(countDownLatch);
+        }
+    }
+
+
+    private void doAsync(CountDownLatch countDownLatch) {
         long startTime = System.currentTimeMillis();
-        for (int i =0; i< th; i++){
-            gobrsService.testGobrs();
-            executorService.execute(()->{
+        for (int i = 0; i < th; i++) {
+            executorService.execute(() -> {
                 gobrsService.testGobrs();
                 countDownLatch.countDown();
             });
@@ -50,13 +69,10 @@ public class GobrsTest {
     }
 
 
-
-    @Test
-    public void testFutures(){
+    private void doFutures(CountDownLatch countDownLatch) {
         long startTime = System.currentTimeMillis();
-        for (int i =0; i< th; i++){
-            gobrsService.testGobrs();
-            executorService.execute(()->{
+        for (int i = 0; i < th; i++) {
+            executorService.execute(() -> {
                 gobrsService.testFuture();
                 countDownLatch.countDown();
             });

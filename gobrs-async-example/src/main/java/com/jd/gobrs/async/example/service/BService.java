@@ -44,7 +44,7 @@ public class BService implements AsyncTask<String, Map, Object>, SerExector {
     @Override
     public void result(boolean b, String integer, TaskResult<Map> taskResult) {
         if (b) {
-            System.out.println("BService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
+//            System.out.println("BService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
         } else {
             System.out.println("BService fail");
         }

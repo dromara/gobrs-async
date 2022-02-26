@@ -43,7 +43,7 @@ public class EService implements AsyncTask<String, Map, Object> , ParaExector {
     @Override
     public void result(boolean b, String aBoolean, TaskResult<Map> taskResult) {
         if(b){
-            System.out.println("EService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
+//            System.out.println("EService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
         }else{
             System.out.println("EService fail");
         }

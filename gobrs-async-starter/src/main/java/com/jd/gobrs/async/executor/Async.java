@@ -81,7 +81,7 @@ public class Async {
         asyncResult.setBusinessId(businessId);
         GobrsFlowState.GobrsState gobrsState = GobrsFlowState.gobrsFlowState.get(businessId);
         if (gobrsState != null) {
-            asyncResult.setCapCode(gobrsState.getExpCode());
+            asyncResult.setExpCode(gobrsState.getExpCode());
         }
         return asyncResult;
     }

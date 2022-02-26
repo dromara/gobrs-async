@@ -25,7 +25,7 @@ public class FService implements AsyncTask<String, Map, Object> , SerExector {
     public void result(boolean success, String param, TaskResult<Map> workResult) {
         if (success) {
             // 这里taskResult 返回的是 自己的task() 执行结果
-            System.out.println("FService success" + JSONObject.toJSONString(workResult.getResult().get("result")));
+//            System.out.println("FService success" + JSONObject.toJSONString(workResult.getResult().get("result")));
         } else {
             System.out.println("FService fail");
         }

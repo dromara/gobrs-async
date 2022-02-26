@@ -44,7 +44,7 @@ public class AService implements AsyncTask<String, Map, Object> , ParaExector {
     public void result(boolean b, String s, TaskResult<Map> taskResult) {
         if (b) {
             // 这里taskResult 返回的是 自己的task() 执行结果
-            System.out.println("AService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
+//            System.out.println("AService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
         } else {
             System.out.println("AService fail");
         }
