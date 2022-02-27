@@ -57,7 +57,7 @@ public class GobrsService {
 
 
     public void testGobrs() {
-        AsyncResult<Object> asyncResult = null;
+        AsyncResult<Object> asyncResult;
         try {
             asyncResult = taskFlow.taskFlow("test", () -> {
                 Map<String, Object> params = new HashMap<>();
