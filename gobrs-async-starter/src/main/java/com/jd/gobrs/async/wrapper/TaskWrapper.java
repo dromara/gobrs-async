@@ -7,6 +7,7 @@ import com.jd.gobrs.async.constant.GobrsAsyncConstant;
 import com.jd.gobrs.async.constant.StateConstant;
 import com.jd.gobrs.async.exception.AsyncExceptionInterceptor;
 import com.jd.gobrs.async.exception.SkippedException;
+import com.jd.gobrs.async.gobrs.GobrsAsyncStore;
 import com.jd.gobrs.async.gobrs.GobrsFlowState;
 import com.jd.gobrs.async.spring.GobrsSpring;
 import com.jd.gobrs.async.task.DependWrapper;
@@ -18,6 +19,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 对每个worker及callback进行包装，一对一
@@ -374,7 +377,6 @@ public class TaskWrapper<T, V> {
             }
 
             callback.begin();
-
             //执行耗时操作
             V resultValue = worker.task(param, forParamUseWrappers, businessId);
 
@@ -402,6 +404,7 @@ public class TaskWrapper<T, V> {
             return objectTaskResult;
         }
     }
+
 
     public TaskResult<V> getWorkResult(Long businessId) {
         return workResult.get(businessId);

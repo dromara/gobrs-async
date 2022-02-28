@@ -1,13 +1,10 @@
 package com.jd.gobrs.async.example.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.jd.gobrs.async.example.executor.ParaExector;
 import com.jd.gobrs.async.example.executor.SerExector;
 import com.jd.gobrs.async.gobrs.GobrsTaskFlow;
 import com.jd.gobrs.async.result.AsyncResult;
 import com.jd.gobrs.async.task.AsyncTask;
-import com.jd.gobrs.async.task.TaskResult;
-import com.jd.gobrs.async.wrapper.TaskWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
@@ -15,7 +12,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
 /**
  * @program: gobrs-async-example

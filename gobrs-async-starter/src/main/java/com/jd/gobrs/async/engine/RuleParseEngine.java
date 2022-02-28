@@ -15,6 +15,9 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static com.jd.gobrs.async.gobrs.GobrsAsyncStore.*;
 
 /**
  * @author sizegang1
@@ -84,7 +87,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
     }
 
     public Rule getRule(String key) {
-        return super.ruleMap.get(key);
+        return ruleMap.get(key);
     }
 
     public static class EngineExecutor {
@@ -101,6 +104,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
 
         private static TaskWrapper getWrapperDepend(Map<String, TaskWrapper> cacheTaskWrappers, String taskBean, TaskWrapper taskWrapper, boolean must) {
             return Optional.ofNullable(getBean(taskBean)).map((bean) -> Optional.ofNullable(cacheTaskWrappers.get(taskBean)).map((tk) -> {
+
                 List<DependWrapper> dependWrappers = tk.getDependWrappers();
                 DependWrapper dependWrapper = new DependWrapper(taskWrapper, must);
                 if (dependWrappers != null) {
@@ -110,8 +114,12 @@ public class RuleParseEngine<T> extends AbstractEngine {
                     dependWrappers.add(dependWrapper);
                     tk.addDepend(dependWrapper);
                 }
+
                 tk.setDependWrappers(dependWrappers);
                 taskWrapper.addNext(tk);
+                // 缓存依赖关系
+                List<String> cachedDepend = cacheDepends.get(tk.getId());
+                cachedDepend.add(taskWrapper.getId());
                 return tk;
             }).orElseGet(() -> {
                 TaskWrapper tk = new TaskWrapper.Builder()
@@ -120,6 +128,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
                         .callback((ICallback) bean)
                         .depend(taskWrapper, must)
                         .build();
+                cacheDepends.put(taskBean, Stream.of(taskWrapper.getId()).collect(Collectors.toList()));
                 cacheTaskWrappers.put(taskBean, tk);
                 return tk;
             })).orElse(null);

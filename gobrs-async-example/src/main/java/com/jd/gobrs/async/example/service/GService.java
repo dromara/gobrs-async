@@ -18,7 +18,7 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class GService implements AsyncTask<String, Map, Object> {
+public class GService implements AsyncTask<String, Map> {
 
     @Override
     public void result(boolean success, String param, TaskResult<Map> workResult) {
@@ -31,7 +31,7 @@ public class GService implements AsyncTask<String, Map, Object> {
     }
 
     @Override
-    public Map task(String object, Map<String, TaskWrapper> dataSources, Long businessId) {
+    public Map task(String params, Map<String, TaskWrapper> dataSources, Long businessId) {
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {

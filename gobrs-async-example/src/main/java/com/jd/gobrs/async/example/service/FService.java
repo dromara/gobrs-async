@@ -19,7 +19,7 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class FService implements AsyncTask<String, Map, Object> , SerExector {
+public class FService implements AsyncTask<String, Map> , SerExector {
 
     @Override
     public void result(boolean success, String param, TaskResult<Map> workResult) {
@@ -32,7 +32,7 @@ public class FService implements AsyncTask<String, Map, Object> , SerExector {
     }
 
     @Override
-    public Map task(String object, Map<String, TaskWrapper> dataSources, Long businessId) {
+    public Map task(String params, Map<String, TaskWrapper> dataSources, Long businessId) {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {

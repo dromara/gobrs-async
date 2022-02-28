@@ -19,11 +19,11 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class EService implements AsyncTask<String, Map, Object> , ParaExector {
+public class EService implements AsyncTask<String, Map>, ParaExector {
 
 
     @Override
-    public Map task(String object, Map<String, TaskWrapper> dataSources, Long businessId) {
+    public Map task(String params, Map<String, TaskWrapper> dataSources, Long businessId) {
         //        System.out.println("开始执行E");
         try {
             Thread.sleep(500);
@@ -42,9 +42,9 @@ public class EService implements AsyncTask<String, Map, Object> , ParaExector {
 
     @Override
     public void result(boolean b, String aBoolean, TaskResult<Map> taskResult) {
-        if(b){
+        if (b) {
 //            System.out.println("EService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
-        }else{
+        } else {
             System.out.println("EService fail");
         }
     }

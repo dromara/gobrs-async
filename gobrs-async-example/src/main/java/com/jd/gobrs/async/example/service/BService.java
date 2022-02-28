@@ -19,17 +19,17 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class BService implements AsyncTask<String, Map, Object>, SerExector {
+public class BService implements AsyncTask<String, Map>, SerExector {
 
     @Override
-    public Map task(String object, Map<String, TaskWrapper> dataSources, Long businessId) {
+    public Map task(String params, Map<String, TaskWrapper> resultSet, Long businessId) {
         //        System.out.println("开始执行A");
 //        System.out.println(1/0);
         try {
 //            System.out.println(1 / 0);
             Thread.sleep(500);
         } catch (Exception e) {
-            stopTaskFlow(dataSources, businessId, 100);
+            stopTaskFlow(resultSet, businessId, 100);
         }
         HashMap<Object, Object> objectObjectHashMap = new HashMap<>();
         objectObjectHashMap.put("result", "我是B的结果");

@@ -19,14 +19,14 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class DService implements AsyncTask<String, Map, Object> , SerExector {
+public class DService implements AsyncTask<String, Map>, SerExector {
 
 
     @Override
-    public Map task(String object, Map<String, TaskWrapper> dataSources, Long businessId) {
+    public Map task(String params, Map<String, TaskWrapper> resultSet, Long businessId) {
 
         try {
-            Object data = getData(dataSources, businessId, AService.class);
+            Map data = getResult(resultSet, businessId, AService.class, Map.class);
 //            System.out.println(JSONObject.toJSONString(data));
             try {
                 Thread.sleep(500);

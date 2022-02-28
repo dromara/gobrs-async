@@ -17,7 +17,7 @@ import java.util.Map;
  * @create: 2022-01-28 00:16
  * @Version 1.0
  **/
-public interface AsyncTask<T, V, P> extends ITask<T, V>, ICallback<T, V> {
+public interface AsyncTask<T, V> extends ITask<T, V>, ICallback<T, V> {
     /**
      * 根据业务实现 判断是否需要执行当前task
      *
@@ -40,17 +40,19 @@ public interface AsyncTask<T, V, P> extends ITask<T, V>, ICallback<T, V> {
      * @param datasources 数据源中
      * @param clazz       源类
      * @param businessId  业务id
+     * @param resultClass 结果集数据类型
      * @return
      */
-    default P getData(Map<String, TaskWrapper> datasources, Long businessId, Class clazz) {
+    default <R> R getResult(Map<String, TaskWrapper> datasources, Long businessId, Class clazz, Class<R> resultClass) {
         TaskWrapper taskWrapper = datasources.get(clazz.getSimpleName()) != null
                 ? datasources.get(clazz.getSimpleName()) : datasources.get(depKey(clazz));
         if (taskWrapper == null) {
             return null;
         }
         TaskResult workResult = taskWrapper.getWorkResult(businessId);
-        return workResult.getResult() == null ? null : (P) workResult.getResult();
+        return workResult.getResult() == null ? null : (R) workResult.getResult();
     }
+
 
     /**
      * The caller closes the workflow
