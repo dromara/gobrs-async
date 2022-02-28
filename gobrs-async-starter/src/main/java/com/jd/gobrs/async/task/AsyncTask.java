@@ -48,11 +48,13 @@ public interface AsyncTask<T, V, P> extends ITask<T, V>, ICallback<T, V> {
         if (taskWrapper == null) {
             return null;
         }
-        return (P) taskWrapper.getWorkResult(businessId);
+        TaskResult workResult = taskWrapper.getWorkResult(businessId);
+        return workResult.getResult() == null ? null : (P) workResult.getResult();
     }
 
     /**
      * The caller closes the workflow
+     *
      * @param datasources
      * @param businessId
      * @param capCode

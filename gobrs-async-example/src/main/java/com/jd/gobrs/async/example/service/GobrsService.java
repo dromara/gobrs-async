@@ -43,11 +43,6 @@ public class GobrsService {
     private DService dService;
     @Autowired
     private EService eService;
-    @Resource
-    List<AsyncTask> asyncTasks;
-
-    @Resource
-    List<ParaExector> paraExectors;
 
     @Resource
     List<SerExector> serExectors;
@@ -71,6 +66,15 @@ public class GobrsService {
 //        Map<String, Object> data = asyncResult.getData();
 //        System.out.println(JSONObject.toJSONString(data));
     }
+
+
+
+    @Resource
+    List<AsyncTask> asyncTasks;
+
+    @Resource
+    List<ParaExector> paraExectors;
+
 
     public void testFuture() {
         List<Future> list = new ArrayList<>();
