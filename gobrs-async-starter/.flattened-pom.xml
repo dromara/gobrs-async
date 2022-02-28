@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.github.memorydoc</groupId>
   <artifactId>gobrs-async-starter</artifactId>
-  <version>1.0.5-RELEASE</version>
+  <version>1.0.8-RELEASE</version>
   <name>${project.artifactId}</name>
   <description>🔥 强大异步任务编排工具（没有依赖中间件）</description>
   <url>https://github.com/Memorydoc/gobrs-async-starter</url>

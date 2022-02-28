@@ -27,7 +27,7 @@ public class DService implements AsyncTask<String, Map>, SerExector {
 
         try {
             Map data = getResult(resultSet, businessId, AService.class, Map.class);
-//            System.out.println(JSONObject.toJSONString(data));
+            System.out.println(JSONObject.toJSONString(data));
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
