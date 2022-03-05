@@ -383,7 +383,7 @@ public class TaskWrapper<T, V> {
             }
 
             taskResult.setResultState(ResultState.SUCCESS);
-            taskResult.setResult(resultValue);
+            taskResult.setResult(null);
             resultMap.put(id, taskResult);
             //回调成功
             callback.result(true, param, taskResult);

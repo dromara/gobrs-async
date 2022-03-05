@@ -13,6 +13,6 @@ import java.util.Map;
  * @create: 2022-02-26 16:16
  * @Version 1.0
  **/
-public interface ParaExector extends AsyncTask<DataContext, Map> {
+public interface ParaExector extends AsyncTask<DataContext, DataContext> {
 
 }

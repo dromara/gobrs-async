@@ -19,10 +19,10 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class EService implements AsyncTask<DataContext, Map>, ParaExector {
+public class EService implements AsyncTask<DataContext, DataContext>, ParaExector {
 
     @Override
-    public void result(boolean success, DataContext param, TaskResult<Map> workResult) {
+    public void result(boolean success, DataContext param, TaskResult<DataContext> workResult) {
         if (success) {
 //            System.out.println("EService 成功");
         } else {
@@ -31,7 +31,7 @@ public class EService implements AsyncTask<DataContext, Map>, ParaExector {
     }
 
     @Override
-    public Map task(DataContext params, GobrsAsyncSupport support) {
+    public DataContext task(DataContext params, GobrsAsyncSupport support) {
         try {
 //            System.out.println(1/0);
             Thread.sleep(1000);
@@ -41,7 +41,8 @@ public class EService implements AsyncTask<DataContext, Map>, ParaExector {
         byte[] result  = new byte[1024*1024*10];
         Map h = new HashMap();
         h.put("result", result);
-        return h;
+        params.setResult(h);
+        return params;
     }
 
     @Override
