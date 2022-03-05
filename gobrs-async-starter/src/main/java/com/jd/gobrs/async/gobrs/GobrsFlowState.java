@@ -15,32 +15,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @Version 1.0
  **/
 public class GobrsFlowState {
-    public static Map<Long, GobrsState> gobrsFlowState = new ConcurrentHashMap<>();
 
-    public synchronized static boolean compareAndSetState(int expect, int update, long businessId) {
-        GobrsState gobrsState = gobrsFlowState.get(businessId);
-        if (gobrsState == null) {
-            GobrsState gs = new GobrsState(StateConstant.WORKING);
-            if (gs.getState() == expect) {
-                gs.setState(update);
-                gobrsFlowState.put(businessId, gs);
-                return true;
-            }
-            return false;
-        }
-        if (expect == gobrsState.getState()) {
-            gobrsState.setState(update);
-            gobrsFlowState.put(businessId, gobrsState);
-            return true;
-        }
-        return false;
+    public static boolean compareAndSetState(AtomicInteger taskFlowState, int expect, int update) {
+        return taskFlowState.compareAndSet(expect, update);
     }
 
-    public static boolean assertState(int expect, Long business) {
-        if (gobrsFlowState.get(business) == null) {
-            return false;
-        }
-        return gobrsFlowState.get(business).getState() == expect;
+    public static boolean assertState(AtomicInteger taskFlowState, int expect) {
+        return taskFlowState.get() == expect;
     }
 
     public static class GobrsState {

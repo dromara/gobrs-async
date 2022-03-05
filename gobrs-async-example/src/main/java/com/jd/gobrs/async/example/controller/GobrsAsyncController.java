@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @program: gobrs-async-example
@@ -23,9 +24,9 @@ public class GobrsAsyncController {
 
 
     @RequestMapping("testGobrs")
-    public String testGobrs() {
+    public String testGobrs(HttpServletRequest httpServletRequest) {
         long start = System.currentTimeMillis();
-        gobrsService.testGobrs();
+        gobrsService.testGobrs(httpServletRequest);
         long end = System.currentTimeMillis() - start;
         System.out.println("总耗时" + end);
         return "success";
@@ -33,9 +34,9 @@ public class GobrsAsyncController {
 
 
     @RequestMapping("testFuture")
-    public String testFuture() {
+    public String testFuture(HttpServletRequest httpServletRequest) {
         long start = System.currentTimeMillis();
-        gobrsService.testFuture();
+        gobrsService.testFuture(httpServletRequest);
         long end = System.currentTimeMillis() - start;
 
         System.out.println("总耗时" + end);

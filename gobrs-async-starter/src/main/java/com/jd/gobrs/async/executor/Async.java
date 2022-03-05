@@ -1,9 +1,9 @@
 package com.jd.gobrs.async.executor;
 
 
-import com.jd.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.jd.gobrs.async.callback.DefaultGroupCallback;
 import com.jd.gobrs.async.callback.IGroupCallback;
+import com.jd.gobrs.async.gobrs.GobrsAsyncSupport;
 import com.jd.gobrs.async.gobrs.GobrsFlowState;
 import com.jd.gobrs.async.result.AsyncResult;
 import com.jd.gobrs.async.spring.GobrsSpring;
@@ -15,6 +15,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+
 
 /**
  * 类入口，可以根据自己情况调整core线程的数量
@@ -44,10 +45,10 @@ public class Async {
      */
     public static AsyncResult startTaskFlow(long timeout, ThreadPoolTaskExecutor executorService, List<TaskWrapper> taskWrappers, Map<String, Object> params) throws ExecutionException, InterruptedException {
 
-        long businessId = snowflakeId.nextId();
         if (taskWrappers == null || taskWrappers.size() == 0) {
             return null;
         }
+        GobrsAsyncSupport support = GobrsAsyncSupport.builder().params(params).build();
         //保存线程池变量
         Async.executorService = executorService;
         //定义一个map，存放所有的wrapper，key为wrapper的唯一id，value是该wrapper，可以从value中获取wrapper的result
@@ -55,54 +56,29 @@ public class Async {
         CompletableFuture[] futures = new CompletableFuture[taskWrappers.size()];
         for (int i = 0; i < taskWrappers.size(); i++) {
             TaskWrapper wrapper = taskWrappers.get(i);
-            futures[i] = CompletableFuture.runAsync(() -> wrapper.task(executorService, timeout, dataSource, params, businessId), executorService);
+            futures[i] = CompletableFuture.runAsync(() -> wrapper.task(executorService, wrapper, timeout, support), executorService);
         }
         try {
             CompletableFuture.allOf(futures).get(timeout, TimeUnit.MILLISECONDS);
-            return buildResult(dataSource, businessId);
+            return buildResult(support);
         } catch (Exception e) {
             Set<TaskWrapper> set = new HashSet<>();
             totalWorkers(taskWrappers, set);
             for (TaskWrapper wrapper : set) {
-                wrapper.stopNow(businessId);
+                wrapper.stopNow(support);
             }
-            return buildResult(dataSource, businessId);
+            return buildResult(support);
         } finally {
-            // 释放资源
-            RELEASE_THREADPOOL.execute(() -> {
-                release(taskWrappers, businessId);
-            });
         }
     }
 
-    private static AsyncResult buildResult(Map<String, TaskWrapper> dataSource, Long businessId) {
+    private static AsyncResult buildResult(GobrsAsyncSupport support) {
         AsyncResult asyncResult = new AsyncResult();
-        asyncResult.setDatasources(dataSource);
-        asyncResult.setBusinessId(businessId);
-        GobrsFlowState.GobrsState gobrsState = GobrsFlowState.gobrsFlowState.get(businessId);
-        if (gobrsState != null) {
-            asyncResult.setExpCode(gobrsState.getExpCode());
-        }
+        asyncResult.setExpCode(support.getExpCode());
+        asyncResult.setResultMap(support.getWorkResult());
         return asyncResult;
     }
 
-    private static void release(List<TaskWrapper> taskWrappers, Long businessId) {
-        taskWrappers.parallelStream().forEach(x -> {
-            doRelease(x.getNextWrappers(), businessId);
-        });
-    }
-
-    private static void doRelease(List<TaskWrapper> taskWrappers, Long businessId) {
-        if (taskWrappers == null) {
-            return;
-        }
-        taskWrappers.parallelStream().forEach(x -> {
-            x.workResult.remove(businessId);
-            x.state.remove(businessId);
-            GobrsFlowState.gobrsFlowState.remove(businessId);
-            doRelease(x.getNextWrappers(), businessId);
-        });
-    }
 
     /**
      * 如果想自定义线程池，请传pool。不自定义的话，就走默认的COMMON_POOL

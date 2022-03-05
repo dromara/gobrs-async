@@ -1,7 +1,10 @@
 package com.jd.gobrs.async.callback;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import com.jd.gobrs.async.gobrs.GobrsAsyncSupport;
+import com.jd.gobrs.async.task.TaskResult;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
 
 /**
@@ -14,11 +17,10 @@ public interface ITask<T, V> {
     /**
      * 在这里做耗时操作，如rpc请求、IO等
      *
-     * @param params     params
-     * @param resultSet  任务执行的结果集
-     * @param businessId 业务ID
+     * @param params  params
+     * @param support async support 核心通道传输辅助对象
      */
-    V task(T params, Map<String, TaskWrapper> resultSet, Long businessId);
+    V task(T params, GobrsAsyncSupport support);
 
     /**
      * 超时、异常时，返回的默认值
@@ -29,7 +31,7 @@ public interface ITask<T, V> {
         return null;
     }
 
-    default boolean nessary(T t) {
+    default boolean nessary(T params, GobrsAsyncSupport support) {
         return true;
     }
 

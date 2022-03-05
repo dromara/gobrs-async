@@ -1,13 +1,13 @@
 package com.jd.gobrs.async.example.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.jd.gobrs.async.example.DataContext;
 import com.jd.gobrs.async.example.executor.ParaExector;
+import com.jd.gobrs.async.gobrs.GobrsAsyncSupport;
 import com.jd.gobrs.async.task.AsyncTask;
 import com.jd.gobrs.async.task.TaskResult;
-import com.jd.gobrs.async.wrapper.TaskWrapper;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,34 +19,19 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class AService implements AsyncTask<String, Map> , ParaExector {
-
-
+public class AService implements AsyncTask<DataContext, Map>, ParaExector {
     @Override
-    public Map task(String params, Map<String, TaskWrapper> resultSet, Long businessId) {
-        //        System.out.println("开始执行A");
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        HashMap<Object, Object> objectObjectHashMap = new HashMap<>();
-        objectObjectHashMap.put("result", "我是A的结果");
-        return objectObjectHashMap;
+    public void result(boolean success, DataContext param, TaskResult<Map> workResult) {
+
     }
 
     @Override
-    public boolean nessary(String s) {
-        return true;
+    public Map task(DataContext params, GobrsAsyncSupport support) {
+        return null;
     }
 
     @Override
-    public void result(boolean b, String s, TaskResult<Map> taskResult) {
-        if (b) {
-            // 这里taskResult 返回的是 自己的task() 执行结果
-//            System.out.println("AService success" + JSONObject.toJSONString(taskResult.getResult().get("result")));
-        } else {
-            System.out.println("AService fail");
-        }
+    public boolean nessary(DataContext params, GobrsAsyncSupport support) {
+        return false;
     }
 }

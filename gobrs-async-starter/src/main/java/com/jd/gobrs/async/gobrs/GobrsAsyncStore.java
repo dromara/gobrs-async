@@ -1,6 +1,7 @@
 package com.jd.gobrs.async.gobrs;
 
 import com.jd.gobrs.async.rule.Rule;
+import com.jd.gobrs.async.task.TaskResult;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
 
 import java.util.HashMap;
@@ -22,5 +23,8 @@ public class GobrsAsyncStore {
     public static Map<String, Map<String, TaskWrapper>> taskRuleMap = new ConcurrentHashMap<>();
 
     public static Map<String, List<String>> cacheDepends = new ConcurrentHashMap<>();
+
+
+
 
 }

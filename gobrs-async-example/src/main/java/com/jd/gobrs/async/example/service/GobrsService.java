@@ -1,5 +1,6 @@
 package com.jd.gobrs.async.example.service;
 
+import com.jd.gobrs.async.example.DataContext;
 import com.jd.gobrs.async.example.executor.ParaExector;
 import com.jd.gobrs.async.example.executor.SerExector;
 import com.jd.gobrs.async.gobrs.GobrsTaskFlow;
@@ -10,6 +11,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -47,14 +49,12 @@ public class GobrsService {
     private ThreadPoolTaskExecutor gobrsThreadPoolExecutor;
 
 
-    public void testGobrs() {
+    public void testGobrs(HttpServletRequest httpServletRequest) {
+        DataContext dataContext = new DataContext();
+        dataContext.setHttpServletRequest(httpServletRequest);
         AsyncResult<Object> asyncResult;
         try {
-            asyncResult = taskFlow.taskFlow("test", () -> {
-                Map<String, Object> params = new HashMap<>();
-                params.put("AService", "AService param");
-                return params;
-            }, 5000);
+            asyncResult = taskFlow.taskFlow("test", dataContext, 5000);
         } catch (Exception e) {
             System.out.println("异常 " + e);
         }
@@ -64,7 +64,6 @@ public class GobrsService {
     }
 
 
-
     @Resource
     List<AsyncTask> asyncTasks;
 
@@ -72,11 +71,13 @@ public class GobrsService {
     List<ParaExector> paraExectors;
 
 
-    public void testFuture() {
+    public void testFuture(HttpServletRequest httpServletRequest) {
+        DataContext dataContext = new DataContext();
+        dataContext.setHttpServletRequest(httpServletRequest);
         List<Future> list = new ArrayList<>();
         for (AsyncTask asyncTask : paraExectors) {
             Future<?> submit = gobrsThreadPoolExecutor.submit(() -> {
-                asyncTask.task("", null, 0L);
+                asyncTask.task(dataContext, null);
             });
             list.add(submit);
         }
@@ -93,7 +94,7 @@ public class GobrsService {
         List<Future> ser = new ArrayList<>();
         for (AsyncTask asyncTask : serExectors) {
             Future<?> submit = gobrsThreadPoolExecutor.submit(() -> {
-                asyncTask.task("", null, 0L);
+                asyncTask.task(dataContext, null);
             });
             ser.add(submit);
         }

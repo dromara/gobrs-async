@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,7 +56,7 @@ public class GobrsTest {
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < th; i++) {
             executorService.execute(() -> {
-                gobrsService.testGobrs();
+                gobrsService.testGobrs(null);
                 countDownLatch.countDown();
             });
         }
@@ -73,7 +74,7 @@ public class GobrsTest {
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < th; i++) {
             executorService.execute(() -> {
-                gobrsService.testFuture();
+                gobrsService.testFuture(null);
                 countDownLatch.countDown();
             });
         }
