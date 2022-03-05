@@ -81,11 +81,6 @@
       <artifactId>fastjson</artifactId>
       <version>1.2.70</version>
     </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
-      <version>${logback.version}</version>
-    </dependency>
   </dependencies>
   <build>
     <finalName>${project.artifactId}</finalName>

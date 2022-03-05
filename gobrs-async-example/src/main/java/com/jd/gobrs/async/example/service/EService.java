@@ -7,6 +7,7 @@ import com.jd.gobrs.async.task.AsyncTask;
 import com.jd.gobrs.async.task.TaskResult;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,16 +23,29 @@ public class EService implements AsyncTask<DataContext, Map>, ParaExector {
 
     @Override
     public void result(boolean success, DataContext param, TaskResult<Map> workResult) {
-
+        if (success) {
+//            System.out.println("EService 成功");
+        } else {
+            System.out.println("EService 失败");
+        }
     }
 
     @Override
     public Map task(DataContext params, GobrsAsyncSupport support) {
-        return null;
+        try {
+//            System.out.println(1/0);
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        byte[] result  = new byte[1024*1024*10];
+        Map h = new HashMap();
+        h.put("result", result);
+        return h;
     }
 
     @Override
     public boolean nessary(DataContext params, GobrsAsyncSupport support) {
-        return false;
+        return true;
     }
 }

@@ -15,10 +15,15 @@ import com.jd.gobrs.async.task.ResultState;
 import com.jd.gobrs.async.callback.ITask;
 import com.jd.gobrs.async.executor.timer.SystemClock;
 import com.jd.gobrs.async.task.TaskResult;
+import javafx.concurrent.Task;
+import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -27,6 +32,7 @@ import java.util.concurrent.*;
  * @author sizegang wrote on 2019-11-19.
  */
 public class TaskWrapper<T, V> {
+    Logger logger = LoggerFactory.getLogger(TaskWrapper.class);
     /**
      * 该wrapper的唯一标识
      */
@@ -104,9 +110,6 @@ public class TaskWrapper<T, V> {
      */
     public void task(ThreadPoolTaskExecutor executorService, TaskWrapper fromWrapper, long remainTime,
                      GobrsAsyncSupport support) {
-        Map<String, Object> params = support.getParams();
-        long businessId = support.getBusinessId();
-        ConcurrentHashMap<String, TaskResult<V>> workResult = support.getWorkResult();
         //将自己放到所有wrapper的集合里去
         long now = SystemClock.now();
         //总的已经超时了，就快速失败，进行下一个
@@ -188,9 +191,6 @@ public class TaskWrapper<T, V> {
      * 进行下一个任务
      */
     private void nextTask(ThreadPoolTaskExecutor executorService, long now, long remainTime, GobrsAsyncSupport support) {
-        Map params = support.getParams();
-        ConcurrentHashMap workResult = support.getWorkResult();
-        long businessId = support.getBusinessId();
         //花费的时间
         long costTime = SystemClock.now() - now;
         if (nextWrappers == null) {
@@ -216,14 +216,12 @@ public class TaskWrapper<T, V> {
     }
 
     private void doDependsOneJob(TaskWrapper dependWrapper, GobrsAsyncSupport support) {
-        Map params = support.getParams();
-        long businessId = support.getBusinessId();
-        ConcurrentHashMap<Long, TaskResult<V>> workResult = support.getWorkResult();
-        if (ResultState.TIMEOUT == workResult.get(businessId).getResultState()) {
-            workResult.put(businessId, defaultResult());
+        ConcurrentHashMap<String, TaskResult<V>> resultMap = support.getWorkResult();
+        if (ResultState.TIMEOUT == resultMap.get(dependWrapper.id).getResultState()) {
+            resultMap.put(id, defaultResult());
             taskFail(INIT, null, support);
-        } else if (ResultState.EXCEPTION == workResult.get(businessId).getResultState()) {
-            workResult.put(businessId, defaultExResult(workResult.get(businessId).getEx()));
+        } else if (ResultState.EXCEPTION == resultMap.get(dependWrapper.id).getResultState()) {
+            resultMap.put(id, defaultExResult(resultMap.get(dependWrapper.id).getEx()));
             taskFail(INIT, null, support);
         } else {
             //前面任务正常完毕了，该自己了
@@ -231,13 +229,12 @@ public class TaskWrapper<T, V> {
         }
     }
 
+
     private void doDependsJobs(ThreadPoolTaskExecutor executorService, List<DependWrapper> dependWrappers, TaskWrapper fromWrapper,
                                long now, long remainTime, GobrsAsyncSupport support) {
         boolean nowDependIsMust = false;
         Map params = support.getParams();
-        long businessId = support.getBusinessId();
-
-        ConcurrentHashMap workResult = support.getWorkResult();
+        ConcurrentHashMap<String, TaskResult<V>> resultMap = support.getWorkResult();
         //创建必须完成的上游wrapper集合
         Set<DependWrapper> mustWrapper = new HashSet<>();
         for (DependWrapper dependWrapper : dependWrappers) {
@@ -248,7 +245,7 @@ public class TaskWrapper<T, V> {
                 nowDependIsMust = dependWrapper.isMust();
             }
         }
-        ConcurrentHashMap<String, TaskResult<V>> resultMap = support.getWorkResult();
+
 
         //如果全部是不必须的条件，那么只要到了这里，就执行自己。
         if (mustWrapper.size() == 0) {
@@ -281,12 +278,12 @@ public class TaskWrapper<T, V> {
                 break;
             }
             if (tempWorkResult != null && ResultState.TIMEOUT == tempWorkResult.getResultState()) {
-                workResult.put(businessId, tempWorkResult);
+                resultMap.put(id, tempWorkResult);
                 hasError = true;
                 break;
             }
             if (tempWorkResult != null && ResultState.EXCEPTION == tempWorkResult.getResultState()) {
-                workResult.put(businessId, defaultExResult(tempWorkResult.getEx()));
+                resultMap.put(id, defaultExResult(tempWorkResult.getEx()));
                 hasError = true;
                 break;
             }
@@ -330,9 +327,8 @@ public class TaskWrapper<T, V> {
      */
     private boolean taskFail(int expect, Exception e, GobrsAsyncSupport support) {
         ConcurrentHashMap<String, TaskResult<V>> resultsMap = support.getWorkResult();
-
         //试图将它从expect状态,改成Error CAS 无锁设置
-        if (!compareAndSetState(support.getTaskState(), expect, ERROR)) {
+        if (!compareAndSetState(support, expect, ERROR)) {
             return false;
         }
 
@@ -354,7 +350,6 @@ public class TaskWrapper<T, V> {
      */
     private TaskResult<V> doTaskDep(GobrsAsyncSupport support) {
         Map<String, Object> params = support.getParams();
-        long businessId = support.getBusinessId();
         ConcurrentHashMap<String, TaskResult<V>> resultMap = support.getWorkResult();
 
         T param = params.containsKey(GobrsAsyncConstant.DEFAULT_PARAMS) == true
@@ -374,7 +369,7 @@ public class TaskWrapper<T, V> {
         try {
 
             //如果已经不是init状态了，说明正在被执行或已执行完毕。这一步很重要，可以保证任务不被重复执行
-            if (!compareAndSetState(support.getState(), INIT, WORKING)) {
+            if (!compareAndSetState(support, INIT, WORKING)) {
                 return taskResult;
             }
 
@@ -383,7 +378,7 @@ public class TaskWrapper<T, V> {
             V resultValue = worker.task(param, support);
 
             //如果状态不是在working,说明别的地方已经修改了
-            if (!compareAndSetState(support.getState(), WORKING, FINISH)) {
+            if (!compareAndSetState(support, WORKING, FINISH)) {
                 return taskResult;
             }
 
@@ -395,6 +390,7 @@ public class TaskWrapper<T, V> {
 
             return taskResult;
         } catch (Exception e) {
+            logger.error("Task {} error => {}", id, e);
             //避免重复回调
             if (!checkIsNullResult(resultMap)) {
                 return taskResult;
@@ -486,30 +482,24 @@ public class TaskWrapper<T, V> {
 
 
     private int getState(GobrsAsyncSupport support) {
-        return (int) support.getState().get(id);
+        AtomicInteger state = support.getTaskState(id);
+        if (state != null) {
+            return state.get();
+        }
+        return INIT;
     }
 
     public String getId() {
         return id;
     }
 
-    public synchronized boolean compareAndSetState(ConcurrentHashMap<String, Integer> state, int expect, int update) {
-        Integer st = state.get(id);
-        if (st == null) {
-            if (expect == INIT) {
-                st = update;
-                state.put(id, st);
-                return true;
-            }
-            return false;
+    public synchronized boolean compareAndSetState(GobrsAsyncSupport support, int expect, int update) {
+        AtomicInteger taskState = support.getTaskState(id);
+        if (taskState == null) {
+            taskState = new AtomicInteger(INIT);
+            support.taskState.put(id, taskState);
         }
-
-        if (st == expect) {
-            st = update;
-            state.put(id, st);
-            return true;
-        }
-        return false;
+        return taskState.compareAndSet(expect, update);
     }
 
     private void setNeedCheckNextWrapperResult(boolean needCheckNextWrapperResult) {
@@ -675,5 +665,13 @@ public class TaskWrapper<T, V> {
             return wrapper;
         }
 
+    }
+
+    TaskResult<V> getResult(ConcurrentHashMap<String, TaskResult<V>> taskResultMap) {
+        TaskResult result = taskResultMap.get(id);
+        if (result != null) {
+            return result;
+        }
+        return defaultResult();
     }
 }

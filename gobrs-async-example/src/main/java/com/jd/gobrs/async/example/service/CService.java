@@ -19,19 +19,27 @@ import java.util.Map;
  **/
 @Service
 public class CService implements AsyncTask<DataContext, Map>, SerExector {
-
     @Override
     public void result(boolean success, DataContext param, TaskResult<Map> workResult) {
-
+        if (success) {
+//            System.out.println("CService 成功");
+        } else {
+            System.out.println("CService 失败");
+        }
     }
 
     @Override
     public Map task(DataContext params, GobrsAsyncSupport support) {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
     @Override
     public boolean nessary(DataContext params, GobrsAsyncSupport support) {
-        return false;
+        return true;
     }
 }

@@ -21,16 +21,24 @@ import java.util.Map;
 public class FService implements AsyncTask<DataContext, Map>, SerExector {
     @Override
     public void result(boolean success, DataContext param, TaskResult<Map> workResult) {
-
+        if (success) {
+//            System.out.println("FService 成功");
+        } else {
+            System.out.println("FService 失败");
+        }
     }
 
     @Override
     public Map task(DataContext params, GobrsAsyncSupport support) {
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return null;
     }
-
     @Override
     public boolean nessary(DataContext params, GobrsAsyncSupport support) {
-        return false;
+        return true;
     }
 }

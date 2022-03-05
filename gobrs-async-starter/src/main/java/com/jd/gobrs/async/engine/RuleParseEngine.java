@@ -84,7 +84,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
     @Override
     public AsyncResult exec(String ruleName, Supplier<Map<String, Object>> supplier, long timeout) throws ExecutionException, InterruptedException {
 
-        System.out.println(ObjectSizeCalculator.getObjectSize(taskRuleMap.get(ruleName)));
+//        System.out.println(ObjectSizeCalculator.getObjectSize(taskRuleMap.get(ruleName)));
         return Async.startTaskFlow(timeout,
                 taskRuleMap.get(ruleName).values().parallelStream().collect(Collectors.toList()), supplier.get());
     }

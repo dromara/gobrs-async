@@ -52,10 +52,11 @@ public class GobrsService {
     public void testGobrs(HttpServletRequest httpServletRequest) {
         DataContext dataContext = new DataContext();
         dataContext.setHttpServletRequest(httpServletRequest);
-        AsyncResult<Object> asyncResult;
+        AsyncResult asyncResult;
         try {
             asyncResult = taskFlow.taskFlow("test", dataContext, 5000);
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("异常 " + e);
         }
 //        System.out.println(asyncResult.getExpCode());

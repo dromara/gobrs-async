@@ -1,7 +1,6 @@
 package com.jd.gobrs.async.result;
 
 import com.jd.gobrs.async.gobrs.GobrsAsyncSupport;
-import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -14,10 +13,33 @@ import java.util.Map;
  * @create: 2022-02-26 14:47
  * @Version 1.0
  **/
-@Data
-public class AsyncResult<P> implements Serializable {
+public class AsyncResult implements Serializable {
 
     private Map resultMap;
     GobrsAsyncSupport support;
     private Integer expCode;
+
+    public Map getResultMap() {
+        return resultMap;
+    }
+
+    public void setResultMap(Map resultMap) {
+        this.resultMap = resultMap;
+    }
+
+    public GobrsAsyncSupport getSupport() {
+        return support;
+    }
+
+    public void setSupport(GobrsAsyncSupport support) {
+        this.support = support;
+    }
+
+    public Integer getExpCode() {
+        return expCode;
+    }
+
+    public void setExpCode(Integer expCode) {
+        this.expCode = expCode;
+    }
 }

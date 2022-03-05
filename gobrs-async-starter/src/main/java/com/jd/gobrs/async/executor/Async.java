@@ -10,6 +10,7 @@ import com.jd.gobrs.async.spring.GobrsSpring;
 import com.jd.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
 import com.jd.gobrs.async.util.SnowflakeId;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
+import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.*;
@@ -48,11 +49,11 @@ public class Async {
         if (taskWrappers == null || taskWrappers.size() == 0) {
             return null;
         }
-        GobrsAsyncSupport support = GobrsAsyncSupport.builder().params(params).build();
+        GobrsAsyncSupport.SupportBuilder builder = GobrsAsyncSupport.builder();
+        GobrsAsyncSupport support = builder.params(params).build();
         //保存线程池变量
         Async.executorService = executorService;
         //定义一个map，存放所有的wrapper，key为wrapper的唯一id，value是该wrapper，可以从value中获取wrapper的result
-        Map<String, TaskWrapper> dataSource = new ConcurrentHashMap<>();
         CompletableFuture[] futures = new CompletableFuture[taskWrappers.size()];
         for (int i = 0; i < taskWrappers.size(); i++) {
             TaskWrapper wrapper = taskWrappers.get(i);
