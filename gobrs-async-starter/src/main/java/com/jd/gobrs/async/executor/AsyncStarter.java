@@ -11,9 +11,7 @@ import com.jd.gobrs.async.gobrs.GobrsFlowState;
 import com.jd.gobrs.async.result.AsyncResult;
 import com.jd.gobrs.async.spring.GobrsSpring;
 import com.jd.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
-import com.jd.gobrs.async.util.SnowflakeId;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
-import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +29,7 @@ import static com.jd.gobrs.async.constant.StateConstant.WORKING;
  * @author sizegang wrote on 2019-12-18
  * @version 1.0
  */
-public class Async {
+public class AsyncStarter {
 
     private static Logger logger = LoggerFactory.getLogger(TaskWrapper.class);
 
@@ -52,7 +50,7 @@ public class Async {
     /**
      * 出发点
      */
-    public static AsyncResult startTaskFlow(long timeout, ThreadPoolExecutor executorService, List<TaskWrapper> taskWrappers, Map<String, Object> params) throws ExecutionException, InterruptedException {
+    public static AsyncResult startTaskFlow(long timeout, ThreadPoolExecutor executorService, List<TaskWrapper> taskWrappers, Map<String, Object> params) {
 
         if (taskWrappers == null || taskWrappers.size() == 0) {
             return null;
@@ -60,7 +58,7 @@ public class Async {
         GobrsAsyncSupport.SupportBuilder builder = GobrsAsyncSupport.builder();
         GobrsAsyncSupport support = builder.params(params).build();
         //保存线程池变量
-        Async.executorService = executorService;
+        AsyncStarter.executorService = executorService;
         CompletableFuture[] futures = new CompletableFuture[taskWrappers.size()];
         // 开启任务流
         starting(support);
@@ -83,7 +81,7 @@ public class Async {
             for (TaskWrapper wrapper : set) {
                 wrapper.stopNow(support);
             }
-            return buildResult(support);
+            return buildResult(support, e);
         } finally {
             support = null; // for gc
         }
@@ -98,14 +96,23 @@ public class Async {
         AsyncResult asyncResult = new AsyncResult();
         asyncResult.setExpCode(support.getExpCode());
         asyncResult.setResultMap(support.getWorkResult());
+        asyncResult.setSuccess(true);
         return asyncResult;
     }
 
+    private static AsyncResult buildResult(GobrsAsyncSupport support, Exception exception) {
+        AsyncResult asyncResult = new AsyncResult();
+        asyncResult.setExpCode(support.getExpCode());
+        asyncResult.setResultMap(support.getWorkResult());
+        asyncResult.setException(exception);
+        asyncResult.setSuccess(false);
+        return asyncResult;
+    }
 
     /**
      * 如果想自定义线程池，请传pool。不自定义的话，就走默认的COMMON_POOL
      */
-    public static AsyncResult startTaskFlow(long timeout, ThreadPoolExecutor executorService, Map<String, Object> parameters, TaskWrapper... workerWrapper) throws ExecutionException, InterruptedException {
+    public static AsyncResult startTaskFlow(long timeout, ThreadPoolExecutor executorService, Map<String, Object> parameters, TaskWrapper... workerWrapper) {
         if (workerWrapper == null || workerWrapper.length == 0) {
             return null;
         }
@@ -116,11 +123,11 @@ public class Async {
     /**
      * 同步阻塞,直到所有都完成,或失败
      */
-    public static AsyncResult startTaskFlow(long timeout, Map<String, Object> parameters, TaskWrapper... workerWrapper) throws ExecutionException, InterruptedException {
+    public static AsyncResult startTaskFlow(long timeout, Map<String, Object> parameters, TaskWrapper... workerWrapper) {
         return startTaskFlow(timeout, COMMON_POOL, parameters, workerWrapper);
     }
 
-    public static AsyncResult startTaskFlow(long timeout, List<TaskWrapper> workerWrapper, Map<String, Object> params) throws ExecutionException, InterruptedException {
+    public static AsyncResult startTaskFlow(long timeout, List<TaskWrapper> workerWrapper, Map<String, Object> params) {
         return startTaskFlow(timeout, COMMON_POOL, workerWrapper, params);
     }
 
@@ -146,7 +153,7 @@ public class Async {
                     } else {
                         finalGroupCallback.failure(Arrays.asList(workerWrapper), new TimeoutException());
                     }
-                } catch (ExecutionException | InterruptedException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     finalGroupCallback.failure(Arrays.asList(workerWrapper), e);
                 }
@@ -160,7 +167,7 @@ public class Async {
                     } else {
                         finalGroupCallback.failure(Arrays.asList(workerWrapper), new TimeoutException());
                     }
-                } catch (ExecutionException | InterruptedException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     finalGroupCallback.failure(Arrays.asList(workerWrapper), e);
                 }

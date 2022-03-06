@@ -15,7 +15,6 @@ import com.jd.gobrs.async.task.ResultState;
 import com.jd.gobrs.async.callback.ITask;
 import com.jd.gobrs.async.executor.timer.SystemClock;
 import com.jd.gobrs.async.task.TaskResult;
-import javafx.concurrent.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -339,7 +338,7 @@ public class TaskWrapper<T, V> {
             }
         }
 
-        callback.result(false, param, resultsMap.get(id));
+        callback.callback(false, param, resultsMap.get(id));
         return true;
     }
 
@@ -383,7 +382,7 @@ public class TaskWrapper<T, V> {
             taskResult.setResult(resultValue);
             resultMap.put(id, taskResult);
             //回调成功
-            callback.result(true, param, taskResult);
+            callback.callback(true, param, taskResult);
 
             return taskResult;
         } catch (Exception e) {

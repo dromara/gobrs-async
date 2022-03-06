@@ -16,9 +16,8 @@ import com.jd.gobrs.async.wrapper.TaskWrapper;
 public interface ITask<T, V> {
     /**
      * 在这里做耗时操作，如rpc请求、IO等
-     *
      * @param params  params
-     * @param support async support 核心通道传输辅助对象
+     * @param support support 任务流对象
      */
     V task(T params, GobrsAsyncSupport support);
 
@@ -31,6 +30,12 @@ public interface ITask<T, V> {
         return null;
     }
 
+    /**
+     *
+     * @param params  任务参数
+     * @param support 任务流对象
+     * @return
+     */
     default boolean nessary(T params, GobrsAsyncSupport support) {
         return true;
     }

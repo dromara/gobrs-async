@@ -2,14 +2,13 @@ package com.jd.gobrs.async.engine;
 
 import com.jd.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.jd.gobrs.async.callback.ICallback;
-import com.jd.gobrs.async.executor.Async;
+import com.jd.gobrs.async.executor.AsyncStarter;
 import com.jd.gobrs.async.result.AsyncResult;
 import com.jd.gobrs.async.spring.GobrsSpring;
 import com.jd.gobrs.async.task.DependWrapper;
 import com.jd.gobrs.async.rule.Rule;
 import com.jd.gobrs.async.task.AsyncTask;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
-import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -82,8 +81,8 @@ public class RuleParseEngine<T> extends AbstractEngine {
     }
 
     @Override
-    public AsyncResult exec(String ruleName, Supplier<Map<String, Object>> supplier, long timeout) throws ExecutionException, InterruptedException {
-        return Async.startTaskFlow(timeout,
+    public AsyncResult exec(String ruleName, Supplier<Map<String, Object>> supplier, long timeout)  {
+        return AsyncStarter.startTaskFlow(timeout,
                 taskRuleMap.get(ruleName).values().parallelStream().collect(Collectors.toList()), supplier.get());
     }
 

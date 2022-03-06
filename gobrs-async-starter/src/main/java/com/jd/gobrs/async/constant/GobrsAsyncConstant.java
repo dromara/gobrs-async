@@ -9,6 +9,6 @@ package com.jd.gobrs.async.constant;
  * @Version 1.0
  **/
 public class GobrsAsyncConstant {
-    public static final String DEFAULT_PARAMS = "default_params";
+    public static final String DEFAULT_PARAMS = "DEFAULT_PARAMS";
     public static final Integer DEFAULT_EXPECTION_CODE = 9999; //
 }

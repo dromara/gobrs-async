@@ -21,7 +21,7 @@ import java.util.Map;
 public class DService implements AsyncTask<DataContext, Map>, SerExector {
 
     @Override
-    public void result(boolean success, DataContext param, TaskResult<Map> workResult) {
+    public void callback(boolean success, DataContext param, TaskResult<Map> workResult) {
         if (success) {
             System.out.println("DService 成功");
         } else {

@@ -22,7 +22,7 @@ import java.util.Map;
 @Service
 public class AService implements AsyncTask<DataContext, DataContext>, ParaExector {
     @Override
-    public void result(boolean success, DataContext param, TaskResult<DataContext> workResult) {
+    public void callback(boolean success, DataContext param, TaskResult<DataContext> workResult) {
         if (success) {
             System.out.println("AService 成功");
         } else {

@@ -21,5 +21,5 @@ public interface ICallback<T, V> {
     /**
      * 耗时操作执行完毕后，就给value注入值
      */
-    void result(boolean success, T param, TaskResult<V> workResult);
+    void callback(boolean success, T param, TaskResult<V> workResult);
 }

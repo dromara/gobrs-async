@@ -1,6 +1,5 @@
 package com.jd.gobrs.async.example.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.jd.gobrs.async.example.DataContext;
 import com.jd.gobrs.async.example.executor.SerExector;
 import com.jd.gobrs.async.gobrs.GobrsAsyncSupport;
@@ -21,7 +20,7 @@ import java.util.Map;
 @Service
 public class GService implements AsyncTask<DataContext, Map>, SerExector {
     @Override
-    public void result(boolean success, DataContext param, TaskResult<Map> workResult) {
+    public void callback(boolean success, DataContext param, TaskResult<Map> workResult) {
         if (success) {
             System.out.println("GService 成功");
         } else {

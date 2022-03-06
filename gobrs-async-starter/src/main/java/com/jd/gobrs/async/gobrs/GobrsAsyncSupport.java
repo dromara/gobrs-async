@@ -2,7 +2,6 @@ package com.jd.gobrs.async.gobrs;
 
 import com.jd.gobrs.async.task.TaskResult;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;

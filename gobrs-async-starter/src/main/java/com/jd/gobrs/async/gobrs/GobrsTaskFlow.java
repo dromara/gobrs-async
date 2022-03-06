@@ -2,10 +2,7 @@ package com.jd.gobrs.async.gobrs;
 
 import com.jd.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.jd.gobrs.async.constant.GobrsAsyncConstant;
-import com.jd.gobrs.async.executor.Async;
 import com.jd.gobrs.async.result.AsyncResult;
-import com.jd.gobrs.async.rule.Rule;
-import com.jd.gobrs.async.wrapper.TaskWrapper;
 import com.jd.gobrs.async.engine.RuleParseEngine;
 
 import javax.annotation.Resource;
@@ -13,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * @author sizegang1
@@ -68,7 +64,7 @@ public class GobrsTaskFlow<T> implements GobrsAsync {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public AsyncResult taskFlow(String ruleName, T t, long timeout) throws ExecutionException, InterruptedException {
+    public AsyncResult taskFlow(String ruleName, T t, long timeout)  {
         return ruleParseEngine.exec(ruleName, () -> {
             Map<String, Object> map = new HashMap<>();
             map.put(GobrsAsyncConstant.DEFAULT_PARAMS, t);

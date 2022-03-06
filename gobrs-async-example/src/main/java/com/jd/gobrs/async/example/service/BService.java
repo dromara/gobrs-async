@@ -24,10 +24,8 @@ import java.util.Map;
 public class BService implements AsyncTask<DataContext, Map>, SerExector {
 
     @Override
-    public void result(boolean success, DataContext param, TaskResult<Map> workResult) {
+    public void callback(boolean success, DataContext param, TaskResult<Map> workResult) {
         if (success) {
-//            System.out.println(JSONObject.toJSONString(workResult.getResult()));
-
             System.out.println("BService 成功");
         } else {
             System.out.println("BService 失败");

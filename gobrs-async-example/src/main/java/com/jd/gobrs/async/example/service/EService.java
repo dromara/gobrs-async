@@ -22,7 +22,7 @@ import java.util.Map;
 public class EService implements AsyncTask<DataContext, DataContext>, ParaExector {
 
     @Override
-    public void result(boolean success, DataContext param, TaskResult<DataContext> workResult) {
+    public void callback(boolean success, DataContext param, TaskResult<DataContext> workResult) {
         if (success) {
             System.out.println("EService 成功");
         } else {
@@ -33,7 +33,7 @@ public class EService implements AsyncTask<DataContext, DataContext>, ParaExecto
     @Override
     public DataContext task(DataContext params, GobrsAsyncSupport support) {
         try {
-            System.out.println(1/0);
+//            System.out.println(1/0);
             Thread.sleep(500);
 //            stopTaskFlow(support, 100);
 

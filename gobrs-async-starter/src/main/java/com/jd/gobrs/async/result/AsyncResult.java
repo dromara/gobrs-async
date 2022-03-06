@@ -18,6 +18,25 @@ public class AsyncResult implements Serializable {
     private Map resultMap;
     GobrsAsyncSupport support;
     private Integer expCode;
+    private boolean success;
+
+    private Exception exception;
+
+    public boolean isSuccess() {
+        return success;
+    }
+
+    public void setSuccess(boolean success) {
+        this.success = success;
+    }
+
+    public Exception getException() {
+        return exception;
+    }
+
+    public void setException(Exception exception) {
+        this.exception = exception;
+    }
 
     public Map getResultMap() {
         return resultMap;
