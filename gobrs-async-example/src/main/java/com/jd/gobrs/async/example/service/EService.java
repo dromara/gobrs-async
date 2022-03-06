@@ -24,7 +24,7 @@ public class EService implements AsyncTask<DataContext, DataContext>, ParaExecto
     @Override
     public void result(boolean success, DataContext param, TaskResult<DataContext> workResult) {
         if (success) {
-//            System.out.println("EService 成功");
+            System.out.println("EService 成功");
         } else {
             System.out.println("EService 失败");
         }
@@ -33,14 +33,16 @@ public class EService implements AsyncTask<DataContext, DataContext>, ParaExecto
     @Override
     public DataContext task(DataContext params, GobrsAsyncSupport support) {
         try {
-//            System.out.println(1/0);
-            Thread.sleep(1000);
+            System.out.println(1/0);
+            Thread.sleep(500);
+//            stopTaskFlow(support, 100);
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        byte[] result  = new byte[1024*1024*10];
+        byte[] result = new byte[1024 * 1024];
         Map h = new HashMap();
-        h.put("result", result);
+        h.put("result", "我是EService 的 结果 恭喜你拿到");
         params.setResult(h);
         return params;
     }

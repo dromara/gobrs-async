@@ -5,6 +5,7 @@ import com.jd.gobrs.async.callback.ITask;
 import com.jd.gobrs.async.constant.StateConstant;
 import com.jd.gobrs.async.gobrs.GobrsAsyncSupport;
 
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -33,14 +34,13 @@ public interface AsyncTask<T, V> extends ITask<T, V>, ICallback<T, V> {
 
     /**
      * @param support
-     * @param businessId
      * @param clazz
      * @param resultClass
      * @param <R>
      * @return
      */
-    default <R> R getResult(GobrsAsyncSupport support, Long businessId, Class clazz, Class<R> resultClass) {
-        ConcurrentHashMap<String, TaskResult<R>> resultMap = support.getWorkResult();
+    default <R> R getResult(GobrsAsyncSupport support, Class clazz, Class<R> resultClass) {
+        Map<String, TaskResult<R>> resultMap = support.getWorkResult();
         TaskResult<R> rTaskResult = resultMap.get(clazz.getSimpleName()) != null ? resultMap.get(clazz.getSimpleName()) : resultMap.get(depKey(clazz));
         if (rTaskResult != null) {
             return rTaskResult.getResult();
@@ -54,6 +54,7 @@ public interface AsyncTask<T, V> extends ITask<T, V>, ICallback<T, V> {
      * @return
      */
     default boolean stopTaskFlow(GobrsAsyncSupport gobrsAsyncSupport, Integer capCode) {
+        gobrsAsyncSupport.setExpCode(capCode);
         return gobrsAsyncSupport.getTaskFlowState().compareAndSet(StateConstant.WORKING, StateConstant.STOP);
     }
 

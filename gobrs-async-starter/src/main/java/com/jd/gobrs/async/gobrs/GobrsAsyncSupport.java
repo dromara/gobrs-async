@@ -17,15 +17,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class GobrsAsyncSupport<V> {
 
     // 创建task对象存储
-    private volatile ConcurrentHashMap<String, TaskResult<V>> workResult;
-
+    private volatile Map<String, TaskResult<V>> workResult;
 
 
     // taskFlow 任务流状态
     private volatile AtomicInteger taskFlowState;
 
 
-    Map<String, Object> params;// 任务参数
+    private Map<String, Object> params;// 任务参数
 
 
     private Integer expCode; // 任务流异常状态码
@@ -36,15 +35,12 @@ public class GobrsAsyncSupport<V> {
      * <p>
      * 1-finish, 2-error, 3-working
      */
-    public volatile ConcurrentHashMap<String, AtomicInteger> taskState;
+    public volatile Map<String, AtomicInteger> taskState;
 
 
     public static SupportBuilder builder() {
         return new SupportBuilder();
     }
-
-
-
 
     // 属性值都是取的 Builder中的值
     public GobrsAsyncSupport(SupportBuilder builder) {
@@ -56,7 +52,7 @@ public class GobrsAsyncSupport<V> {
     }
 
 
-    public ConcurrentHashMap<String, TaskResult<V>> getWorkResult() {
+    public Map<String, TaskResult<V>> getWorkResult() {
         return workResult;
     }
 
@@ -76,22 +72,36 @@ public class GobrsAsyncSupport<V> {
         return expCode;
     }
 
+    public void setWorkResult(Map<String, TaskResult<V>> workResult) {
+        this.workResult = workResult;
+    }
 
-    public  static class SupportBuilder<V> {
+    public void setTaskFlowState(AtomicInteger taskFlowState) {
+        this.taskFlowState = taskFlowState;
+    }
+
+    public void setParams(Map<String, Object> params) {
+        this.params = params;
+    }
+
+    public void setExpCode(Integer expCode) {
+        this.expCode = expCode;
+    }
+
+    public void setTaskState(Map<String, AtomicInteger> taskState) {
+        this.taskState = taskState;
+    }
+
+    public static class SupportBuilder<V> {
 
         // 创建task对象存储
-        private volatile ConcurrentHashMap<String, TaskResult<V>> workResult = new ConcurrentHashMap<String, TaskResult<V>>();
+        private volatile Map<String, TaskResult<V>> workResult = new ConcurrentHashMap<String, TaskResult<V>>();
 
-        // 创建task状态
-        private volatile ConcurrentHashMap<String, Integer> state = new ConcurrentHashMap<>();
 
         // taskFlow 任务流状态
         private volatile AtomicInteger taskFlowState = new AtomicInteger();
 
-        private long businessId; // 任务流唯一编号
-
         Map<String, Object> params;// 任务参数
-
 
         private Integer expCode; // 任务流异常状态码
 
@@ -101,18 +111,14 @@ public class GobrsAsyncSupport<V> {
          * <p>
          * 1-finish, 2-error, 3-working
          */
-        public volatile ConcurrentHashMap<String, Integer> taskState = new ConcurrentHashMap<>();
+        public volatile Map<String, Integer> taskState = new ConcurrentHashMap<>();
 
 
-        public SupportBuilder workResult(ConcurrentHashMap<String, TaskResult<V>> workResult) {
+        public SupportBuilder workResult(Map<String, TaskResult<V>> workResult) {
             this.workResult = workResult;
             return this;
         }
 
-        public SupportBuilder state(ConcurrentHashMap<String, Integer> state) {
-            this.state = state;
-            return this;
-        }
 
         public SupportBuilder taskFlowState(AtomicInteger taskFlowState) {
             this.taskFlowState = taskFlowState;
@@ -135,7 +141,7 @@ public class GobrsAsyncSupport<V> {
         }
 
 
-        public GobrsAsyncSupport build(){
+        public GobrsAsyncSupport build() {
             return new GobrsAsyncSupport(this);
         }
     }

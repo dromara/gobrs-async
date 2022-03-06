@@ -23,7 +23,7 @@ public class GService implements AsyncTask<DataContext, Map>, SerExector {
     @Override
     public void result(boolean success, DataContext param, TaskResult<Map> workResult) {
         if (success) {
-//            System.out.println("GService 成功");
+            System.out.println("GService 成功");
         } else {
             System.out.println("GService 失败");
         }

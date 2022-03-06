@@ -54,7 +54,7 @@ public class GobrsService {
         dataContext.setHttpServletRequest(httpServletRequest);
         AsyncResult asyncResult;
         try {
-            asyncResult = taskFlow.taskFlow("test", dataContext, 5000);
+            asyncResult = taskFlow.taskFlow("test", dataContext, 100000);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("异常 " + e);

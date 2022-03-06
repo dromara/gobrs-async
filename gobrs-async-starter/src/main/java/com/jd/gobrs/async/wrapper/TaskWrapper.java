@@ -16,14 +16,14 @@ import com.jd.gobrs.async.callback.ITask;
 import com.jd.gobrs.async.executor.timer.SystemClock;
 import com.jd.gobrs.async.task.TaskResult;
 import javafx.concurrent.Task;
-import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.jd.gobrs.async.constant.StateConstant.*;
 
 
 /**
@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author sizegang wrote on 2019-11-19.
  */
 public class TaskWrapper<T, V> {
+
     Logger logger = LoggerFactory.getLogger(TaskWrapper.class);
     /**
      * 该wrapper的唯一标识
@@ -85,11 +86,6 @@ public class TaskWrapper<T, V> {
      */
     private volatile boolean needCheckNextWrapperResult = true;
 
-    private static final int FINISH = StateConstant.FINISH;
-    private static final int ERROR = StateConstant.ERROR;
-    private static final int WORKING = StateConstant.WORKING;
-    private static final int INIT = StateConstant.INIT;
-
     private TaskWrapper(String id, ITask<T, V> worker, T param, ICallback<T, V> callback) {
         if (worker == null) {
             throw new NullPointerException("async.worker is null");
@@ -108,7 +104,7 @@ public class TaskWrapper<T, V> {
      * 开始工作
      * fromWrapper 代表这次work是由哪个上游wrapper发起的
      */
-    public void task(ThreadPoolTaskExecutor executorService, TaskWrapper fromWrapper, long remainTime,
+    public void task(ThreadPoolExecutor executorService, TaskWrapper fromWrapper, long remainTime,
                      GobrsAsyncSupport support) {
         //将自己放到所有wrapper的集合里去
         long now = SystemClock.now();
@@ -159,7 +155,7 @@ public class TaskWrapper<T, V> {
     }
 
 
-    public void task(ThreadPoolTaskExecutor executorService, long remainTime, GobrsAsyncSupport support) {
+    public void task(ThreadPoolExecutor executorService, long remainTime, GobrsAsyncSupport support) {
         task(executorService, null, remainTime, support);
     }
 
@@ -173,7 +169,7 @@ public class TaskWrapper<T, V> {
     }
 
     /**
-     * 判断自己下游链路上，是否存在已经出结果的或已经开始执行的
+     * 判断自己下游链路上，是否存在已经出结果的或已经开始执行的 递归检查
      * 如果没有返回true，如果有返回false
      */
     private boolean checkNextWrapperResult(GobrsAsyncSupport support) {
@@ -190,7 +186,7 @@ public class TaskWrapper<T, V> {
     /**
      * 进行下一个任务
      */
-    private void nextTask(ThreadPoolTaskExecutor executorService, long now, long remainTime, GobrsAsyncSupport support) {
+    private void nextTask(ThreadPoolExecutor executorService, long now, long remainTime, GobrsAsyncSupport support) {
         //花费的时间
         long costTime = SystemClock.now() - now;
         if (nextWrappers == null) {
@@ -208,7 +204,7 @@ public class TaskWrapper<T, V> {
                                     remainTime - costTime, support), executorService)
                     .exceptionally((ex) -> {
                         boolean state = gobrsAsyncProperties.isTaskInterrupt() &&
-                                GobrsFlowState.compareAndSetState(support.getTaskFlowState(), StateConstant.WORKING, StateConstant.ERROR);
+                                GobrsFlowState.compareAndSetState(support.getTaskFlowState(), StateConstant.WORKING, ERROR);
                         throw asyncExceptionInterceptor.exception(ex, state);
                     });
         }
@@ -216,12 +212,13 @@ public class TaskWrapper<T, V> {
     }
 
     private void doDependsOneJob(TaskWrapper dependWrapper, GobrsAsyncSupport support) {
-        ConcurrentHashMap<String, TaskResult<V>> resultMap = support.getWorkResult();
-        if (ResultState.TIMEOUT == resultMap.get(dependWrapper.id).getResultState()) {
+        Map<String, TaskResult<V>> resultMap = support.getWorkResult();
+        TaskResult<V> depResult = resultMap.get(dependWrapper.id);
+        if (ResultState.TIMEOUT == depResult.getResultState()) {
             resultMap.put(id, defaultResult());
             taskFail(INIT, null, support);
-        } else if (ResultState.EXCEPTION == resultMap.get(dependWrapper.id).getResultState()) {
-            resultMap.put(id, defaultExResult(resultMap.get(dependWrapper.id).getEx()));
+        } else if (ResultState.EXCEPTION == depResult.getResultState()) {
+            resultMap.put(id, defaultExResult(depResult.getEx()));
             taskFail(INIT, null, support);
         } else {
             //前面任务正常完毕了，该自己了
@@ -230,11 +227,11 @@ public class TaskWrapper<T, V> {
     }
 
 
-    private void doDependsJobs(ThreadPoolTaskExecutor executorService, List<DependWrapper> dependWrappers, TaskWrapper fromWrapper,
+    private void doDependsJobs(ThreadPoolExecutor executorService, List<DependWrapper> dependWrappers, TaskWrapper fromWrapper,
                                long now, long remainTime, GobrsAsyncSupport support) {
         boolean nowDependIsMust = false;
         Map params = support.getParams();
-        ConcurrentHashMap<String, TaskResult<V>> resultMap = support.getWorkResult();
+        Map<String, TaskResult<V>> resultMap = support.getWorkResult();
         //创建必须完成的上游wrapper集合
         Set<DependWrapper> mustWrapper = new HashSet<>();
         for (DependWrapper dependWrapper : dependWrappers) {
@@ -310,13 +307,14 @@ public class TaskWrapper<T, V> {
      * 执行自己的job.具体的执行是在另一个线程里,但判断阻塞超时是在work线程
      */
     private void doTask(GobrsAsyncSupport support) {
+
         if (GobrsFlowState.assertState(support.getTaskFlowState(), StateConstant.STOP)) {
             return;
         }
-        if (gobrsAsyncProperties.isTaskInterrupt() &&
-                GobrsFlowState.assertState(support.getTaskFlowState(), StateConstant.STOP)) {
+        if (gobrsAsyncProperties.isTaskInterrupt() && GobrsFlowState.assertState(support.getTaskFlowState(), ERROR)) {
             return;
         }
+
         //执行结果
         doTaskDep(support);
     }
@@ -326,7 +324,7 @@ public class TaskWrapper<T, V> {
      * 任务失败
      */
     private boolean taskFail(int expect, Exception e, GobrsAsyncSupport support) {
-        ConcurrentHashMap<String, TaskResult<V>> resultsMap = support.getWorkResult();
+        Map<String, TaskResult<V>> resultsMap = support.getWorkResult();
         //试图将它从expect状态,改成Error CAS 无锁设置
         if (!compareAndSetState(support, expect, ERROR)) {
             return false;
@@ -350,7 +348,7 @@ public class TaskWrapper<T, V> {
      */
     private TaskResult<V> doTaskDep(GobrsAsyncSupport support) {
         Map<String, Object> params = support.getParams();
-        ConcurrentHashMap<String, TaskResult<V>> resultMap = support.getWorkResult();
+        Map<String, TaskResult<V>> resultMap = support.getWorkResult();
 
         T param = params.containsKey(GobrsAsyncConstant.DEFAULT_PARAMS) == true
                 ? (T) params.get(GobrsAsyncConstant.DEFAULT_PARAMS) : (T) params.get(id);
@@ -381,9 +379,8 @@ public class TaskWrapper<T, V> {
             if (!compareAndSetState(support, WORKING, FINISH)) {
                 return taskResult;
             }
-
             taskResult.setResultState(ResultState.SUCCESS);
-            taskResult.setResult(null);
+            taskResult.setResult(resultValue);
             resultMap.put(id, taskResult);
             //回调成功
             callback.result(true, param, taskResult);
@@ -413,7 +410,7 @@ public class TaskWrapper<T, V> {
     }
 
 
-    private boolean checkIsNullResult(ConcurrentHashMap<String, TaskResult<V>> workResult) {
+    private boolean checkIsNullResult(Map<String, TaskResult<V>> workResult) {
         return workResult.get(id) == null;
     }
 
@@ -505,30 +502,6 @@ public class TaskWrapper<T, V> {
     private void setNeedCheckNextWrapperResult(boolean needCheckNextWrapperResult) {
         this.needCheckNextWrapperResult = needCheckNextWrapperResult;
     }
-
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) {
-//            return true;
-//        }
-//        if (o == null || getClass() != o.getClass()) {
-//            return false;
-//        }
-//        TaskWrapper<?, ?> that = (TaskWrapper<?, ?>) o;
-//        return needCheckNextWrapperResult == that.needCheckNextWrapperResult &&
-//                Objects.equals(param, that.param) &&
-//                Objects.equals(worker, that.worker) &&
-//                Objects.equals(callback, that.callback) &&
-//                Objects.equals(nextWrappers, that.nextWrappers) &&
-//                Objects.equals(dependWrappers, that.dependWrappers) &&
-//                Objects.equals(state.get(businessId), that.state.get(businessId)) &&
-//                Objects.equals(workResult, that.workResult);
-//    }
-
-//    @Override
-//    public int hashCode() {
-//        return Objects.hash(param, worker, callback, nextWrappers, dependWrappers, state.get(), workResult, needCheckNextWrapperResult);
-//    }
 
 
     public static class Builder<W, C> {

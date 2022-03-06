@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -22,6 +23,8 @@ public class ThreadPoolConfig {
     @Autowired
     private GobrsAsyncThreadPoolFactory factory;
 
+    private ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+
     @Bean
     public ThreadPoolTaskExecutor gobrsThreadPoolExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
@@ -33,7 +36,8 @@ public class ThreadPoolConfig {
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());//拒绝策略
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.initialize();//执行初始化
-        factory.setThreadPoolExecutor(executor);
+
+        factory.setThreadPoolExecutor(threadPoolExecutor);
         return executor;
     }
 

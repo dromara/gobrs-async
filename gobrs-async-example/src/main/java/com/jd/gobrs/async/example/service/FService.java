@@ -1,5 +1,6 @@
 package com.jd.gobrs.async.example.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jd.gobrs.async.example.DataContext;
 import com.jd.gobrs.async.example.executor.SerExector;
 import com.jd.gobrs.async.gobrs.GobrsAsyncSupport;
@@ -22,7 +23,7 @@ public class FService implements AsyncTask<DataContext, Map>, SerExector {
     @Override
     public void result(boolean success, DataContext param, TaskResult<Map> workResult) {
         if (success) {
-//            System.out.println("FService 成功");
+            System.out.println("FService 成功");
         } else {
             System.out.println("FService 失败");
         }
@@ -31,12 +32,15 @@ public class FService implements AsyncTask<DataContext, Map>, SerExector {
     @Override
     public Map task(DataContext params, GobrsAsyncSupport support) {
         try {
-            Thread.sleep(500);
+            DataContext result = getResult(support, EService.class, DataContext.class);
+            System.out.println(JSONObject.toJSONString(result.getResult()));
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         return null;
     }
+
     @Override
     public boolean nessary(DataContext params, GobrsAsyncSupport support) {
         return true;

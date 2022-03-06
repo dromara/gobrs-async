@@ -1,8 +1,11 @@
 package com.jd.gobrs.async.executor;
 
 
+import com.jd.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.jd.gobrs.async.callback.DefaultGroupCallback;
 import com.jd.gobrs.async.callback.IGroupCallback;
+import com.jd.gobrs.async.constant.StateConstant;
+import com.jd.gobrs.async.exception.AsyncExceptionInterceptor;
 import com.jd.gobrs.async.gobrs.GobrsAsyncSupport;
 import com.jd.gobrs.async.gobrs.GobrsFlowState;
 import com.jd.gobrs.async.result.AsyncResult;
@@ -11,11 +14,15 @@ import com.jd.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
 import com.jd.gobrs.async.util.SnowflakeId;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
 import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
+
+import static com.jd.gobrs.async.constant.StateConstant.INIT;
+import static com.jd.gobrs.async.constant.StateConstant.WORKING;
 
 
 /**
@@ -25,26 +32,27 @@ import java.util.stream.Collectors;
  * @version 1.0
  */
 public class Async {
+
+    private static Logger logger = LoggerFactory.getLogger(TaskWrapper.class);
+
+    private static AsyncExceptionInterceptor asyncExceptionInterceptor = GobrsSpring.getBean(AsyncExceptionInterceptor.class);
+
+
+    private static GobrsAsyncProperties gobrsAsyncProperties = GobrsSpring.getBean(GobrsAsyncProperties.class);
     /**
      * 默认不定长线程池
      */
-    private static final ThreadPoolTaskExecutor COMMON_POOL = GobrsSpring.getBean(GobrsAsyncThreadPoolFactory.class).getThreadPoolExecutor();
+    private static final ThreadPoolExecutor COMMON_POOL = GobrsSpring.getBean(GobrsAsyncThreadPoolFactory.class).getThreadPoolExecutor();
 
-    /**
-     * 获取释放资源线程池
-     */
-    private static final ThreadPoolTaskExecutor RELEASE_THREADPOOL = GobrsSpring.getBean(GobrsAsyncThreadPoolFactory.class).getReleaseThreadPoolExecutor();
     /**
      * 注意，这里是个static，也就是只能有一个线程池。用户自定义线程池时，也只能定义一个
      */
-    private static ThreadPoolTaskExecutor executorService;
-
-    private static SnowflakeId snowflakeId = new SnowflakeId(0, 0);
+    private static ThreadPoolExecutor executorService;
 
     /**
      * 出发点
      */
-    public static AsyncResult startTaskFlow(long timeout, ThreadPoolTaskExecutor executorService, List<TaskWrapper> taskWrappers, Map<String, Object> params) throws ExecutionException, InterruptedException {
+    public static AsyncResult startTaskFlow(long timeout, ThreadPoolExecutor executorService, List<TaskWrapper> taskWrappers, Map<String, Object> params) throws ExecutionException, InterruptedException {
 
         if (taskWrappers == null || taskWrappers.size() == 0) {
             return null;
@@ -53,11 +61,18 @@ public class Async {
         GobrsAsyncSupport support = builder.params(params).build();
         //保存线程池变量
         Async.executorService = executorService;
-        //定义一个map，存放所有的wrapper，key为wrapper的唯一id，value是该wrapper，可以从value中获取wrapper的result
         CompletableFuture[] futures = new CompletableFuture[taskWrappers.size()];
+        // 开启任务流
+        starting(support);
         for (int i = 0; i < taskWrappers.size(); i++) {
             TaskWrapper wrapper = taskWrappers.get(i);
-            futures[i] = CompletableFuture.runAsync(() -> wrapper.task(executorService, wrapper, timeout, support), executorService);
+            GobrsAsyncSupport finalSupport = support;
+            futures[i] = CompletableFuture.runAsync(() -> wrapper.task(executorService, wrapper, timeout, finalSupport), executorService)
+                    .exceptionally((ex) -> {
+                        boolean state = gobrsAsyncProperties.isTaskInterrupt() &&
+                                GobrsFlowState.compareAndSetState(finalSupport.getTaskFlowState(), WORKING, StateConstant.ERROR);
+                        throw asyncExceptionInterceptor.exception(ex, state);
+                    });
         }
         try {
             CompletableFuture.allOf(futures).get(timeout, TimeUnit.MILLISECONDS);
@@ -70,7 +85,13 @@ public class Async {
             }
             return buildResult(support);
         } finally {
+            support = null; // for gc
         }
+    }
+
+
+    private static boolean starting(GobrsAsyncSupport support) {
+        return support.getTaskFlowState().compareAndSet(INIT, WORKING);
     }
 
     private static AsyncResult buildResult(GobrsAsyncSupport support) {
@@ -84,7 +105,7 @@ public class Async {
     /**
      * 如果想自定义线程池，请传pool。不自定义的话，就走默认的COMMON_POOL
      */
-    public static AsyncResult startTaskFlow(long timeout, ThreadPoolTaskExecutor executorService, Map<String, Object> parameters, TaskWrapper... workerWrapper) throws ExecutionException, InterruptedException {
+    public static AsyncResult startTaskFlow(long timeout, ThreadPoolExecutor executorService, Map<String, Object> parameters, TaskWrapper... workerWrapper) throws ExecutionException, InterruptedException {
         if (workerWrapper == null || workerWrapper.length == 0) {
             return null;
         }
@@ -111,7 +132,7 @@ public class Async {
     /**
      * 异步执行,直到所有都完成,或失败后，发起回调
      */
-    public static void startTaskFlowAsync(long timeout, ThreadPoolTaskExecutor executorService, IGroupCallback groupCallback, Map<String, Object> params, TaskWrapper... workerWrapper) {
+    public static void startTaskFlowAsync(long timeout, ThreadPoolExecutor executorService, IGroupCallback groupCallback, Map<String, Object> params, TaskWrapper... workerWrapper) {
         if (groupCallback == null) {
             groupCallback = new DefaultGroupCallback();
         }
@@ -174,17 +195,11 @@ public class Async {
     /**
      * 关闭线程池
      */
-    public static void shutDown(ThreadPoolTaskExecutor executorService) {
+    public static void shutDown(ThreadPoolExecutor executorService) {
         if (executorService != null) {
             executorService.shutdown();
         } else {
             COMMON_POOL.shutdown();
         }
-    }
-
-    public static String getThreadCount() {
-        return "getPoolSize=" + COMMON_POOL.getPoolSize() +
-                "  getCorePoolSize " + COMMON_POOL.getCorePoolSize() +
-                "  getMaxPoolSize " + COMMON_POOL.getMaxPoolSize();
     }
 }

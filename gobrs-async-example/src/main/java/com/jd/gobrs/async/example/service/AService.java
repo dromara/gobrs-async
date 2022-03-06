@@ -24,7 +24,7 @@ public class AService implements AsyncTask<DataContext, DataContext>, ParaExecto
     @Override
     public void result(boolean success, DataContext param, TaskResult<DataContext> workResult) {
         if (success) {
-//            System.out.println("AService 成功");
+            System.out.println("AService 成功");
         } else {
             System.out.println("AService 失败");
         }
@@ -33,11 +33,14 @@ public class AService implements AsyncTask<DataContext, DataContext>, ParaExecto
     @Override
     public DataContext task(DataContext params, GobrsAsyncSupport support) {
         try {
+//            System.out.println(1/0);
             Thread.sleep(1000);
+            System.out.println("AService 执行完了");
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        byte[] result  = new byte[1024*1024*10];
+        byte[] result  = new byte[1024*1024];
         Map h = new HashMap();
         h.put("result", result);
         params.setResult(h);

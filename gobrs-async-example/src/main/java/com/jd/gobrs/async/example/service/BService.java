@@ -6,6 +6,7 @@ import com.jd.gobrs.async.example.executor.SerExector;
 import com.jd.gobrs.async.gobrs.GobrsAsyncSupport;
 import com.jd.gobrs.async.task.AsyncTask;
 import com.jd.gobrs.async.task.TaskResult;
+import jdk.nashorn.internal.ir.debug.ObjectSizeCalculator;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -27,7 +28,7 @@ public class BService implements AsyncTask<DataContext, Map>, SerExector {
         if (success) {
 //            System.out.println(JSONObject.toJSONString(workResult.getResult()));
 
-//            System.out.println("BService 成功");
+            System.out.println("BService 成功");
         } else {
             System.out.println("BService 失败");
         }
@@ -36,7 +37,6 @@ public class BService implements AsyncTask<DataContext, Map>, SerExector {
     @Override
     public Map task(DataContext params, GobrsAsyncSupport support) {
         try {
-
             Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
