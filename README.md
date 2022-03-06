@@ -1,7 +1,3 @@
----
-title: 简介 date: 2021-05-11 13:59:38 permalink: /pages/52d5c3 article: false
----
-
 ## 本框架是什么
 
 **Gobrs-Async** 是一款功能强大、配置灵活、带有全链路异常回调、内存优化、异常状态管理于一身的高性能异步编排框架。为企业提供在复杂应用场景下动态任务编排的能力。
@@ -114,37 +110,6 @@ asyncTool 本身已经功能很强大了，本人与asyncTool 作者 都是在�
 
 5 其他有顺序编排的需求。
 
-<br/>
-> 摘自 [京东零售 asyncTool](https://gitee.com/jd-platform-opensource/asyncTool "京东零售技术asyncTool")
-
-
-::: tip 应运而生 针对当前需求。Gobrs-Async 应运而生
-:::
-
-::: cardList
-
-```yaml
-- name: 技术小屋
-  desc: 大道至简，知易行难
-  avatar: https://cdn.jsdelivr.net/gh/xugaoyi/image_store/blog/20200122153807.jpg # 可选
-  link: https://docs.sizegang.cn/ # 可选
-  bgColor: '#CBEAFA' # 可选，默认var(--bodyBg)。颜色值有#号时请添加单引号
-  textColor: '#6854A1' # 可选，默认var(--textColor)
-- name: 架构师必经之路
-  desc: '精品学习资源'
-  avatar: https://cdn.jsdelivr.net/gh/xaoxuu/assets@master/avatar/avatar.png
-  link: https://learn.sizegang.cn
-  bgColor: '#718971'
-  textColor: '#fff'
-- name: 平凡的你我
-  desc: 快乐购物，享受生活
-  avatar: https://reinness.com/avatar.png
-  link: https://m.jd.com
-  bgColor: '#FCDBA0'
-  textColor: '#A05F2C'
-```
-
-:::
 
 ## 它有什么特性
 
@@ -155,3 +120,228 @@ Gobrs-Async 项目目录及其精简
 
 - `gobrs-async-example`：Gobrs-Async 接入实例，提供测试用例。
 - `gobrs-async-starter`：Gobrs-Async 框架核心组件
+
+
+
+
+## 准备条件
+
+所需运行环境
+
+* **Maven**
+* **JDK1.8**
+* **Spring**
+
+
+## Gobrs-Async 配置
+
+### Maven依赖
+
+```xml
+
+<dependency>
+    <groupId>io.github.memorydoc</groupId>
+    <artifactId>gobrs-async-starter</artifactId>
+    <version>1.0.9-RELEASE</version>
+</dependency>
+```
+
+### 配置 application.yml
+
+```yaml
+server:
+  port: 8888
+spring:
+  gobrs:
+    async:
+      rules: '[{name: "test", content: "AService->BService,CService,GService,DService, FService:not;EService->FService"}]'
+      #      rules: '[{name: "test", content: "BService->CService->EService->DService:not;AService->DService:not"}]'
+      task-interrupt: true #局部异常是否打断主流程
+```
+
+## 使用任务触发器
+
+```java 
+@Resource
+private GobrsTaskFlow taskFlow;
+```
+
+## 启动任务流程
+
+```java 
+// 一行代码即可启动任务流程
+// 任务流名称 , 任务流参数, 任务超时时间
+Map<String, Object> params  = new HashMap();
+AsyncResult asyncResult = taskFlow.taskFlow("test", params, 100000);
+```
+
+
+任务流程的params参数 有两种参数形式。
+### 参数类型一
+如果任务流程中所有任务 都是用同一个参数进行传递传递， 则params 直接传入公用的同一个参数即可
+```java 
+User user = new User();
+AsyncResult asyncResult = taskFlow.taskFlow("test", user, 100000);
+```
+
+
+### 参数类型二
+如果任务流程中不同任务使用不同的参数。则参数需要传递Map类型， Map的key 为 任务bean 名称， 值为所需要传递的参数值。
+
+```java 
+User user = new User();
+Fruit fruit = new Fruit();
+
+Map<String,Object> params = new HashMap();
+params.put("A", user);
+params.put("B", fruit);
+
+AsyncResult asyncResult = taskFlow.taskFlow("test", params, 100000);
+```
+
+## 规则组成
+
+## 规则名称
+
+规则对象又两部分组成：
+* （1）规则名称
+* （2）规则内容
+
+**规则名称** 约定规则的唯一标识符： 在任务触发器开发触发任务的时候需要传递。
+
+## 规则内容
+
+**规则内容** 则是规则引擎解析的核心内容，根据任务执行流程不同，任务规则配置也会不同，但是不会很复杂，详细配置流程分为一下几种场景。
+## 规则示例
+
+### 情景一
+
+如图1-1
+
+![情景一](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/type1.png)
+
+**说明**
+任务A 执行完了之后，继续执行 B、C、D
+
+**配置**
+```yaml
+spring:
+  gobrs:
+    async:
+      rules: '[{name: "test", content: "A->B,C,D"}]'
+
+```
+
+
+### 情景二
+
+如图1-2
+
+![情景二](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/type2.png)
+
+**说明**
+任务A 执行完了之后执行B 然后再执行 C、D
+
+**配置**
+```yaml
+spring:
+  gobrs:
+    async:
+      rules: '[{name: "test", content: "A->B->C,D"}]'
+
+```
+
+
+### 情景三
+
+如图1-3
+
+![情景二](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/type3.png)
+
+**说明**
+任务A 执行完了之后执行B、E 然后按照顺序 B的流程走C、D、G。 E的流程走F、G
+
+**配置**
+```yaml
+spring:
+  gobrs:
+    async:
+      rules: '[{name: "test", content: "A->B->C->D->G;A->E->F->G"}]'
+
+```
+
+
+### 情景四
+
+如图1-4
+
+![情景二](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/type4.png)
+
+**说明**
+任务A 执行完了之后执行B、C、D。 E执行完之后执行D
+
+:::warning 爱心提示
+看上图的任务流程，两条执行流程都会执行D， 此时D任务可以选择依赖上一任务或者不依赖
+如果不依赖 则只需在 任务后面加上 <code>:not</code>
+如下
+:::
+
+
+
+**配置**
+```yaml
+spring:
+  gobrs:
+    async:
+      # D 不依赖C的返回 如果E先返回结果 并执行了D 那么C执行完任务之后 不会再次执行D
+      rules: '[{name: "test", content: "A->B->C->D:not->G;A->E->D"}]'
+      #D 谁都不依赖 谁先返回 谁先执行 
+      #rules: '[{name: "test", content: "A->B->C->D:not->G;A->E->D:not"}]'
+```
+
+
+
+
+### 情景五
+
+如图1-5
+
+![情景二](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/type5.png)
+
+**说明**
+这种任务流程 Gobrs-Async 也能轻松支持
+
+**配置**
+```yaml
+spring:
+  gobrs:
+    async:
+      rules: '[{name: "test", content: "A->B->C,D,E;A->H->I,J,K"}]'
+
+```
+
+### 情景五
+
+如图1-6
+
+![情景二](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/type6.png)
+
+**说明**
+A、B、C 执行完之后再执行D
+
+**配置**
+```yaml
+spring:
+  gobrs:
+    async:
+      rules: '[{name: "test", content: "A->D;B->D;C->D"}]'
+
+```
+
+## 规则总结
+
+规则配置跟流程图几乎非常相近。
+* 在任务分叉时 使用 <code>,</code> 区分不同任务。
+* 在任务流程发起时 用<code>-></code> 区分任务流。
+* 每个任务流结束后 用<code>;</code> 进行结束配置。
+* 当前任务不依赖上游 用<code>:not</code> 进行配置。

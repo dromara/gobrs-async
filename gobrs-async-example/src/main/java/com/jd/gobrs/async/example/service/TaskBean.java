@@ -42,6 +42,7 @@ public class TaskBean implements AsyncTask<String, Map> {
      */
     @Override
     public Map task(String params, GobrsAsyncSupport support) {
+        Map result = getResult(support, AService.class, Map.class);
         return null;
     }
 
