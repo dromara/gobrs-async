@@ -42,8 +42,6 @@ public class GobrsService {
     @Autowired
     private EService eService;
 
-    @Resource
-    List<SerExector> serExectors;
 
     @Autowired
     private ThreadPoolTaskExecutor gobrsThreadPoolExecutor;
@@ -59,9 +57,6 @@ public class GobrsService {
             e.printStackTrace();
             System.out.println("异常 " + e);
         }
-//        System.out.println(asyncResult.getExpCode());
-//        Map<String, Object> data = asyncResult.getData();
-//        System.out.println(JSONObject.toJSONString(data));
     }
 
 
@@ -71,6 +66,8 @@ public class GobrsService {
     @Resource
     List<ParaExector> paraExectors;
 
+    @Resource
+    List<SerExector> serExectors;
 
     public void testFuture(HttpServletRequest httpServletRequest) {
         DataContext dataContext = new DataContext();
