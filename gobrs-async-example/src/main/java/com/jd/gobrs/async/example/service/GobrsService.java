@@ -51,13 +51,6 @@ public class GobrsService {
         DataContext dataContext = new DataContext();
         dataContext.setHttpServletRequest(httpServletRequest);
         AsyncResult asyncResult = taskFlow.taskFlow("test", dataContext, 100000);
-
-        if(asyncResult.getExpCode().equals(100)){
-            // 业务一
-        }else if(asyncResult.getExpCode().equals(200)){
-            // 业务二
-        }
-
     }
 
 

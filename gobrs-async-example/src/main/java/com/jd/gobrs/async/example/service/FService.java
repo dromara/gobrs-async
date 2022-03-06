@@ -23,7 +23,7 @@ public class FService implements AsyncTask<DataContext, Map>, SerExector {
     @Override
     public void callback(boolean success, DataContext param, TaskResult<Map> workResult) {
         if (success) {
-            System.out.println("FService 成功");
+//            System.out.println("FService 成功");
         } else {
             System.out.println("FService 失败");
         }
@@ -32,8 +32,8 @@ public class FService implements AsyncTask<DataContext, Map>, SerExector {
     @Override
     public Map task(DataContext params, GobrsAsyncSupport support) {
         try {
-            DataContext result = getResult(support, EService.class, DataContext.class);
-            System.out.println(JSONObject.toJSONString(result.getResult()));
+//            DataContext result = getResult(support, EService.class, DataContext.class);
+//            System.out.println(JSONObject.toJSONString(result.getResult()));
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();

@@ -26,7 +26,7 @@ public class BService implements AsyncTask<DataContext, Map>, SerExector {
     @Override
     public void callback(boolean success, DataContext param, TaskResult<Map> workResult) {
         if (success) {
-            System.out.println("BService 成功");
+//            System.out.println("BService 成功");
         } else {
             System.out.println("BService 失败");
         }
