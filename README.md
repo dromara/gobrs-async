@@ -65,6 +65,11 @@
 以上事例中，Product数据是通过RPC 方式获取， Item是通过HTTP服务获取，大家都知道， RPC性能要高于HTTP性能。 但是通过Future 的方式， get会阻塞等待 Item数据返回后才会往下执行。 这样的话，
 图书音像、装修数据、限购数据等都要等待Item数据返回，但是这些中台并不依赖Item返回的数据， 所以会产生等待时间影响系统整体QPS。
 
+
+
+
+
+
 ## 业界对比
 
 在开源平台找了挺多任务异步编排框架，发现都不是很理想，唯一一款现阶段比较好用的异步编排框架就数asyncTool比较好用。但是在使用时发现，API不是很好用。而且需要频繁的创建 <code>WorkerWrapper</code> 对象
@@ -120,6 +125,37 @@ Gobrs-Async 项目目录及其精简
 
 - `gobrs-async-example`：Gobrs-Async 接入实例，提供测试用例。
 - `gobrs-async-starter`：Gobrs-Async 框架核心组件
+
+
+> Gobrs-Async 在设计时，就充分考虑了开发者的使用习惯， 没有依赖任何中间件。 只是对 <code>CompletableFuture</code> 做了良好的封装。
+填补了 <code>CompletableFuture</code> 在异常捕获中和API使用中的不足。
+
+
+
+## 任务触发器
+
+任务流的启动者， 负责启动任务执行流
+
+## 规则解析引擎
+
+负责解析使用者配置的规则，同时于Spring结合，将配置的 <code>Spring Bean</code> 解析成 <code>TaskBean</code>，进而通过解析引擎加载成 任务装饰器。进而组装成任务树
+
+
+## 任务启动器
+
+
+负责通过使用解析引擎解析的任务树。结合 <code>CompletableFuture</code> 发起任务调用
+
+## 任务装饰器
+
+对使用者所开发的SpringBean 包装修饰。 间接调用使用这开发的功能方法，通过状态管理（借鉴AQS）实现对任务的状态和任务流的状态进行管理。
+
+## 架构图
+
+<br/>
+
+![1.0](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/1231646558079_.pic_hd.jpg)
+
 
 
 [快速实战](https://async.sizegang.cn)
