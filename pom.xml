@@ -5,7 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.memorydoc</groupId>
     <artifactId>gobrs-async</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.9-RELEASE</version>
+    <packaging>pom</packaging>
 
 
     <modules>
