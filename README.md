@@ -157,8 +157,7 @@ Gobrs-Async 在设计时，就充分考虑了开发者的使用习惯， 没有�
 
 <br/>
 
-![1.0](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/1231646558079_.pic_hd.jpg)
-
+![1.0](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/1431646633075_.pic_hd.jpg)
 
 
 [快速实战](https://async.sizegang.cn)
