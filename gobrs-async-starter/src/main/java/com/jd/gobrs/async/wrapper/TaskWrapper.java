@@ -229,7 +229,6 @@ public class TaskWrapper<T, V> {
     private void doDependsJobs(ThreadPoolExecutor executorService, List<DependWrapper> dependWrappers, TaskWrapper fromWrapper,
                                long now, long remainTime, GobrsAsyncSupport support) {
         boolean nowDependIsMust = false;
-        Map params = support.getParams();
         Map<String, TaskResult<V>> resultMap = support.getWorkResult();
         //创建必须完成的上游wrapper集合
         Set<DependWrapper> mustWrapper = new HashSet<>();
@@ -241,7 +240,6 @@ public class TaskWrapper<T, V> {
                 nowDependIsMust = dependWrapper.isMust();
             }
         }
-
 
         //如果全部是不必须的条件，那么只要到了这里，就执行自己。
         if (mustWrapper.size() == 0) {
@@ -265,7 +263,6 @@ public class TaskWrapper<T, V> {
         //先判断前面必须要执行的依赖任务的执行结果，如果有任何一个失败，那就不用走doTask了，直接给自己设置为失败，进行下一步就是了
         for (DependWrapper dependWrapper : mustWrapper) {
             TaskWrapper workerWrapper = dependWrapper.getDependWrapper();
-
 
             TaskResult tempWorkResult = resultMap.get(workerWrapper.id);
             //为null或者isWorking，说明它依赖的某个任务还没执行到或没执行完

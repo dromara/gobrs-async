@@ -1,11 +1,7 @@
 package com.jd.gobrs.async.threadpool;
 
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @program: gobrs-async
@@ -16,7 +12,6 @@ import java.util.concurrent.TimeUnit;
  * @Version 1.0
  **/
 public class GobrsAsyncThreadPoolFactory {
-
 
 
     private static final ThreadPoolExecutor COMMON_POOL = (ThreadPoolExecutor) Executors.newCachedThreadPool();

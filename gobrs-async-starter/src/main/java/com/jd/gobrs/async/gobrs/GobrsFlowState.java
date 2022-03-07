@@ -24,30 +24,4 @@ public class GobrsFlowState {
         return taskFlowState.get() == expect;
     }
 
-    public static class GobrsState {
-        public GobrsState(Integer state) {
-            this.state = state;
-        }
-
-        private int state;
-        private int expCode;
-
-        public Integer getState() {
-            return state;
-        }
-
-        public void setState(Integer state) {
-            this.state = state;
-        }
-
-        public int getExpCode() {
-            return expCode;
-        }
-
-        public void setExpCode(int expCode) {
-            this.expCode = expCode;
-        }
-    }
-
-
 }

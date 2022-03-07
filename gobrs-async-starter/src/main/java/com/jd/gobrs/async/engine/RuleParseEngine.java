@@ -137,14 +137,6 @@ public class RuleParseEngine<T> extends AbstractEngine {
         public static Object getBean(String bean) {
             return Optional.ofNullable(GobrsSpring.getBean(bean)).orElseThrow(() -> new RuntimeException("bean not found"));
         }
-
-//        public static void setParams(TaskWrapper taskWrapper, Map<String, Object> paramMap) {
-//            if (paramMap.size() == 1 && paramMap.containsKey(DEFAULT_PARAMS)) {
-//                taskWrapper.setParam(paramMap.get(DEFAULT_PARAMS));
-//            } else {
-//                taskWrapper.setParam(paramMap.get(taskWrapper.getId()));
-//            }
-//        }
     }
 
 }
