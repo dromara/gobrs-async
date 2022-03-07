@@ -127,9 +127,12 @@ Gobrs-Async 项目目录及其精简
 - `gobrs-async-starter`：Gobrs-Async 框架核心组件
 
 
-> Gobrs-Async 在设计时，就充分考虑了开发者的使用习惯， 没有依赖任何中间件。 只是对 <code>CompletableFuture</code> 做了良好的封装。
-填补了 <code>CompletableFuture</code> 在异常捕获中和API使用中的不足。
 
+
+# 架构设计
+
+Gobrs-Async 在设计时，就充分考虑了开发者的使用习惯， 没有依赖任何中间件。 只是对 <code>CompletableFuture</code> 做了良好的封装。
+填补了 <code>CompletableFuture</code> 在异常捕获中和API使用中的不足
 
 
 ## 任务触发器
