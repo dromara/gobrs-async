@@ -141,6 +141,7 @@ public class TaskWrapper<T, V> {
          一种是前面只有一个wrapper。即 A  ->  B
         一种是前面有多个wrapper。A C D ->   B。需要A、C、D都完成了才能轮到B。但是无论是A执行完，还是C执行完，都会去唤醒B。
         所以需要B来做判断，必须A、C、D都完成，自己才能执行 */
+
         //只有一个依赖
         if (dependWrappers.size() == 1) {
             doDependsOneJob(fromWrapper, support);
