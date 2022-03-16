@@ -1,5 +1,6 @@
 package com.jd.gobrs.async.example.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jd.gobrs.async.example.DataContext;
 import com.jd.gobrs.async.example.executor.SerExector;
 import com.jd.gobrs.async.gobrs.GobrsAsyncSupport;
@@ -7,6 +8,7 @@ import com.jd.gobrs.async.task.AsyncTask;
 import com.jd.gobrs.async.task.TaskResult;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,7 +24,7 @@ public class GService implements AsyncTask<DataContext, Map>, SerExector {
     @Override
     public void callback(boolean success, DataContext param, TaskResult<Map> workResult) {
         if (success) {
-            System.out.println("GService 成功");
+            System.out.println("GService 成功" + JSONObject.toJSONString(workResult.getResult().get("result")));
         } else {
             System.out.println("GService 失败");
         }
@@ -35,7 +37,9 @@ public class GService implements AsyncTask<DataContext, Map>, SerExector {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return null;
+        HashMap hashMap = new HashMap();
+        hashMap.put("result", "我是FService的结果");
+        return hashMap;
     }
     @Override
     public boolean nessary(DataContext params, GobrsAsyncSupport support) {

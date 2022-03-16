@@ -1,5 +1,6 @@
 package com.jd.gobrs.async.example.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jd.gobrs.async.example.DataContext;
 import com.jd.gobrs.async.example.executor.ParaExector;
 import com.jd.gobrs.async.gobrs.GobrsAsyncSupport;
@@ -19,19 +20,19 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class EService implements AsyncTask<DataContext, DataContext>, ParaExector {
+public class EService implements AsyncTask<DataContext, Map>, ParaExector {
 
     @Override
-    public void callback(boolean success, DataContext param, TaskResult<DataContext> workResult) {
+    public void callback(boolean success, DataContext param, TaskResult<Map> workResult) {
         if (success) {
-//            System.out.println("EService 成功");
+            System.out.println("EService 成功" + JSONObject.toJSONString(workResult.getResult().get("result")));
         } else {
             System.out.println("EService 失败");
         }
     }
 
     @Override
-    public DataContext task(DataContext params, GobrsAsyncSupport support) {
+    public Map task(DataContext params, GobrsAsyncSupport support) {
         try {
 //            System.out.println(1/0);
             Thread.sleep(500);
@@ -42,9 +43,8 @@ public class EService implements AsyncTask<DataContext, DataContext>, ParaExecto
         }
 //        byte[] result = new byte[1024 * 1024];
         Map h = new HashMap();
-        h.put("result", "我是EService 的 结果 恭喜你拿到");
-        params.setResult(h);
-        return params;
+        h.put("result", "我是EService的结果");
+        return h;
     }
 
     @Override

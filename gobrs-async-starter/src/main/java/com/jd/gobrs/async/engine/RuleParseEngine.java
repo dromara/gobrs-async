@@ -81,9 +81,9 @@ public class RuleParseEngine<T> extends AbstractEngine {
     }
 
     @Override
-    public AsyncResult exec(String ruleName, Supplier<Map<String, Object>> supplier, long timeout)  {
+    public AsyncResult exec(String ruleName, Supplier<Map<String, Object>> supplier, long timeout) {
         return AsyncStarter.startTaskFlow(timeout,
-                taskRuleMap.get(ruleName).values().parallelStream().collect(Collectors.toList()), supplier.get());
+                taskRuleMap.get(ruleName), supplier.get());
     }
 
     public Rule getRule(String key) {

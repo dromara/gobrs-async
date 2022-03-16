@@ -6,6 +6,7 @@ import com.jd.gobrs.async.rule.Rule;
 import com.jd.gobrs.async.wrapper.TaskWrapper;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.jd.gobrs.async.gobrs.GobrsAsyncStore.taskRuleMap;
 import static com.jd.gobrs.async.gobrs.GobrsAsyncStore.ruleMap;
@@ -29,7 +30,9 @@ public abstract class AbstractEngine implements RuleEngine {
             List<Rule> rules = JSONArray.parseArray(ru, Rule.class);
             for (Rule r : rules) {
                 ruleMap.put(r.getName(), r);
-                taskRuleMap.put(r.getName(), doParse(r, Collections.emptyMap()));
+                Map<String, TaskWrapper> wrapperMap = doParse(r, Collections.emptyMap());
+                List<TaskWrapper> taskWrapperList = wrapperMap.values().parallelStream().collect(Collectors.toList());
+                taskRuleMap.put(r.getName(), taskWrapperList);
             }
             return listMap;
         }).orElse(Collections.emptyMap());

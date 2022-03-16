@@ -20,18 +20,18 @@ import java.util.Map;
  * @Version 1.0
  **/
 @Service
-public class AService implements AsyncTask<DataContext, DataContext>, ParaExector {
+public class AService implements AsyncTask<DataContext, Map>, ParaExector {
     @Override
-    public void callback(boolean success, DataContext param, TaskResult<DataContext> workResult) {
+    public void callback(boolean success, DataContext param, TaskResult<Map> workResult) {
         if (success) {
-//            System.out.println("AService 成功");
+            System.out.println("AService 成功" + JSONObject.toJSONString(workResult.getResult().get("result")));
         } else {
             System.out.println("AService 失败");
         }
     }
 
     @Override
-    public DataContext task(DataContext params, GobrsAsyncSupport support) {
+    public Map task(DataContext params, GobrsAsyncSupport support) {
         try {
             Thread.sleep(1000);
 //            System.out.println("AService 执行完了");
@@ -41,9 +41,9 @@ public class AService implements AsyncTask<DataContext, DataContext>, ParaExecto
         }
 //        byte[] result  = new byte[1024*1024];
         Map h = new HashMap();
+        h.put("key", "我是AService 的结果");
         h.put("result", h);
-        params.setResult(h);
-        return params;
+        return h;
     }
 
     @Override

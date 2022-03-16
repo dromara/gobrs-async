@@ -57,18 +57,17 @@ public class AsyncStarter {
         }
         GobrsAsyncSupport.SupportBuilder builder = GobrsAsyncSupport.builder();
         GobrsAsyncSupport support = builder.params(params).build();
-        //保存线程池变量
+        //Save thread pool variables
         AsyncStarter.executorService = executorService;
         CompletableFuture[] futures = new CompletableFuture[taskWrappers.size()];
-        // 开启任务流
+        // Start task Flow
         starting(support);
         for (int i = 0; i < taskWrappers.size(); i++) {
             TaskWrapper wrapper = taskWrappers.get(i);
-            GobrsAsyncSupport finalSupport = support;
-            futures[i] = CompletableFuture.runAsync(() -> wrapper.task(executorService, wrapper, timeout, finalSupport), executorService)
+            futures[i] = CompletableFuture.runAsync(() -> wrapper.task(executorService, wrapper, timeout, support), executorService)
                     .exceptionally((ex) -> {
                         boolean state = gobrsAsyncProperties.isTaskInterrupt() &&
-                                GobrsFlowState.compareAndSetState(finalSupport.getTaskFlowState(), WORKING, StateConstant.ERROR);
+                                GobrsFlowState.compareAndSetState(support.getTaskFlowState(), WORKING, StateConstant.ERROR);
                         throw asyncExceptionInterceptor.exception(ex, state);
                     });
         }
@@ -82,8 +81,6 @@ public class AsyncStarter {
                 wrapper.stopNow(support);
             }
             return buildResult(support, e);
-        } finally {
-            support = null; // for gc
         }
     }
 

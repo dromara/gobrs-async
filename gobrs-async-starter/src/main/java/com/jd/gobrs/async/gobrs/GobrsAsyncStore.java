@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GobrsAsyncStore {
     public static  Map<String, Rule> ruleMap = new ConcurrentHashMap<>();
 
-    public static Map<String, Map<String, TaskWrapper>> taskRuleMap = new ConcurrentHashMap<>();
+    public static Map<String, List<TaskWrapper>> taskRuleMap = new ConcurrentHashMap<>();
 
     public static Map<String, List<String>> cacheDepends = new ConcurrentHashMap<>();
 

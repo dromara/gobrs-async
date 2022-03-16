@@ -26,7 +26,7 @@ public class BService implements AsyncTask<DataContext, Map>, SerExector {
     @Override
     public void callback(boolean success, DataContext param, TaskResult<Map> workResult) {
         if (success) {
-//            System.out.println("BService 成功");
+            System.out.println("BService 成功" + JSONObject.toJSONString(workResult.getResult().get("result")));
         } else {
             System.out.println("BService 失败");
         }
@@ -35,13 +35,16 @@ public class BService implements AsyncTask<DataContext, Map>, SerExector {
     @Override
     public Map task(DataContext params, GobrsAsyncSupport support) {
         try {
+            Map result = getResult(support, AService.class, Map.class);
+            System.out.println("准备拿AService结果" + JSONObject.toJSONString(result.get("result")));
+
             Thread.sleep(500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         HashMap hashMap = new HashMap();
-        hashMap.put("result", "我是B的结果");
-        return null;
+        hashMap.put("result", "我是BService的结果");
+        return hashMap;
     }
 
     @Override
