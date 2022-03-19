@@ -29,25 +29,21 @@ class TaskTrigger {
 
     private void prepare() {
 
-        /**
-         * Copy depended event handler map from script map to avoid aside effect
-         * to Script.
-         */
-        Map<AsyncTask, List<AsyncTask>> dependTasks = copyDependTasks(taskBus.getdenpendedEventHandlers());
-        /**
-         * Compute depending event handler map. We can compute only depending
-         * count, but that is not the key to the performance.
-         */
+
+        Map<AsyncTask, List<AsyncTask>> dependTasks = copyDependTasks(taskBus.getDependsTasks());
+
         Map<AsyncTask, List<AsyncTask>> excessiveTaskMap = new HashMap<>();
 
         for (AsyncTask task : dependTasks.keySet()) {
             excessiveTaskMap.put(task, new ArrayList<>(1));
         }
+
         for (AsyncTask task : dependTasks.keySet()) {
             for (AsyncTask depended : dependTasks.get(task)) {
                 excessiveTaskMap.get(depended).add(task);
             }
         }
+
 
         Starter starter = new Starter();
         List<AsyncTask> endDependTask = new ArrayList<>(1);
@@ -84,23 +80,25 @@ class TaskTrigger {
         return rt;
     }
 
-    TaskLoader build(AsyncParam param, long timeout) {
-        return build(param, timeout, null);
+    TaskLoader trigger(AsyncParam param, long timeout) {
+        return trigger(param, timeout, null);
     }
 
-    TaskLoader build(AsyncParam param, long timeout, Callback callback) {
+    TaskLoader trigger(AsyncParam param, long timeout, Callback callback) {
         /**
          * clone Process
          */
         IdentityHashMap<AsyncTask, TaskProcess> newProcessMap = new IdentityHashMap<>(prepareTaskMap.size());
-        TaskLoader runtime = new TaskLoader(param, executorService, newProcessMap, callback, timeout);
+        /**
+         * Assign one loader to each task
+         */
+        TaskLoader loader = new TaskLoader(param, executorService, newProcessMap, callback, timeout);
         for (AsyncTask task : prepareTaskMap.keySet()) {
-            TaskProcess newProcess = (TaskProcess) prepareTaskMap
-                    .get(task).clone();
-            newProcess.init(runtime, param);
+            TaskProcess newProcess = (TaskProcess) prepareTaskMap.get(task).clone();
+            newProcess.init(loader, param);
             newProcessMap.put(task, newProcess);
         }
-        return runtime;
+        return loader;
     }
 
     /**

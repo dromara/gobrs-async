@@ -34,11 +34,11 @@ public class GobrsAsync {
     }
 
 
-    public TaskCluster begin(AsyncTask... tasks) {
+    public TaskBuilder begin(AsyncTask... tasks) {
         return taskBus.start(tasks);
     }
 
-    public TaskCluster after(AsyncTask... eventHandlers) {
+    public TaskBuilder after(AsyncTask... eventHandlers) {
         return taskBus.after(eventHandlers);
     }
 
@@ -46,7 +46,7 @@ public class GobrsAsync {
         if (!ready) {
             throw new IllegalStateException("sirector not started.");
         }
-        return trigger.build(param, timeout).run();
+        return trigger.trigger(param, timeout).run();
     }
 
     public AsyncResult start(AsyncParam param) {
@@ -60,7 +60,7 @@ public class GobrsAsync {
         if (callback == null) {
             throw new IllegalArgumentException("callback can not be null");
         }
-        return trigger.build(param, 0, callback).run();
+        return trigger.trigger(param, 0, callback).run();
     }
 
     public boolean isReady() {

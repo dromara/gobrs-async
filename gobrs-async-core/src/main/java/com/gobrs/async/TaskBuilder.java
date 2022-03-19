@@ -1,29 +1,27 @@
 package com.gobrs.async;
 
-/**
- * @program: gobrs-async-starter
- * @ClassName EventHandlerGroup
- * @description:
- * @author: sizegang
- * @create: 2022-03-16
- **/
-
 import com.gobrs.async.task.AsyncTask;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class TaskCluster {
+/**
+ * @program: gobrs-async-starter
+ * @ClassName
+ * @description:
+ * @author: sizegang
+ * @create: 2022-03-16
+ **/
+public class TaskBuilder {
 
     private final TaskBus taskBus;
-
     /**
      * cache taskList
      */
     private List<AsyncTask> cacheTaskList;
 
-    TaskCluster(TaskBus taskBus, List<AsyncTask> taskList) {
+    TaskBuilder(TaskBus taskBus, List<AsyncTask> taskList) {
         synchronized (taskBus) {
             if (taskBus.isReady()) {
                 throw new IllegalStateException("taskBus is ready, cannot be edit any more.");
@@ -40,7 +38,7 @@ public class TaskCluster {
         }
     }
 
-    public TaskCluster then(AsyncTask... eventHandlers) {
+    public TaskBuilder then(AsyncTask... eventHandlers) {
         synchronized (taskBus) {
             if (taskBus.isReady()) {
                 throw new IllegalStateException(

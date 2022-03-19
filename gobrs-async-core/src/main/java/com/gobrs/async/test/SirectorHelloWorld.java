@@ -4,6 +4,7 @@ import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.task.AsyncTask;
 import com.gobrs.async.Callback;
 import com.gobrs.async.GobrsAsync;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -22,8 +23,8 @@ public class SirectorHelloWorld {
     public static ExecutorService executorService = Executors.newCachedThreadPool();
 
     public static void main(String[] args) {
-        GobrsAsync gobrsAsync = new GobrsAsync(
-                executorService);
+
+        GobrsAsync gobrsAsync = new GobrsAsync(executorService);
 
         //准备事件处理器实例和回调实例
         HelloWorldEventHandler onceHandler = new HelloWorldEventHandler(1);
@@ -33,15 +34,15 @@ public class SirectorHelloWorld {
         Callback<HelloWorldEvent> alertCallback = new AlertCallback();
 
         //编排事件处理器
-        gobrsAsync.begin(onceHandler).then(twiceHandler);
-        gobrsAsync.after(onceHandler).then(threeTimesHandler);
-        gobrsAsync.after(twiceHandler, threeTimesHandler).then(fourTimesHandler);
+        gobrsAsync.begin(onceHandler).then(threeTimesHandler);
+        gobrsAsync.after(threeTimesHandler).then(twiceHandler);
+        gobrsAsync.after(twiceHandler).then(fourTimesHandler);
         gobrsAsync.ready();
 
         //同步发布事件
-        gobrsAsync.start(()->new Object());
+        gobrsAsync.start(() -> new Object(), 100);
         //异步发布事件
-        gobrsAsync.start(() -> new Object(), alertCallback);
+//        gobrsAsync.start(() -> new Object(), alertCallback);
     }
 
     static class HelloWorldEvent {
@@ -59,7 +60,7 @@ public class SirectorHelloWorld {
     }
 
     static class HelloWorldEventHandler implements
-            AsyncTask<HelloWorldEvent, Object> {
+            AsyncTask<Object, Object> {
 
         private final int times;
 
@@ -67,19 +68,22 @@ public class SirectorHelloWorld {
             this.times = times;
         }
 
+
         @Override
-        public Object task(HelloWorldEvent t) {
-            for (int i = 0; i < times; i++) {
-                t.increaseCallCount();
+        public Object task(Object o) {
+            if(true){
+                while (true){
+                    System.out.println(111);
+                }
             }
+            System.out.println(times);
             return null;
         }
 
         @Override
-        public boolean nessary(HelloWorldEvent helloWorldEvent) {
+        public boolean nessary(Object o) {
             return false;
         }
-
     }
 
     static class AlertCallback implements Callback<HelloWorldEvent> {
@@ -91,6 +95,7 @@ public class SirectorHelloWorld {
 
         @Override
         public void onSuccess(AsyncParam event) {
+
         }
 
     }

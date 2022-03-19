@@ -19,14 +19,14 @@ import java.util.Map;
 
 public class TaskBus {
 
-
     private boolean ready = false;
+
     /**
-     * denpende Task tree
+     * Task tree
      */
     private final IdentityHashMap<AsyncTask, List<AsyncTask>> denpendedTasks = new IdentityHashMap<>();
 
-    synchronized TaskCluster after(final AsyncTask... handlers) {
+    synchronized TaskBuilder after(final AsyncTask... handlers) {
         if (ready) {
             throw new IllegalStateException(
                     "script is ready, cannot be edit any more.");
@@ -40,7 +40,7 @@ public class TaskBus {
         return start(handlers);
     }
 
-    synchronized TaskCluster start(AsyncTask... asyncTasks) {
+    synchronized TaskBuilder start(AsyncTask... asyncTasks) {
         if (ready) {
             throw new IllegalStateException(
                     "script is ready, cannot be edit any more.");
@@ -48,11 +48,11 @@ public class TaskBus {
         /**
          * Building task groups
          */
-        TaskCluster cluster = new TaskCluster(this, Arrays.asList(asyncTasks));
-        return cluster;
+        TaskBuilder builder = new TaskBuilder(this, Arrays.asList(asyncTasks));
+        return builder;
     }
 
-    synchronized Map<AsyncTask, List<AsyncTask>> getdenpendedEventHandlers() {
+    synchronized Map<AsyncTask, List<AsyncTask>> getDependsTasks() {
         return denpendedTasks;
     }
 

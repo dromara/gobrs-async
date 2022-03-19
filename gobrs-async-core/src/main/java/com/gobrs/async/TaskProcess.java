@@ -23,7 +23,7 @@ class TaskProcess implements Runnable, Cloneable {
     /**
      * Tasks to be performed
      */
-    private final AsyncTask task;
+    public final AsyncTask task;
 
     private volatile int unsatisfiedDepdendings;
 
@@ -57,7 +57,7 @@ class TaskProcess implements Runnable, Cloneable {
     @Override
     public void run() {
         try {
-            task.task(param);
+            task.task(param.get());
             //Fix bug find by zhulixin@jd.com which would block processes already satisfy running conditions.
             if (dependedEventHandlers != null) {
                 List<TaskProcess> readyProcesses = new ArrayList<TaskProcess>(dependedEventHandlers.size());
@@ -110,4 +110,7 @@ class TaskProcess implements Runnable, Cloneable {
         }
     }
 
+    public AsyncTask getTask() {
+        return task;
+    }
 }

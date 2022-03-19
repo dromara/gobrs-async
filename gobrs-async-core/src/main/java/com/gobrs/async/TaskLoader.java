@@ -60,20 +60,18 @@ class TaskLoader {
         }
         this.timeout = timeout;
         if (this.timeout > 0) {
-            futures = new ArrayList<Future<?>>(1);
+            futures = new ArrayList<>(1);
         } else {
             futures = EmptyFutures;
         }
     }
 
     AsyncResult run() {
-        /*Find all process not depend on any other processes. It should be done before any process is started. Otherwise
-         * it may cause bug of 0.2.0-beta, executing some process more than once.
-         * */
         ArrayList<TaskProcess> processesWithNoDependencies = getProcessedWithNoDependencies();
         for (TaskProcess process : processesWithNoDependencies) {
             startProcess(process);
         }
+        // wait
         waitIfNecessary();
         return null;
     }
@@ -154,8 +152,6 @@ class TaskLoader {
     }
 
     void startProcess(TaskProcess process) {
-
-
         if (timeout > 0) {
             lock.lock();
             try {
