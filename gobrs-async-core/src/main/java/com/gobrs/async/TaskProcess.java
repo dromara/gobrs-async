@@ -8,28 +8,37 @@ package com.gobrs.async;
  * @create: 2022-03-16
  **/
 
+import com.gobrs.async.domain.AsyncParam;
+import com.gobrs.async.task.AsyncTask;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-class EventProcess<Event> implements Runnable, Cloneable {
+class TaskProcess implements Runnable, Cloneable {
 
-    protected ScriptRuntime<Event> runtime;
+    protected TaskLoader taskLoader;
 
-    private final EventHandler<Event> eventHandler;
+    /**
+     * Tasks to be performed
+     */
+    private final AsyncTask task;
 
     private volatile int unsatisfiedDepdendings;
 
-    private final List<EventHandler<Event>> dependedEventHandlers;
+    /**
+     * Dependent task
+     */
+    private final List<AsyncTask> dependedEventHandlers;
 
-    private Event event;
+    private AsyncParam param;
 
     private Lock lock;
 
-    EventProcess(EventHandler<Event> eventHandler, int depdending,
-                 List<EventHandler<Event>> dependedEventHandlers) {
-        this.eventHandler = eventHandler;
+    TaskProcess(AsyncTask eventHandler, int depdending,
+                List<AsyncTask> dependedEventHandlers) {
+        this.task = eventHandler;
         this.unsatisfiedDepdendings = depdending;
         this.dependedEventHandlers = dependedEventHandlers;
     }
@@ -37,22 +46,23 @@ class EventProcess<Event> implements Runnable, Cloneable {
     /**
      * Initialize the object cloned from prototype.
      *
-     * @param runtime
-     * @param t
+     * @param taskLoader
+     * @param param
      */
-    void init(ScriptRuntime<Event> runtime, Event t) {
-        this.runtime = runtime;
-        this.event = t;
+    void init(TaskLoader taskLoader, AsyncParam param) {
+        this.taskLoader = taskLoader;
+        this.param = param;
     }
 
+    @Override
     public void run() {
         try {
-            eventHandler.onEvent(event);
+            task.task(param);
             //Fix bug find by zhulixin@jd.com which would block processes already satisfy running conditions.
             if (dependedEventHandlers != null) {
-                List<EventProcess<Event>> readyProcesses = new ArrayList<EventProcess<Event>>(dependedEventHandlers.size());
+                List<TaskProcess> readyProcesses = new ArrayList<TaskProcess>(dependedEventHandlers.size());
                 for (int i = 0; i < dependedEventHandlers.size(); i++) {
-                    EventProcess<Event> process = runtime
+                    TaskProcess process = taskLoader
                             .getProcess(dependedEventHandlers.get(i));
                     if (process.decreaseUnsatisfiedDependcies() == 0) {
                         readyProcesses.add(process);
@@ -60,13 +70,13 @@ class EventProcess<Event> implements Runnable, Cloneable {
                 }
                 if (readyProcesses.size() > 0) {
                     for (int i = (readyProcesses.size() - 1); i > 0; i--) {
-                        runtime.startProcess(readyProcesses.get(i));
+                        taskLoader.startProcess(readyProcesses.get(i));
                     }
                     readyProcesses.get(0).run();
                 }
             }
         } catch (Exception e) {
-            runtime.markAsError(e);
+            taskLoader.markAsError(e);
         }
     }
 
@@ -88,10 +98,11 @@ class EventProcess<Event> implements Runnable, Cloneable {
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Object clone() {
         try {
-            EventProcess<Event> cloned = (EventProcess<Event>) super.clone();
+            TaskProcess cloned = (TaskProcess) super.clone();
             cloned.lock = new ReentrantLock();
             return cloned;
         } catch (Exception e) {

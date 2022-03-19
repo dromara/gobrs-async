@@ -1,9 +1,9 @@
 package com.gobrs.async.test;
 
+import com.gobrs.async.domain.AsyncParam;
+import com.gobrs.async.task.AsyncTask;
 import com.gobrs.async.Callback;
-import com.gobrs.async.EventHandler;
-import com.gobrs.async.Sirector;
-
+import com.gobrs.async.GobrsAsync;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -22,7 +22,7 @@ public class SirectorHelloWorld {
     public static ExecutorService executorService = Executors.newCachedThreadPool();
 
     public static void main(String[] args) {
-        Sirector<HelloWorldEvent> sirector = new Sirector<SirectorHelloWorld.HelloWorldEvent>(
+        GobrsAsync gobrsAsync = new GobrsAsync(
                 executorService);
 
         //准备事件处理器实例和回调实例
@@ -33,17 +33,15 @@ public class SirectorHelloWorld {
         Callback<HelloWorldEvent> alertCallback = new AlertCallback();
 
         //编排事件处理器
-        sirector.begin(onceHandler).then(twiceHandler);
-        sirector.after(onceHandler).then(threeTimesHandler);
-        sirector.after(twiceHandler, threeTimesHandler).then(fourTimesHandler);
-        sirector.ready();
+        gobrsAsync.begin(onceHandler).then(twiceHandler);
+        gobrsAsync.after(onceHandler).then(threeTimesHandler);
+        gobrsAsync.after(twiceHandler, threeTimesHandler).then(fourTimesHandler);
+        gobrsAsync.ready();
 
         //同步发布事件
-        HelloWorldEvent event = sirector.publish(new HelloWorldEvent());
-        System.out.println("hello world are called " + event.callCount
-                + " times");
+        gobrsAsync.start(()->new Object());
         //异步发布事件
-        sirector.publish(new HelloWorldEvent(), alertCallback);
+        gobrsAsync.start(() -> new Object(), alertCallback);
     }
 
     static class HelloWorldEvent {
@@ -61,7 +59,7 @@ public class SirectorHelloWorld {
     }
 
     static class HelloWorldEventHandler implements
-            EventHandler<HelloWorldEvent> {
+            AsyncTask<HelloWorldEvent, Object> {
 
         private final int times;
 
@@ -70,10 +68,16 @@ public class SirectorHelloWorld {
         }
 
         @Override
-        public void onEvent(HelloWorldEvent t) {
+        public Object task(HelloWorldEvent t) {
             for (int i = 0; i < times; i++) {
                 t.increaseCallCount();
             }
+            return null;
+        }
+
+        @Override
+        public boolean nessary(HelloWorldEvent helloWorldEvent) {
+            return false;
         }
 
     }
@@ -81,14 +85,12 @@ public class SirectorHelloWorld {
     static class AlertCallback implements Callback<HelloWorldEvent> {
 
         @Override
-        public void onError(HelloWorldEvent event, Throwable throwable) {
+        public void onError(AsyncParam event, Throwable throwable) {
             //处理异常
         }
 
         @Override
-        public void onSuccess(HelloWorldEvent event) {
-            System.out.println("hello world are called " + event.callCount
-                    + " times");
+        public void onSuccess(AsyncParam event) {
         }
 
     }

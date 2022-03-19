@@ -1,5 +1,9 @@
 package com.gobrs.async;
 
+import com.gobrs.async.domain.AsyncParam;
+import com.gobrs.async.domain.AsyncResult;
+import com.gobrs.async.task.AsyncTask;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -11,23 +15,23 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @program: gobrs-async-starter
- * @ClassName ScriptRuntime
+ * @ClassName
  * @description:
  * @author: sizegang
  * @create: 2022-03-16
  **/
 
-class ScriptRuntime<Event> {
+class TaskLoader {
 
-    private final Event t;
+    private final AsyncParam param;
 
     private final ExecutorService executorService;
 
     private final CountDownLatch completeLatch;
 
-    private final Map<EventHandler<Event>, EventProcess<Event>> processMap;
+    private final Map<AsyncTask, TaskProcess> processMap;
 
-    private final Callback<Event> callback;
+    private final Callback<AsyncTask> callback;
 
     private final long timeout;
 
@@ -42,10 +46,10 @@ class ScriptRuntime<Event> {
     private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<Future<?>>(
             0);
 
-    ScriptRuntime(Event t, ExecutorService executorService,
-                  Map<EventHandler<Event>, EventProcess<Event>> processMap,
-                  Callback<Event> callback, long timeout) {
-        this.t = t;
+    TaskLoader(AsyncParam param, ExecutorService executorService,
+               Map<AsyncTask, TaskProcess> processMap,
+               Callback<AsyncTask> callback, long timeout) {
+        this.param = param;
         this.executorService = executorService;
         this.processMap = processMap;
         this.callback = callback;
@@ -62,22 +66,21 @@ class ScriptRuntime<Event> {
         }
     }
 
-    Event run() {
-
+    AsyncResult run() {
         /*Find all process not depend on any other processes. It should be done before any process is started. Otherwise
          * it may cause bug of 0.2.0-beta, executing some process more than once.
          * */
-        ArrayList<EventProcess<Event>> processesWithNoDependencies = getProcessedWithNoDependencies();
-        for (EventProcess<Event> process : processesWithNoDependencies) {
+        ArrayList<TaskProcess> processesWithNoDependencies = getProcessedWithNoDependencies();
+        for (TaskProcess process : processesWithNoDependencies) {
             startProcess(process);
         }
         waitIfNecessary();
-        return t;
+        return null;
     }
 
-    private ArrayList<EventProcess<Event>> getProcessedWithNoDependencies() {
-        ArrayList<EventProcess<Event>> processesWithNoDependencies = new ArrayList<EventProcess<Event>>(1);
-        for (EventProcess<Event> process : processMap.values()) {
+    private ArrayList<TaskProcess> getProcessedWithNoDependencies() {
+        ArrayList<TaskProcess> processesWithNoDependencies = new ArrayList<TaskProcess>(1);
+        for (TaskProcess process : processMap.values()) {
             if (!process.hasUnsatisfiedDependcies()) {
                 processesWithNoDependencies.add(process);
             }
@@ -89,7 +92,7 @@ class ScriptRuntime<Event> {
         if (callback == null) {
             completeLatch.countDown();
         } else {
-            callback.onSuccess(t);
+            callback.onSuccess(param);
         }
     }
 
@@ -98,7 +101,7 @@ class ScriptRuntime<Event> {
             this.error = error;
             completeLatch.countDown();
         } else {
-            callback.onError(t, error);
+            callback.onError(param, error);
         }
     }
 
@@ -142,15 +145,17 @@ class ScriptRuntime<Event> {
         }
     }
 
-    Callback<Event> getCallback() {
+    Callback<AsyncTask> getCallback() {
         return callback;
     }
 
-    EventProcess<Event> getProcess(EventHandler<Event> eventHandler) {
+    TaskProcess getProcess(AsyncTask eventHandler) {
         return processMap.get(eventHandler);
     }
 
-    void startProcess(EventProcess<Event> process) {
+    void startProcess(TaskProcess process) {
+
+
         if (timeout > 0) {
             lock.lock();
             try {
