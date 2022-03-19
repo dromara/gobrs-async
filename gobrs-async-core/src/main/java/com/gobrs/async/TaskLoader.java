@@ -43,7 +43,7 @@ class TaskLoader {
 
     private final ArrayList<Future<?>> futures;
 
-    private TaskSupport taskSupport;
+    public TaskSupport taskSupport;
 
     private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<>(0);
 
@@ -80,7 +80,7 @@ class TaskLoader {
     }
 
     private ArrayList<TaskProcess> getBeginProcess() {
-        ArrayList<TaskProcess> beginsWith = new ArrayList<TaskProcess>(1);
+        ArrayList<TaskProcess> beginsWith = new ArrayList<>(1);
         for (TaskProcess process : processMap.values()) {
             if (!process.hasUnsatisfiedDependcies()) {
                 beginsWith.add(process);
@@ -111,6 +111,9 @@ class TaskLoader {
         try {
             canceled = true;
             for (Future<?> future : futures) {
+                /**
+                 * Enforced interruptions
+                 */
                 future.cancel(true);
             }
         } finally {
@@ -120,12 +123,6 @@ class TaskLoader {
     }
 
     private void waitIfNecessary() {
-        /**
-         * Synchronize style, we should block script call thread. when all event
-         * handler processes are done, we can wake up the call thread. If any
-         * exception is thrown when call event handler process, we should catch
-         * the exception, and throw the exception in the script call thread.
-         */
         if (callback == null) { //
             try {
                 if (timeout > 0) {
@@ -155,6 +152,22 @@ class TaskLoader {
     }
 
     void startProcess(TaskProcess process) {
+
+        /**
+         * Check whether the command needs to be executed
+         */
+        if (!process.task.nessary(process.param)) {
+            return;
+        }
+
+        /**
+         * Don't do it if you've already done it
+         */
+        Object result = process.taskLoader.taskSupport.getResultMap().get(process.task.getClass());
+        if (result != null) {
+            return;
+        }
+
         if (timeout > 0) {
             lock.lock();
             try {

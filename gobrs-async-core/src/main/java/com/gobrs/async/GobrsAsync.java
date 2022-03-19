@@ -26,7 +26,7 @@ public class GobrsAsync {
     /**
      * Sirector constructor
      *
-     * @param executorService the executor service instance used by sirector.
+     * @param executorService the executor service instance used by gobrs-async.
      */
     public GobrsAsync(ExecutorService executorService) {
         this.executorService = executorService;
@@ -42,20 +42,20 @@ public class GobrsAsync {
         return taskFlow.after(eventHandlers);
     }
 
-    public AsyncResult start(AsyncParam param, long timeout) {
+    public AsyncResult go(AsyncParam param, long timeout) {
         if (!ready) {
-            throw new IllegalStateException("sirector not started.");
+            throw new IllegalStateException("gobrs-async not started.");
         }
         return trigger.trigger(param, timeout).load();
     }
 
-    public AsyncResult start(AsyncParam param) {
-        return start(param, (long) 0);
+    public AsyncResult go(AsyncParam param) {
+        return go(param, 0L);
     }
 
     public AsyncResult start(AsyncParam param, Callback callback) {
         if (!ready) {
-            throw new IllegalStateException("sirector not started.");
+            throw new IllegalStateException("gobrs-async not started.");
         }
         if (callback == null) {
             throw new IllegalArgumentException("callback can not be null");
@@ -67,15 +67,8 @@ public class GobrsAsync {
         return ready;
     }
 
-    /**
-     * Mark the event transaction type of the sirector instance as ready. This
-     * method should be called before start any events. And we should not
-     * called transaction type building methods any more after this method
-     * called. otherwise {@link IllegalStateException} will be throwed.
-     *
-     * @see GobrsAsync#isReady()
-     */
-    public synchronized void ready() {
+
+    public synchronized void readyTo() {
         if (!ready) {
             taskFlow.ready();
             trigger = new TaskTrigger(taskFlow, executorService);

@@ -32,7 +32,7 @@ class TaskProcess implements Runnable, Cloneable {
      */
     private final List<AsyncTask> dependTasks;
 
-    private AsyncParam param;
+    public AsyncParam param;
 
     private Lock lock;
 
@@ -59,9 +59,17 @@ class TaskProcess implements Runnable, Cloneable {
     @Override
     public void run() {
         try {
-            Object result = this.task.task(param.get());
-            taskSupport.getResultMap().put(task.getClass(), result);
-            //Fix bug find by zhulixin@jd.com which would block processes already satisfy running conditions.
+            Object parameter = param.get();
+
+            /**
+             * If the conditions are not met
+             * no execution is performed
+             */
+            if (task.nessary(parameter) && taskLoader.taskSupport.getResultMap().get(task.getClass()) == null) {
+                Object result = task.task(param.get());
+                taskLoader.taskSupport.getResultMap().put(task.getClass(), result);
+            }
+
             if (dependTasks != null) {
                 List<TaskProcess> readyProcesses = new ArrayList<TaskProcess>(dependTasks.size());
                 for (int i = 0; i < dependTasks.size(); i++) {

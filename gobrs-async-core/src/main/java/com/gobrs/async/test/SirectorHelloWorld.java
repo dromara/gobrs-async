@@ -27,20 +27,21 @@ public class SirectorHelloWorld {
         GobrsAsync gobrsAsync = new GobrsAsync(executorService);
 
         //准备事件处理器实例和回调实例
-        HelloWorldEventHandler onceHandler = new HelloWorldEventHandler(1);
-        HelloWorldEventHandler twiceHandler = new HelloWorldEventHandler(2);
-        HelloWorldEventHandler threeTimesHandler = new HelloWorldEventHandler(3);
-        HelloWorldEventHandler fourTimesHandler = new HelloWorldEventHandler(4);
-        HelloWorldEventHandler fiveTimesHandler = new HelloWorldEventHandler(5);
+        AService aService = new AService();
+        BService bService = new BService();
+        CService cService = new CService();
+        DService dService = new DService();
+        EService eService = new EService();
+
         Callback alertCallback = new AlertCallback();
 
         //编排事件处理器
-        gobrsAsync.begin(onceHandler, twiceHandler).then(threeTimesHandler).then(fiveTimesHandler);
-        gobrsAsync.after(fiveTimesHandler).then(fourTimesHandler);
-        gobrsAsync.ready();
+        gobrsAsync.begin(aService, bService).then(cService).then(eService);
+        gobrsAsync.after(eService).then(dService);
+        gobrsAsync.readyTo();
 
         //同步发布事件
-        gobrsAsync.start(() -> new Object());
+        gobrsAsync.go(() -> new Object());
         //异步发布事件
 //        gobrsAsync.start(() -> new Object(), alertCallback);
     }
@@ -62,14 +63,13 @@ public class SirectorHelloWorld {
 //                    System.out.println(111);
 //                }
 //            }
-            System.out.println(1000);
             System.out.println(times);
             return null;
         }
 
         @Override
         public boolean nessary(Object o) {
-            return false;
+            return true;
         }
     }
 

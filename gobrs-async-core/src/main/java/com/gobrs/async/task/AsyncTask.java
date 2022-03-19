@@ -16,7 +16,7 @@ public interface AsyncTask<Param, Result> extends Task{
     Result task(Param param);
 
 
-    boolean nessary(Param param);
+    boolean nessary(Param param) ;
 
 //    default <R> R getResult(GobrsAsyncSupport support, Class clazz, Class<R> resultClass) {
 //        Map<String, TaskResult<R>> resultMap = support.getWorkResult();
