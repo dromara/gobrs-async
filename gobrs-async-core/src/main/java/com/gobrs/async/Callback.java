@@ -10,9 +10,9 @@ import com.gobrs.async.domain.AsyncParam;
  * @create: 2022-03-16
  **/
 
-public interface Callback<Event> {
-    public void onSuccess(AsyncParam param);
+public interface Callback {
+     void onSuccess(AsyncParam param);
 
-    public void onError(AsyncParam param, Throwable throwable);
+     void onError(AsyncParam param, Throwable throwable);
 
 }

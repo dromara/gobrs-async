@@ -17,7 +17,7 @@ public class GobrsAsync {
 
     private final ExecutorService executorService;
 
-    private final TaskBus taskBus;
+    private final TaskFlow taskFlow;
 
     private TaskTrigger trigger;
 
@@ -30,23 +30,23 @@ public class GobrsAsync {
      */
     public GobrsAsync(ExecutorService executorService) {
         this.executorService = executorService;
-        this.taskBus = new TaskBus();
+        this.taskFlow = new TaskFlow();
     }
 
 
     public TaskBuilder begin(AsyncTask... tasks) {
-        return taskBus.start(tasks);
+        return taskFlow.start(tasks);
     }
 
     public TaskBuilder after(AsyncTask... eventHandlers) {
-        return taskBus.after(eventHandlers);
+        return taskFlow.after(eventHandlers);
     }
 
     public AsyncResult start(AsyncParam param, long timeout) {
         if (!ready) {
             throw new IllegalStateException("sirector not started.");
         }
-        return trigger.trigger(param, timeout).run();
+        return trigger.trigger(param, timeout).load();
     }
 
     public AsyncResult start(AsyncParam param) {
@@ -60,7 +60,7 @@ public class GobrsAsync {
         if (callback == null) {
             throw new IllegalArgumentException("callback can not be null");
         }
-        return trigger.trigger(param, 0, callback).run();
+        return trigger.trigger(param, 0, callback).load();
     }
 
     public boolean isReady() {
@@ -77,8 +77,8 @@ public class GobrsAsync {
      */
     public synchronized void ready() {
         if (!ready) {
-            taskBus.ready();
-            trigger = new TaskTrigger(taskBus, executorService);
+            taskFlow.ready();
+            trigger = new TaskTrigger(taskFlow, executorService);
             ready = true;
         }
     }

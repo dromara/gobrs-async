@@ -2,28 +2,28 @@ package com.gobrs.async;
 
 /**
  * @program: gobrs-async-starter
- * @ClassName SirectorException
+ * @ClassName GobrsAsyncException
  * @description:
  * @author: sizegang
  * @create: 2022-03-16
  **/
-public class SirectorException extends RuntimeException {
+public class GobrsAsyncException extends RuntimeException {
 
     private static final long serialVersionUID = 4898686611676070892L;
 
-    public SirectorException() {
+    public GobrsAsyncException() {
         super();
     }
 
-    public SirectorException(String message, Throwable cause) {
+    public GobrsAsyncException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public SirectorException(String message) {
+    public GobrsAsyncException(String message) {
         super(message);
     }
 
-    public SirectorException(Throwable cause) {
+    public GobrsAsyncException(Throwable cause) {
         super(cause);
     }
 

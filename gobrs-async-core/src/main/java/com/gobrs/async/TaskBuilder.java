@@ -15,42 +15,42 @@ import java.util.List;
  **/
 public class TaskBuilder {
 
-    private final TaskBus taskBus;
+    private final TaskFlow taskFlow;
     /**
      * cache taskList
      */
     private List<AsyncTask> cacheTaskList;
 
-    TaskBuilder(TaskBus taskBus, List<AsyncTask> taskList) {
-        synchronized (taskBus) {
-            if (taskBus.isReady()) {
-                throw new IllegalStateException("taskBus is ready, cannot be edit any more.");
+    TaskBuilder(TaskFlow taskFlow, List<AsyncTask> taskList) {
+        synchronized (taskFlow) {
+            if (taskFlow.isReady()) {
+                throw new IllegalStateException("taskFlow is ready, cannot be edit any more.");
             }
-            this.taskBus = taskBus;
+            this.taskFlow = taskFlow;
             this.cacheTaskList = new ArrayList<>(taskList.size());
             /**
              *  src -> dest
              */
             copyList(taskList, this.cacheTaskList);
             for (AsyncTask task : taskList) {
-                taskBus.addDependency(task, null);
+                taskFlow.addDependency(task, null);
             }
         }
     }
 
     public TaskBuilder then(AsyncTask... eventHandlers) {
-        synchronized (taskBus) {
-            if (taskBus.isReady()) {
+        synchronized (taskFlow) {
+            if (taskFlow.isReady()) {
                 throw new IllegalStateException(
-                        "taskBus is ready, cannot be edit any more.");
+                        "taskFlow is ready, cannot be edit any more.");
             }
             for (AsyncTask from : this.cacheTaskList) {
                 for (AsyncTask to : eventHandlers) {
-                    taskBus.addDependency(from, to);
+                    taskFlow.addDependency(from, to);
                 }
             }
             for (AsyncTask to : eventHandlers) {
-                taskBus.addDependency(to, null);
+                taskFlow.addDependency(to, null);
             }
             this.cacheTaskList = new ArrayList<AsyncTask>(
                     eventHandlers.length);

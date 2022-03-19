@@ -31,32 +31,18 @@ public class SirectorHelloWorld {
         HelloWorldEventHandler twiceHandler = new HelloWorldEventHandler(2);
         HelloWorldEventHandler threeTimesHandler = new HelloWorldEventHandler(3);
         HelloWorldEventHandler fourTimesHandler = new HelloWorldEventHandler(4);
-        Callback<HelloWorldEvent> alertCallback = new AlertCallback();
+        HelloWorldEventHandler fiveTimesHandler = new HelloWorldEventHandler(5);
+        Callback alertCallback = new AlertCallback();
 
         //编排事件处理器
-        gobrsAsync.begin(onceHandler).then(threeTimesHandler);
-        gobrsAsync.after(threeTimesHandler).then(twiceHandler);
-        gobrsAsync.after(twiceHandler).then(fourTimesHandler);
+        gobrsAsync.begin(onceHandler, twiceHandler).then(threeTimesHandler).then(fiveTimesHandler);
+        gobrsAsync.after(fiveTimesHandler).then(fourTimesHandler);
         gobrsAsync.ready();
 
         //同步发布事件
-        gobrsAsync.start(() -> new Object(), 100);
+        gobrsAsync.start(() -> new Object());
         //异步发布事件
 //        gobrsAsync.start(() -> new Object(), alertCallback);
-    }
-
-    static class HelloWorldEvent {
-
-        private int callCount;
-
-        public void increaseCallCount() {
-            callCount++;
-        }
-
-        public int getCallCount() {
-            return callCount;
-        }
-
     }
 
     static class HelloWorldEventHandler implements
@@ -71,11 +57,12 @@ public class SirectorHelloWorld {
 
         @Override
         public Object task(Object o) {
-            if(true){
-                while (true){
-                    System.out.println(111);
-                }
-            }
+//            if(true){
+//                while (true){
+//                    System.out.println(111);
+//                }
+//            }
+            System.out.println(1000);
             System.out.println(times);
             return null;
         }
@@ -86,7 +73,7 @@ public class SirectorHelloWorld {
         }
     }
 
-    static class AlertCallback implements Callback<HelloWorldEvent> {
+    static class AlertCallback implements Callback {
 
         @Override
         public void onError(AsyncParam event, Throwable throwable) {

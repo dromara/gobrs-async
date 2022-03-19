@@ -15,9 +15,7 @@ import java.util.Map;
  * @author: sizegang
  * @create: 2022-03-16
  **/
-
-
-public class TaskBus {
+public class TaskFlow {
 
     private boolean ready = false;
 
@@ -74,5 +72,4 @@ public class TaskBus {
             denpendedTasks.get(from).add(to);
         }
     }
-
 }

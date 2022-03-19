@@ -28,19 +28,21 @@ class TaskProcess implements Runnable, Cloneable {
     private volatile int unsatisfiedDepdendings;
 
     /**
-     * Dependent task
+     * depend task
      */
-    private final List<AsyncTask> dependedEventHandlers;
+    private final List<AsyncTask> dependTasks;
 
     private AsyncParam param;
 
     private Lock lock;
 
-    TaskProcess(AsyncTask eventHandler, int depdending,
-                List<AsyncTask> dependedEventHandlers) {
+    private TaskSupport taskSupport;
+
+
+    TaskProcess(AsyncTask eventHandler, int depdending, List<AsyncTask> dependTasks) {
         this.task = eventHandler;
         this.unsatisfiedDepdendings = depdending;
-        this.dependedEventHandlers = dependedEventHandlers;
+        this.dependTasks = dependTasks;
     }
 
     /**
@@ -57,13 +59,13 @@ class TaskProcess implements Runnable, Cloneable {
     @Override
     public void run() {
         try {
-            task.task(param.get());
+            Object result = this.task.task(param.get());
+            taskSupport.getResultMap().put(task.getClass(), result);
             //Fix bug find by zhulixin@jd.com which would block processes already satisfy running conditions.
-            if (dependedEventHandlers != null) {
-                List<TaskProcess> readyProcesses = new ArrayList<TaskProcess>(dependedEventHandlers.size());
-                for (int i = 0; i < dependedEventHandlers.size(); i++) {
-                    TaskProcess process = taskLoader
-                            .getProcess(dependedEventHandlers.get(i));
+            if (dependTasks != null) {
+                List<TaskProcess> readyProcesses = new ArrayList<TaskProcess>(dependTasks.size());
+                for (int i = 0; i < dependTasks.size(); i++) {
+                    TaskProcess process = taskLoader.getProcess(dependTasks.get(i));
                     if (process.decreaseUnsatisfiedDependcies() == 0) {
                         readyProcesses.add(process);
                     }
@@ -112,5 +114,13 @@ class TaskProcess implements Runnable, Cloneable {
 
     public AsyncTask getTask() {
         return task;
+    }
+
+    public TaskSupport getTaskSupport() {
+        return taskSupport;
+    }
+
+    public void setTaskSupport(TaskSupport taskSupport) {
+        this.taskSupport = taskSupport;
     }
 }

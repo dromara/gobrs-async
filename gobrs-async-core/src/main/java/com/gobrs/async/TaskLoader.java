@@ -31,7 +31,7 @@ class TaskLoader {
 
     private final Map<AsyncTask, TaskProcess> processMap;
 
-    private final Callback<AsyncTask> callback;
+    private final Callback callback;
 
     private final long timeout;
 
@@ -43,12 +43,13 @@ class TaskLoader {
 
     private final ArrayList<Future<?>> futures;
 
-    private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<Future<?>>(
-            0);
+    private TaskSupport taskSupport;
+
+    private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<>(0);
 
     TaskLoader(AsyncParam param, ExecutorService executorService,
                Map<AsyncTask, TaskProcess> processMap,
-               Callback<AsyncTask> callback, long timeout) {
+               Callback callback, long timeout, TaskSupport taskSupport) {
         this.param = param;
         this.executorService = executorService;
         this.processMap = processMap;
@@ -59,6 +60,8 @@ class TaskLoader {
             completeLatch = null;
         }
         this.timeout = timeout;
+        this.taskSupport = taskSupport;
+
         if (this.timeout > 0) {
             futures = new ArrayList<>(1);
         } else {
@@ -66,9 +69,9 @@ class TaskLoader {
         }
     }
 
-    AsyncResult run() {
-        ArrayList<TaskProcess> processesWithNoDependencies = getProcessedWithNoDependencies();
-        for (TaskProcess process : processesWithNoDependencies) {
+    AsyncResult load() {
+        ArrayList<TaskProcess> begins = getBeginProcess();
+        for (TaskProcess process : begins) {
             startProcess(process);
         }
         // wait
@@ -76,14 +79,14 @@ class TaskLoader {
         return null;
     }
 
-    private ArrayList<TaskProcess> getProcessedWithNoDependencies() {
-        ArrayList<TaskProcess> processesWithNoDependencies = new ArrayList<TaskProcess>(1);
+    private ArrayList<TaskProcess> getBeginProcess() {
+        ArrayList<TaskProcess> beginsWith = new ArrayList<TaskProcess>(1);
         for (TaskProcess process : processMap.values()) {
             if (!process.hasUnsatisfiedDependcies()) {
-                processesWithNoDependencies.add(process);
+                beginsWith.add(process);
             }
         }
-        return processesWithNoDependencies;
+        return beginsWith;
     }
 
     void markAsCompleted() {
@@ -135,15 +138,15 @@ class TaskLoader {
                 }
 
                 if (error != null) {
-                    throw new SirectorException(error);
+                    throw new GobrsAsyncException(error);
                 }
             } catch (InterruptedException e) {
-                throw new SirectorException(e);
+                throw new GobrsAsyncException(e);
             }
         }
     }
 
-    Callback<AsyncTask> getCallback() {
+    Callback getCallback() {
         return callback;
     }
 

@@ -7,7 +7,7 @@ package com.gobrs.async;
  * @author: sizegang
  * @create: 2022-03-16
  **/
-public class TimeoutException extends SirectorException {
+public class TimeoutException extends GobrsAsyncException {
 
     private static final long serialVersionUID = -5423490721470482068L;
 

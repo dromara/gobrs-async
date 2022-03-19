@@ -15,14 +15,14 @@ import java.util.concurrent.ExecutorService;
 
 class TaskTrigger {
 
-    private final TaskBus taskBus;
+    private final TaskFlow taskFlow;
 
     private final ExecutorService executorService;
 
     private IdentityHashMap<AsyncTask, TaskProcess> prepareTaskMap = new IdentityHashMap<>();
 
-    TaskTrigger(TaskBus taskBus, ExecutorService executorService) {
-        this.taskBus = taskBus;
+    TaskTrigger(TaskFlow taskFlow, ExecutorService executorService) {
+        this.taskFlow = taskFlow;
         this.executorService = executorService;
         prepare();
     }
@@ -30,7 +30,7 @@ class TaskTrigger {
     private void prepare() {
 
 
-        Map<AsyncTask, List<AsyncTask>> dependTasks = copyDependTasks(taskBus.getDependsTasks());
+        Map<AsyncTask, List<AsyncTask>> dependTasks = copyDependTasks(taskFlow.getDependsTasks());
 
         Map<AsyncTask, List<AsyncTask>> excessiveTaskMap = new HashMap<>();
 
@@ -64,8 +64,14 @@ class TaskTrigger {
         for (AsyncTask task : dependTasks.keySet()) {
             TaskProcess process;
             if (task != starter) {
+                /**
+                 * Each task is executed using a new Processs
+                 */
                 process = new TaskProcess(task, excessiveTaskMap.get(task).size(), dependTasks.get(task));
             } else {
+                /***
+                 * completely
+                 */
                 process = new WrapperTaskProcess(task, excessiveTaskMap.get(task).size(), dependTasks.get(task));
             }
             prepareTaskMap.put(task, process);
@@ -92,7 +98,7 @@ class TaskTrigger {
         /**
          * Assign one loader to each task
          */
-        TaskLoader loader = new TaskLoader(param, executorService, newProcessMap, callback, timeout);
+        TaskLoader loader = new TaskLoader(param, executorService, newProcessMap, callback, timeout, getSupport(param));
         for (AsyncTask task : prepareTaskMap.keySet()) {
             TaskProcess newProcess = (TaskProcess) prepareTaskMap.get(task).clone();
             newProcess.init(loader, param);
@@ -100,6 +106,8 @@ class TaskTrigger {
         }
         return loader;
     }
+
+ 
 
     /**
      * ScriptEndEventHandler will do work to complete the whole ScriptRuntime
@@ -130,5 +138,10 @@ class TaskTrigger {
         }
     }
 
+    private TaskSupport getSupport(AsyncParam param) {
+        TaskSupport taskSupport = new TaskSupport();
+        taskSupport.setParam(param);
+        return taskSupport;
+    }
 
 }

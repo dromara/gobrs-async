@@ -11,6 +11,8 @@ package com.gobrs.async.task;
  **/
 public interface AsyncTask<Param, Result> extends Task{
 
+
+
     Result task(Param param);
 
 
