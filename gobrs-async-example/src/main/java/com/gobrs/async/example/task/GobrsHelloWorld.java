@@ -1,8 +1,5 @@
 package com.gobrs.async.example.task;
 
-import com.gobrs.async.domain.AsyncParam;
-import com.gobrs.async.task.AsyncTask;
-import com.gobrs.async.Callback;
 import com.gobrs.async.GobrsAsync;
 
 /**

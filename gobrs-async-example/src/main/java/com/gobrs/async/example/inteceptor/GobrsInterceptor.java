@@ -1,10 +1,8 @@
 package com.gobrs.async.example.inteceptor;
 
 import com.gobrs.async.callback.ErrorCallback;
-import com.gobrs.async.exception.AsyncExceptionInterceptor;
+import com.gobrs.async.callback.AsyncExceptionInterceptor;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.CompletionException;
 
 /**
  * @program: gobrs-async-core

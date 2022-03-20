@@ -3,10 +3,9 @@ package com.gobrs.async;
 import com.gobrs.async.callback.ErrorCallback;
 import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.AsyncResult;
-import com.gobrs.async.exception.AsyncExceptionInterceptor;
+import com.gobrs.async.callback.AsyncExceptionInterceptor;
 import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
-import com.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,6 @@ public class TaskLoader {
 
     private final Map<AsyncTask, TaskProcess> processMap;
 
-    private final Callback callback;
 
     private final long timeout;
 
@@ -58,16 +56,11 @@ public class TaskLoader {
     private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<>(0);
 
     TaskLoader(AsyncParam param, ExecutorService executorService, Map<AsyncTask, TaskProcess> processMap,
-               Callback callback, long timeout) {
+               long timeout) {
         this.param = param;
         this.executorService = executorService;
         this.processMap = processMap;
-        this.callback = callback;
-        if (callback == null) {
-            completeLatch = new CountDownLatch(1);
-        } else {
-            completeLatch = null;
-        }
+        completeLatch = new CountDownLatch(1);
         this.timeout = timeout;
 
         if (this.timeout > 0) {
@@ -103,23 +96,14 @@ public class TaskLoader {
     }
 
     void completed() {
-        if (callback == null) {
-            completeLatch.countDown();
-        } else {
-            callback.onSuccess(param);
-        }
+        completeLatch.countDown();
     }
 
     public void error(ErrorCallback errorCallback) {
-        if (callback != null) {
-            callback.onError(errorCallback);
-        }
+        asyncExceptionInterceptor.exception(errorCallback);
     }
 
     public void errorInterrupted(ErrorCallback errorCallback) {
-        if (callback != null) {
-            callback.onError(errorCallback);
-        }
         this.error = errorCallback.getThrowable();
         cancel();
 
@@ -149,28 +133,23 @@ public class TaskLoader {
     }
 
     private void waitIfNecessary() {
-        if (callback == null) {
-            try {
-                if (timeout > 0) {
-                    if (!completeLatch.await(timeout, TimeUnit.MILLISECONDS)) {
-                        cancel();
-                        throw new TimeoutException();
-                    }
-                } else {
-                    completeLatch.await(10, TimeUnit.SECONDS);
+        try {
+            if (timeout > 0) {
+                if (!completeLatch.await(timeout, TimeUnit.MILLISECONDS)) {
+                    cancel();
+                    throw new TimeoutException();
                 }
-                if (error != null) {
-                    throw new GobrsAsyncException(error);
-                }
-            } catch (InterruptedException e) {
-                throw new GobrsAsyncException(e);
+            } else {
+                completeLatch.await(10, TimeUnit.SECONDS);
             }
+            if (error != null) {
+                throw new GobrsAsyncException(error);
+            }
+        } catch (InterruptedException e) {
+            throw new GobrsAsyncException(e);
         }
     }
 
-    Callback getCallback() {
-        return callback;
-    }
 
     TaskProcess getProcess(AsyncTask eventHandler) {
         return processMap.get(eventHandler);

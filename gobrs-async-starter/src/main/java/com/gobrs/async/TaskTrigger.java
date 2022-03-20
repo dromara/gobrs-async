@@ -88,16 +88,13 @@ class TaskTrigger {
         return rt;
     }
 
-    TaskLoader trigger(AsyncParam param, long timeout) {
-        return trigger(param, timeout, null);
-    }
 
-    TaskLoader trigger(AsyncParam param, long timeout, Callback callback) {
+    TaskLoader trigger(AsyncParam param, long timeout) {
         IdentityHashMap<AsyncTask, TaskProcess> newProcessMap = new IdentityHashMap<>(prepareTaskMap.size());
         /**
          * Assign one loader to each task
          */
-        TaskLoader loader = new TaskLoader(param, executorService, newProcessMap, callback, timeout);
+        TaskLoader loader = new TaskLoader(param, executorService, newProcessMap, timeout);
         TaskSupport support = getSupport(param);
         support.setTaskLoader(loader);
 

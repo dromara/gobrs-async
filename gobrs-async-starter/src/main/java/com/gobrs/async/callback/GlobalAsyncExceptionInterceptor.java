@@ -1,8 +1,4 @@
-package com.gobrs.async.exception;
-
-import com.gobrs.async.callback.ErrorCallback;
-
-import java.util.concurrent.CompletionException;
+package com.gobrs.async.callback;
 
 /**
  * @program: gobrs-async

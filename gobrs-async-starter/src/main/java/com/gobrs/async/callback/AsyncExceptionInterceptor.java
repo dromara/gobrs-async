@@ -1,4 +1,4 @@
-package com.gobrs.async.exception;
+package com.gobrs.async.callback;
 
 import com.gobrs.async.callback.ErrorCallback;
 

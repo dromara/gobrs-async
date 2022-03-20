@@ -4,17 +4,13 @@ import com.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.AsyncResult;
 import com.gobrs.async.exception.NotTaskRuleException;
-import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
-import com.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.Trigger;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
 
 /**
  * @program: gobrs-async-starter
@@ -62,13 +58,6 @@ public class GobrsAsync {
 
     public AsyncResult go(String taskName, AsyncParam param) {
         return go(taskName, param, 0L);
-    }
-
-    public AsyncResult go(String taskName, AsyncParam param, Callback callback) {
-        if (callback == null) {
-            throw new IllegalArgumentException("callback can not be null");
-        }
-        return trigger.get(taskName).trigger(param, 0, callback).load();
     }
 
 
