@@ -1,0 +1,8 @@
+server:
+  port: 8888
+spring:
+  gobrs:
+    async:
+      rules: '[{name: "test", content: "AService->BService;EService->FService"}]'
+      #      rules: '[{name: "test", content: "BService->CService->EService->DService:not;AService->DService:not"}]'
+      task-interrupt: true #局部异常是否打断主流程

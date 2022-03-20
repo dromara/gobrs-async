@@ -21,20 +21,16 @@ import java.util.Optional;
 public class RulePostProcessor implements ApplicationListener<ContextRefreshedEvent> {
     Logger logger = LoggerFactory.getLogger(RulePostProcessor.class);
 
-
-
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-
         ApplicationContext applicationContext = event.getApplicationContext();
         GobrsAsyncProperties properties = applicationContext.getBean(GobrsAsyncProperties.class);
-        GobrsAsync gobrsAsync = applicationContext.getBean(GobrsAsync.class);
+
         String rules = properties.getRules();
         Optional.ofNullable(rules).map((data) -> {
             // 初始化解析规则 主要是为了检查规则是否正确
             RuleEngine engine = applicationContext.getBean(RuleEngine.class);
             engine.parse(data);
-            gobrsAsync.readyTo();
             logger.info("Gobrs Async Loading Success !!!");
             return 1;
         }).orElseThrow(() -> new NotTaskRuleException("spring.gobrs.async.rules is empty"));

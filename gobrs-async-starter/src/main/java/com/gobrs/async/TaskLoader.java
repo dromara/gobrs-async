@@ -164,7 +164,7 @@ public class TaskLoader {
         /**
          * Check whether the command needs to be executed
          */
-        if (!process.task.nessary(process.param)) {
+        if (!process.task.nessary(process.param, process.getTaskSupport())) {
             return;
         }
         /**

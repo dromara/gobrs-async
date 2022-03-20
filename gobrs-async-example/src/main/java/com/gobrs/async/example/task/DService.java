@@ -1,4 +1,4 @@
-package com.gobrs.async.test;
+package com.gobrs.async.example.task;
 
 import com.gobrs.async.TaskSupport;
 import com.gobrs.async.task.AsyncTask;
@@ -20,20 +20,15 @@ public class DService implements AsyncTask<Object, Object> {
     }
 
     @Override
-    public Object task(Object o) {
-
-        System.out.println("DService");
-        while (i < 100000 && !Thread.currentThread().isInterrupted()) {
-            System.out.println("i++:" + i);
-            i++;
-        }
-        return "DService";
+    public Object task(Object o, TaskSupport support) {
+        return null;
     }
 
     @Override
-    public boolean nessary(Object o) {
-        return true;
+    public boolean nessary(Object o, TaskSupport support) {
+        return false;
     }
+
 
     @Override
     public void onSuccess(TaskSupport support) {

@@ -1,4 +1,4 @@
-package com.gobrs.async.test;
+package com.gobrs.async.example.task;
 
 import com.gobrs.async.TaskSupport;
 import com.gobrs.async.task.AsyncTask;
@@ -18,14 +18,13 @@ public class FService implements AsyncTask<Object, Object> {
     }
 
     @Override
-    public Object task(Object o) {
-        System.out.println("FService");
-        return "FService";
+    public Object task(Object o, TaskSupport support) {
+        return null;
     }
 
     @Override
-    public boolean nessary(Object o) {
-        return true;
+    public boolean nessary(Object o, TaskSupport support) {
+        return false;
     }
 
     @Override

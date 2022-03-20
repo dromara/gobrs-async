@@ -6,7 +6,8 @@
     <version>0.2.2-beta</version>
     <packaging>pom</packaging>
     <modules>
-        <module>gobrs-async-core</module>
+        <module>gobrs-async-starter</module>
+        <module>gobrs-async-example</module>
     </modules>
 
     <properties>

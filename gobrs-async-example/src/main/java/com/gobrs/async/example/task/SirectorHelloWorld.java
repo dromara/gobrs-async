@@ -1,12 +1,9 @@
-package com.gobrs.async.test;
+package com.gobrs.async.example.task;
 
 import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.task.AsyncTask;
 import com.gobrs.async.Callback;
 import com.gobrs.async.GobrsAsync;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @program: gobrs-async-starter
@@ -35,14 +32,14 @@ public class SirectorHelloWorld {
 
 
         //编排事件处理器
-        gobrsAsync.begin(aService, bService);
-        gobrsAsync.after(aService).then(cService);
-        gobrsAsync.after(bService).then(dService).then(eService);
-        gobrsAsync.after(bService).then(fService).then(gService);
-        gobrsAsync.readyTo();
+//        gobrsAsync.begin(aService, bService);
+//        gobrsAsync.after(aService).then(cService);
+//        gobrsAsync.after(bService).then(dService).then(eService);
+//        gobrsAsync.after(bService).then(fService).then(gService);
+//        gobrsAsync.readyTo();
 
         //同步发布事件
-        gobrsAsync.go(() -> new Object(), 100);
+        gobrsAsync.go("", () -> new Object(), 100);
         //异步发布事件
 //        gobrsAsync.start(() -> new Object(), alertCallback);
     }

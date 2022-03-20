@@ -20,7 +20,6 @@ import java.util.Map;
 public class TaskFlow {
 
 
-    @Resource
     private GobrsAsyncProperties gobrsAsyncProperties;
 
     /**

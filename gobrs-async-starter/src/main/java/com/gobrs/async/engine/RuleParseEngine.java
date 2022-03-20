@@ -39,13 +39,12 @@ public class RuleParseEngine<T> extends AbstractEngine {
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
             pioneer.add(EngineExecutor.getAsyncTask(taskArr[0]));
         }
-        gobrsAsync.begin(pioneer);
-
+        gobrsAsync.begin(rule.getName(),pioneer);
         for (String taskFlow : taskFlows) {
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
             List<String> arrayList = Arrays.asList(taskArr);
             String leftTaskName = arrayList.get(0);
-            TaskBuilder taskBuilder = gobrsAsync.after(EngineExecutor.getAsyncTask(leftTaskName));
+            TaskBuilder taskBuilder = gobrsAsync.after(rule.getName(),EngineExecutor.getAsyncTask(leftTaskName));
             for (int i = 1; i < arrayList.size(); i++) {
                 String taskBean = arrayList.get(i);
                 if (taskBean.contains(sp)) {

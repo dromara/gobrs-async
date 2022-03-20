@@ -1,37 +1,33 @@
-package com.gobrs.async.test;
+package com.gobrs.async.example.task;
 
 import com.gobrs.async.TaskSupport;
 import com.gobrs.async.task.AsyncTask;
 
 /**
  * @program: gobrs-async-starter
- * @ClassName BService
+ * @ClassName CService
  * @description:
  * @author: sizegang
  * @create: 2022-03-20
  **/
-public class BService implements AsyncTask<Object, Object> {
+public class CService implements AsyncTask<Object, Object> {
 
     @Override
     public void prepare(Object o) {
+
 
     }
 
     @Override
     public Object task(Object o, TaskSupport support) {
-//        try {
-//            Thread.sleep(5000);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-        System.out.println("BService");
-        return "BService";
+        return null;
     }
 
     @Override
-    public boolean nessary(Object o) {
-        return true;
+    public boolean nessary(Object o, TaskSupport support) {
+        return false;
     }
+
 
     @Override
     public void onSuccess(TaskSupport support) {
