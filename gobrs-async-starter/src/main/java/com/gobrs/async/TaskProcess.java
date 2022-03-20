@@ -22,7 +22,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 class TaskProcess implements Runnable, Cloneable {
 
-    public TaskLoader taskLoader;
+    public TaskSupport support;
 
     /**
      * Tasks to be performed
@@ -40,7 +40,6 @@ class TaskProcess implements Runnable, Cloneable {
 
     private Lock lock;
 
-    private TaskSupport taskSupport;
 
     private GobrsAsyncProperties gobrsAsyncProperties;
 
@@ -54,18 +53,18 @@ class TaskProcess implements Runnable, Cloneable {
     /**
      * Initialize the object cloned from prototype.
      *
-     * @param taskLoader
+     * @param support
      * @param param
      */
-    void init(TaskLoader taskLoader, AsyncParam param) {
-        this.taskLoader = taskLoader;
+    void init(TaskSupport support, AsyncParam param) {
+        this.support = support;
         this.param = param;
     }
 
     @Override
     public void run() {
         Object parameter = param.get();
-        TaskSupport support = taskLoader.taskSupport;
+        TaskLoader taskLoader = support.getTaskLoader();
         try {
             /**
              * If the conditions are not met
@@ -141,11 +140,11 @@ class TaskProcess implements Runnable, Cloneable {
     }
 
     public TaskSupport getTaskSupport() {
-        return taskSupport;
+        return support;
     }
 
     public void setTaskSupport(TaskSupport taskSupport) {
-        this.taskSupport = taskSupport;
+        this.support = taskSupport;
     }
 
 

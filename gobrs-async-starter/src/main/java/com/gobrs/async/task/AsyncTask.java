@@ -64,7 +64,7 @@ public interface AsyncTask<Param, Result> extends Task {
      */
     default <R> R getResult(TaskSupport support, Class clazz, Class<R> resultClass) {
         Map<Class, TaskResult> resultMap = support.getResultMap();
-        TaskResult<R> taskResult = resultMap.get(clazz.getSimpleName()) != null ? resultMap.get(clazz.getSimpleName()) : resultMap.get(depKey(clazz));
+        TaskResult<R> taskResult = resultMap.get(clazz) != null ? resultMap.get(clazz) : resultMap.get(depKey(clazz));
         if (taskResult != null) {
             return taskResult.getResult();
         }

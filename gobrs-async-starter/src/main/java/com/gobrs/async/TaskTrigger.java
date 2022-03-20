@@ -97,13 +97,16 @@ class TaskTrigger {
         /**
          * Assign one loader to each task
          */
-        TaskLoader loader = new TaskLoader(param, executorService, newProcessMap, callback, timeout, getSupport(param));
+        TaskLoader loader = new TaskLoader(param, executorService, newProcessMap, callback, timeout);
+        TaskSupport support = getSupport(param);
+        support.setTaskLoader(loader);
+
         for (AsyncTask task : prepareTaskMap.keySet()) {
             /**
              * clone Process
              */
             TaskProcess newProcess = (TaskProcess) prepareTaskMap.get(task).clone();
-            newProcess.init(loader, param);
+            newProcess.init(support, param);
             newProcessMap.put(task, newProcess);
         }
         return loader;
@@ -119,12 +122,10 @@ class TaskTrigger {
         WrapperTaskProcess(AsyncTask handler, int depdending, List<AsyncTask> dependedTasks) {
             super(handler, depdending, dependedTasks);
         }
-
         @Override
         public void run() {
-            taskLoader.completed();
+            support.taskLoader.completed();
         }
-
     }
 
     private class Starter<P, R> implements AsyncTask<P, R> {

@@ -1,5 +1,6 @@
 package com.gobrs.async;
 
+import com.gobrs.async.domain.AsyncResult;
 import com.gobrs.async.domain.TaskResult;
 
 import java.util.HashMap;
@@ -21,6 +22,7 @@ public class TaskSupport {
      * The task parameters
      */
     private Object param;
+
 
     /**
      * Task result encapsulation

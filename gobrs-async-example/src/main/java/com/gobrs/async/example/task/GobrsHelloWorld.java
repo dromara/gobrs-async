@@ -15,7 +15,7 @@ import com.gobrs.async.GobrsAsync;
 
 
 @SuppressWarnings("unchecked")
-public class SirectorHelloWorld {
+public class GobrsHelloWorld {
 
     public static void main(String[] args) {
 

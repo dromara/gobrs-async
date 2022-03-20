@@ -44,12 +44,11 @@ public class TaskLoader {
 
     private final ArrayList<Future<?>> futures;
 
-    public TaskSupport taskSupport;
 
     private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<>(0);
 
     TaskLoader(AsyncParam param, ExecutorService executorService, Map<AsyncTask, TaskProcess> processMap,
-               Callback callback, long timeout, TaskSupport taskSupport) {
+               Callback callback, long timeout) {
         this.param = param;
         this.executorService = executorService;
         this.processMap = processMap;
@@ -60,7 +59,6 @@ public class TaskLoader {
             completeLatch = null;
         }
         this.timeout = timeout;
-        this.taskSupport = taskSupport;
 
         if (this.timeout > 0) {
             futures = new ArrayList<>(1);
@@ -111,6 +109,7 @@ public class TaskLoader {
             callback.onError(errorCallback);
         }
         this.error = errorCallback.getThrowable();
+        cancel();
         completeLatch.countDown();
     }
 
@@ -169,12 +168,12 @@ public class TaskLoader {
         /**
          * Don't do it if you've already done it
          */
-        Object result = process.taskLoader.taskSupport.getResultMap().get(process.task.getClass());
+        Object result = process.support.getResultMap().get(process.task.getClass());
         if (result != null) {
             return;
         }
 
-        if (timeout > 0) {
+        if (timeout > 0 || process.getGobrsAsyncProperties().isTaskInterrupt()) {
             /**
              * Only threads in a lock can be interrupted
              */

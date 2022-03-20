@@ -21,6 +21,8 @@ public class BService implements AsyncTask<Object, Object> {
 
     @Override
     public Object task(Object o, TaskSupport support) {
+        String result = getResult(support, AService.class, String.class);
+        System.out.println("拿到的结果" + result);
         System.out.println("执行BService");
         return null;
     }

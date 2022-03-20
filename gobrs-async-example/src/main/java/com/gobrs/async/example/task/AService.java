@@ -24,11 +24,12 @@ public class AService implements AsyncTask<Object, Object> {
     public Object task(Object o, TaskSupport support) {
         System.out.println("执行AService");
         try {
-            Thread.sleep(10000);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return null;
+        stop(support);
+        return "我是A的结果";
     }
 
     @Override
