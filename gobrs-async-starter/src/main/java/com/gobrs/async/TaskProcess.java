@@ -65,16 +65,17 @@ class TaskProcess implements Runnable, Cloneable {
     @Override
     public void run() {
         Object parameter = param.get();
+        TaskSupport support = taskLoader.taskSupport;
         try {
             /**
              * If the conditions are not met
              * no execution is performed
              */
-            if (task.nessary(parameter) && taskLoader.taskSupport.getResultMap().get(task.getClass()) == null) {
+            if (task.nessary(parameter,support) && support.getResultMap().get(task.getClass()) == null) {
                 task.prepare(param);
-                Object result = task.task(param.get(), taskSupport);
-                taskSupport.getResultMap().put(task.getClass(), buildSuccessResult(result));
-                task.onSuccess(taskLoader.taskSupport);
+                Object result = task.task(param.get(), support);
+                support.getResultMap().put(task.getClass(), buildSuccessResult(result));
+                task.onSuccess(support);
             }
             if (dependTasks != null) {
                 List<TaskProcess> readyProcesses = new ArrayList<TaskProcess>(dependTasks.size());
@@ -95,12 +96,12 @@ class TaskProcess implements Runnable, Cloneable {
                 }
             }
         } catch (Exception e) {
-            taskSupport.getResultMap().put(task.getClass(), buildErrorResult(null, e));
-            task.onFail(taskLoader.taskSupport);
+            support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
+            task.onFail(support);
             if (gobrsAsyncProperties.isTaskInterrupt()) {
-                taskLoader.errorInterrupted(errorCallback(parameter, e, taskSupport, task));
+                taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
             } else {
-                taskLoader.error(errorCallback(parameter, e, taskSupport, task));
+                taskLoader.error(errorCallback(parameter, e, support, task));
             }
         }
     }

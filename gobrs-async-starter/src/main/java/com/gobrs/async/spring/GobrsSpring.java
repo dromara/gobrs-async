@@ -10,7 +10,7 @@ import org.springframework.context.ApplicationContextAware;
  * @date 2022-01-27 23:56 2022-01-27 23:56
  */
 public class GobrsSpring implements ApplicationContextAware {
-    private static ApplicationContext applicationContext;
+    public static ApplicationContext applicationContext;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

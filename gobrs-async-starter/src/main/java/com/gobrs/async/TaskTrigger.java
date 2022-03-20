@@ -1,7 +1,9 @@
 package com.gobrs.async;
 
 import com.gobrs.async.domain.AsyncParam;
+import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
+import com.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -17,13 +19,12 @@ class TaskTrigger {
 
     private final TaskFlow taskFlow;
 
-    private final ExecutorService executorService;
+    private final ExecutorService executorService = GobrsSpring.getBean(GobrsAsyncThreadPoolFactory.class).getThreadPoolExecutor();
 
     private IdentityHashMap<AsyncTask, TaskProcess> prepareTaskMap = new IdentityHashMap<>();
 
-    TaskTrigger(TaskFlow taskFlow, ExecutorService executorService) {
+    TaskTrigger(TaskFlow taskFlow) {
         this.taskFlow = taskFlow;
-        this.executorService = executorService;
         prepare();
     }
 

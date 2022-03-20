@@ -19,15 +19,13 @@ import java.util.*;
  **/
 public abstract class AbstractEngine implements RuleEngine {
 
-    @Resource
-    private RuleEngine ruleEngine;
 
     @Override
     public void parse(String rule) {
         GobrsAsync gobrsAsync = GobrsSpring.getBean(GobrsAsync.class);
         List<Rule> rules = JSONArray.parseArray(rule, Rule.class);
         for (Rule r : rules) {
-            ruleEngine.doParse(r, Collections.emptyMap());
+            doParse(r, Collections.emptyMap());
             gobrsAsync.readyTo(r.getName());
         }
     }

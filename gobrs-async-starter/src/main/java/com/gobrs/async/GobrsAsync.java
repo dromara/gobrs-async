@@ -1,11 +1,15 @@
 package com.gobrs.async;
 
+import com.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.AsyncResult;
 import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
 import com.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.Trigger;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -19,8 +23,9 @@ import java.util.concurrent.ExecutorService;
  **/
 public class GobrsAsync {
 
-    private final ExecutorService executorService = GobrsSpring.getBean(GobrsAsyncThreadPoolFactory.class).getThreadPoolExecutor();
 
+    @Autowired
+    private GobrsAsyncProperties gobrsAsyncProperties;
     private Map<String, TaskFlow> taskFlow;
 
     private Map<String, TaskTrigger> trigger;
@@ -32,6 +37,12 @@ public class GobrsAsync {
 
 
     public TaskBuilder begin(String taskName, List<AsyncTask> asyncTasks) {
+        if (taskFlow == null) {
+            loadTaskFlow(taskName);
+        }
+        if (taskFlow.get(taskName) == null) {
+            loadTaskFlowForOne(taskName);
+        }
         return taskFlow.get(taskName).start(asyncTasks);
     }
 
@@ -56,9 +67,40 @@ public class GobrsAsync {
 
 
     public synchronized void readyTo(String taskName) {
-        TaskTrigger taskTrigger = new TaskTrigger(taskFlow.get(taskName), executorService);
+        TaskTrigger taskTrigger = new TaskTrigger(taskFlow.get(taskName));
+        if (trigger == null) {
+            loadTrigger(taskName);
+        }
+        if (trigger.get(taskName) == null) {
+            loadTriggerForOne(taskName);
+        }
         trigger.put(taskName, taskTrigger);
     }
+
+    private void loadTaskFlow(String taskName) {
+        taskFlow = new HashMap<>();
+        TaskFlow tf = new TaskFlow();
+        tf.setGobrsAsyncProperties(gobrsAsyncProperties);
+        taskFlow.put(taskName, tf);
+    }
+
+    private void loadTaskFlowForOne(String taskName) {
+        TaskFlow tf = new TaskFlow();
+        tf.setGobrsAsyncProperties(gobrsAsyncProperties);
+        taskFlow.put(taskName, tf);
+    }
+
+    private void loadTrigger(String taskName) {
+        trigger = new HashMap<>();
+        TaskTrigger tr = new TaskTrigger(taskFlow.get(taskName));
+        trigger.put(taskName, tr);
+    }
+
+    private void loadTriggerForOne(String taskName) {
+        TaskTrigger tr = new TaskTrigger(taskFlow.get(taskName));
+        trigger.put(taskName, tr);
+    }
+
 
 }
 

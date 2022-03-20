@@ -2,6 +2,7 @@ package com.gobrs.async.example.task;
 
 import com.gobrs.async.TaskSupport;
 import com.gobrs.async.task.AsyncTask;
+import org.springframework.stereotype.Component;
 
 /**
  * @program: gobrs-async-starter
@@ -10,6 +11,7 @@ import com.gobrs.async.task.AsyncTask;
  * @author: sizegang
  * @create: 2022-03-20
  **/
+@Component
 public class AService implements AsyncTask<Object, Object> {
 
     @Override
@@ -20,12 +22,18 @@ public class AService implements AsyncTask<Object, Object> {
 
     @Override
     public Object task(Object o, TaskSupport support) {
+        System.out.println("执行AService");
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
     @Override
     public boolean nessary(Object o, TaskSupport support) {
-        return false;
+        return true;
     }
 
 

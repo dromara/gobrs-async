@@ -5,8 +5,6 @@ import com.gobrs.async.TaskFlow;
 import com.gobrs.async.engine.RuleEngine;
 import com.gobrs.async.engine.RuleParseEngine;
 import com.gobrs.async.engine.RulePostProcessor;
-import com.gobrs.async.exception.AsyncExceptionInterceptor;
-import com.gobrs.async.exception.GlobalAsyncExceptionInterceptor;
 import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -15,7 +13,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @program: gobrs
@@ -37,11 +34,6 @@ public class GobrsAutoConfiguration {
     }
 
     @Bean
-    public GobrsAsync gobrsAsync() {
-        return new GobrsAsync();
-    }
-
-    @Bean
     public TaskFlow taskFlow() {
         return new TaskFlow();
     }
@@ -54,7 +46,7 @@ public class GobrsAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(value = RuleEngine.class)
-    public RuleEngine asyncExceptionInterceptor() {
+    public RuleEngine ruleEngine() {
         return new RuleParseEngine<>();
     }
 
@@ -63,6 +55,16 @@ public class GobrsAutoConfiguration {
         return new RulePostProcessor();
     }
 
+
+    @Bean
+    public GobrsAsync gobrsAsync() {
+        return new GobrsAsync();
+    }
+
+    @Bean
+    public GobrsSpring gobrsSpring() {
+        return new GobrsSpring();
+    }
 
 
 }

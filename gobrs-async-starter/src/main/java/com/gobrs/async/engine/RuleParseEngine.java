@@ -86,6 +86,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
             }).orElseGet(() -> {
                 AsyncTask asyncTask = getAsyncTask(taskBean);
                 cacheTaskWrappers.put(taskBean, asyncTask);
+                taskBuilder.then(asyncTask);
                 return asyncTask;
             })).orElse(null);
         }

@@ -3,6 +3,7 @@ package com.gobrs.async.engine;
 import com.gobrs.async.GobrsAsync;
 import com.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.gobrs.async.exception.NotTaskRuleException;
+import com.gobrs.async.spring.GobrsSpring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -25,7 +26,6 @@ public class RulePostProcessor implements ApplicationListener<ContextRefreshedEv
     public void onApplicationEvent(ContextRefreshedEvent event) {
         ApplicationContext applicationContext = event.getApplicationContext();
         GobrsAsyncProperties properties = applicationContext.getBean(GobrsAsyncProperties.class);
-
         String rules = properties.getRules();
         Optional.ofNullable(rules).map((data) -> {
             // 初始化解析规则 主要是为了检查规则是否正确
