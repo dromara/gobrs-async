@@ -40,10 +40,6 @@ public class GobrsAsyncProperties {
      */
     private String must = ":not";
 
-    /**
-     * 或
-     */
-    private String or = "|";
 
 
     /**
@@ -109,11 +105,4 @@ public class GobrsAsyncProperties {
         this.taskInterrupt = taskInterrupt;
     }
 
-    public String getOr() {
-        return or;
-    }
-
-    public void setOr(String or) {
-        this.or = or;
-    }
 }

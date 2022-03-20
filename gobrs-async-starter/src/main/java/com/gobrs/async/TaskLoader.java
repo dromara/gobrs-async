@@ -3,7 +3,10 @@ package com.gobrs.async;
 import com.gobrs.async.callback.ErrorCallback;
 import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.AsyncResult;
+import com.gobrs.async.exception.AsyncExceptionInterceptor;
+import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
+import com.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +35,8 @@ public class TaskLoader {
     private final AsyncParam param;
 
     private final ExecutorService executorService;
+
+    private AsyncExceptionInterceptor asyncExceptionInterceptor = GobrsSpring.getBean(AsyncExceptionInterceptor.class);
 
     private final CountDownLatch completeLatch;
 
@@ -117,7 +122,14 @@ public class TaskLoader {
         }
         this.error = errorCallback.getThrowable();
         cancel();
+
         completeLatch.countDown();
+        /**
+         * Global interception listening
+         */
+        asyncExceptionInterceptor.exception(errorCallback);
+
+
     }
 
     private void cancel() {
