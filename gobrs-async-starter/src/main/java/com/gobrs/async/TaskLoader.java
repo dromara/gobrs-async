@@ -4,6 +4,8 @@ import com.gobrs.async.callback.ErrorCallback;
 import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.AsyncResult;
 import com.gobrs.async.callback.AsyncExceptionInterceptor;
+import com.gobrs.async.exception.GobrsAsyncException;
+import com.gobrs.async.exception.TimeoutException;
 import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
 

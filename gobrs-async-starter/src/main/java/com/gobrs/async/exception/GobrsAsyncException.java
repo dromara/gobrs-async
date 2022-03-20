@@ -1,4 +1,4 @@
-package com.gobrs.async;
+package com.gobrs.async.exception;
 
 /**
  * @program: gobrs-async-starter
