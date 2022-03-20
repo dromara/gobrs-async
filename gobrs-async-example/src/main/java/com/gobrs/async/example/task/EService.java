@@ -23,7 +23,7 @@ public class EService implements AsyncTask<Object, Object> {
     public Object task(Object o, TaskSupport support) {
         System.out.println("执行EService");
         try {
-            Thread.sleep(10000);
+            Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
+ * @author sizegang1
  * @program: gobrs
  * @ClassName BootstrapProperties
  * @description:
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Component;
  * @create: 2022-01-08 17:30
  * @Version 1.0
  * @date 2022-01-27 22:04
- * @author sizegang1
  **/
 @ConfigurationProperties(prefix = GobrsAsyncProperties.PREFIX)
 @Component
@@ -35,6 +35,12 @@ public class GobrsAsyncProperties {
      */
     private String point = "->";
 
+
+    /**
+     * 执行异常是否打断 工作流程
+     */
+    private boolean taskInterrupt = false;
+
     /**
      * 是否必须依赖
      */
@@ -43,17 +49,19 @@ public class GobrsAsyncProperties {
 
 
     /**
-     * 执行异常是否打断 工作流程
+     *
      */
-    private boolean taskInterrupt = false;
+
 
     /**
      * 默认总任务超时时间 3s
+     *
      * @return
      */
     private long timeout = 3000;
 
 
+    private boolean relyDepend = false;
 
 
     public long getTimeout() {
@@ -81,13 +89,6 @@ public class GobrsAsyncProperties {
         this.point = point;
     }
 
-    public String getMust() {
-        return must;
-    }
-
-    public void setMust(String must) {
-        this.must = must;
-    }
 
     public String getRules() {
         return rules;
@@ -105,4 +106,19 @@ public class GobrsAsyncProperties {
         this.taskInterrupt = taskInterrupt;
     }
 
+    public boolean isRelyDepend() {
+        return relyDepend;
+    }
+
+    public void setRelyDepend(boolean relyDepend) {
+        this.relyDepend = relyDepend;
+    }
+
+    public String getMust() {
+        return must;
+    }
+
+    public void setMust(String must) {
+        this.must = must;
+    }
 }

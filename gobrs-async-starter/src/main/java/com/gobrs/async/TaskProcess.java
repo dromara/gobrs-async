@@ -29,6 +29,9 @@ class TaskProcess implements Runnable, Cloneable {
      */
     public final AsyncTask task;
 
+    private boolean must = true;
+
+
     private volatile int unsatisfiedDepdendings;
 
     /**
@@ -70,17 +73,24 @@ class TaskProcess implements Runnable, Cloneable {
              * If the conditions are not met
              * no execution is performed
              */
-            if (task.nessary(parameter,support) && support.getResultMap().get(task.getClass()) == null) {
+            if (task.nessary(parameter, support) && support.getResultMap().get(task.getClass()) == null) {
                 task.prepare(param);
                 Object result = task.task(param.get(), support);
                 support.getResultMap().put(task.getClass(), buildSuccessResult(result));
                 task.onSuccess(support);
             }
             if (dependTasks != null) {
-                List<TaskProcess> readyProcesses = new ArrayList<TaskProcess>(dependTasks.size());
+                List<TaskProcess> readyProcesses = new ArrayList<>(dependTasks.size());
                 for (int i = 0; i < dependTasks.size(); i++) {
                     TaskProcess process = taskLoader.getProcess(dependTasks.get(i));
-                    if (process.decreaseUnsatisfiedDependcies() == 0) {
+                    /**
+                     * No dependent task is executed By configuring
+                     */
+                    if(gobrsAsyncProperties.isRelyDepend()){
+                        if (process.decreaseUnsatisfiedDependcies() == 0) {
+                            readyProcesses.add(process);
+                        }
+                    }else{
                         readyProcesses.add(process);
                     }
                 }
@@ -91,6 +101,9 @@ class TaskProcess implements Runnable, Cloneable {
                     for (int i = (readyProcesses.size() - 1); i > 0; i--) {
                         taskLoader.startProcess(readyProcesses.get(i));
                     }
+                    /**
+                     * End Task Process
+                     */
                     readyProcesses.get(0).run();
                 }
             }
@@ -172,5 +185,13 @@ class TaskProcess implements Runnable, Cloneable {
 
     public void setGobrsAsyncProperties(GobrsAsyncProperties gobrsAsyncProperties) {
         this.gobrsAsyncProperties = gobrsAsyncProperties;
+    }
+
+    public boolean isMust() {
+        return must;
+    }
+
+    public void setMust(boolean must) {
+        this.must = must;
     }
 }

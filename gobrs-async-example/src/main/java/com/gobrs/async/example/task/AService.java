@@ -28,7 +28,7 @@ public class AService implements AsyncTask<Object, Object> {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        stop(support, 666);
+//        stop(support, 666);
         return "我是A的结果";
     }
 

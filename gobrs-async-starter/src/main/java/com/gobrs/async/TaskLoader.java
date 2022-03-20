@@ -4,6 +4,7 @@ import com.gobrs.async.callback.ErrorCallback;
 import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.AsyncResult;
 import com.gobrs.async.callback.AsyncExceptionInterceptor;
+import com.gobrs.async.enums.ExpState;
 import com.gobrs.async.exception.GobrsAsyncException;
 import com.gobrs.async.exception.TimeoutException;
 import com.gobrs.async.spring.GobrsSpring;
@@ -32,8 +33,7 @@ public class TaskLoader {
     /**
      * Interruption code
      */
-    private AtomicInteger expCode;
-    private final AsyncParam param;
+    private AtomicInteger expCode = new AtomicInteger(ExpState.DEFAULT.getCode());
 
     private final ExecutorService executorService;
 
@@ -59,7 +59,6 @@ public class TaskLoader {
 
     TaskLoader(AsyncParam param, ExecutorService executorService, Map<AsyncTask, TaskProcess> processMap,
                long timeout) {
-        this.param = param;
         this.executorService = executorService;
         this.processMap = processMap;
         completeLatch = new CountDownLatch(1);
@@ -74,8 +73,6 @@ public class TaskLoader {
 
     AsyncResult load() {
         ArrayList<TaskProcess> begins = getBeginProcess();
-
-
         for (TaskProcess process : begins) {
             /**
              * Start the thread to perform tasks without any dependencies

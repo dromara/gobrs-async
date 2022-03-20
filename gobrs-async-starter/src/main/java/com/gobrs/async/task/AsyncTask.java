@@ -5,7 +5,6 @@ import com.gobrs.async.TaskSupport;
 import com.gobrs.async.callback.ErrorCallback;
 import com.gobrs.async.domain.TaskResult;
 import com.gobrs.async.enums.ExpState;
-import com.gobrs.async.enums.ResultState;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,7 +17,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @create: 2022-03-16
  **/
 public interface AsyncTask<Param, Result> extends Task {
-
     /**
      * Before the mission begins
      *
@@ -101,6 +99,7 @@ public interface AsyncTask<Param, Result> extends Task {
         }
         return true;
     }
+
 
 
 }
