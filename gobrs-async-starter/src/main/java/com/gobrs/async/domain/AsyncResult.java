@@ -14,18 +14,9 @@ import java.util.Map;
  **/
 public class AsyncResult implements Serializable {
 
-    private TaskResult taskResult;
     private Integer expCode;
     private boolean success;
     private Map<Class, TaskResult> resultMap = new HashMap();
-
-    public TaskResult getTaskResult() {
-        return taskResult;
-    }
-
-    public void setTaskResult(TaskResult taskResult) {
-        this.taskResult = taskResult;
-    }
 
     public Integer getExpCode() {
         return expCode;

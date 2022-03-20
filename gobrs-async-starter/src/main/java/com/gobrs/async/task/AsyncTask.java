@@ -4,8 +4,11 @@ package com.gobrs.async.task;
 import com.gobrs.async.TaskSupport;
 import com.gobrs.async.callback.ErrorCallback;
 import com.gobrs.async.domain.TaskResult;
+import com.gobrs.async.enums.ExpState;
+import com.gobrs.async.enums.ResultState;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @program: gobrs-async-starter
@@ -80,6 +83,18 @@ public interface AsyncTask<Param, Result> extends Task {
     default boolean stop(TaskSupport support) {
         try {
             ErrorCallback errorCallback = new ErrorCallback(() -> support.getParam(), null, support, this);
+            support.taskLoader.setExpCode(new AtomicInteger(ExpState.DEFAULT.getCode()));
+            support.taskLoader.errorInterrupted(errorCallback);
+        } catch (Exception ex) {
+            return false;
+        }
+        return true;
+    }
+
+    default boolean stop(TaskSupport support, Integer expCode) {
+        try {
+            ErrorCallback errorCallback = new ErrorCallback(() -> support.getParam(), null, support, this);
+            support.taskLoader.setExpCode(new AtomicInteger(expCode));
             support.taskLoader.errorInterrupted(errorCallback);
         } catch (Exception ex) {
             return false;

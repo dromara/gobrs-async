@@ -6,11 +6,13 @@ import com.gobrs.async.domain.AsyncResult;
 import com.gobrs.async.task.AsyncTask;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -23,7 +25,10 @@ import java.util.concurrent.locks.ReentrantLock;
  **/
 
 public class TaskLoader {
-
+    /**
+     * Interruption code
+     */
+    private AtomicInteger expCode;
     private final AsyncParam param;
 
     private final ExecutorService executorService;
@@ -69,6 +74,8 @@ public class TaskLoader {
 
     AsyncResult load() {
         ArrayList<TaskProcess> begins = getBeginProcess();
+
+
         for (TaskProcess process : begins) {
             /**
              * Start the thread to perform tasks without any dependencies
@@ -77,7 +84,7 @@ public class TaskLoader {
         }
         // wait
         waitIfNecessary();
-        return null;
+        return back(begins);
     }
 
     private ArrayList<TaskProcess> getBeginProcess() {
@@ -190,4 +197,26 @@ public class TaskLoader {
         }
     }
 
+
+    private TaskSupport getSupport(List<TaskProcess> begins) {
+        return begins.get(0).getTaskSupport();
+    }
+
+
+    private AsyncResult back(List<TaskProcess> begins) {
+        TaskSupport support = getSupport(begins);
+        AsyncResult asyncResult = new AsyncResult();
+        asyncResult.setResultMap(support.getResultMap());
+        asyncResult.setExpCode(expCode.get());
+        asyncResult.setSuccess(true);
+        return asyncResult;
+    }
+
+    public AtomicInteger getExpCode() {
+        return expCode;
+    }
+
+    public void setExpCode(AtomicInteger expCode) {
+        this.expCode = expCode;
+    }
 }

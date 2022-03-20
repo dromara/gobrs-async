@@ -1,6 +1,7 @@
 package com.gobrs.async.example.controller;
 
 import com.gobrs.async.GobrsAsync;
+import com.gobrs.async.domain.AsyncResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +23,7 @@ public class GobrsController {
 
     @RequestMapping("test")
     public String gobrsTest() {
-        gobrsAsync.go("test", () -> new Object());
+        AsyncResult test = gobrsAsync.go("test", () -> new Object());
         return "success";
     }
 
