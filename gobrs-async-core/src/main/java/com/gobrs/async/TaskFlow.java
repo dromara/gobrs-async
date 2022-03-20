@@ -1,7 +1,9 @@
 package com.gobrs.async;
 
+import com.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.gobrs.async.task.AsyncTask;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.IdentityHashMap;
@@ -10,39 +12,34 @@ import java.util.Map;
 
 /**
  * @program: gobrs-async-starter
- * @ClassName Task bus Responsible for task handling flow flow
+ * @ClassName Task bus Responsible for task handling flow
  * @description:
  * @author: sizegang
  * @create: 2022-03-16
  **/
 public class TaskFlow {
 
-    private boolean ready = false;
+
+    @Resource
+    private GobrsAsyncProperties gobrsAsyncProperties;
 
     /**
      * Task tree
      */
     private final IdentityHashMap<AsyncTask, List<AsyncTask>> denpendedTasks = new IdentityHashMap<>();
 
-    synchronized TaskBuilder after(final AsyncTask... handlers) {
-        if (ready) {
-            throw new IllegalStateException(
-                    "script is ready, cannot be edit any more.");
-        }
-        for (AsyncTask handler : handlers) {
+    synchronized TaskBuilder after(final AsyncTask... asyncTasks) {
+
+        for (AsyncTask handler : asyncTasks) {
             if (!denpendedTasks.containsKey(handler)) {
                 throw new IllegalStateException(
-                        "event handler is not in script yet.");
+                        "asyncTask not begin command");
             }
         }
-        return start(handlers);
+        return start(asyncTasks);
     }
 
     synchronized TaskBuilder start(AsyncTask... asyncTasks) {
-        if (ready) {
-            throw new IllegalStateException(
-                    "script is ready, cannot be edit any more.");
-        }
         /**
          * Building task groups
          */
@@ -50,17 +47,18 @@ public class TaskFlow {
         return builder;
     }
 
+    synchronized TaskBuilder start(List<AsyncTask> asyncTasks) {
+        /**
+         * Building task groups
+         */
+        TaskBuilder builder = new TaskBuilder(this, asyncTasks);
+        return builder;
+    }
+
     synchronized Map<AsyncTask, List<AsyncTask>> getDependsTasks() {
         return denpendedTasks;
     }
 
-    synchronized void ready() {
-        ready = true;
-    }
-
-    synchronized boolean isReady() {
-        return ready;
-    }
 
     void addDependency(AsyncTask from, AsyncTask to) {
         // create
@@ -71,5 +69,13 @@ public class TaskFlow {
         if (to != null && !denpendedTasks.get(from).contains(to)) {
             denpendedTasks.get(from).add(to);
         }
+    }
+
+    public GobrsAsyncProperties getGobrsAsyncProperties() {
+        return gobrsAsyncProperties;
+    }
+
+    public void setGobrsAsyncProperties(GobrsAsyncProperties gobrsAsyncProperties) {
+        this.gobrsAsyncProperties = gobrsAsyncProperties;
     }
 }

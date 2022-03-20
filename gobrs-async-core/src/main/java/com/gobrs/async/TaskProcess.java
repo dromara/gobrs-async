@@ -8,7 +8,11 @@ package com.gobrs.async;
  * @create: 2022-03-16
  **/
 
+import com.gobrs.async.autoconfig.GobrsAsyncProperties;
+import com.gobrs.async.callback.ErrorCallback;
 import com.gobrs.async.domain.AsyncParam;
+import com.gobrs.async.domain.TaskResult;
+import com.gobrs.async.enums.ResultState;
 import com.gobrs.async.task.AsyncTask;
 
 import java.util.ArrayList;
@@ -18,7 +22,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 class TaskProcess implements Runnable, Cloneable {
 
-    protected TaskLoader taskLoader;
+    public TaskLoader taskLoader;
 
     /**
      * Tasks to be performed
@@ -37,6 +41,8 @@ class TaskProcess implements Runnable, Cloneable {
     private Lock lock;
 
     private TaskSupport taskSupport;
+
+    private GobrsAsyncProperties gobrsAsyncProperties;
 
 
     TaskProcess(AsyncTask eventHandler, int depdending, List<AsyncTask> dependTasks) {
@@ -58,18 +64,18 @@ class TaskProcess implements Runnable, Cloneable {
 
     @Override
     public void run() {
+        Object parameter = param.get();
         try {
-            Object parameter = param.get();
-
             /**
              * If the conditions are not met
              * no execution is performed
              */
             if (task.nessary(parameter) && taskLoader.taskSupport.getResultMap().get(task.getClass()) == null) {
-                Object result = task.task(param.get());
-                taskLoader.taskSupport.getResultMap().put(task.getClass(), result);
+                task.prepare(param);
+                Object result = task.task(param.get(), taskSupport);
+                taskSupport.getResultMap().put(task.getClass(), buildSuccessResult(result));
+                task.onSuccess(taskLoader.taskSupport);
             }
-
             if (dependTasks != null) {
                 List<TaskProcess> readyProcesses = new ArrayList<TaskProcess>(dependTasks.size());
                 for (int i = 0; i < dependTasks.size(); i++) {
@@ -78,6 +84,9 @@ class TaskProcess implements Runnable, Cloneable {
                         readyProcesses.add(process);
                     }
                 }
+                /**
+                 * Response to perform
+                 */
                 if (readyProcesses.size() > 0) {
                     for (int i = (readyProcesses.size() - 1); i > 0; i--) {
                         taskLoader.startProcess(readyProcesses.get(i));
@@ -86,7 +95,13 @@ class TaskProcess implements Runnable, Cloneable {
                 }
             }
         } catch (Exception e) {
-            taskLoader.markAsError(e);
+            taskSupport.getResultMap().put(task.getClass(), buildErrorResult(null, e));
+            task.onFail(taskLoader.taskSupport);
+            if (gobrsAsyncProperties.isTaskInterrupt()) {
+                taskLoader.errorInterrupted(errorCallback(parameter, e, taskSupport, task));
+            } else {
+                taskLoader.error(errorCallback(parameter, e, taskSupport, task));
+            }
         }
     }
 
@@ -130,5 +145,32 @@ class TaskProcess implements Runnable, Cloneable {
 
     public void setTaskSupport(TaskSupport taskSupport) {
         this.taskSupport = taskSupport;
+    }
+
+
+    public TaskResult buildTaskResult(Object parameter, ResultState resultState, Exception ex) {
+        return new TaskResult(parameter, resultState, ex);
+    }
+
+
+    public TaskResult buildSuccessResult(Object parameter) {
+        return new TaskResult(parameter, ResultState.SUCCESS, null);
+    }
+
+
+    public TaskResult buildErrorResult(Object parameter, Exception ex) {
+        return new TaskResult(parameter, ResultState.SUCCESS, ex);
+    }
+
+    public ErrorCallback errorCallback(Object parameter, Exception e, TaskSupport support, AsyncTask asyncTask) {
+        return new ErrorCallback(param, e, support, asyncTask);
+    }
+
+    public GobrsAsyncProperties getGobrsAsyncProperties() {
+        return gobrsAsyncProperties;
+    }
+
+    public void setGobrsAsyncProperties(GobrsAsyncProperties gobrsAsyncProperties) {
+        this.gobrsAsyncProperties = gobrsAsyncProperties;
     }
 }

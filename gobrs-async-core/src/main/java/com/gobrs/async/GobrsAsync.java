@@ -2,8 +2,11 @@ package com.gobrs.async;
 
 import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.AsyncResult;
+import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
-
+import com.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
+import javax.annotation.Resource;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -15,27 +18,23 @@ import java.util.concurrent.ExecutorService;
  **/
 public class GobrsAsync {
 
-    private final ExecutorService executorService;
+    private final ExecutorService executorService = GobrsSpring.getBean(GobrsAsyncThreadPoolFactory.class).getThreadPoolExecutor();;
 
-    private final TaskFlow taskFlow;
+    @Resource
+    private TaskFlow taskFlow;
 
     private TaskTrigger trigger;
 
+
     private volatile boolean ready = false;
-
-    /**
-     * Sirector constructor
-     *
-     * @param executorService the executor service instance used by gobrs-async.
-     */
-    public GobrsAsync(ExecutorService executorService) {
-        this.executorService = executorService;
-        this.taskFlow = new TaskFlow();
-    }
-
 
     public TaskBuilder begin(AsyncTask... tasks) {
         return taskFlow.start(tasks);
+    }
+
+
+    public TaskBuilder begin(List<AsyncTask> asyncTasks) {
+        return taskFlow.start(asyncTasks);
     }
 
     public TaskBuilder after(AsyncTask... eventHandlers) {
@@ -53,7 +52,7 @@ public class GobrsAsync {
         return go(param, 0L);
     }
 
-    public AsyncResult start(AsyncParam param, Callback callback) {
+    public AsyncResult go(AsyncParam param, Callback callback) {
         if (!ready) {
             throw new IllegalStateException("gobrs-async not started.");
         }
@@ -67,10 +66,8 @@ public class GobrsAsync {
         return ready;
     }
 
-
     public synchronized void readyTo() {
         if (!ready) {
-            taskFlow.ready();
             trigger = new TaskTrigger(taskFlow, executorService);
             ready = true;
         }

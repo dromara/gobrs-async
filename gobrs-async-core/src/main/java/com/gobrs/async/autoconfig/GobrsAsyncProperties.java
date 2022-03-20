@@ -41,6 +41,12 @@ public class GobrsAsyncProperties {
     private String must = ":not";
 
     /**
+     * 或
+     */
+    private String or = "|";
+
+
+    /**
      * 执行异常是否打断 工作流程
      */
     private boolean taskInterrupt = false;
@@ -50,6 +56,7 @@ public class GobrsAsyncProperties {
      * @return
      */
     private long timeout = 3000;
+
 
 
 
@@ -100,5 +107,13 @@ public class GobrsAsyncProperties {
 
     public void setTaskInterrupt(boolean taskInterrupt) {
         this.taskInterrupt = taskInterrupt;
+    }
+
+    public String getOr() {
+        return or;
+    }
+
+    public void setOr(String or) {
+        this.or = or;
     }
 }

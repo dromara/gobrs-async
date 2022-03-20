@@ -1,5 +1,7 @@
 package com.gobrs.async;
 
+import com.gobrs.async.domain.TaskResult;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,10 +15,17 @@ import java.util.Map;
 
 public class TaskSupport {
 
+    public TaskLoader taskLoader;
 
+    /**
+     * The task parameters
+     */
     private Object param;
 
-    private Map<Class, Object> resultMap = new HashMap();
+    /**
+     * Task result encapsulation
+     */
+    private Map<Class, TaskResult> resultMap = new HashMap();
 
 
     public Object getParam() {
@@ -27,11 +36,19 @@ public class TaskSupport {
         this.param = param;
     }
 
-    public Map<Class, Object> getResultMap() {
+    public Map<Class, TaskResult> getResultMap() {
         return resultMap;
     }
 
-    public void setResultMap(Map<Class, Object> resultMap) {
+    public void setResultMap(Map<Class, TaskResult> resultMap) {
         this.resultMap = resultMap;
+    }
+
+    public TaskLoader getTaskLoader() {
+        return taskLoader;
+    }
+
+    public void setTaskLoader(TaskLoader taskLoader) {
+        this.taskLoader = taskLoader;
     }
 }

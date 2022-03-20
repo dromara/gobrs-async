@@ -1,5 +1,6 @@
 package com.gobrs.async.test;
 
+import com.gobrs.async.TaskSupport;
 import com.gobrs.async.task.AsyncTask;
 
 /**
@@ -12,12 +13,17 @@ import com.gobrs.async.task.AsyncTask;
 public class BService implements AsyncTask<Object, Object> {
 
     @Override
-    public Object task(Object o) {
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    public void prepare(Object o) {
+
+    }
+
+    @Override
+    public Object task(Object o, TaskSupport support) {
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
         System.out.println("BService");
         return "BService";
     }
@@ -25,5 +31,15 @@ public class BService implements AsyncTask<Object, Object> {
     @Override
     public boolean nessary(Object o) {
         return true;
+    }
+
+    @Override
+    public void onSuccess(TaskSupport support) {
+
+    }
+
+    @Override
+    public void onFail(TaskSupport support) {
+
     }
 }

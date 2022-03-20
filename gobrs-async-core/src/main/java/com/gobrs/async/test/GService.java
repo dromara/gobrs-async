@@ -5,14 +5,12 @@ import com.gobrs.async.task.AsyncTask;
 
 /**
  * @program: gobrs-async-starter
- * @ClassName DService
+ * @ClassName EService
  * @description:
  * @author: sizegang
  * @create: 2022-03-20
  **/
-public class DService implements AsyncTask<Object, Object> {
-
-    int i = 0;
+public class GService implements AsyncTask<Object, Object> {
 
     @Override
     public void prepare(Object o) {
@@ -21,13 +19,8 @@ public class DService implements AsyncTask<Object, Object> {
 
     @Override
     public Object task(Object o) {
-
-        System.out.println("DService");
-        while (i < 100000 && !Thread.currentThread().isInterrupted()) {
-            System.out.println("i++:" + i);
-            i++;
-        }
-        return "DService";
+        System.out.println("GService");
+        return "GService";
     }
 
     @Override

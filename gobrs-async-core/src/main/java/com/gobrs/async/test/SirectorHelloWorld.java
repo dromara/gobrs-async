@@ -20,11 +20,9 @@ import java.util.concurrent.Executors;
 @SuppressWarnings("unchecked")
 public class SirectorHelloWorld {
 
-    public static ExecutorService executorService = Executors.newCachedThreadPool();
-
     public static void main(String[] args) {
 
-        GobrsAsync gobrsAsync = new GobrsAsync(executorService);
+        GobrsAsync gobrsAsync = new GobrsAsync();
 
         //准备事件处理器实例和回调实例
         AService aService = new AService();
@@ -32,59 +30,21 @@ public class SirectorHelloWorld {
         CService cService = new CService();
         DService dService = new DService();
         EService eService = new EService();
+        FService fService = new FService();
+        GService gService = new GService();
 
-        Callback alertCallback = new AlertCallback();
 
         //编排事件处理器
-        gobrsAsync.begin(aService, bService).then(cService).then(eService);
-        gobrsAsync.after(eService).then(dService);
+        gobrsAsync.begin(aService, bService);
+        gobrsAsync.after(aService).then(cService);
+        gobrsAsync.after(bService).then(dService).then(eService);
+        gobrsAsync.after(bService).then(fService).then(gService);
         gobrsAsync.readyTo();
 
         //同步发布事件
-        gobrsAsync.go(() -> new Object());
+        gobrsAsync.go(() -> new Object(), 100);
         //异步发布事件
 //        gobrsAsync.start(() -> new Object(), alertCallback);
-    }
-
-    static class HelloWorldEventHandler implements
-            AsyncTask<Object, Object> {
-
-        private final int times;
-
-        public HelloWorldEventHandler(int times) {
-            this.times = times;
-        }
-
-
-        @Override
-        public Object task(Object o) {
-//            if(true){
-//                while (true){
-//                    System.out.println(111);
-//                }
-//            }
-            System.out.println(times);
-            return null;
-        }
-
-        @Override
-        public boolean nessary(Object o) {
-            return true;
-        }
-    }
-
-    static class AlertCallback implements Callback {
-
-        @Override
-        public void onError(AsyncParam event, Throwable throwable) {
-            //处理异常
-        }
-
-        @Override
-        public void onSuccess(AsyncParam event) {
-
-        }
-
     }
 
 }

@@ -23,9 +23,6 @@ public class TaskBuilder {
 
     TaskBuilder(TaskFlow taskFlow, List<AsyncTask> taskList) {
         synchronized (taskFlow) {
-            if (taskFlow.isReady()) {
-                throw new IllegalStateException("taskFlow is ready, cannot be edit any more.");
-            }
             this.taskFlow = taskFlow;
             this.cacheTaskList = new ArrayList<>(taskList.size());
             /**
@@ -40,10 +37,6 @@ public class TaskBuilder {
 
     public TaskBuilder then(AsyncTask... eventHandlers) {
         synchronized (taskFlow) {
-            if (taskFlow.isReady()) {
-                throw new IllegalStateException(
-                        "taskFlow is ready, cannot be edit any more.");
-            }
             for (AsyncTask from : this.cacheTaskList) {
                 for (AsyncTask to : eventHandlers) {
                     taskFlow.addDependency(from, to);

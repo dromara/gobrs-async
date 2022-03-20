@@ -1,6 +1,8 @@
 package com.gobrs.async;
 
+import com.gobrs.async.callback.ErrorCallback;
 import com.gobrs.async.domain.AsyncParam;
+import com.gobrs.async.task.AsyncTask;
 
 /**
  * @program: gobrs-async-starter
@@ -11,8 +13,8 @@ import com.gobrs.async.domain.AsyncParam;
  **/
 
 public interface Callback {
-     void onSuccess(AsyncParam param);
+    void onSuccess(AsyncParam param);
 
-     void onError(AsyncParam param, Throwable throwable);
+    void onError(ErrorCallback errorCallback);
 
 }

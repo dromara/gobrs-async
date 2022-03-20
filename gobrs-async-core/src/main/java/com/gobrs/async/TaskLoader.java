@@ -1,5 +1,6 @@
 package com.gobrs.async;
 
+import com.gobrs.async.callback.ErrorCallback;
 import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.AsyncResult;
 import com.gobrs.async.task.AsyncTask;
@@ -21,7 +22,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @create: 2022-03-16
  **/
 
-class TaskLoader {
+public class TaskLoader {
 
     private final AsyncParam param;
 
@@ -47,8 +48,7 @@ class TaskLoader {
 
     private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<>(0);
 
-    TaskLoader(AsyncParam param, ExecutorService executorService,
-               Map<AsyncTask, TaskProcess> processMap,
+    TaskLoader(AsyncParam param, ExecutorService executorService, Map<AsyncTask, TaskProcess> processMap,
                Callback callback, long timeout, TaskSupport taskSupport) {
         this.param = param;
         this.executorService = executorService;
@@ -72,6 +72,9 @@ class TaskLoader {
     AsyncResult load() {
         ArrayList<TaskProcess> begins = getBeginProcess();
         for (TaskProcess process : begins) {
+            /**
+             * Start the thread to perform tasks without any dependencies
+             */
             startProcess(process);
         }
         // wait
@@ -89,7 +92,7 @@ class TaskLoader {
         return beginsWith;
     }
 
-    void markAsCompleted() {
+    void completed() {
         if (callback == null) {
             completeLatch.countDown();
         } else {
@@ -97,13 +100,18 @@ class TaskLoader {
         }
     }
 
-    void markAsError(Throwable error) {
-        if (callback == null) {
-            this.error = error;
-            completeLatch.countDown();
-        } else {
-            callback.onError(param, error);
+    public void error(ErrorCallback errorCallback) {
+        if (callback != null) {
+            callback.onError(errorCallback);
         }
+    }
+
+    public void errorInterrupted(ErrorCallback errorCallback) {
+        if (callback != null) {
+            callback.onError(errorCallback);
+        }
+        this.error = errorCallback.getThrowable();
+        completeLatch.countDown();
     }
 
     private void cancel() {
@@ -123,7 +131,7 @@ class TaskLoader {
     }
 
     private void waitIfNecessary() {
-        if (callback == null) { //
+        if (callback == null) {
             try {
                 if (timeout > 0) {
                     if (!completeLatch.await(timeout, TimeUnit.MILLISECONDS)) {
@@ -159,7 +167,6 @@ class TaskLoader {
         if (!process.task.nessary(process.param)) {
             return;
         }
-
         /**
          * Don't do it if you've already done it
          */
@@ -169,6 +176,9 @@ class TaskLoader {
         }
 
         if (timeout > 0) {
+            /**
+             * Only threads in a lock can be interrupted
+             */
             lock.lock();
             try {
                 if (!canceled) {
