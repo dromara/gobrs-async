@@ -3,6 +3,7 @@ package com.gobrs.async;
 import com.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.AsyncResult;
+import com.gobrs.async.exception.NotTaskRuleException;
 import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
 import com.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
@@ -12,6 +13,7 @@ import org.springframework.scheduling.Trigger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -51,7 +53,11 @@ public class GobrsAsync {
     }
 
     public AsyncResult go(String taskName, AsyncParam param, long timeout) {
-        return trigger.get(taskName).trigger(param, timeout).load();
+        if(check(taskName).isPresent()){
+           return trigger.get(taskName).trigger(param,timeout).load();
+        }
+        throw new NotTaskRuleException("Gobrs Rule Name Is Error");
+
     }
 
     public AsyncResult go(String taskName, AsyncParam param) {
@@ -101,6 +107,9 @@ public class GobrsAsync {
         trigger.put(taskName, tr);
     }
 
+    private Optional<TaskTrigger> check(String ruleName) {
+       return Optional.ofNullable(trigger.get(ruleName));
+    }
 
 }
 
