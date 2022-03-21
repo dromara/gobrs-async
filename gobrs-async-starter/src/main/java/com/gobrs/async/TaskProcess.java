@@ -74,8 +74,8 @@ class TaskProcess implements Runnable, Cloneable {
              * no execution is performed
              */
             if (task.nessary(parameter, support) && support.getResultMap().get(task.getClass()) == null) {
-                task.prepare(param);
-                Object result = task.task(param.get(), support);
+                task.prepare(parameter);
+                Object result = task.task(parameter, support);
                 support.getResultMap().put(task.getClass(), buildSuccessResult(result));
                 task.onSuccess(support);
             }
