@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.memorydoc</groupId>
     <artifactId>gobrs-async-starter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.1.3-RELEASE</version>
     <name>${project.artifactId}</name>
     <description>🔥 强大异步任务编排工具（没有依赖中间件）</description>
     <url>https://github.com/Memorydoc/gobrs-async-starter</url>
@@ -23,18 +23,12 @@
         </developer>
     </developers>
     <distributionManagement>
-        <repository>
-            <id>libs-snapshots</id>
-            <name>libs-snapshots</name>
-            <url>http://artifactory.jd.com/libs-snapshots-local</url>
-        </repository>
         <snapshotRepository>
-            <id>libs-snapshots</id>
+            <id>snapshots</id>
             <name>JD maven2 repository-snapshots</name>
             <url>http://artifactory.jd.com/libs-snapshots-local</url>
         </snapshotRepository>
     </distributionManagement>
-
     <properties>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
         <java.version>1.8</java.version>
@@ -79,25 +73,65 @@
         </dependency>
     </dependencies>
     <build>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.1</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
                 <configuration>
-                    <attach>true</attach>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <compilerArgument>-Xlint:unchecked</compilerArgument>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.1.0</version>
                 <executions>
                     <execution>
-                        <phase>compile</phase>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <attach>true</attach>
+                </configuration>
             </plugin>
         </plugins>
     </build>
-
     <profiles>
         <profile>
             <id>disable-javadoc-doclint</id>

@@ -4,7 +4,7 @@ import com.gobrs.async.GobrsAsync;
 
 /**
  * @program: gobrs-async-starter
- * @ClassName SirectorHelloWorld
+ * @ClassName GobrsAsync
  * @description:
  * @author: sizegang
  * @create: 2022-03-16
