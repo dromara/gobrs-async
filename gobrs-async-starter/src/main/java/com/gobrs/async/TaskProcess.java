@@ -86,11 +86,11 @@ class TaskProcess implements Runnable, Cloneable {
                     /**
                      * No dependent task is executed By configuring
                      */
-                    if(gobrsAsyncProperties.isRelyDepend()){
-                        if (process.decreaseUnsatisfiedDependcies() == 0) {
+                    if (gobrsAsyncProperties.isRelyDepend()) {
+                        if (noDependsOn(process)) {
                             readyProcesses.add(process);
                         }
-                    }else{
+                    } else {
                         readyProcesses.add(process);
                     }
                 }
@@ -100,11 +100,14 @@ class TaskProcess implements Runnable, Cloneable {
                 if (readyProcesses.size() > 0) {
                     for (int i = (readyProcesses.size() - 1); i > 0; i--) {
                         taskLoader.startProcess(readyProcesses.get(i));
+                        if (noDependsOn(readyProcesses.get(i))) {
+                            /**
+                             * End Task Process
+                             */
+                            readyProcesses.get(0).run();
+                            break;
+                        }
                     }
-                    /**
-                     * End Task Process
-                     */
-                    readyProcesses.get(0).run();
                 }
             }
         } catch (Exception e) {
@@ -116,6 +119,15 @@ class TaskProcess implements Runnable, Cloneable {
                 taskLoader.error(errorCallback(parameter, e, support, task));
             }
         }
+    }
+
+    /**
+     * There is no dependence
+     * @param process
+     * @return
+     */
+    private boolean noDependsOn(TaskProcess process) {
+        return process.decreaseUnsatisfiedDependcies() == 0;
     }
 
     boolean hasUnsatisfiedDependcies() {
