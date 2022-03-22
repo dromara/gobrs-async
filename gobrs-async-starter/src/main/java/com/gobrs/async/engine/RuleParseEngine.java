@@ -1,7 +1,7 @@
 package com.gobrs.async.engine;
 
 import com.gobrs.async.GobrsAsync;
-import com.gobrs.async.TaskRecevieFlow;
+import com.gobrs.async.TaskRecevie;
 import com.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.gobrs.async.rule.Rule;
 import com.gobrs.async.spring.GobrsSpring;
@@ -44,7 +44,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
             List<String> arrayList = Arrays.asList(taskArr);
             String leftTaskName = arrayList.get(0);
-            TaskRecevieFlow taskBuilder = gobrsAsync.after(rule.getName(),EngineExecutor.getAsyncTask(leftTaskName));
+            TaskRecevie taskBuilder = gobrsAsync.after(rule.getName(),EngineExecutor.getAsyncTask(leftTaskName));
             for (int i = 1; i < arrayList.size(); i++) {
                 String taskBean = arrayList.get(i);
                 if (taskBean.contains(sp)) {
@@ -75,11 +75,11 @@ public class RuleParseEngine<T> extends AbstractEngine {
             return (AsyncTask) getBean(taskName);
         }
 
-        public static AsyncTask getWrapperDepend(Map<String, AsyncTask> cacheTaskWrappers, String taskBean, TaskRecevieFlow taskBuilder) {
+        public static AsyncTask getWrapperDepend(Map<String, AsyncTask> cacheTaskWrappers, String taskBean, TaskRecevie taskBuilder) {
             return getWrapperDepend(cacheTaskWrappers, taskBean, taskBuilder, true);
         }
 
-        public static AsyncTask getWrapperDepend(Map<String, AsyncTask> cacheTaskWrappers, String taskBean, TaskRecevieFlow taskBuilder, boolean must) {
+        public static AsyncTask getWrapperDepend(Map<String, AsyncTask> cacheTaskWrappers, String taskBean, TaskRecevie taskBuilder, boolean must) {
             return Optional.ofNullable(getAsyncTask(taskBean)).map((bean) -> Optional.ofNullable(cacheTaskWrappers.get(taskBean)).map((tk) -> {
                 taskBuilder.then(tk);
                 return tk;

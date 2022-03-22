@@ -13,7 +13,7 @@ import java.util.List;
  * @author: sizegang
  * @create: 2022-03-16
  **/
-public class TaskRecevieFlow {
+public class TaskRecevie {
 
     private final TaskFlow taskFlow;
     /**
@@ -21,7 +21,7 @@ public class TaskRecevieFlow {
      */
     private List<AsyncTask> cacheTaskList;
 
-    TaskRecevieFlow(TaskFlow taskFlow, List<AsyncTask> taskList) {
+    TaskRecevie(TaskFlow taskFlow, List<AsyncTask> taskList) {
         synchronized (taskFlow) {
             this.taskFlow = taskFlow;
             this.cacheTaskList = new ArrayList<>(taskList.size());
@@ -35,7 +35,7 @@ public class TaskRecevieFlow {
         }
     }
 
-    public TaskRecevieFlow then(AsyncTask... eventHandlers) {
+    public TaskRecevie then(AsyncTask... eventHandlers) {
         synchronized (taskFlow) {
             for (AsyncTask from : this.cacheTaskList) {
                 for (AsyncTask to : eventHandlers) {
