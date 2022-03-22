@@ -3,7 +3,6 @@ package com.gobrs.async;
 import com.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.gobrs.async.task.AsyncTask;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.IdentityHashMap;
@@ -27,7 +26,7 @@ public class TaskFlow {
      */
     private final IdentityHashMap<AsyncTask, List<AsyncTask>> denpendedTasks = new IdentityHashMap<>();
 
-    synchronized TaskBuilder after(final AsyncTask... asyncTasks) {
+    synchronized TaskRecevieFlow after(final AsyncTask... asyncTasks) {
 
         for (AsyncTask handler : asyncTasks) {
             if (!denpendedTasks.containsKey(handler)) {
@@ -38,19 +37,19 @@ public class TaskFlow {
         return start(asyncTasks);
     }
 
-    synchronized TaskBuilder start(AsyncTask... asyncTasks) {
+    synchronized TaskRecevieFlow start(AsyncTask... asyncTasks) {
         /**
          * Building task groups
          */
-        TaskBuilder builder = new TaskBuilder(this, Arrays.asList(asyncTasks));
+        TaskRecevieFlow builder = new TaskRecevieFlow(this, Arrays.asList(asyncTasks));
         return builder;
     }
 
-    synchronized TaskBuilder start(List<AsyncTask> asyncTasks) {
+    synchronized TaskRecevieFlow start(List<AsyncTask> asyncTasks) {
         /**
          * Building task groups
          */
-        TaskBuilder builder = new TaskBuilder(this, asyncTasks);
+        TaskRecevieFlow builder = new TaskRecevieFlow(this, asyncTasks);
         return builder;
     }
 

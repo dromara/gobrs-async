@@ -41,7 +41,7 @@ public class TaskLoader {
 
     private final CountDownLatch completeLatch;
 
-    private final Map<AsyncTask, TaskProcess> processMap;
+    private final Map<AsyncTask, TaskActuator> processMap;
 
 
     private final long timeout;
@@ -57,7 +57,7 @@ public class TaskLoader {
 
     private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<>(0);
 
-    TaskLoader(AsyncParam param, ExecutorService executorService, Map<AsyncTask, TaskProcess> processMap,
+    TaskLoader(AsyncParam param, ExecutorService executorService, Map<AsyncTask, TaskActuator> processMap,
                long timeout) {
         this.executorService = executorService;
         this.processMap = processMap;
@@ -72,8 +72,8 @@ public class TaskLoader {
     }
 
     AsyncResult load() {
-        ArrayList<TaskProcess> begins = getBeginProcess();
-        for (TaskProcess process : begins) {
+        ArrayList<TaskActuator> begins = getBeginProcess();
+        for (TaskActuator process : begins) {
             /**
              * Start the thread to perform tasks without any dependencies
              */
@@ -84,9 +84,9 @@ public class TaskLoader {
         return back(begins);
     }
 
-    private ArrayList<TaskProcess> getBeginProcess() {
-        ArrayList<TaskProcess> beginsWith = new ArrayList<>(1);
-        for (TaskProcess process : processMap.values()) {
+    private ArrayList<TaskActuator> getBeginProcess() {
+        ArrayList<TaskActuator> beginsWith = new ArrayList<>(1);
+        for (TaskActuator process : processMap.values()) {
             if (!process.hasUnsatisfiedDependcies()) {
                 beginsWith.add(process);
             }
@@ -150,11 +150,11 @@ public class TaskLoader {
     }
 
 
-    TaskProcess getProcess(AsyncTask eventHandler) {
+    TaskActuator getProcess(AsyncTask eventHandler) {
         return processMap.get(eventHandler);
     }
 
-    void startProcess(TaskProcess process) {
+    void startProcess(TaskActuator process) {
 
         if (timeout > 0 || process.getGobrsAsyncProperties().isTaskInterrupt()) {
             /**
@@ -174,12 +174,12 @@ public class TaskLoader {
     }
 
 
-    private TaskSupport getSupport(List<TaskProcess> begins) {
+    private TaskSupport getSupport(List<TaskActuator> begins) {
         return begins.get(0).getTaskSupport();
     }
 
 
-    private AsyncResult back(List<TaskProcess> begins) {
+    private AsyncResult back(List<TaskActuator> begins) {
         TaskSupport support = getSupport(begins);
         AsyncResult asyncResult = new AsyncResult();
         asyncResult.setResultMap(support.getResultMap());

@@ -1,221 +1,172 @@
 package com.gobrs.async;
 
+import com.gobrs.async.domain.AsyncParam;
+import com.gobrs.async.spring.GobrsSpring;
+import com.gobrs.async.task.AsyncTask;
+import com.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
+
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+
 /**
  * @program: gobrs-async-starter
- * @ClassName EventProcess
- * @description:
+ * @description: Task preloader
  * @author: sizegang
  * @create: 2022-03-16
  **/
 
-import com.gobrs.async.autoconfig.GobrsAsyncProperties;
-import com.gobrs.async.callback.ErrorCallback;
-import com.gobrs.async.domain.AsyncParam;
-import com.gobrs.async.domain.TaskResult;
-import com.gobrs.async.enums.ResultState;
-import com.gobrs.async.task.AsyncTask;
+class TaskProcess {
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+    private final TaskFlow taskFlow;
 
-class TaskProcess implements Runnable, Cloneable {
+    private final ExecutorService executorService = GobrsSpring.getBean(GobrsAsyncThreadPoolFactory.class).getThreadPoolExecutor();
 
-    public TaskSupport support;
+    private IdentityHashMap<AsyncTask, TaskActuator> prepareTaskMap = new IdentityHashMap<>();
 
-    /**
-     * Tasks to be performed
-     */
-    public final AsyncTask task;
-
-    private boolean must = true;
-
-
-    private volatile int unsatisfiedDepdendings;
-
-    /**
-     * depend task
-     */
-    private final List<AsyncTask> subTasks;
-
-    public AsyncParam param;
-
-    private Lock lock;
-
-
-    private GobrsAsyncProperties gobrsAsyncProperties;
-
-
-    TaskProcess(AsyncTask eventHandler, int depdending, List<AsyncTask> subTasks) {
-        this.task = eventHandler;
-        this.unsatisfiedDepdendings = depdending;
-        this.subTasks = subTasks;
+    TaskProcess(TaskFlow taskFlow) {
+        this.taskFlow = taskFlow;
+        prepare();
     }
 
     /**
-     * Initialize the object cloned from prototype.
-     *
-     * @param support
-     * @param param
+     * Build task dependencies Load the cache for the first time when a project is started, subsequent cache processing is performed only once
      */
-    void init(TaskSupport support, AsyncParam param) {
-        this.support = support;
-        this.param = param;
-    }
+    private void prepare() {
 
-    @Override
-    public void run() {
-        Object parameter = param.get();
-        TaskLoader taskLoader = support.getTaskLoader();
-        try {
-            /**
-             * If the conditions are not met
-             * no execution is performed
-             */
-            if (task.nessary(parameter, support) && support.getResultMap().get(task.getClass()) == null) {
-                task.prepare(parameter);
-                Object result = task.task(parameter, support);
-                support.getResultMap().put(task.getClass(), buildSuccessResult(result));
-                task.onSuccess(support);
+
+        Map<AsyncTask, List<AsyncTask>> downTasksMap = copyDependTasks(taskFlow.getDependsTasks());
+
+        Map<AsyncTask, List<AsyncTask>> upwardTasksMap = new HashMap<>();
+
+        for (AsyncTask task : downTasksMap.keySet()) {
+            upwardTasksMap.put(task, new ArrayList<>(1));
+        }
+
+        for (AsyncTask task : downTasksMap.keySet()) {
+            for (AsyncTask depended : downTasksMap.get(task)) {
+                upwardTasksMap.get(depended).add(task);
             }
+        }
 
-            nextTask(taskLoader);
 
-        } catch (Exception e) {
-            support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
-            task.onFail(support);
-            if (gobrsAsyncProperties.isTaskInterrupt()) {
-                taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
+        AssistantTask starter = new AssistantTask();
+        List<AsyncTask> noDependsTasks = new ArrayList<>(1);
+
+        for (AsyncTask task : downTasksMap.keySet()) {
+            List<AsyncTask> dTasks = downTasksMap.get(task);
+            if (dTasks.isEmpty()) {
+                noDependsTasks.add(task);
+                downTasksMap.get(task).add(starter);
+            }
+        }
+        downTasksMap.put(starter, new ArrayList<>(0));
+        upwardTasksMap.put(starter, noDependsTasks);
+
+        for (AsyncTask task : downTasksMap.keySet()) {
+            TaskActuator process;
+            if (task != starter) {
+                /**
+                 * Each task is executed using a new Processs
+                 */
+                process = new TaskActuator(task, upwardTasksMap.get(task).size(), downTasksMap.get(task));
             } else {
-                taskLoader.error(errorCallback(parameter, e, support, task));
-
-                nextTask(taskLoader);
+                /***
+                 * completely  and  Termination of the task
+                 */
+                process = new TerminationTask(task, upwardTasksMap.get(task).size(), downTasksMap.get(task));
             }
+            process.setGobrsAsyncProperties(taskFlow.getGobrsAsyncProperties());
+            prepareTaskMap.put(task, process);
         }
     }
 
+    private Map<AsyncTask, List<AsyncTask>> copyDependTasks(Map<AsyncTask, List<AsyncTask>> handlerMap) {
+        IdentityHashMap<AsyncTask, List<AsyncTask>> rt = new IdentityHashMap<>();
+        for (AsyncTask eventHandler : handlerMap.keySet()) {
+            rt.put(eventHandler, new ArrayList<>(handlerMap.get(eventHandler)));
+        }
+        return rt;
+    }
+
+
+    TaskLoader trigger(AsyncParam param, long timeout) {
+        IdentityHashMap<AsyncTask, TaskActuator> newProcessMap = new IdentityHashMap<>(prepareTaskMap.size());
+        /**
+         * Assign one loader to each task
+         */
+        TaskLoader loader = new TaskLoader(param, executorService, newProcessMap, timeout);
+        TaskSupport support = getSupport(param);
+        support.setTaskLoader(loader);
+
+        for (AsyncTask task : prepareTaskMap.keySet()) {
+            /**
+             * clone Process
+             */
+            TaskActuator newProcess = (TaskActuator) prepareTaskMap.get(task).clone();
+            newProcess.init(support, param);
+            newProcessMap.put(task, newProcess);
+        }
+        return loader;
+    }
+
+
     /**
-     * Move on to the next task
+     * ScriptEndEventHandler will do work to complete the whole ScriptRuntime
+     * process.
      */
-    public void nextTask(TaskLoader taskLoader) {
-        if (subTasks != null) {
-            boolean hasUsedSynRunTimeOnce = false;
-            for (int i = 0; i < subTasks.size(); i++) {
-                TaskProcess process = taskLoader
-                        .getProcess(subTasks.get(i));
+    private class TerminationTask extends TaskActuator {
 
-                if (process.decreaseUnsatisfiedDependcies() == 0) {
-                    /**
-                     * Make the most of your threads
-                     * Use the parent thread to perform the first child task
-                     */
-                    if (!hasUsedSynRunTimeOnce) {
-                        hasUsedSynRunTimeOnce = true;
-                        process.run();
-                    } else {
-                        /**
-                         * The remaining subtasks open threads using thread pools
-                         */
-                        taskLoader.startProcess(process);
-                    }
-                }
-            }
+        TerminationTask(AsyncTask handler, int depdending, List<AsyncTask> dependedTasks) {
+            super(handler, depdending, dependedTasks);
+        }
+        @Override
+        public void run() {
+            support.taskLoader.completed();
         }
     }
 
+    /**
+     * Count the number of dependent tasks by this class
+     * @param <P>
+     * @param <R>
+     */
+    private class AssistantTask<P, R> implements AsyncTask<P, R> {
+
+        @Override
+        public void prepare(P p) {
+
+        }
+
+        @Override
+        public R task(P p, TaskSupport support) {
+            return null;
+        }
+
+        @Override
+        public boolean nessary(P p, TaskSupport support) {
+            return true;
+        }
+
+        @Override
+        public void onSuccess(TaskSupport support) {
+
+        }
+
+        @Override
+        public void onFail(TaskSupport support) {
+
+        }
+    }
 
     /**
-     * There is no dependence
-     *
-     * @param process
+     * Get the task Bus
+     * @param param
      * @return
      */
-    private boolean noDependsOn(TaskProcess process) {
-        return process.decreaseUnsatisfiedDependcies() == 0;
+    private TaskSupport getSupport(AsyncParam param) {
+        TaskSupport taskSupport = new TaskSupport();
+        taskSupport.setParam(param);
+        return taskSupport;
     }
 
-    boolean hasUnsatisfiedDependcies() {
-        lock.lock();
-        try {
-            return unsatisfiedDepdendings != 0;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    /**
-     * Release the dependon task
-     *
-     *Gets the number of task dependencies that still need to wait
-     *
-     * @return
-     */
-    private int decreaseUnsatisfiedDependcies() {
-        lock.lock();
-        try {
-            return --unsatisfiedDepdendings;
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public Object clone() {
-        try {
-            TaskProcess cloned = (TaskProcess) super.clone();
-            cloned.lock = new ReentrantLock();
-            return cloned;
-        } catch (Exception e) {
-            throw new InternalError();
-        }
-    }
-
-    public AsyncTask getTask() {
-        return task;
-    }
-
-    public TaskSupport getTaskSupport() {
-        return support;
-    }
-
-    public void setTaskSupport(TaskSupport taskSupport) {
-        this.support = taskSupport;
-    }
-
-
-    public TaskResult buildTaskResult(Object parameter, ResultState resultState, Exception ex) {
-        return new TaskResult(parameter, resultState, ex);
-    }
-
-
-    public TaskResult buildSuccessResult(Object parameter) {
-        return new TaskResult(parameter, ResultState.SUCCESS, null);
-    }
-
-
-    public TaskResult buildErrorResult(Object parameter, Exception ex) {
-        return new TaskResult(parameter, ResultState.SUCCESS, ex);
-    }
-
-    public ErrorCallback errorCallback(Object parameter, Exception e, TaskSupport support, AsyncTask asyncTask) {
-        return new ErrorCallback(param, e, support, asyncTask);
-    }
-
-    public GobrsAsyncProperties getGobrsAsyncProperties() {
-        return gobrsAsyncProperties;
-    }
-
-    public void setGobrsAsyncProperties(GobrsAsyncProperties gobrsAsyncProperties) {
-        this.gobrsAsyncProperties = gobrsAsyncProperties;
-    }
-
-    public boolean isMust() {
-        return must;
-    }
-
-    public void setMust(boolean must) {
-        this.must = must;
-    }
 }

@@ -26,15 +26,15 @@ public class GobrsAsync {
     private GobrsAsyncProperties gobrsAsyncProperties;
     private Map<String, TaskFlow> taskFlow;
 
-    private Map<String, TaskTrigger> trigger;
+    private Map<String, TaskProcess> trigger;
 
 
-    public TaskBuilder begin(String taskName, AsyncTask... tasks) {
+    public TaskRecevieFlow begin(String taskName, AsyncTask... tasks) {
         return taskFlow.get(taskName).start(tasks);
     }
 
 
-    public TaskBuilder begin(String taskName, List<AsyncTask> asyncTasks) {
+    public TaskRecevieFlow begin(String taskName, List<AsyncTask> asyncTasks) {
         if (taskFlow == null) {
             loadTaskFlow(taskName);
         }
@@ -44,7 +44,7 @@ public class GobrsAsync {
         return taskFlow.get(taskName).start(asyncTasks);
     }
 
-    public TaskBuilder after(String taskName, AsyncTask... eventHandlers) {
+    public TaskRecevieFlow after(String taskName, AsyncTask... eventHandlers) {
         return taskFlow.get(taskName).after(eventHandlers);
     }
 
@@ -85,16 +85,16 @@ public class GobrsAsync {
 
     private void loadTrigger(String taskName) {
         trigger = new HashMap<>();
-        TaskTrigger tr = new TaskTrigger(taskFlow.get(taskName));
+        TaskProcess tr = new TaskProcess(taskFlow.get(taskName));
         trigger.put(taskName, tr);
     }
 
     private void loadTriggerForOne(String taskName) {
-        TaskTrigger tr = new TaskTrigger(taskFlow.get(taskName));
+        TaskProcess tr = new TaskProcess(taskFlow.get(taskName));
         trigger.put(taskName, tr);
     }
 
-    private Optional<TaskTrigger> check(String ruleName) {
+    private Optional<TaskProcess> check(String ruleName) {
         return Optional.ofNullable(trigger.get(ruleName));
     }
 
