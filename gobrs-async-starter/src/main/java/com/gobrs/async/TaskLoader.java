@@ -156,20 +156,6 @@ public class TaskLoader {
 
     void startProcess(TaskProcess process) {
 
-        /**
-         * Check whether the command needs to be executed
-         */
-        if (!process.task.nessary(process.param.get(), process.getTaskSupport())) {
-            return;
-        }
-        /**
-         * Don't do it if you've already done it
-         */
-        Object result = process.support.getResultMap().get(process.task.getClass());
-        if (result != null) {
-            return;
-        }
-
         if (timeout > 0 || process.getGobrsAsyncProperties().isTaskInterrupt()) {
             /**
              * Only threads in a lock can be interrupted

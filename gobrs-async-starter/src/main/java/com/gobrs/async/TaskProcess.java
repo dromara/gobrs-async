@@ -80,35 +80,8 @@ class TaskProcess implements Runnable, Cloneable {
                 task.onSuccess(support);
             }
 
-//                for (int i = 0; i < dependTasks.size(); i++) {
-//                    TaskProcess process = taskLoader.getProcess(dependTasks.get(i));
-//                    /**
-//                     * No dependent task is executed By configuring
-//                     */
-//                    if (gobrsAsyncProperties.isRelyDepend()) {
-//                        if (noDependsOn(process)) {
-//                            readyProcesses.add(process);
-//                        }
-//                    } else {
-//                        readyProcesses.add(process);
-//                    }
-//                }
-//                /**
-//                 * Response to perform
-//                 */
-//                if (readyProcesses.size() > 0) {
-//                    for (int i = (readyProcesses.size() - 1); i > 0; i--) {
-//                        taskLoader.startProcess(readyProcesses.get(i));
-//                        if (noDependsOn(readyProcesses.get(i))) {
-//                            /**
-//                             * End Task Process
-//                             */
-//                            readyProcesses.get(0).run();
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
+            nextTask(taskLoader);
+
         } catch (Exception e) {
             support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
             task.onFail(support);
@@ -125,16 +98,25 @@ class TaskProcess implements Runnable, Cloneable {
     /**
      * Move on to the next task
      */
-    private void nextTask(TaskLoader taskLoader) {
+    public void nextTask(TaskLoader taskLoader) {
         if (subTasks != null) {
             boolean hasUsedSynRunTimeOnce = false;
             for (int i = 0; i < subTasks.size(); i++) {
-                TaskProcess process = taskLoader.getProcess(subTasks.get(i));
+                TaskProcess process = taskLoader
+                        .getProcess(subTasks.get(i));
+
                 if (process.decreaseUnsatisfiedDependcies() == 0) {
+                    /**
+                     * Make the most of your threads
+                     * Use the parent thread to perform the first child task
+                     */
                     if (!hasUsedSynRunTimeOnce) {
                         hasUsedSynRunTimeOnce = true;
                         process.run();
                     } else {
+                        /**
+                         * The remaining subtasks open threads using thread pools
+                         */
                         taskLoader.startProcess(process);
                     }
                 }
@@ -163,7 +145,9 @@ class TaskProcess implements Runnable, Cloneable {
     }
 
     /**
-     * Release the task
+     * Release the dependon task
+     *
+     *Gets the number of task dependencies that still need to wait
      *
      * @return
      */
