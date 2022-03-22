@@ -37,7 +37,7 @@ class TaskProcess implements Runnable, Cloneable {
     /**
      * depend task
      */
-    private final List<AsyncTask> dependTasks;
+    private final List<AsyncTask> subTasks;
 
     public AsyncParam param;
 
@@ -47,10 +47,10 @@ class TaskProcess implements Runnable, Cloneable {
     private GobrsAsyncProperties gobrsAsyncProperties;
 
 
-    TaskProcess(AsyncTask eventHandler, int depdending, List<AsyncTask> dependTasks) {
+    TaskProcess(AsyncTask eventHandler, int depdending, List<AsyncTask> subTasks) {
         this.task = eventHandler;
         this.unsatisfiedDepdendings = depdending;
-        this.dependTasks = dependTasks;
+        this.subTasks = subTasks;
     }
 
     /**
@@ -79,37 +79,36 @@ class TaskProcess implements Runnable, Cloneable {
                 support.getResultMap().put(task.getClass(), buildSuccessResult(result));
                 task.onSuccess(support);
             }
-            if (dependTasks != null) {
-                List<TaskProcess> readyProcesses = new ArrayList<>(dependTasks.size());
-                for (int i = 0; i < dependTasks.size(); i++) {
-                    TaskProcess process = taskLoader.getProcess(dependTasks.get(i));
-                    /**
-                     * No dependent task is executed By configuring
-                     */
-                    if (gobrsAsyncProperties.isRelyDepend()) {
-                        if (noDependsOn(process)) {
-                            readyProcesses.add(process);
-                        }
-                    } else {
-                        readyProcesses.add(process);
-                    }
-                }
-                /**
-                 * Response to perform
-                 */
-                if (readyProcesses.size() > 0) {
-                    for (int i = (readyProcesses.size() - 1); i > 0; i--) {
-                        taskLoader.startProcess(readyProcesses.get(i));
-                        if (noDependsOn(readyProcesses.get(i))) {
-                            /**
-                             * End Task Process
-                             */
-                            readyProcesses.get(0).run();
-                            break;
-                        }
-                    }
-                }
-            }
+
+//                for (int i = 0; i < dependTasks.size(); i++) {
+//                    TaskProcess process = taskLoader.getProcess(dependTasks.get(i));
+//                    /**
+//                     * No dependent task is executed By configuring
+//                     */
+//                    if (gobrsAsyncProperties.isRelyDepend()) {
+//                        if (noDependsOn(process)) {
+//                            readyProcesses.add(process);
+//                        }
+//                    } else {
+//                        readyProcesses.add(process);
+//                    }
+//                }
+//                /**
+//                 * Response to perform
+//                 */
+//                if (readyProcesses.size() > 0) {
+//                    for (int i = (readyProcesses.size() - 1); i > 0; i--) {
+//                        taskLoader.startProcess(readyProcesses.get(i));
+//                        if (noDependsOn(readyProcesses.get(i))) {
+//                            /**
+//                             * End Task Process
+//                             */
+//                            readyProcesses.get(0).run();
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
         } catch (Exception e) {
             support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
             task.onFail(support);
@@ -117,12 +116,36 @@ class TaskProcess implements Runnable, Cloneable {
                 taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
             } else {
                 taskLoader.error(errorCallback(parameter, e, support, task));
+
+                nextTask(taskLoader);
             }
         }
     }
 
     /**
+     * Move on to the next task
+     */
+    private void nextTask(TaskLoader taskLoader) {
+        if (subTasks != null) {
+            boolean hasUsedSynRunTimeOnce = false;
+            for (int i = 0; i < subTasks.size(); i++) {
+                TaskProcess process = taskLoader.getProcess(subTasks.get(i));
+                if (process.decreaseUnsatisfiedDependcies() == 0) {
+                    if (!hasUsedSynRunTimeOnce) {
+                        hasUsedSynRunTimeOnce = true;
+                        process.run();
+                    } else {
+                        taskLoader.startProcess(process);
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
      * There is no dependence
+     *
      * @param process
      * @return
      */
@@ -139,6 +162,11 @@ class TaskProcess implements Runnable, Cloneable {
         }
     }
 
+    /**
+     * Release the task
+     *
+     * @return
+     */
     private int decreaseUnsatisfiedDependcies() {
         lock.lock();
         try {

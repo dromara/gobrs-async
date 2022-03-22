@@ -47,17 +47,17 @@ class TaskTrigger {
 
 
         Starter starter = new Starter();
-        List<AsyncTask> endDependTask = new ArrayList<>(1);
+        List<AsyncTask> noDependsTasks = new ArrayList<>(1);
 
         for (AsyncTask task : downTasksMap.keySet()) {
             List<AsyncTask> dTasks = downTasksMap.get(task);
             if (dTasks.isEmpty()) {
-                endDependTask.add(task);
+                noDependsTasks.add(task);
                 downTasksMap.get(task).add(starter);
             }
         }
         downTasksMap.put(starter, new ArrayList<>(0));
-        upwardTasksMap.put(starter, endDependTask);
+        upwardTasksMap.put(starter, noDependsTasks);
 
         /**
          * Prepare process prototypes

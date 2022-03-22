@@ -139,7 +139,7 @@ public class TaskLoader {
                     throw new TimeoutException();
                 }
             } else {
-                completeLatch.await(10, TimeUnit.SECONDS);
+                completeLatch.await();
             }
             if (error != null) {
                 throw new GobrsAsyncException(error);

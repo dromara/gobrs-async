@@ -49,8 +49,8 @@ public class GobrsAsync {
     }
 
     public AsyncResult go(String taskName, AsyncParam param, long timeout) {
-        if(check(taskName).isPresent()){
-           return trigger.get(taskName).trigger(param,timeout).load();
+        if (check(taskName).isPresent()) {
+            return trigger.get(taskName).trigger(param, timeout).load();
         }
         throw new NotTaskRuleException("Gobrs Rule Name Is Error");
 
@@ -62,14 +62,12 @@ public class GobrsAsync {
 
 
     public synchronized void readyTo(String taskName) {
-        TaskTrigger taskTrigger = new TaskTrigger(taskFlow.get(taskName));
         if (trigger == null) {
             loadTrigger(taskName);
         }
         if (trigger.get(taskName) == null) {
             loadTriggerForOne(taskName);
         }
-        trigger.put(taskName, taskTrigger);
     }
 
     private void loadTaskFlow(String taskName) {
@@ -97,7 +95,7 @@ public class GobrsAsync {
     }
 
     private Optional<TaskTrigger> check(String ruleName) {
-       return Optional.ofNullable(trigger.get(ruleName));
+        return Optional.ofNullable(trigger.get(ruleName));
     }
 
 }
