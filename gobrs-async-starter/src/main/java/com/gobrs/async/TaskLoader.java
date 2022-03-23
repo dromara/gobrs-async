@@ -119,12 +119,12 @@ public class TaskLoader {
         asyncExceptionInterceptor.exception(errorCallback);
     }
 
-    public void preInterceptor(Object object, String taskKey, String taskName){
-        asyncTaskPreInterceptor.preProcess(object, taskKey, taskName);
+    public void preInterceptor(Object object, String taskName) {
+        asyncTaskPreInterceptor.preProcess(object, taskName);
     }
 
-    public void postInterceptor(Object object, String taskKey, String taskName){
-        asyncTaskPostInterceptor.postProcess(object, taskKey, taskName);
+    public void postInterceptor(Object object, String taskName) {
+        asyncTaskPostInterceptor.postProcess(object, taskName);
     }
 
     private void cancel() {

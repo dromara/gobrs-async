@@ -9,5 +9,5 @@ package com.gobrs.async.callback;
  **/
 public interface AsyncTaskPreInterceptor<P> {
 
-    void preProcess(P params, String taskKey, String taskName);
+    void preProcess(P params, String taskName);
 }

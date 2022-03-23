@@ -79,7 +79,7 @@ class TaskActuator implements Runnable, Cloneable {
                 /**
                  * Unified front intercept
                  */
-                taskLoader.preInterceptor(parameter, task.getKey(), task.getName());
+                taskLoader.preInterceptor(parameter,  task.getName());
 
                 /**
                  * Perform a task
@@ -89,7 +89,7 @@ class TaskActuator implements Runnable, Cloneable {
                 /**
                  * Post-processing of tasks
                  */
-                taskLoader.postInterceptor(result, task.getKey(), task.getName());
+                taskLoader.postInterceptor(result,  task.getName());
 
                 /**
                  * Setting Task Results

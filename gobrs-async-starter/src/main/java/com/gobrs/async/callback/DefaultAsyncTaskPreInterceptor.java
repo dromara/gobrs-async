@@ -10,7 +10,7 @@ package com.gobrs.async.callback;
 public class DefaultAsyncTaskPreInterceptor<P> implements AsyncTaskPreInterceptor<P> {
 
     @Override
-    public void preProcess(Object result, String taskKey, String taskName) {
+    public void preProcess(Object result, String taskName) {
 
     }
 }

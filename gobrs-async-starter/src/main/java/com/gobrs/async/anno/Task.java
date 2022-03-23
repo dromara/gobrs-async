@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  **/
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AsyncTask {
+public @interface Task {
 
     String key() default "gobrsAsyncKey";
 

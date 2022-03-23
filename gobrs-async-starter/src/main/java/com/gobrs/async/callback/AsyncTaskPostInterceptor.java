@@ -9,6 +9,6 @@ package com.gobrs.async.callback;
  **/
 public interface AsyncTaskPostInterceptor {
 
-   void postProcess(Object result, String taskKey, String taskName);
+   void postProcess(Object result,  String taskName);
 
 }

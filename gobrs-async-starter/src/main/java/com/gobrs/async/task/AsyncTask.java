@@ -18,7 +18,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  **/
 public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Result>  {
 
-    private String key;
 
     private String name;
 
@@ -68,13 +67,6 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         return true;
     }
 
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
 
     public String getName() {
         return name;
