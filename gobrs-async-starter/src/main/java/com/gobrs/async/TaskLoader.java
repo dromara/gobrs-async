@@ -1,9 +1,11 @@
 package com.gobrs.async;
 
+import com.gobrs.async.callback.AsyncTaskPostInterceptor;
+import com.gobrs.async.callback.AsyncTaskPreInterceptor;
 import com.gobrs.async.callback.ErrorCallback;
 import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.AsyncResult;
-import com.gobrs.async.callback.AsyncExceptionInterceptor;
+import com.gobrs.async.callback.AsyncTaskExceptionInterceptor;
 import com.gobrs.async.enums.ExpState;
 import com.gobrs.async.exception.GobrsAsyncException;
 import com.gobrs.async.exception.TimeoutException;
@@ -37,7 +39,11 @@ public class TaskLoader {
 
     private final ExecutorService executorService;
 
-    private AsyncExceptionInterceptor asyncExceptionInterceptor = GobrsSpring.getBean(AsyncExceptionInterceptor.class);
+    private AsyncTaskExceptionInterceptor asyncExceptionInterceptor = GobrsSpring.getBean(AsyncTaskExceptionInterceptor.class);
+
+    private AsyncTaskPreInterceptor asyncTaskPreInterceptor = GobrsSpring.getBean(AsyncTaskPreInterceptor.class);
+
+    private AsyncTaskPostInterceptor asyncTaskPostInterceptor = GobrsSpring.getBean(AsyncTaskPostInterceptor.class);
 
     private final CountDownLatch completeLatch;
 
@@ -111,8 +117,14 @@ public class TaskLoader {
          * Global interception listening
          */
         asyncExceptionInterceptor.exception(errorCallback);
+    }
 
+    public void preInterceptor(Object object, String taskKey, String taskName){
+        asyncTaskPreInterceptor.preProcess(object, taskKey, taskName);
+    }
 
+    public void postInterceptor(Object object, String taskKey, String taskName){
+        asyncTaskPostInterceptor.postProcess(object, taskKey, taskName);
     }
 
     private void cancel() {

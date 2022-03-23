@@ -73,9 +73,32 @@ class TaskActuator implements Runnable, Cloneable {
              * no execution is performed
              */
             if (task.nessary(parameter, support) && support.getResultMap().get(task.getClass()) == null) {
+
                 task.prepare(parameter);
+
+                /**
+                 * Unified front intercept
+                 */
+                taskLoader.preInterceptor(parameter, task.getKey(), task.getName());
+
+                /**
+                 * Perform a task
+                 */
                 Object result = task.task(parameter, support);
+
+                /**
+                 * Post-processing of tasks
+                 */
+                taskLoader.postInterceptor(result, task.getKey(), task.getName());
+
+                /**
+                 * Setting Task Results
+                 */
                 support.getResultMap().put(task.getClass(), buildSuccessResult(result));
+
+                /**
+                 * Success callback
+                 */
                 task.onSuccess(support);
             }
 
@@ -83,7 +106,9 @@ class TaskActuator implements Runnable, Cloneable {
 
         } catch (Exception e) {
             support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
+
             task.onFail(support);
+
             if (gobrsAsyncProperties.isTaskInterrupt()) {
                 taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
             } else {
@@ -145,8 +170,8 @@ class TaskActuator implements Runnable, Cloneable {
 
     /**
      * Release the dependon task
-     *
-     *Gets the number of task dependencies that still need to wait
+     * <p>
+     * Gets the number of task dependencies that still need to wait
      *
      * @return
      */

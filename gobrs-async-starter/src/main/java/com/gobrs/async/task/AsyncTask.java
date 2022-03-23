@@ -16,43 +16,11 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author: sizegang
  * @create: 2022-03-16
  **/
-public interface AsyncTask<Param, Result> extends Task {
-    /**
-     * Before the mission begins
-     *
-     * @param param
-     */
-    void prepare(Param param);
+public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Result>  {
 
-    /**
-     * Tasks to be performed
-     *
-     * @param param
-     * @return
-     */
-    Result task(Param param, TaskSupport support);
+    private String key;
 
-    /**
-     * Whether a task needs to be executed
-     *
-     * @param param
-     * @return
-     */
-    boolean nessary(Param param, TaskSupport support);
-
-    /**
-     * Task Executed Successfully
-     *
-     * @param support
-     */
-    void onSuccess(TaskSupport support);
-
-    /**
-     * Task execution failure
-     *
-     * @param support
-     */
-    void onFail(TaskSupport support);
+    private String name;
 
     /**
      * Gets the execution results of dependencies
@@ -63,7 +31,7 @@ public interface AsyncTask<Param, Result> extends Task {
      * @param <R>
      * @return
      */
-    default <R> R getResult(TaskSupport support, Class clazz, Class<R> resultClass) {
+    <R> R getResult(TaskSupport support, Class clazz, Class<R> resultClass) {
         Map<Class, TaskResult> resultMap = support.getResultMap();
         TaskResult<R> taskResult = resultMap.get(clazz) != null ? resultMap.get(clazz) : resultMap.get(depKey(clazz));
         if (taskResult != null) {
@@ -72,13 +40,13 @@ public interface AsyncTask<Param, Result> extends Task {
         return null;
     }
 
-    default String depKey(Class clazz) {
+    String depKey(Class clazz) {
         char[] cs = clazz.getSimpleName().toCharArray();
         cs[0] += 32;
         return String.valueOf(cs);
     }
 
-    default boolean stop(TaskSupport support) {
+    boolean stop(TaskSupport support) {
         try {
             ErrorCallback errorCallback = new ErrorCallback(() -> support.getParam(), null, support, this);
             support.taskLoader.setExpCode(new AtomicInteger(ExpState.DEFAULT.getCode()));
@@ -89,7 +57,7 @@ public interface AsyncTask<Param, Result> extends Task {
         return true;
     }
 
-    default boolean stop(TaskSupport support, Integer expCode) {
+    boolean stop(TaskSupport support, Integer expCode) {
         try {
             ErrorCallback errorCallback = new ErrorCallback(() -> support.getParam(), null, support, this);
             support.taskLoader.setExpCode(new AtomicInteger(expCode));
@@ -100,6 +68,19 @@ public interface AsyncTask<Param, Result> extends Task {
         return true;
     }
 
+    public String getKey() {
+        return key;
+    }
 
+    public void setKey(String key) {
+        this.key = key;
+    }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

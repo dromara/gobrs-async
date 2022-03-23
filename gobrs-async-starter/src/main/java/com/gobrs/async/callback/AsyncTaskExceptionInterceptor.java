@@ -12,6 +12,6 @@ import java.util.concurrent.CompletionException;
  * @create: 2022-02-19 22:41
  * @Version 1.0
  **/
-public interface AsyncExceptionInterceptor {
+public interface AsyncTaskExceptionInterceptor {
     void exception(ErrorCallback errorCallback);
 }

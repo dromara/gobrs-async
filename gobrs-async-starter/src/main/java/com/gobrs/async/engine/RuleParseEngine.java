@@ -72,7 +72,10 @@ public class RuleParseEngine<T> extends AbstractEngine {
 
     public static class EngineExecutor {
         private static AsyncTask getAsyncTask(String taskName) {
-            return (AsyncTask) getBean(taskName);
+            AsyncTask task = (AsyncTask) getBean(taskName);
+            task.setKey(getKey(task));
+            task.setName(getName(task));
+            return task;
         }
 
         public static AsyncTask getWrapperDepend(Map<String, AsyncTask> cacheTaskWrappers, String taskBean, TaskRecevie taskBuilder) {
@@ -93,6 +96,16 @@ public class RuleParseEngine<T> extends AbstractEngine {
 
         public static Object getBean(String bean) {
             return Optional.ofNullable(GobrsSpring.getBean(bean)).orElseThrow(() -> new RuntimeException("bean not found"));
+        }
+
+        public static String getKey(AsyncTask task){
+            com.gobrs.async.anno.AsyncTask annotation = task.getClass().getAnnotation(com.gobrs.async.anno.AsyncTask.class);
+           return annotation.key();
+        }
+
+        public static String getName(AsyncTask task){
+            com.gobrs.async.anno.AsyncTask annotation = task.getClass().getAnnotation(com.gobrs.async.anno.AsyncTask.class);
+            return annotation.name();
         }
     }
 

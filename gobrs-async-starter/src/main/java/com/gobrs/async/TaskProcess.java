@@ -130,7 +130,7 @@ class TaskProcess {
      * @param <P>
      * @param <R>
      */
-    private class AssistantTask<P, R> implements AsyncTask<P, R> {
+    private class AssistantTask<P, R> extends AsyncTask<P, R> {
 
         @Override
         public void prepare(P p) {

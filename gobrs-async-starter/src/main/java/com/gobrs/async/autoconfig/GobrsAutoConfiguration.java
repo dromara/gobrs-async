@@ -2,11 +2,10 @@ package com.gobrs.async.autoconfig;
 
 import com.gobrs.async.GobrsAsync;
 import com.gobrs.async.TaskFlow;
+import com.gobrs.async.callback.*;
 import com.gobrs.async.engine.RuleEngine;
 import com.gobrs.async.engine.RuleParseEngine;
 import com.gobrs.async.engine.RulePostProcessor;
-import com.gobrs.async.callback.AsyncExceptionInterceptor;
-import com.gobrs.async.callback.GlobalAsyncExceptionInterceptor;
 import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -69,9 +68,21 @@ public class GobrsAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(value = AsyncExceptionInterceptor.class)
-    public AsyncExceptionInterceptor asyncExceptionInterceptor() {
-        return new GlobalAsyncExceptionInterceptor();
+    @ConditionalOnMissingBean(value = AsyncTaskExceptionInterceptor.class)
+    public AsyncTaskExceptionInterceptor asyncExceptionInterceptor() {
+        return new DefaultAsyncExceptionInterceptor();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(value = AsyncTaskPreInterceptor.class)
+    public AsyncTaskPreInterceptor asyncTaskPreInterceptor() {
+        return new DefaultAsyncTaskPreInterceptor();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(value = AsyncTaskPostInterceptor.class)
+    public AsyncTaskPostInterceptor asyncTaskPostInterceptor() {
+        return new DefaultAsyncTaskPostInterceptor();
     }
 
 }
