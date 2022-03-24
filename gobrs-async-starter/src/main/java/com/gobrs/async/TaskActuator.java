@@ -94,7 +94,9 @@ class TaskActuator implements Runnable, Cloneable {
                 /**
                  * Setting Task Results
                  */
-                support.getResultMap().put(task.getClass(), buildSuccessResult(result));
+                if(gobrsAsyncProperties.isParamContext()){
+                    support.getResultMap().put(task.getClass(), buildSuccessResult(result));
+                }
 
                 /**
                  * Success callback

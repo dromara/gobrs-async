@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author: sizegang
  * @create: 2022-03-16
  **/
-public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Result>  {
+public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Result> {
 
 
     private String name;
@@ -30,7 +30,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * @param <R>
      * @return
      */
-    <R> R getResult(TaskSupport support, Class clazz, Class<R> resultClass) {
+    public <R> R getResult(TaskSupport support, Class clazz, Class<R> resultClass) {
         Map<Class, TaskResult> resultMap = support.getResultMap();
         TaskResult<R> taskResult = resultMap.get(clazz) != null ? resultMap.get(clazz) : resultMap.get(depKey(clazz));
         if (taskResult != null) {
@@ -45,7 +45,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         return String.valueOf(cs);
     }
 
-    boolean stop(TaskSupport support) {
+    public boolean stopAsync(TaskSupport support) {
         try {
             ErrorCallback errorCallback = new ErrorCallback(() -> support.getParam(), null, support, this);
             support.taskLoader.setExpCode(new AtomicInteger(ExpState.DEFAULT.getCode()));
@@ -56,7 +56,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         return true;
     }
 
-    boolean stop(TaskSupport support, Integer expCode) {
+    public boolean stopAsync(TaskSupport support, Integer expCode) {
         try {
             ErrorCallback errorCallback = new ErrorCallback(() -> support.getParam(), null, support, this);
             support.taskLoader.setExpCode(new AtomicInteger(expCode));

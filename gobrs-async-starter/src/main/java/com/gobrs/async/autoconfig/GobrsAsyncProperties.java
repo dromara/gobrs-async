@@ -21,37 +21,36 @@ public class GobrsAsyncProperties {
     public static final String PREFIX = "spring.gobrs.async";
 
     /**
-     * 任务规则
+     * Task rules
      */
     private String rules;
 
     /**
-     * rule task 分隔符
+     * Task separator
      */
     private String split = ";";
 
     /**
-     * task 指向
+     * Next task
      */
     private String point = "->";
 
 
     /**
-     * 执行异常是否打断 工作流程
+     * Whether the execution exception interrupts the workflow
      */
     private boolean taskInterrupt = false;
 
     /**
-     * 是否必须依赖
+     * Whether a dependency must be currently not in use
      */
     private String must = ":not";
 
 
-
     /**
-     *
+     * Whether global parameter dataContext mode  Parameter context
      */
-
+    private boolean paramContext = false;
 
     /**
      * 默认总任务超时时间 3s
@@ -120,5 +119,13 @@ public class GobrsAsyncProperties {
 
     public void setMust(String must) {
         this.must = must;
+    }
+
+    public boolean isParamContext() {
+        return paramContext;
+    }
+
+    public void setParamContext(boolean paramContext) {
+        this.paramContext = paramContext;
     }
 }
