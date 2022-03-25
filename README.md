@@ -153,7 +153,12 @@ Gobrs-Async 在设计时，就充分考虑了开发者的使用习惯， 没有�
 
 对使用者所开发的SpringBean 包装修饰。 间接调用使用这开发的功能方法，通过状态管理（借鉴AQS）实现对任务的状态和任务流的状态进行管理。
 
-## 架构图
+
+## Gobrs-Async 核心能力
+![核心能力](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/gobrs-hxnl.jpg)
+
+## 架构图 V1 版本
+对应master分支
 
 <br/>
 
@@ -161,3 +166,12 @@ Gobrs-Async 在设计时，就充分考虑了开发者的使用习惯， 没有�
 
 
 [快速实战](https://async.sizegang.cn)
+
+## 架构图 V2版本
+对应master-v2分支
+
+![1.0](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/gobrs-jgt3.png)
+
+
+## 说明
+V2 版本由 compleableFuture  改为 countdownlatch  实现方式， 性能提升30%。

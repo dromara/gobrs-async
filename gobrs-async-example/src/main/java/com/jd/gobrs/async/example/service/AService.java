@@ -35,7 +35,6 @@ public class AService implements AsyncTask<DataContext, Map>, ParaExector {
         try {
             Thread.sleep(1000);
 //            System.out.println("AService 执行完了");
-
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

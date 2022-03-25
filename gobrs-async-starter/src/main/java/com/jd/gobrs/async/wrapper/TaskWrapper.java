@@ -196,11 +196,12 @@ public class TaskWrapper<T, V> {
             return;
         }
         CompletableFuture[] futures = new CompletableFuture[nextWrappers.size()];
+        long time = remainTime - costTime;
         for (int i = 0; i < nextWrappers.size(); i++) {
             int finalI = i;
             futures[i] = CompletableFuture.runAsync(() -> nextWrappers.get(finalI)
-                            .task(executorService, TaskWrapper.this,
-                                    remainTime - costTime, support), executorService)
+                            .task(executorService, TaskWrapper.this, time
+                                    , support), executorService)
                     .exceptionally((ex) -> {
                         boolean state = gobrsAsyncProperties.isTaskInterrupt() &&
                                 GobrsFlowState.compareAndSetState(support.getTaskFlowState(), StateConstant.WORKING, ERROR);
