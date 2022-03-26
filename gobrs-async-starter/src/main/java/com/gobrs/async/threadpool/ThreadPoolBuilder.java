@@ -1,6 +1,6 @@
 package com.gobrs.async.threadpool;
 
-import org.springframework.core.task.TaskDecorator;
+import com.gobrs.async.exception.GobrsAsyncException;
 
 import java.math.BigDecimal;
 import java.util.concurrent.*;
@@ -66,25 +66,9 @@ public class ThreadPoolBuilder {
     private String threadNamePrefix;
 
     /**
-     * 线程任务装饰器
-     */
-    private TaskDecorator taskDecorator;
-
-    /**
-     * 等待终止毫秒
-     */
-    private Long awaitTerminationMillis = 5000L;
-
-    /**
-     * 等待任务在关机时完成
-     */
-    private Boolean waitForTasksToCompleteOnShutdown = true;
-
-    /**
      * 允许核心线程超时
      */
     private Boolean allowCoreThreadTimeOut = false;
-
 
 
     public int getCorePoolSize() {
@@ -177,32 +161,8 @@ public class ThreadPoolBuilder {
         return this;
     }
 
-    public TaskDecorator getTaskDecorator() {
-        return taskDecorator;
-    }
 
-    public ThreadPoolBuilder taskDecorator(TaskDecorator taskDecorator) {
-        this.taskDecorator = taskDecorator;
-        return this;
-    }
 
-    public Long getAwaitTerminationMillis() {
-        return awaitTerminationMillis;
-    }
-
-    public ThreadPoolBuilder awaitTerminationMillis(Long awaitTerminationMillis) {
-        this.awaitTerminationMillis = awaitTerminationMillis;
-        return this;
-    }
-
-    public Boolean getWaitForTasksToCompleteOnShutdown() {
-        return waitForTasksToCompleteOnShutdown;
-    }
-
-    public ThreadPoolBuilder waitForTasksToCompleteOnShutdown(Boolean waitForTasksToCompleteOnShutdown) {
-        this.waitForTasksToCompleteOnShutdown = waitForTasksToCompleteOnShutdown;
-        return this;
-    }
 
     public Boolean getAllowCoreThreadTimeOut() {
         return allowCoreThreadTimeOut;
@@ -217,28 +177,37 @@ public class ThreadPoolBuilder {
 
         ThreadPoolExecutor executor = new ThreadPoolExecutor(maxPoolSize, corePoolSize, keepAliveTime, timeUnit, workQueue, rejectedExecutionHandler);
         executor.allowCoreThreadTimeOut(allowCoreThreadTimeOut);
-        try {
-            executor.awaitTermination(awaitTerminationMillis, timeUnit);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         return executor;
     }
 
 
-    public static ThreadPoolExecutor buildByThreadPool(ThreadPool pool){
-
+    public static ThreadPoolExecutor buildByThreadPool(ThreadPool pool) {
         ThreadPoolExecutor executor = new ThreadPoolExecutor(pool.getMaxPoolSize(), pool.getCorePoolSize()
-                ,pool.getKeepAliveTime(), pool.getTimeUnit(), pool.getWorkQueue(), pool.getRejectedExecutionHandler());
+                , pool.getKeepAliveTime(), pool.getTimeUnit(), pool.getWorkQueue(), caseReject(pool.getRejectedExecutionHandler()));
         executor.allowCoreThreadTimeOut(pool.getAllowCoreThreadTimeOut());
-        try {
-            executor.awaitTermination(pool.getAwaitTerminationMillis(), pool.getTimeUnit());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         return executor;
     }
 
+    private static RejectedExecutionHandler caseReject(String rejected) {
+        RejectedExecutionHandler rejectedExecutionHandler;
+        switch (rejected) {
+            case "CallerRunsPolicy":
+                rejectedExecutionHandler = new ThreadPoolExecutor.CallerRunsPolicy();
+                break;
+            case "AbortPolicy":
+                rejectedExecutionHandler = new ThreadPoolExecutor.AbortPolicy();
+                break;
+            case "DiscardPolicy":
+                rejectedExecutionHandler = new ThreadPoolExecutor.DiscardPolicy();
+                break;
+            case "DiscardOldestPolicy":
+                rejectedExecutionHandler = new ThreadPoolExecutor.DiscardOldestPolicy();
+                break;
+            default:
+                rejectedExecutionHandler = new ThreadPoolExecutor.AbortPolicy();
+        }
+        return rejectedExecutionHandler;
+    }
 
 
     private Integer calculateCoreNum() {

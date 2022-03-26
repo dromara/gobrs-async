@@ -41,7 +41,7 @@ public class ThreadPool {
     /**
      * 队列最大容量
      */
-    private int capacity = 512;
+    private int capacity = 10000;
 
 
     /**
@@ -52,32 +52,13 @@ public class ThreadPool {
     /**
      * 线程池任务满时拒绝任务策略
      */
-    private RejectedExecutionHandler rejectedExecutionHandler = new ThreadPoolExecutor.AbortPolicy();
-
-    /**
-     * 是否守护线程
-     */
-    private boolean isDaemon = false;
+    private String rejectedExecutionHandler;
 
     /**
      * 线程名称前缀
      */
     private String threadNamePrefix;
 
-    /**
-     * 线程任务装饰器
-     */
-    private TaskDecorator taskDecorator;
-
-    /**
-     * 等待终止毫秒
-     */
-    private Long awaitTerminationMillis = 5000L;
-
-    /**
-     * 等待任务在关机时完成
-     */
-    private Boolean waitForTasksToCompleteOnShutdown = true;
 
     /**
      * 允许核心线程超时
@@ -144,21 +125,6 @@ public class ThreadPool {
         this.workQueue = workQueue;
     }
 
-    public RejectedExecutionHandler getRejectedExecutionHandler() {
-        return rejectedExecutionHandler;
-    }
-
-    public void setRejectedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler) {
-        this.rejectedExecutionHandler = rejectedExecutionHandler;
-    }
-
-    public boolean isDaemon() {
-        return isDaemon;
-    }
-
-    public void setDaemon(boolean daemon) {
-        isDaemon = daemon;
-    }
 
     public String getThreadNamePrefix() {
         return threadNamePrefix;
@@ -168,29 +134,7 @@ public class ThreadPool {
         this.threadNamePrefix = threadNamePrefix;
     }
 
-    public TaskDecorator getTaskDecorator() {
-        return taskDecorator;
-    }
 
-    public void setTaskDecorator(TaskDecorator taskDecorator) {
-        this.taskDecorator = taskDecorator;
-    }
-
-    public Long getAwaitTerminationMillis() {
-        return awaitTerminationMillis;
-    }
-
-    public void setAwaitTerminationMillis(Long awaitTerminationMillis) {
-        this.awaitTerminationMillis = awaitTerminationMillis;
-    }
-
-    public Boolean getWaitForTasksToCompleteOnShutdown() {
-        return waitForTasksToCompleteOnShutdown;
-    }
-
-    public void setWaitForTasksToCompleteOnShutdown(Boolean waitForTasksToCompleteOnShutdown) {
-        this.waitForTasksToCompleteOnShutdown = waitForTasksToCompleteOnShutdown;
-    }
 
     public Boolean getAllowCoreThreadTimeOut() {
         return allowCoreThreadTimeOut;
@@ -198,5 +142,13 @@ public class ThreadPool {
 
     public void setAllowCoreThreadTimeOut(Boolean allowCoreThreadTimeOut) {
         this.allowCoreThreadTimeOut = allowCoreThreadTimeOut;
+    }
+
+    public String getRejectedExecutionHandler() {
+        return rejectedExecutionHandler;
+    }
+
+    public void setRejectedExecutionHandler(String rejectedExecutionHandler) {
+        this.rejectedExecutionHandler = rejectedExecutionHandler;
     }
 }
