@@ -6,10 +6,12 @@ import com.gobrs.async.exception.NotTaskRuleException;
 import com.gobrs.async.spring.GobrsSpring;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
+import javax.annotation.PostConstruct;
 import java.util.Optional;
 
 /**
@@ -19,7 +21,8 @@ import java.util.Optional;
  * @description:
  * @date 2022-01-27 22:05
  **/
-public class RulePostProcessor implements ApplicationListener<ContextRefreshedEvent> {
+
+public class RulePostProcessor implements ApplicationListener<ContextRefreshedEvent>  {
     Logger logger = LoggerFactory.getLogger(RulePostProcessor.class);
 
     @Override

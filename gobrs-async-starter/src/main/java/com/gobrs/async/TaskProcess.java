@@ -42,6 +42,7 @@ class TaskProcess {
             upwardTasksMap.put(task, new ArrayList<>(1));
         }
 
+
         for (AsyncTask task : downTasksMap.keySet()) {
             for (AsyncTask depended : downTasksMap.get(task)) {
                 upwardTasksMap.get(depended).add(task);
@@ -49,22 +50,22 @@ class TaskProcess {
         }
 
 
-        AssistantTask starter = new AssistantTask();
+        AssistantTask assistantTask = new AssistantTask();
         List<AsyncTask> noDependsTasks = new ArrayList<>(1);
 
         for (AsyncTask task : downTasksMap.keySet()) {
             List<AsyncTask> dTasks = downTasksMap.get(task);
             if (dTasks.isEmpty()) {
                 noDependsTasks.add(task);
-                downTasksMap.get(task).add(starter);
+                downTasksMap.get(task).add(assistantTask);
             }
         }
-        downTasksMap.put(starter, new ArrayList<>(0));
-        upwardTasksMap.put(starter, noDependsTasks);
+        downTasksMap.put(assistantTask, new ArrayList<>(0));
+        upwardTasksMap.put(assistantTask, noDependsTasks);
 
         for (AsyncTask task : downTasksMap.keySet()) {
             TaskActuator process;
-            if (task != starter) {
+            if (task != assistantTask) {
                 /**
                  * Each task is executed using a new Processs
                  */
@@ -97,7 +98,6 @@ class TaskProcess {
         TaskLoader loader = new TaskLoader(param, executorService, newProcessMap, timeout);
         TaskSupport support = getSupport(param);
         support.setTaskLoader(loader);
-
         for (AsyncTask task : prepareTaskMap.keySet()) {
             /**
              * clone Process

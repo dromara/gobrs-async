@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * @program: gobrs-async-starter
  * @ClassName Task bus Responsible for task handling flow
- * @description:
+ * @description: Task flow
  * @author: sizegang
  * @create: 2022-03-16
  **/

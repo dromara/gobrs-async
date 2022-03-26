@@ -19,7 +19,6 @@ import java.util.*;
  **/
 public abstract class AbstractEngine implements RuleEngine {
 
-
     @Override
     public void parse(String rule) {
         GobrsAsync gobrsAsync = GobrsSpring.getBean(GobrsAsync.class);
@@ -30,4 +29,11 @@ public abstract class AbstractEngine implements RuleEngine {
         }
     }
 
+    /**
+     * 真正解析的方法
+     *
+     * @param r
+     * @return
+     */
+    abstract void doParse(Rule r, Map<String, Object> params);
 }

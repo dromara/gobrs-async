@@ -166,22 +166,22 @@ public class TaskLoader {
         return processMap.get(eventHandler);
     }
 
-    void startProcess(TaskActuator process) {
+    void startProcess(TaskActuator taskActuator) {
 
-        if (timeout > 0 || process.getGobrsAsyncProperties().isTaskInterrupt()) {
+        if (timeout > 0 || taskActuator.getGobrsAsyncProperties().isTaskInterrupt()) {
             /**
              * Only threads in a lock can be interrupted
              */
             lock.lock();
             try {
                 if (!canceled) {
-                    futures.add(executorService.submit(process));
+                    futures.add(executorService.submit(taskActuator));
                 }
             } finally {
                 lock.unlock();
             }
         } else {
-            executorService.submit(process);
+            executorService.submit(taskActuator);
         }
     }
 

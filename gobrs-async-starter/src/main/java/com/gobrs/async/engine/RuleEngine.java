@@ -18,14 +18,4 @@ public interface RuleEngine extends Engine {
      */
     void parse(String r);
 
-    /**
-     * 真正解析的方法
-     *
-     * @param r
-     * @return
-     */
-    void doParse(Rule r, Map<String, Object> params);
-
-
-
 }

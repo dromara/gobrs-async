@@ -24,6 +24,8 @@ public class GobrsAsync {
 
     @Autowired
     private GobrsAsyncProperties gobrsAsyncProperties;
+
+    // A rule corresponds to a taskFlow
     private Map<String, TaskFlow> taskFlow;
 
     private Map<String, TaskProcess> trigger;
@@ -34,23 +36,23 @@ public class GobrsAsync {
     }
 
 
-    public TaskRecevie begin(String taskName, List<AsyncTask> asyncTasks) {
+    public TaskRecevie begin(String ruleName, List<AsyncTask> asyncTasks) {
         if (taskFlow == null) {
-            loadTaskFlow(taskName);
+            loadTaskFlow(ruleName);
         }
-        if (taskFlow.get(taskName) == null) {
-            loadTaskFlowForOne(taskName);
+        if (taskFlow.get(ruleName) == null) {
+            loadTaskFlowForOne(ruleName);
         }
-        return taskFlow.get(taskName).start(asyncTasks);
+        return taskFlow.get(ruleName).start(asyncTasks);
     }
 
-    public TaskRecevie after(String taskName, AsyncTask... eventHandlers) {
-        return taskFlow.get(taskName).after(eventHandlers);
+    public TaskRecevie after(String taskName, AsyncTask... tasks) {
+        return taskFlow.get(taskName).after(tasks);
     }
 
-    public AsyncResult go(String taskName, AsyncParam param, long timeout) {
-        if (check(taskName).isPresent()) {
-            return trigger.get(taskName).trigger(param, timeout).load();
+    public AsyncResult go(String ruleName, AsyncParam param, long timeout) {
+        if (check(ruleName).isPresent()) {
+            return trigger.get(ruleName).trigger(param, timeout).load();
         }
         throw new NotTaskRuleException("Gobrs Rule Name Is Error");
 
@@ -61,32 +63,32 @@ public class GobrsAsync {
     }
 
 
-    public synchronized void readyTo(String taskName) {
+    public synchronized void readyTo(String ruleName) {
         if (trigger == null) {
-            loadTrigger(taskName);
+            loadTrigger(ruleName);
         }
-        if (trigger.get(taskName) == null) {
-            loadTriggerForOne(taskName);
+        if (trigger.get(ruleName) == null) {
+            loadTriggerForOne(ruleName);
         }
     }
 
-    private void loadTaskFlow(String taskName) {
+    private void loadTaskFlow(String ruleName) {
         taskFlow = new HashMap<>();
         TaskFlow tf = new TaskFlow();
         tf.setGobrsAsyncProperties(gobrsAsyncProperties);
-        taskFlow.put(taskName, tf);
+        taskFlow.put(ruleName, tf);
     }
 
-    private void loadTaskFlowForOne(String taskName) {
+    private void loadTaskFlowForOne(String ruleName) {
         TaskFlow tf = new TaskFlow();
         tf.setGobrsAsyncProperties(gobrsAsyncProperties);
-        taskFlow.put(taskName, tf);
+        taskFlow.put(ruleName, tf);
     }
 
-    private void loadTrigger(String taskName) {
+    private void loadTrigger(String ruleName) {
         trigger = new HashMap<>();
-        TaskProcess tr = new TaskProcess(taskFlow.get(taskName));
-        trigger.put(taskName, tr);
+        TaskProcess tr = new TaskProcess(taskFlow.get(ruleName));
+        trigger.put(ruleName, tr);
     }
 
     private void loadTriggerForOne(String taskName) {
