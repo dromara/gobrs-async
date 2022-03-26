@@ -3,7 +3,6 @@ package com.gobrs.async.threadpool;
 import com.gobrs.async.exception.GobrsAsyncException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.invoke.empty.Empty;
 
 import java.math.BigDecimal;
 import java.util.concurrent.*;
@@ -19,7 +18,6 @@ import static com.gobrs.async.def.DefaultConfig.THREADPOOLQUEUESIZE;
  **/
 public class ThreadPoolBuilder {
 
-    static Logger logger = LoggerFactory.getLogger(ThreadPoolBuilder.class);
     /**
      * 核心线程数量
      */
@@ -178,7 +176,12 @@ public class ThreadPoolBuilder {
     }
 
     public ThreadPoolExecutor build() {
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(maxPoolSize, corePoolSize, keepAliveTime, timeUnit, workQueue, rejectedExecutionHandler);
+        ThreadPoolExecutor executor;
+        try {
+            executor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime, timeUnit, workQueue, rejectedExecutionHandler);
+        } catch (Exception exception) {
+            throw new GobrsAsyncException(String.format("Thread Pool Config Error %s", exception));
+        }
         executor.allowCoreThreadTimeOut(allowCoreThreadTimeOut);
         return executor;
     }
@@ -186,13 +189,13 @@ public class ThreadPoolBuilder {
 
     public static ThreadPoolExecutor buildByThreadPool(ThreadPool pool) {
         check(pool);
-        ThreadPoolExecutor executor = null;
+        ThreadPoolExecutor executor;
         try {
             executor = new ThreadPoolExecutor(pool.getCorePoolSize(), pool.getMaxPoolSize()
                     , pool.getKeepAliveTime(), pool.getTimeUnit(), pool.getWorkQueue(), caseReject(pool.getRejectedExecutionHandler()));
             executor.allowCoreThreadTimeOut(pool.getAllowCoreThreadTimeOut());
         } catch (Exception exception) {
-            logger.error("Thread Pool Config Error ", exception);
+            throw new GobrsAsyncException(String.format("Thread Pool Config Error %s", exception));
         }
         return executor;
     }
