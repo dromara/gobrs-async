@@ -5,6 +5,7 @@ import com.gobrs.async.domain.TaskResult;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @program: gobrs-async-starter
@@ -17,6 +18,8 @@ import java.util.Map;
 public class TaskSupport {
 
     public TaskLoader taskLoader;
+
+    public ExecutorService executorService;
 
     /**
      * The task parameters
@@ -52,5 +55,13 @@ public class TaskSupport {
 
     public void setTaskLoader(TaskLoader taskLoader) {
         this.taskLoader = taskLoader;
+    }
+
+    public ExecutorService getExecutorService() {
+        return executorService;
+    }
+
+    public void setExecutorService(ExecutorService executorService) {
+        this.executorService = executorService;
     }
 }

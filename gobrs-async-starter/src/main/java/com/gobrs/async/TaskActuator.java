@@ -77,6 +77,11 @@ class TaskActuator implements Runnable, Cloneable {
     @Override
     public void run() {
         Object parameter = param.get();
+
+        if (parameter instanceof Map) {
+            parameter = ((Map<?, ?>) parameter).get(this.getClass());
+        }
+
         TaskLoader taskLoader = support.getTaskLoader();
         try {
             /**
@@ -217,12 +222,12 @@ class TaskActuator implements Runnable, Cloneable {
      * Data rollback
      */
     private void rollBack() {
-        if (gobrsAsyncProperties.isRollback()) {
+        if (gobrsAsyncProperties.isTransaction()) {
             List<AsyncTask> asyncTaskList = upwardTasksMap.get(this.task);
-            if (asyncTaskList.isEmpty()) {
+            if (asyncTaskList == null || asyncTaskList.isEmpty()) {
                 return;
             }
-            new Thread(() -> doRollBack(asyncTaskList, support)).start();
+            support.getExecutorService().execute(() -> doRollBack(asyncTaskList, support));
         }
     }
 
@@ -230,7 +235,11 @@ class TaskActuator implements Runnable, Cloneable {
     private void doRollBack(List<AsyncTask> asyncTasks, TaskSupport support) {
         try {
             for (AsyncTask asyncTask : asyncTasks) {
-                asyncTask.rollback(support.getParam());
+                if (support.getParam() instanceof Map) {
+                    asyncTask.rollback(((Map<?, ?>) support.getParam()).get(this.getClass()));
+                } else {
+                    asyncTask.rollback(support.getParam());
+                }
                 List<AsyncTask> asyncTaskList = upwardTasksMap.get(asyncTask);
                 doRollBack(asyncTaskList, support);
             }

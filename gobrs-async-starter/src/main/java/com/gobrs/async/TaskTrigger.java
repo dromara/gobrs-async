@@ -69,7 +69,7 @@ class TaskTrigger {
                 /**
                  * Each task is executed using a new Processs
                  */
-               if(taskFlow.getGobrsAsyncProperties().isRollback()){
+               if(taskFlow.getGobrsAsyncProperties().isTransaction()){
                    process = new TaskActuator(task, upwardTasksMap.get(task).size(), downTasksMap.get(task), upwardTasksMap);
                }else{
                    process = new TaskActuator(task, upwardTasksMap.get(task).size(), downTasksMap.get(task));
@@ -102,6 +102,7 @@ class TaskTrigger {
         TaskLoader loader = new TaskLoader(param, threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
         TaskSupport support = getSupport(param);
         support.setTaskLoader(loader);
+        support.setExecutorService(threadPoolFactory.getThreadPoolExecutor());
         for (AsyncTask task : prepareTaskMap.keySet()) {
             /**
              * clone Process
@@ -172,7 +173,7 @@ class TaskTrigger {
      */
     private TaskSupport getSupport(AsyncParam param) {
         TaskSupport taskSupport = new TaskSupport();
-        taskSupport.setParam(param);
+        taskSupport.setParam(param.get());
         return taskSupport;
     }
 
