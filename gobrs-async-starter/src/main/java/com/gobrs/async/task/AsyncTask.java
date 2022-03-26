@@ -5,6 +5,8 @@ import com.gobrs.async.TaskSupport;
 import com.gobrs.async.callback.ErrorCallback;
 import com.gobrs.async.domain.TaskResult;
 import com.gobrs.async.enums.ExpState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  **/
 public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Result> {
 
-
+    Logger logger = LoggerFactory.getLogger(AsyncTask.class);
     private String name;
 
     /**
@@ -51,6 +53,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
             support.taskLoader.setExpCode(new AtomicInteger(ExpState.DEFAULT.getCode()));
             support.taskLoader.errorInterrupted(errorCallback);
         } catch (Exception ex) {
+            logger.error("stopAsync error ", ex);
             return false;
         }
         return true;
@@ -62,11 +65,11 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
             support.taskLoader.setExpCode(new AtomicInteger(expCode));
             support.taskLoader.errorInterrupted(errorCallback);
         } catch (Exception ex) {
+            logger.error("stopAsync error ", ex);
             return false;
         }
         return true;
     }
-
 
     public String getName() {
         return name;

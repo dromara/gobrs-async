@@ -4,9 +4,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * @program: gobrs-async
- * @ClassName GobrsThreadPool
- * @description:
+ * @program: gobrs-async-starter
+ * @ClassName GobrsAsyncThreadPoolFactory
+ * @description: Thread pool factory
  * @author: sizegang
  * @create: 2022-02-20
  * @Version 1.0

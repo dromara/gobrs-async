@@ -110,6 +110,7 @@ public class TaskLoader {
 
     public void errorInterrupted(ErrorCallback errorCallback) {
         this.error = errorCallback.getThrowable();
+
         cancel();
 
         completeLatch.countDown();

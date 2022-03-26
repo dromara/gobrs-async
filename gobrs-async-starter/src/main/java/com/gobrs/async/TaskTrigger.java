@@ -119,6 +119,7 @@ class TaskTrigger {
         TerminationTask(AsyncTask handler, int depdending, List<AsyncTask> dependedTasks) {
             super(handler, depdending, dependedTasks);
         }
+
         @Override
         public void run() {
             support.taskLoader.completed();
@@ -127,6 +128,7 @@ class TaskTrigger {
 
     /**
      * Count the number of dependent tasks by this class
+     *
      * @param <P>
      * @param <R>
      */
@@ -160,6 +162,7 @@ class TaskTrigger {
 
     /**
      * Get the task Bus
+     *
      * @param param
      * @return
      */
