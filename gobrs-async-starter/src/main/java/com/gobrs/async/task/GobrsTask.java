@@ -45,4 +45,11 @@ public interface GobrsTask<Param, Result> extends Task {
      * @param support
      */
     void onFail(TaskSupport support);
+
+    /**
+     * rollback
+     */
+    default void rollback(Param param) {
+
+    }
 }

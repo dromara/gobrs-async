@@ -45,7 +45,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
             List<String> arrayList = Arrays.asList(taskArr);
             String leftTaskName = arrayList.get(0);
-            TaskRecevie taskBuilder = gobrsAsync.after(rule.getName(), EngineExecutor.getAsyncTask(leftTaskName));
+            TaskRecevie taskRecevie = gobrsAsync.after(rule.getName(), EngineExecutor.getAsyncTask(leftTaskName));
             for (int i = 1; i < arrayList.size(); i++) {
                 String taskBean = arrayList.get(i);
                 if (taskBean.contains(sp)) {
@@ -55,15 +55,15 @@ public class RuleParseEngine<T> extends AbstractEngine {
                         if (tbean.contains(gobrsAsyncProperties.getMust())) { // 强依赖上游 上游不返回 方法不执行
                             tbean = tbean.replace(gobrsAsyncProperties.getMust(), "");
                         } else {
-                            EngineExecutor.getWrapperDepend(cacheTaskWrappers, tbean, taskBuilder);
+                            EngineExecutor.getWrapperDepend(cacheTaskWrappers, tbean, taskRecevie);
                         }
                     }
                 } else {
                     if (taskBean.contains(gobrsAsyncProperties.getMust())) { // 强依赖上游 上游不返回 方法不执行
                         taskBean = taskBean.replace(gobrsAsyncProperties.getMust(), "");
-                        EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, taskBuilder, false);
+                        EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, taskRecevie, false);
                     } else {
-                        EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, taskBuilder);
+                        EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, taskRecevie);
                     }
                 }
             }

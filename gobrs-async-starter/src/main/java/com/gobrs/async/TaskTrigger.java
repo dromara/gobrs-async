@@ -69,7 +69,11 @@ class TaskTrigger {
                 /**
                  * Each task is executed using a new Processs
                  */
-                process = new TaskActuator(task, upwardTasksMap.get(task).size(), downTasksMap.get(task));
+               if(taskFlow.getGobrsAsyncProperties().isRollback()){
+                   process = new TaskActuator(task, upwardTasksMap.get(task).size(), downTasksMap.get(task), upwardTasksMap);
+               }else{
+                   process = new TaskActuator(task, upwardTasksMap.get(task).size(), downTasksMap.get(task));
+               }
             } else {
                 /***
                  * completely  and  Termination of the task

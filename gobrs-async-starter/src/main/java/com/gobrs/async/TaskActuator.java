@@ -16,6 +16,7 @@ import com.gobrs.async.enums.ResultState;
 import com.gobrs.async.task.AsyncTask;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -42,6 +43,8 @@ class TaskActuator implements Runnable, Cloneable {
 
     private Lock lock;
 
+    private Map<AsyncTask, List<AsyncTask>> upwardTasksMap;
+
 
     private GobrsAsyncProperties gobrsAsyncProperties;
 
@@ -51,6 +54,14 @@ class TaskActuator implements Runnable, Cloneable {
         this.unsatisfiedDepdendings = depdending;
         this.subTasks = subTasks;
     }
+
+    TaskActuator(AsyncTask eventHandler, int depdending, List<AsyncTask> subTasks, Map<AsyncTask, List<AsyncTask>> upwardTasksMap) {
+        this.task = eventHandler;
+        this.unsatisfiedDepdendings = depdending;
+        this.subTasks = subTasks;
+        this.upwardTasksMap = upwardTasksMap;
+    }
+
 
     /**
      * Initialize the object cloned from prototype.
@@ -79,7 +90,7 @@ class TaskActuator implements Runnable, Cloneable {
                 /**
                  * Unified front intercept
                  */
-                taskLoader.preInterceptor(parameter,  task.getName());
+                taskLoader.preInterceptor(parameter, task.getName());
 
                 /**
                  * Perform a task
@@ -89,12 +100,12 @@ class TaskActuator implements Runnable, Cloneable {
                 /**
                  * Post-processing of tasks
                  */
-                taskLoader.postInterceptor(result,  task.getName());
+                taskLoader.postInterceptor(result, task.getName());
 
                 /**
                  * Setting Task Results
                  */
-                if(gobrsAsyncProperties.isParamContext()){
+                if (gobrsAsyncProperties.isParamContext()) {
                     support.getResultMap().put(task.getClass(), buildSuccessResult(result));
                 }
 
@@ -111,6 +122,8 @@ class TaskActuator implements Runnable, Cloneable {
 
             task.onFail(support);
 
+            rollBack();
+
             if (gobrsAsyncProperties.isTaskInterrupt()) {
                 taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
             } else {
@@ -120,6 +133,7 @@ class TaskActuator implements Runnable, Cloneable {
             }
         }
     }
+
 
     /**
      * Move on to the next task
@@ -197,6 +211,34 @@ class TaskActuator implements Runnable, Cloneable {
             throw new InternalError();
         }
     }
+
+
+    /**
+     * Data rollback
+     */
+    private void rollBack() {
+        if (gobrsAsyncProperties.isRollback()) {
+            List<AsyncTask> asyncTaskList = upwardTasksMap.get(this.task);
+            if (asyncTaskList.isEmpty()) {
+                return;
+            }
+            new Thread(() -> doRollBack(asyncTaskList, support)).start();
+        }
+    }
+
+
+    private void doRollBack(List<AsyncTask> asyncTasks, TaskSupport support) {
+        try {
+            for (AsyncTask asyncTask : asyncTasks) {
+                asyncTask.rollback(support.getParam());
+                List<AsyncTask> asyncTaskList = upwardTasksMap.get(asyncTask);
+                doRollBack(asyncTaskList, support);
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
 
     public AsyncTask getTask() {
         return task;

@@ -52,6 +52,8 @@ public class GobrsAsyncProperties {
      */
     private boolean paramContext = false;
 
+    private boolean rollback = false;
+
     /**
      * 默认总任务超时时间 3s
      *
@@ -127,5 +129,13 @@ public class GobrsAsyncProperties {
 
     public void setParamContext(boolean paramContext) {
         this.paramContext = paramContext;
+    }
+
+    public boolean isRollback() {
+        return rollback;
+    }
+
+    public void setRollback(boolean rollback) {
+        this.rollback = rollback;
     }
 }
