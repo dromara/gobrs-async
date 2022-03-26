@@ -28,7 +28,7 @@ public class GobrsAsync {
     // A rule corresponds to a taskFlow
     private Map<String, TaskFlow> taskFlow;
 
-    private Map<String, TaskProcess> trigger;
+    private Map<String, TaskTrigger> trigger;
 
 
     public TaskRecevie begin(String taskName, AsyncTask... tasks) {
@@ -87,16 +87,16 @@ public class GobrsAsync {
 
     private void loadTrigger(String ruleName) {
         trigger = new HashMap<>();
-        TaskProcess tr = new TaskProcess(taskFlow.get(ruleName));
+        TaskTrigger tr = new TaskTrigger(taskFlow.get(ruleName));
         trigger.put(ruleName, tr);
     }
 
     private void loadTriggerForOne(String taskName) {
-        TaskProcess tr = new TaskProcess(taskFlow.get(taskName));
+        TaskTrigger tr = new TaskTrigger(taskFlow.get(taskName));
         trigger.put(taskName, tr);
     }
 
-    private Optional<TaskProcess> check(String ruleName) {
+    private Optional<TaskTrigger> check(String ruleName) {
         return Optional.ofNullable(trigger.get(ruleName));
     }
 

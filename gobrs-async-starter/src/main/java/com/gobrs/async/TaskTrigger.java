@@ -15,7 +15,7 @@ import java.util.concurrent.ExecutorService;
  * @create: 2022-03-16
  **/
 
-class TaskProcess {
+class TaskTrigger {
 
     private final TaskFlow taskFlow;
 
@@ -23,7 +23,7 @@ class TaskProcess {
 
     private IdentityHashMap<AsyncTask, TaskActuator> prepareTaskMap = new IdentityHashMap<>();
 
-    TaskProcess(TaskFlow taskFlow) {
+    TaskTrigger(TaskFlow taskFlow) {
         this.taskFlow = taskFlow;
         prepare();
     }
