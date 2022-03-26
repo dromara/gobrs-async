@@ -19,7 +19,7 @@ class TaskTrigger {
 
     private final TaskFlow taskFlow;
 
-    private final ExecutorService executorService = GobrsSpring.getBean(GobrsAsyncThreadPoolFactory.class).getThreadPoolExecutor();
+    private  GobrsAsyncThreadPoolFactory threadPoolFactory = GobrsSpring.getBean(GobrsAsyncThreadPoolFactory.class);
 
     private IdentityHashMap<AsyncTask, TaskActuator> prepareTaskMap = new IdentityHashMap<>();
 
@@ -95,7 +95,7 @@ class TaskTrigger {
         /**
          * Assign one loader to each task
          */
-        TaskLoader loader = new TaskLoader(param, executorService, newProcessMap, timeout);
+        TaskLoader loader = new TaskLoader(param, threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
         TaskSupport support = getSupport(param);
         support.setTaskLoader(loader);
         for (AsyncTask task : prepareTaskMap.keySet()) {
