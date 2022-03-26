@@ -5,6 +5,8 @@ import org.springframework.core.task.TaskDecorator;
 import java.math.BigDecimal;
 import java.util.concurrent.*;
 
+import static com.gobrs.async.def.DefaultConfig.*;
+
 /**
  * @program: gobrs-async-core
  * @ClassName ThreadPool
@@ -16,17 +18,17 @@ public class ThreadPool {
     /**
      * 核心线程数量
      */
-    private int corePoolSize = calculateCoreNum();
+    private Integer corePoolSize = calculateCoreNum();
 
     /**
      * 最大线程数量
      */
-    private int maxPoolSize = corePoolSize + (corePoolSize >> 1);
+    private Integer maxPoolSize = corePoolSize + (corePoolSize >> 1);
 
     /**
      * 线程存活时间
      */
-    private long keepAliveTime = 30000L;
+    private Long keepAliveTime = KEEPALIVETIME;
 
     /**
      * 线程存活时间单位
@@ -36,12 +38,12 @@ public class ThreadPool {
     /**
      * 线程执行超时时间
      */
-    private long executeTimeOut = 10000L;
+    private Long executeTimeOut = EXECUTETIMEOUT;
 
     /**
      * 队列最大容量
      */
-    private int capacity = 10000;
+    private Integer capacity = THREADPOOLQUEUESIZE;
 
 
     /**
@@ -52,7 +54,7 @@ public class ThreadPool {
     /**
      * 线程池任务满时拒绝任务策略
      */
-    private String rejectedExecutionHandler;
+    private String rejectedExecutionHandler = "AbortPolicy";
 
     /**
      * 线程名称前缀
@@ -64,12 +66,13 @@ public class ThreadPool {
      * 允许核心线程超时
      */
     private Boolean allowCoreThreadTimeOut = false;
+
     private Integer calculateCoreNum() {
         int cpuCoreNum = Runtime.getRuntime().availableProcessors();
         return new BigDecimal(cpuCoreNum).divide(new BigDecimal("0.2")).intValue();
     }
 
-    public int getCorePoolSize() {
+    public Integer getCorePoolSize() {
         return corePoolSize;
     }
 
@@ -77,7 +80,7 @@ public class ThreadPool {
         this.corePoolSize = corePoolSize;
     }
 
-    public int getMaxPoolSize() {
+    public Integer getMaxPoolSize() {
         return maxPoolSize;
     }
 
@@ -85,7 +88,7 @@ public class ThreadPool {
         this.maxPoolSize = maxPoolSize;
     }
 
-    public long getKeepAliveTime() {
+    public Long getKeepAliveTime() {
         return keepAliveTime;
     }
 
@@ -101,7 +104,7 @@ public class ThreadPool {
         this.timeUnit = timeUnit;
     }
 
-    public long getExecuteTimeOut() {
+    public Long getExecuteTimeOut() {
         return executeTimeOut;
     }
 
@@ -109,7 +112,7 @@ public class ThreadPool {
         this.executeTimeOut = executeTimeOut;
     }
 
-    public int getCapacity() {
+    public Integer getCapacity() {
         return capacity;
     }
 
@@ -133,7 +136,6 @@ public class ThreadPool {
     public void setThreadNamePrefix(String threadNamePrefix) {
         this.threadNamePrefix = threadNamePrefix;
     }
-
 
 
     public Boolean getAllowCoreThreadTimeOut() {

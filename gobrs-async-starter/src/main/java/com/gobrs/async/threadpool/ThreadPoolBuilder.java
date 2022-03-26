@@ -1,9 +1,14 @@
 package com.gobrs.async.threadpool;
 
 import com.gobrs.async.exception.GobrsAsyncException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import sun.invoke.empty.Empty;
 
 import java.math.BigDecimal;
 import java.util.concurrent.*;
+
+import static com.gobrs.async.def.DefaultConfig.THREADPOOLQUEUESIZE;
 
 /**
  * @program: gobrs-async-core
@@ -14,6 +19,7 @@ import java.util.concurrent.*;
  **/
 public class ThreadPoolBuilder {
 
+    static Logger logger = LoggerFactory.getLogger(ThreadPoolBuilder.class);
     /**
      * 核心线程数量
      */
@@ -162,8 +168,6 @@ public class ThreadPoolBuilder {
     }
 
 
-
-
     public Boolean getAllowCoreThreadTimeOut() {
         return allowCoreThreadTimeOut;
     }
@@ -174,7 +178,6 @@ public class ThreadPoolBuilder {
     }
 
     public ThreadPoolExecutor build() {
-
         ThreadPoolExecutor executor = new ThreadPoolExecutor(maxPoolSize, corePoolSize, keepAliveTime, timeUnit, workQueue, rejectedExecutionHandler);
         executor.allowCoreThreadTimeOut(allowCoreThreadTimeOut);
         return executor;
@@ -182,13 +185,38 @@ public class ThreadPoolBuilder {
 
 
     public static ThreadPoolExecutor buildByThreadPool(ThreadPool pool) {
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(pool.getMaxPoolSize(), pool.getCorePoolSize()
-                , pool.getKeepAliveTime(), pool.getTimeUnit(), pool.getWorkQueue(), caseReject(pool.getRejectedExecutionHandler()));
-        executor.allowCoreThreadTimeOut(pool.getAllowCoreThreadTimeOut());
+        check(pool);
+        ThreadPoolExecutor executor = null;
+        try {
+            executor = new ThreadPoolExecutor(pool.getCorePoolSize(), pool.getMaxPoolSize()
+                    , pool.getKeepAliveTime(), pool.getTimeUnit(), pool.getWorkQueue(), caseReject(pool.getRejectedExecutionHandler()));
+            executor.allowCoreThreadTimeOut(pool.getAllowCoreThreadTimeOut());
+        } catch (Exception exception) {
+            logger.error("Thread Pool Config Error ", exception);
+        }
         return executor;
     }
 
+    private static void check(ThreadPool pool) {
+        if (pool.getCorePoolSize() == null) {
+            throw new GobrsAsyncException("thread pool coreSize empty");
+        }
+        if (pool.getMaxPoolSize() == null) {
+            throw new GobrsAsyncException("thread pool maxSize empty");
+        }
+        if (pool.getKeepAliveTime() == null) {
+            throw new GobrsAsyncException("thread pool keepAliveTime size empty");
+        }
+        if (pool.getCapacity() == null) {
+            pool.setCapacity(THREADPOOLQUEUESIZE);
+        }
+    }
+
     private static RejectedExecutionHandler caseReject(String rejected) {
+        if (rejected == null) {
+            return new ThreadPoolExecutor.AbortPolicy();
+        }
+
         RejectedExecutionHandler rejectedExecutionHandler;
         switch (rejected) {
             case "CallerRunsPolicy":
