@@ -51,6 +51,7 @@ public class GobrsAutoConfiguration {
         return new RuleParseEngine<>();
     }
 
+
     @Bean
     public RulePostProcessor ruleEnginePostProcessor() {
         return new RulePostProcessor();

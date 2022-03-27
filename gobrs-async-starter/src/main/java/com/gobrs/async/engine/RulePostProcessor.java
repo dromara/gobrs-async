@@ -13,11 +13,10 @@ import java.util.Optional;
 /**
  * @author sizegang1
  * @program: gobrs-async
- * @ClassName GobrsEngineLoading
- * @description:
- * @date 2022-01-27 22:05
+ * @ClassName RulePostProcessor
+ * @description: Task flow resolver
+ * The implementation ApplicationListener gets the Spring context, which in turn gets the Bean instance
  **/
-
 public class RulePostProcessor implements ApplicationListener<ContextRefreshedEvent>  {
     Logger logger = LoggerFactory.getLogger(RulePostProcessor.class);
 
@@ -29,6 +28,7 @@ public class RulePostProcessor implements ApplicationListener<ContextRefreshedEv
         Optional.ofNullable(rules).map((data) -> {
             /**
              * The primary purpose of resolving a rule is to check that the rule is correct
+             * Extensible task flow resolution up
              */
             RuleEngine engine = applicationContext.getBean(RuleEngine.class);
             engine.parse(data);
