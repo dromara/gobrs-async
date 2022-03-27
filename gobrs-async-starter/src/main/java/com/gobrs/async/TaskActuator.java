@@ -233,18 +233,18 @@ class TaskActuator implements Runnable, Cloneable {
 
 
     private void doRollBack(List<AsyncTask> asyncTasks, TaskSupport support) {
-        try {
-            for (AsyncTask asyncTask : asyncTasks) {
+        for (AsyncTask asyncTask : asyncTasks) {
+            try {
                 if (support.getParam() instanceof Map) {
                     asyncTask.rollback(((Map<?, ?>) support.getParam()).get(this.getClass()));
                 } else {
                     asyncTask.rollback(support.getParam());
                 }
-                List<AsyncTask> asyncTaskList = upwardTasksMap.get(asyncTask);
-                doRollBack(asyncTaskList, support);
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
-        } catch (Exception exception) {
-            exception.printStackTrace();
+            List<AsyncTask> asyncTaskList = upwardTasksMap.get(asyncTask);
+            doRollBack(asyncTaskList, support);
         }
     }
 
