@@ -135,3 +135,54 @@ Gobrs-Async 项目目录及其精简
 - `gobrs-async-example`：Gobrs-Async 接入实例，提供测试用例。
 - `gobrs-async-starter`：Gobrs-Async 框架核心组件
 
+
+
+
+
+Gobrs-Async 在设计时，就充分考虑了开发者的使用习惯， 没有依赖任何中间件。 对并发框架做了良好的封装。主要使用
+<code>CountDownLatch</code> 、<code>ReentrantLock</code> 、<code>volatile</code> 等一系列并发技术开发设计。
+
+## 整体架构
+<br/>
+
+![1.0](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/gobrs-jgt3.png)
+
+## 任务触发器
+
+任务流的启动者， 负责启动任务执行流
+
+## 规则解析引擎
+
+负责解析使用者配置的规则，同时于Spring结合，将配置的 <code>Spring Bean</code> 解析成 <code>TaskBean</code>，进而通过解析引擎加载成 任务装饰器。进而组装成任务树
+
+## 任务启动器
+
+负责通过使用解析引擎解析的任务树。结合 **JUC** 并发框架调度实现对任务的统一管理，核心方法有
+* trigger 触发任务加载器，为加载任务准备环境
+
+## 任务加载器
+负责加载任务流程，开始调用任务执行器执行核心流程
+
+* load 核心任务流程方法，在这里阻塞等待整个任务流程
+* getBeginProcess 获取子任务开始流程
+* completed 任务完成
+* errorInterrupted 任务失败 中断任务流程
+* error 任务失败
+
+
+### 任务执行器
+最终的任务执行，每一个任务对应一个<code>TaskActuator</code> 任务的 拦截、异常、执行、线程复用 等必要条件判断都在这里处理
+* prepare 任务前置处理
+* preInterceptor 统一任务前置处理
+* task 核心任务方法，业务执行内容
+* postInterceptor 统一后置处理
+* onSuccess 任务执行成功回调
+* onFail 任务执行失败回调
+
+
+## 任务总线
+任务流程传递总线，包括 请求参数、任务加载器、 响应结果， 该对象暴露给使用者，拿到匹配业务的数据信息，例如： 返回结果、主动中断任务流程等功能
+需要任务总线(<code>TaskSupport</code>)支持
+
+
+[快速实战](https://ali.sizegang.cn)
