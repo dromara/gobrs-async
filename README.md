@@ -185,4 +185,4 @@ Gobrs-Async 在设计时，就充分考虑了开发者的使用习惯， 没有�
 需要任务总线(<code>TaskSupport</code>)支持
 
 
-[快速实战](https://ali.sizegang.cn)
+[快速实战](https://async.sizegang.cn)
