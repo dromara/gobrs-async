@@ -63,7 +63,7 @@ public class TaskLoader {
 
     private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<>(0);
 
-    TaskLoader(AsyncParam param, ExecutorService executorService, Map<AsyncTask, TaskActuator> processMap,
+    TaskLoader(ExecutorService executorService, Map<AsyncTask, TaskActuator> processMap,
                long timeout) {
         this.executorService = executorService;
         this.processMap = processMap;

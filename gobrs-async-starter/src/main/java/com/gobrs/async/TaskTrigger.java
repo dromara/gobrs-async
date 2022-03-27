@@ -19,7 +19,7 @@ class TaskTrigger {
 
     private final TaskFlow taskFlow;
 
-    private  GobrsAsyncThreadPoolFactory threadPoolFactory = GobrsSpring.getBean(GobrsAsyncThreadPoolFactory.class);
+    private GobrsAsyncThreadPoolFactory threadPoolFactory = GobrsSpring.getBean(GobrsAsyncThreadPoolFactory.class);
 
     private IdentityHashMap<AsyncTask, TaskActuator> prepareTaskMap = new IdentityHashMap<>();
 
@@ -33,9 +33,14 @@ class TaskTrigger {
      */
     private void prepare() {
 
-
+        /**
+         * Subtasks under a task
+         */
         Map<AsyncTask, List<AsyncTask>> downTasksMap = copyDependTasks(taskFlow.getDependsTasks());
 
+        /**
+         * The task on which a task depends
+         */
         Map<AsyncTask, List<AsyncTask>> upwardTasksMap = new HashMap<>();
 
         for (AsyncTask task : downTasksMap.keySet()) {
@@ -51,29 +56,32 @@ class TaskTrigger {
 
 
         AssistantTask assistantTask = new AssistantTask();
-        List<AsyncTask> noDependsTasks = new ArrayList<>(1);
+        /**
+         * task without any subtasks
+         */
+        List<AsyncTask> noSubtasks = new ArrayList<>(1);
 
         for (AsyncTask task : downTasksMap.keySet()) {
             List<AsyncTask> dTasks = downTasksMap.get(task);
             if (dTasks.isEmpty()) {
-                noDependsTasks.add(task);
+                noSubtasks.add(task);
                 downTasksMap.get(task).add(assistantTask);
             }
         }
         downTasksMap.put(assistantTask, new ArrayList<>(0));
-        upwardTasksMap.put(assistantTask, noDependsTasks);
+        upwardTasksMap.put(assistantTask, noSubtasks);
 
         for (AsyncTask task : downTasksMap.keySet()) {
             TaskActuator process;
             if (task != assistantTask) {
                 /**
-                 * Each task is executed using a new Processs
+                 * Each business task is executed using a new taskActuator
                  */
-               if(taskFlow.getGobrsAsyncProperties().isTransaction()){
-                   process = new TaskActuator(task, upwardTasksMap.get(task).size(), downTasksMap.get(task), upwardTasksMap);
-               }else{
-                   process = new TaskActuator(task, upwardTasksMap.get(task).size(), downTasksMap.get(task));
-               }
+                if (taskFlow.getGobrsAsyncProperties().isTransaction()) {
+                    process = new TaskActuator(task, upwardTasksMap.get(task).size(), downTasksMap.get(task), upwardTasksMap);
+                } else {
+                    process = new TaskActuator(task, upwardTasksMap.get(task).size(), downTasksMap.get(task));
+                }
             } else {
                 /***
                  * completely  and  Termination of the task
@@ -97,15 +105,15 @@ class TaskTrigger {
     TaskLoader trigger(AsyncParam param, long timeout) {
         IdentityHashMap<AsyncTask, TaskActuator> newProcessMap = new IdentityHashMap<>(prepareTaskMap.size());
         /**
-         * Assign one loader to each task
+         * Create a task loader, A task flow corresponds to a taskLoader
          */
-        TaskLoader loader = new TaskLoader(param, threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
+        TaskLoader loader = new TaskLoader(threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
         TaskSupport support = getSupport(param);
         support.setTaskLoader(loader);
         support.setExecutorService(threadPoolFactory.getThreadPoolExecutor());
         for (AsyncTask task : prepareTaskMap.keySet()) {
             /**
-             * clone Process
+             * clone Process for Thread isolation
              */
             TaskActuator newProcess = (TaskActuator) prepareTaskMap.get(task).clone();
             newProcess.init(support, param);
@@ -116,8 +124,7 @@ class TaskTrigger {
 
 
     /**
-     * ScriptEndEventHandler will do work to complete the whole ScriptRuntime
-     * process.
+     * Task flow End tasks
      */
     private class TerminationTask extends TaskActuator {
 
@@ -125,6 +132,9 @@ class TaskTrigger {
             super(handler, depdending, dependedTasks);
         }
 
+        /**
+         * Task completion interrupt the main thread blocks
+         */
         @Override
         public void run() {
             support.taskLoader.completed();
@@ -132,8 +142,7 @@ class TaskTrigger {
     }
 
     /**
-     * Count the number of dependent tasks by this class
-     *
+     *Assistant task, help the task process to finish properly
      * @param <P>
      * @param <R>
      */
@@ -166,7 +175,7 @@ class TaskTrigger {
     }
 
     /**
-     * Get the task Bus
+     * Get the task support , Similar task bus
      *
      * @param param
      * @return

@@ -126,8 +126,10 @@ class TaskActuator implements Runnable, Cloneable {
             support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
 
             task.onFail(support);
-
-            rollBack();
+            /**
+             * transaction task
+             */
+            transaction();
 
             if (gobrsAsyncProperties.isTaskInterrupt()) {
                 taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
@@ -219,20 +221,20 @@ class TaskActuator implements Runnable, Cloneable {
 
 
     /**
-     * Data rollback
+     * Data transaction
      */
-    private void rollBack() {
+    private void transaction() {
         if (gobrsAsyncProperties.isTransaction()) {
             List<AsyncTask> asyncTaskList = upwardTasksMap.get(this.task);
             if (asyncTaskList == null || asyncTaskList.isEmpty()) {
                 return;
             }
-            support.getExecutorService().execute(() -> doRollBack(asyncTaskList, support));
+            support.getExecutorService().execute(() -> rollback(asyncTaskList, support));
         }
     }
 
 
-    private void doRollBack(List<AsyncTask> asyncTasks, TaskSupport support) {
+    private void rollback(List<AsyncTask> asyncTasks, TaskSupport support) {
         for (AsyncTask asyncTask : asyncTasks) {
             try {
                 if (support.getParam() instanceof Map) {
@@ -244,7 +246,7 @@ class TaskActuator implements Runnable, Cloneable {
                 ex.printStackTrace();
             }
             List<AsyncTask> asyncTaskList = upwardTasksMap.get(asyncTask);
-            doRollBack(asyncTaskList, support);
+            rollback(asyncTaskList, support);
         }
     }
 
