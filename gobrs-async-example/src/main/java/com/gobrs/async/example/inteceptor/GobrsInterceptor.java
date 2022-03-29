@@ -1,7 +1,7 @@
 package com.gobrs.async.example.inteceptor;
 
+import com.gobrs.async.callback.AsyncTaskExceptionInterceptor;
 import com.gobrs.async.callback.ErrorCallback;
-import com.gobrs.async.callback.AsyncExceptionInterceptor;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * @create: 2022-03-20
  **/
 @Component
-public class GobrsInterceptor implements AsyncExceptionInterceptor {
+public class GobrsInterceptor implements AsyncTaskExceptionInterceptor {
 
     @Override
     public void exception(ErrorCallback errorCallback) {

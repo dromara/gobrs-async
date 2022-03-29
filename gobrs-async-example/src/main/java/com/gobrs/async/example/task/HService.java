@@ -18,8 +18,8 @@ import java.util.Map;
  * @create: 2022-03-20
  **/
 @Component
-public class FService extends AsyncTask<Object, Object> implements IWorker<String, String>, ICallback<String, String> {
-    int i = 10000;
+public class HService extends AsyncTask<Object, Object> implements IWorker<String, String>, ICallback<String, String> {
+    int i  = 10000;
     @Override
     public void prepare(Object o) {
 
@@ -28,14 +28,15 @@ public class FService extends AsyncTask<Object, Object> implements IWorker<Strin
     @Override
     public Object task(Object o, TaskSupport support) {
         try {
-            Thread.sleep(200);
-            for (int i1 = 0; i1 < i; i1++) {
-                i1 += i1;
-            }
-            System.out.println("FService 完成");
+            Thread.sleep(100);
+            System.out.println("HService 完成");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        for (int i1 = 0; i1 < i; i1++) {
+            i1 += i1;
+        }
+
         return null;
     }
 
@@ -67,13 +68,13 @@ public class FService extends AsyncTask<Object, Object> implements IWorker<Strin
     @Override
     public String action(String s, Map<String, WorkerWrapper> map) {
         try {
-            Thread.sleep(200);
-            for (int i1 = 0; i1 < i; i1++) {
-                i1 += i1;
-            }
-//            System.out.println("FService 完成");
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+//        System.out.println("GService 完成");
+        for (int i1 = 0; i1 < i; i1++) {
+            i1 += i1;
         }
         return "";
     }

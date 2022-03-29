@@ -2,7 +2,13 @@ package com.gobrs.async.example.task;
 
 import com.gobrs.async.TaskSupport;
 import com.gobrs.async.task.AsyncTask;
+import com.jd.platform.async.callback.ICallback;
+import com.jd.platform.async.callback.IWorker;
+import com.jd.platform.async.worker.WorkResult;
+import com.jd.platform.async.wrapper.WorkerWrapper;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 /**
  * @program: gobrs-async-starter
@@ -12,7 +18,9 @@ import org.springframework.stereotype.Component;
  * @create: 2022-03-20
  **/
 @Component
-public class AService implements AsyncTask<Object, Object> {
+public class AService extends AsyncTask<Object, Object> implements IWorker<String, String>, ICallback<String, String> {
+
+    int i = 10000;
 
     @Override
     public void prepare(Object o) {
@@ -22,14 +30,16 @@ public class AService implements AsyncTask<Object, Object> {
 
     @Override
     public Object task(Object o, TaskSupport support) {
-        System.out.println("执行AService");
         try {
-            Thread.sleep(100);
+            Thread.sleep(300);
+            for (int i1 = 0; i1 < i; i1++) {
+                i1 += i1;
+            }
+//            System.out.println("AService 完成");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-//        stop(support, 666);
-        return "我是A的结果";
+        return null;
     }
 
     @Override
@@ -46,5 +56,34 @@ public class AService implements AsyncTask<Object, Object> {
     @Override
     public void onFail(TaskSupport support) {
 
+    }
+
+    @Override
+    public void begin() {
+
+    }
+
+    @Override
+    public void result(boolean b, String s, WorkResult<String> workResult) {
+
+    }
+
+    @Override
+    public String action(String s, Map<String, WorkerWrapper> map) {
+        try {
+            Thread.sleep(300);
+            for (int i1 = 0; i1 < i; i1++) {
+                i1 += i1;
+            }
+//            System.out.println("AService 完成");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    @Override
+    public String defaultValue() {
+        return null;
     }
 }

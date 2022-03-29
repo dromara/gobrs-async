@@ -54,7 +54,6 @@ class TaskActuator implements Runnable, Cloneable {
         this.unsatisfiedDepdendings = depdending;
         this.subTasks = subTasks;
     }
-
     TaskActuator(AsyncTask eventHandler, int depdending, List<AsyncTask> subTasks, Map<AsyncTask, List<AsyncTask>> upwardTasksMap) {
         this.task = eventHandler;
         this.unsatisfiedDepdendings = depdending;
