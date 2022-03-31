@@ -22,6 +22,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
 
     Logger logger = LoggerFactory.getLogger(AsyncTask.class);
     private String name;
+    private boolean callback;
 
     /**
      * Gets the execution results of dependencies
@@ -77,5 +78,13 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public boolean isCallback() {
+        return callback;
+    }
+
+    public void setCallback(boolean callback) {
+        this.callback = callback;
     }
 }

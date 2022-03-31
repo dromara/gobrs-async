@@ -75,6 +75,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
         private static AsyncTask getAsyncTask(String taskName) {
             AsyncTask task = (AsyncTask) getBean(taskName);
             task.setName(getName(task));
+            task.setCallback(getCallBack(task));
             return task;
         }
 
@@ -105,6 +106,14 @@ public class RuleParseEngine<T> extends AbstractEngine {
                 return null;
             }
             return annotation.name();
+        }
+
+        public static boolean getCallBack(AsyncTask task) {
+            Task annotation = task.getClass().getAnnotation(Task.class);
+            if (annotation == null) {
+                return false;
+            }
+            return annotation.callback();
         }
     }
 

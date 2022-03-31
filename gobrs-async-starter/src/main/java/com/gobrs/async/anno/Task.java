@@ -14,4 +14,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Task {
     String name() default "gobrsAsyncName";
+    boolean callback() default  false;
 }
