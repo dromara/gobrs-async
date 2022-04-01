@@ -115,9 +115,14 @@ public class TaskLoader {
 
         completeLatch.countDown();
         /**
-         * Global interception listening
+         * manual stopAsync  exception  is null
          */
-        asyncExceptionInterceptor.exception(errorCallback);
+        if (errorCallback.getThrowable() != null) {
+            /**
+             * Global interception listening
+             */
+            asyncExceptionInterceptor.exception(errorCallback);
+        }
     }
 
     public void preInterceptor(Object object, String taskName) {

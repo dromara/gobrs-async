@@ -11,9 +11,9 @@ import com.gobrs.async.task.AsyncTask;
  * @author: sizegang
  * @create: 2022-03-20
  **/
-public class ErrorCallback {
+public class ErrorCallback<Param> {
 
-    AsyncParam param;
+    AsyncParam<Param> param;
     Exception exception;
     TaskSupport support;
     AsyncTask task;
@@ -26,7 +26,7 @@ public class ErrorCallback {
         this.task = task;
     }
 
-    public AsyncParam getParam() {
+    public AsyncParam<Param> getParam() {
         return param;
     }
 

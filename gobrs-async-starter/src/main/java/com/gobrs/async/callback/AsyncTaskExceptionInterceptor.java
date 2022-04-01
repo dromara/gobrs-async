@@ -12,10 +12,10 @@ import java.util.concurrent.CompletionException;
  * @create: 2022-02-19 22:41
  * @Version 1.0
  **/
-public interface AsyncTaskExceptionInterceptor {
+public interface AsyncTaskExceptionInterceptor<Param> {
     /**
      * error CallBack
      * @param errorCallback
      */
-    void exception(ErrorCallback errorCallback);
+     void exception(ErrorCallback<Param> errorCallback);
 }
