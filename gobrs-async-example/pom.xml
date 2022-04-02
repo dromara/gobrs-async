@@ -37,11 +37,6 @@
             <artifactId>gobrs-async-starter</artifactId>
             <version>0.0.5-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>com.jd.platform</groupId>
-            <artifactId>asyncTool</artifactId>
-            <version>1.4.1-SNAPSHOT</version>
-        </dependency>
     </dependencies>
 
     <build>
