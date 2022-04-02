@@ -42,14 +42,14 @@ public class GobrsController {
 
     }
 
-    @RequestMapping("asyncTool")
-    public void asyncTool() {
-        long start = System.currentTimeMillis();
-        gobrsService.asyncTool();
-        long coust = System.currentTimeMillis() - start;
-        System.out.println("asyncTool " + coust);
-
-    }
+//    @RequestMapping("asyncTool")
+//    public void asyncTool() {
+//        long start = System.currentTimeMillis();
+//        gobrsService.asyncTool();
+//        long coust = System.currentTimeMillis() - start;
+//        System.out.println("asyncTool " + coust);
+//
+//    }
 
 
     @RequestMapping("gobrsAsync")

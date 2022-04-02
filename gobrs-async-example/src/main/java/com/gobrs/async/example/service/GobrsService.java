@@ -3,8 +3,6 @@ package com.gobrs.async.example.service;
 import com.gobrs.async.GobrsAsync;
 import com.gobrs.async.example.task.*;
 import com.gobrs.async.task.AsyncTask;
-import com.jd.platform.async.executor.Async;
-import com.jd.platform.async.wrapper.WorkerWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,51 +49,6 @@ public class GobrsService {
         gobrsAsync.go("test", () -> new Object());
     }
 
-
-    public void asyncTool() {
-
-        WorkerWrapper<String, String> gWorker = new WorkerWrapper.Builder<String, String>()
-                .worker(gService)
-                .build();
-
-        WorkerWrapper<String, String> eWorker = new WorkerWrapper.Builder<String, String>()
-                .worker(eService)
-                .next(gWorker)
-                .build();
-        WorkerWrapper<String, String> fWorker = new WorkerWrapper.Builder<String, String>()
-                .worker(fService)
-                .next(gWorker)
-                .build();
-
-
-        WorkerWrapper<String, String> cWorker = new WorkerWrapper.Builder<String, String>()
-                .worker(cService)
-                .next(eWorker)
-                .build();
-        WorkerWrapper<String, String> dWorker = new WorkerWrapper.Builder<String, String>()
-                .worker(dService)
-                .next(fWorker)
-                .build();
-
-
-        WorkerWrapper<String, String> aWorker = new WorkerWrapper.Builder<String, String>()
-                .worker(bService)
-                .next(dWorker)
-                .build();
-        WorkerWrapper<String, String> bWorker = new WorkerWrapper.Builder<String, String>()
-                .worker(aService)
-                .next(cWorker)
-                .build();
-        try {
-            Async.beginWork(10000, aWorker, bWorker);
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-
-    }
 
 
     public void future() {
