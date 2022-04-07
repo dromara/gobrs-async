@@ -17,6 +17,7 @@ import com.gobrs.async.task.AsyncTask;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -48,6 +49,8 @@ class TaskActuator implements Runnable, Cloneable {
 
     private GobrsAsyncProperties gobrsAsyncProperties;
 
+    private AtomicInteger state;
+
 
     TaskActuator(AsyncTask eventHandler, int depdending, List<AsyncTask> subTasks) {
         this.task = eventHandler;
@@ -76,6 +79,7 @@ class TaskActuator implements Runnable, Cloneable {
 
     @Override
     public void run() {
+        state = new AtomicInteger(1);
         Object parameter = param.get();
 
         if (parameter instanceof Map) {
@@ -97,32 +101,15 @@ class TaskActuator implements Runnable, Cloneable {
                  */
                 taskLoader.preInterceptor(parameter, task.getName());
 
-                /**
-                 * Perform a task
-                 */
-                Object result = task.task(parameter, support);
-
-                /**
-                 * Post-processing of tasks
-                 */
-                taskLoader.postInterceptor(result, task.getName());
-
-                /**
-                 * Setting Task Results
-                 */
-                if (gobrsAsyncProperties.isParamContext()) {
-                    support.getResultMap().put(task.getClass(), buildSuccessResult(result));
-                }
-
-                /**
-                 * Success callback
-                 */
-                task.onSuccess(support);
+                doTaskWithRetryConditional(parameter, taskLoader);
             }
 
             nextTask(taskLoader);
 
         } catch (Exception e) {
+            if (retryTask(parameter, taskLoader)) {
+                return;
+            }
             support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
 
             task.onFail(support);
@@ -139,6 +126,44 @@ class TaskActuator implements Runnable, Cloneable {
                 nextTask(taskLoader);
             }
         }
+    }
+
+    private boolean retryTask(Object parameter, TaskLoader taskLoader) {
+        try {
+            if (task.getRetryCount() > 1 && task.getRetryCount() >= state.get()) {
+                state.incrementAndGet();
+                doTaskWithRetryConditional(parameter, taskLoader);
+                nextTask(taskLoader);
+                return true;
+            }
+            return false;
+        } catch (Exception exception) {
+            return retryTask(parameter, taskLoader);
+        }
+    }
+
+    private void doTaskWithRetryConditional(Object parameter, TaskLoader taskLoader) {
+        /**
+         * Perform a task
+         */
+        Object result = task.task(parameter, support);
+
+        /**
+         * Post-processing of tasks
+         */
+        taskLoader.postInterceptor(result, task.getName());
+
+        /**
+         * Setting Task Results
+         */
+        if (gobrsAsyncProperties.isParamContext()) {
+            support.getResultMap().put(task.getClass(), buildSuccessResult(result));
+        }
+
+        /**
+         * Success callback
+         */
+        task.onSuccess(support);
     }
 
 

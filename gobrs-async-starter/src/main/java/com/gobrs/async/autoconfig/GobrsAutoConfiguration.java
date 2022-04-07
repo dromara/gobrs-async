@@ -6,6 +6,7 @@ import com.gobrs.async.callback.*;
 import com.gobrs.async.engine.RuleEngine;
 import com.gobrs.async.engine.RuleParseEngine;
 import com.gobrs.async.engine.RulePostProcessor;
+import com.gobrs.async.engine.RuleThermalLoad;
 import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -86,4 +87,8 @@ public class GobrsAutoConfiguration {
         return new DefaultAsyncTaskPostInterceptor();
     }
 
+    @Bean
+    public RuleThermalLoad ruleThermalLoading() {
+        return new RuleThermalLoad();
+    }
 }

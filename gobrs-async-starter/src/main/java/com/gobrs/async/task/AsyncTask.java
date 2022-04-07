@@ -3,6 +3,7 @@ package com.gobrs.async.task;
 
 import com.gobrs.async.TaskSupport;
 import com.gobrs.async.callback.ErrorCallback;
+import com.gobrs.async.def.DefaultConfig;
 import com.gobrs.async.domain.TaskResult;
 import com.gobrs.async.enums.ExpState;
 import org.slf4j.Logger;
@@ -23,6 +24,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
     Logger logger = LoggerFactory.getLogger(AsyncTask.class);
     private String name;
     private boolean callback = false;
+    private int retryCount = DefaultConfig.retryCount;
 
     /**
      * Gets the execution results of dependencies
@@ -86,5 +88,14 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
 
     public void setCallback(boolean callback) {
         this.callback = callback;
+    }
+
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public void setRetryCount(int retryCount) {
+        this.retryCount = retryCount;
     }
 }

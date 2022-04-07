@@ -54,6 +54,6 @@ public class CService extends AsyncTask<Object, Object> {
 
     @Override
     public void onFail(TaskSupport support) {
-
+        System.out.println(1/0);
     }
 }

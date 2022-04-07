@@ -36,14 +36,22 @@ public class GobrsAsync {
     }
 
 
-    public TaskRecevie begin(String ruleName, List<AsyncTask> asyncTasks) {
+    public TaskRecevie begin(String ruleName, List<AsyncTask> asyncTasks, boolean reload) {
         if (taskFlow == null) {
             loadTaskFlow(ruleName);
         }
         if (taskFlow.get(ruleName) == null) {
             loadTaskFlowForOne(ruleName);
         }
+        if(reload){
+            loadTaskFlowForOne(ruleName);
+        }
         return taskFlow.get(ruleName).start(asyncTasks);
+    }
+
+
+    public TaskRecevie begin(String ruleName, List<AsyncTask> asyncTasks) {
+        return begin(ruleName, asyncTasks, false);
     }
 
     public TaskRecevie after(String taskName, AsyncTask... tasks) {
@@ -64,13 +72,21 @@ public class GobrsAsync {
 
 
     public synchronized void readyTo(String ruleName) {
+        readyTo(ruleName, false);
+    }
+
+    public synchronized void readyTo(String ruleName, boolean reload) {
         if (trigger == null) {
             loadTrigger(ruleName);
         }
         if (trigger.get(ruleName) == null) {
             loadTriggerForOne(ruleName);
         }
+        if(reload){
+            loadTriggerForOne(ruleName);
+        }
     }
+
 
     private void loadTaskFlow(String ruleName) {
         taskFlow = new HashMap<>();

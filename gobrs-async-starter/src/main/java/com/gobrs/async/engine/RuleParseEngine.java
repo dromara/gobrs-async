@@ -4,6 +4,7 @@ import com.gobrs.async.GobrsAsync;
 import com.gobrs.async.TaskRecevie;
 import com.gobrs.async.anno.Task;
 import com.gobrs.async.autoconfig.GobrsAsyncProperties;
+import com.gobrs.async.def.DefaultConfig;
 import com.gobrs.async.rule.Rule;
 import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
@@ -32,7 +33,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
     private GobrsAsync gobrsAsync;
 
     @Override
-    public void doParse(Rule rule, Map<String, Object> parameters) {
+    public void doParse(Rule rule, boolean reload) {
         String[] taskFlows = rule.getContent().replaceAll("\\s+", "").split(gobrsAsyncProperties.getSplit());
         Map<String, AsyncTask> cacheTaskWrappers = new HashMap<>();
         List<AsyncTask> pioneer = new ArrayList<>();
@@ -40,7 +41,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
             pioneer.add(EngineExecutor.getAsyncTask(taskArr[0]));
         }
-        gobrsAsync.begin(rule.getName(), pioneer);
+        gobrsAsync.begin(rule.getName(), pioneer, reload);
         for (String taskFlow : taskFlows) {
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
             List<String> arrayList = Arrays.asList(taskArr);
@@ -76,6 +77,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
             AsyncTask task = (AsyncTask) getBean(taskName);
             task.setName(getName(task));
             task.setCallback(getCallBack(task));
+            task.setRetryCount(getRetryCount(task));
             return task;
         }
 
@@ -114,6 +116,14 @@ public class RuleParseEngine<T> extends AbstractEngine {
                 return false;
             }
             return annotation.callback();
+        }
+
+        public static int getRetryCount(AsyncTask task) {
+            Task annotation = task.getClass().getAnnotation(Task.class);
+            if (annotation == null) {
+                return DefaultConfig.retryCount;
+            }
+            return annotation.retryCount();
         }
     }
 

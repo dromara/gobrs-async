@@ -1,11 +1,14 @@
 package com.gobrs.async.example.service;
 
 import com.gobrs.async.GobrsAsync;
+import com.gobrs.async.engine.RuleThermalLoad;
 import com.gobrs.async.example.task.*;
+import com.gobrs.async.rule.Rule;
 import com.gobrs.async.task.AsyncTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
@@ -42,13 +45,15 @@ public class GobrsService {
     @Autowired
     private GobrsAsync gobrsAsync;
 
+    @Resource
+    private RuleThermalLoad ruleThermalLoad;
+
     ExecutorService executorService = Executors.newCachedThreadPool();
 
 
     public void gobrsAsync() {
         gobrsAsync.go("test", () -> new Object());
     }
-
 
 
     public void future() {
@@ -121,5 +126,9 @@ public class GobrsService {
         }
 
 
+    }
+
+    public void updateRule(Rule rule) {
+        ruleThermalLoad.load(rule);
     }
 }

@@ -24,16 +24,9 @@ public abstract class AbstractEngine implements RuleEngine {
         GobrsAsync gobrsAsync = GobrsSpring.getBean(GobrsAsync.class);
         List<Rule> rules = JSONArray.parseArray(rule, Rule.class);
         for (Rule r : rules) {
-            doParse(r, Collections.emptyMap());
+            doParse(r, false);
             gobrsAsync.readyTo(r.getName());
         }
     }
 
-    /**
-     * 真正解析的方法
-     *
-     * @param r
-     * @return
-     */
-    abstract void doParse(Rule r, Map<String, Object> params);
 }

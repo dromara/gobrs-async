@@ -3,9 +3,13 @@ package com.gobrs.async.example.controller;
 import com.gobrs.async.GobrsAsync;
 import com.gobrs.async.domain.AsyncResult;
 import com.gobrs.async.example.service.GobrsService;
+import com.gobrs.async.rule.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * @program: gobrs-async-core
@@ -38,7 +42,7 @@ public class GobrsController {
         gobrsService.future();
 
         long coust = System.currentTimeMillis() - start;
-        System.out.println("future " +coust);
+        System.out.println("future " + coust);
 
     }
 
@@ -61,5 +65,8 @@ public class GobrsController {
 
     }
 
-
+    @RequestMapping("updateRule")
+    public void updateRule(@RequestBody Rule rule) {
+        gobrsService.updateRule(rule);
+    }
 }
