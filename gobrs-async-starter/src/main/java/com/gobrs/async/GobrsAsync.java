@@ -31,12 +31,12 @@ public class GobrsAsync {
     private Map<String, TaskTrigger> trigger;
 
 
-    public TaskRecevie begin(String taskName, AsyncTask... tasks) {
+    public TaskReceive begin(String taskName, AsyncTask... tasks) {
         return taskFlow.get(taskName).start(tasks);
     }
 
 
-    public TaskRecevie begin(String ruleName, List<AsyncTask> asyncTasks, boolean reload) {
+    public TaskReceive begin(String ruleName, List<AsyncTask> asyncTasks, boolean reload) {
         if (taskFlow == null) {
             loadTaskFlow(ruleName);
         }
@@ -50,11 +50,11 @@ public class GobrsAsync {
     }
 
 
-    public TaskRecevie begin(String ruleName, List<AsyncTask> asyncTasks) {
+    public TaskReceive begin(String ruleName, List<AsyncTask> asyncTasks) {
         return begin(ruleName, asyncTasks, false);
     }
 
-    public TaskRecevie after(String taskName, AsyncTask... tasks) {
+    public TaskReceive after(String taskName, AsyncTask... tasks) {
         return taskFlow.get(taskName).after(tasks);
     }
 
