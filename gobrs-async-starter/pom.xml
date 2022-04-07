@@ -2,9 +2,9 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.jd.gobrs</groupId>
+    <groupId>io.github.memorydoc</groupId>
     <artifactId>gobrs-async-starter</artifactId>
-    <version>0.0.5-SNAPSHOT</version>
+    <version>1.1.6-RELEASE</version>
     <name>${project.artifactId}</name>
     <description>🔥 强大异步任务编排工具（没有依赖中间件）</description>
     <url>https://github.com/Memorydoc/gobrs-async-starter</url>
@@ -17,24 +17,31 @@
     </licenses>
     <developers>
         <developer>
-            <name>sizegang1</name>
-            <email>sizegang1@jd.com</email>
-            <organization>jd</organization>
+            <name>Memorydoc</name>
+            <email>17615195790@163.com</email>
+            <organization>Github</organization>
         </developer>
     </developers>
+    <scm>
+        <connection>scm:git:git@github.com:Memorydoc/gobrs-async-starter.git</connection>
+        <developerConnection>scm:git:git@github.com:Memorydoc/gobrs-async-starter.git</developerConnection>
+        <tag>master</tag>
+        <url>git@github.com:Memorydoc/gobrs-async-starter.git</url>
+    </scm>
+    <issueManagement>
+        <system>Github Issue</system>
+        <url>https://github.com/Memorydoc/gobrs-async-starter/issues</url>
+    </issueManagement>
     <distributionManagement>
         <repository>
-            <id>libs-releases-local</id>
-            <name>Release Repository</name>
-            <url>http://artifactory.jd.com/libs-releases-local</url>
+            <id>sonatype-nexus-staging</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
         <snapshotRepository>
-            <id>snapshots</id>
-            <name>Snapshot Repository</name>
-            <url>http://artifactory.jd.com/libs-snapshots-local</url>
+            <id>sonatype-nexus-snapshots</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
-
     <properties>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
         <java.version>1.8</java.version>
@@ -60,8 +67,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -78,6 +83,7 @@
         </dependency>
     </dependencies>
     <build>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -120,6 +126,18 @@
                 <version>${spring-boot.version}</version>
             </plugin>
             <plugin>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.10.4</version>
                 <executions>
@@ -151,7 +169,6 @@
             </plugin>
         </plugins>
     </build>
-
     <profiles>
         <profile>
             <id>disable-javadoc-doclint</id>

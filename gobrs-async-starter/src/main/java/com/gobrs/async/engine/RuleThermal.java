@@ -15,7 +15,7 @@ public interface RuleThermal {
 
     void load(Rule rule);
 
-    void loadAll(List<Rule> ruleList);
+    void loadBatch(List<Rule> ruleList);
 
 
 }

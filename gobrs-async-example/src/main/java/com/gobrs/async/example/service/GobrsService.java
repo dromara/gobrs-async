@@ -129,6 +129,9 @@ public class GobrsService {
     }
 
     public void updateRule(Rule rule) {
+        Rule r = new Rule();
+        r.setName("ruleName");
+        r.setContent("AService->CService->EService->GService; BService->DService->FService->HService;");
         ruleThermalLoad.load(rule);
     }
 }
