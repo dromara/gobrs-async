@@ -26,7 +26,7 @@ public class TaskFlow {
      */
     private final IdentityHashMap<AsyncTask, List<AsyncTask>> denpendedTasks = new IdentityHashMap<>();
 
-    synchronized TaskRecevie after(final AsyncTask... asyncTasks) {
+    synchronized TaskReceive after(final AsyncTask... asyncTasks) {
 
         for (AsyncTask handler : asyncTasks) {
             if (!denpendedTasks.containsKey(handler)) {
@@ -37,19 +37,19 @@ public class TaskFlow {
         return start(asyncTasks);
     }
 
-    synchronized TaskRecevie start(AsyncTask... asyncTasks) {
+    synchronized TaskReceive start(AsyncTask... asyncTasks) {
         /**
          * Building task groups
          */
-        TaskRecevie builder = new TaskRecevie(this, Arrays.asList(asyncTasks));
+        TaskReceive builder = new TaskReceive(this, Arrays.asList(asyncTasks));
         return builder;
     }
 
-    synchronized TaskRecevie start(List<AsyncTask> asyncTasks) {
+    synchronized TaskReceive start(List<AsyncTask> asyncTasks) {
         /**
          * Building task groups
          */
-        TaskRecevie builder = new TaskRecevie(this, asyncTasks);
+        TaskReceive builder = new TaskReceive(this, asyncTasks);
         return builder;
     }
 
