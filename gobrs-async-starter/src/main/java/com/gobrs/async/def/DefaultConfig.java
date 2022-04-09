@@ -12,4 +12,12 @@ public class DefaultConfig {
     public static final Long KEEPALIVETIME = 30000L;
     public static final Long EXECUTETIMEOUT = 10000L;
     public static final int retryCount = 1;
+    /**
+     * Whether to execute a subtask if it fails
+     */
+    public static final boolean failSubExec = false;
+    /**
+     * Transaction task
+     */
+    public static final boolean transaction = false;
 }

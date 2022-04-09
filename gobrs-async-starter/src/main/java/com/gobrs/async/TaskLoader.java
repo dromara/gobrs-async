@@ -3,7 +3,6 @@ package com.gobrs.async;
 import com.gobrs.async.callback.AsyncTaskPostInterceptor;
 import com.gobrs.async.callback.AsyncTaskPreInterceptor;
 import com.gobrs.async.callback.ErrorCallback;
-import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.AsyncResult;
 import com.gobrs.async.callback.AsyncTaskExceptionInterceptor;
 import com.gobrs.async.enums.ExpState;
@@ -19,6 +18,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -36,6 +36,11 @@ public class TaskLoader {
      * Interruption code
      */
     private AtomicInteger expCode = new AtomicInteger(ExpState.DEFAULT.getCode());
+
+    /**
+     * task Loader is Running
+     */
+    private AtomicBoolean isRunning = new AtomicBoolean(true);
 
     private final ExecutorService executorService;
 
@@ -212,5 +217,13 @@ public class TaskLoader {
 
     public void setExpCode(AtomicInteger expCode) {
         this.expCode = expCode;
+    }
+
+    public AtomicBoolean isRunning() {
+        return isRunning;
+    }
+
+    public void setIsRunning(boolean isRunning) {
+        this.isRunning = new AtomicBoolean(isRunning);
     }
 }

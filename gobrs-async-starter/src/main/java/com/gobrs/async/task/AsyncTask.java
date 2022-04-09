@@ -22,9 +22,20 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Result> {
 
     Logger logger = LoggerFactory.getLogger(AsyncTask.class);
+
     private String name;
-    private boolean callback = false;
+
+    /**
+     *Transaction task
+     */
+    private boolean callback = DefaultConfig.transaction;
+
     private int retryCount = DefaultConfig.retryCount;
+
+    /**
+     * Whether to execute a subtask if it fails
+     */
+    private boolean failSubExec = DefaultConfig.failSubExec;
 
     /**
      * Gets the execution results of dependencies
@@ -64,9 +75,12 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
 
     public boolean stopAsync(TaskSupport support, Integer expCode) {
         try {
-            ErrorCallback errorCallback = new ErrorCallback(() -> support.getParam(), null, support, this);
+            support.taskLoader.setIsRunning(false);
             support.taskLoader.setExpCode(new AtomicInteger(expCode));
+
+            ErrorCallback errorCallback = new ErrorCallback(() -> support.getParam(), null, support, this);
             support.taskLoader.errorInterrupted(errorCallback);
+
         } catch (Exception ex) {
             logger.error("stopAsync error ", ex);
             return false;
@@ -97,5 +111,13 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
 
     public void setRetryCount(int retryCount) {
         this.retryCount = retryCount;
+    }
+
+    public boolean isFailSubExec() {
+        return failSubExec;
+    }
+
+    public void setFailSubExec(boolean failSubExec) {
+        this.failSubExec = failSubExec;
     }
 }

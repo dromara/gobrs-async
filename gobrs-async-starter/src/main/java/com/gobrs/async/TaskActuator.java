@@ -79,7 +79,7 @@ class TaskActuator implements Runnable, Cloneable {
 
     @Override
     public void run() {
-        state = new AtomicInteger(1);
+
         Object parameter = param.get();
 
         if (parameter instanceof Map) {
@@ -101,30 +101,55 @@ class TaskActuator implements Runnable, Cloneable {
                  */
                 taskLoader.preInterceptor(parameter, task.getName());
 
-                doTaskWithRetryConditional(parameter, taskLoader);
+                /**
+                 * Perform a task
+                 */
+                Object result = task.task(parameter, support);
+
+                /**
+                 * Post-processing of tasks
+                 */
+                taskLoader.postInterceptor(result, task.getName());
+
+                /**
+                 * Setting Task Results
+                 */
+                if (gobrsAsyncProperties.isParamContext()) {
+                    support.getResultMap().put(task.getClass(), buildSuccessResult(result));
+                }
+
+                /**
+                 * Success callback
+                 */
+                task.onSuccess(support);
             }
-
-            nextTask(taskLoader);
-
-        } catch (Exception e) {
-            if (retryTask(parameter, taskLoader)) {
-                return;
-            }
-            support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
-
-            task.onFail(support);
             /**
-             * transaction task
+             * Determine whether the process is interrupted
              */
-            transaction();
-
-            if (gobrsAsyncProperties.isTaskInterrupt()) {
-                taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
-            } else {
-                taskLoader.error(errorCallback(parameter, e, support, task));
-
+            if (taskLoader.isRunning().get()) {
                 nextTask(taskLoader);
             }
+        } catch (Exception e) {
+            state = new AtomicInteger(1);
+            if (!retryTask(parameter, taskLoader)) {
+                support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
+
+                task.onFail(support);
+                /**
+                 * transaction task
+                 */
+                transaction();
+
+                if (gobrsAsyncProperties.isTaskInterrupt()) {
+                    taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
+                } else {
+                    taskLoader.error(errorCallback(parameter, e, support, task));
+                    if(task.isFailSubExec()){
+                        nextTask(taskLoader);
+                    }
+                }
+            }
+
         }
     }
 
@@ -133,7 +158,9 @@ class TaskActuator implements Runnable, Cloneable {
             if (task.getRetryCount() > 1 && task.getRetryCount() >= state.get()) {
                 state.incrementAndGet();
                 doTaskWithRetryConditional(parameter, taskLoader);
-                nextTask(taskLoader);
+                if(task.isFailSubExec()){
+                    nextTask(taskLoader);
+                }
                 return true;
             }
             return false;
@@ -143,27 +170,32 @@ class TaskActuator implements Runnable, Cloneable {
     }
 
     private void doTaskWithRetryConditional(Object parameter, TaskLoader taskLoader) {
+
         /**
          * Perform a task
          */
         Object result = task.task(parameter, support);
 
-        /**
-         * Post-processing of tasks
-         */
-        taskLoader.postInterceptor(result, task.getName());
+        try {
+            /**
+             * Post-processing of tasks
+             */
+            taskLoader.postInterceptor(result, task.getName());
 
-        /**
-         * Setting Task Results
-         */
-        if (gobrsAsyncProperties.isParamContext()) {
-            support.getResultMap().put(task.getClass(), buildSuccessResult(result));
+            /**
+             * Setting Task Results
+             */
+            if (gobrsAsyncProperties.isParamContext()) {
+                support.getResultMap().put(task.getClass(), buildSuccessResult(result));
+            }
+
+            /**
+             * Success callback
+             */
+            task.onSuccess(support);
+        } catch (Exception ex) {
+            // todo log
         }
-
-        /**
-         * Success callback
-         */
-        task.onSuccess(support);
     }
 
 

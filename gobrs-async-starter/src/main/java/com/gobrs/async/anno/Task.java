@@ -21,5 +21,7 @@ public @interface Task {
 
     boolean callback() default false;
 
+    boolean failSubExec() default false;
+
     int retryCount() default DefaultConfig.retryCount;
 }

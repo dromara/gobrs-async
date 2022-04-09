@@ -1,16 +1,12 @@
 package com.gobrs.async.engine;
 
-import com.alibaba.fastjson.JSONArray;
 import com.gobrs.async.GobrsAsync;
-import com.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.gobrs.async.rule.Rule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @program: gobrs-async-core

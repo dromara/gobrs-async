@@ -78,6 +78,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
             task.setName(getName(task));
             task.setCallback(getCallBack(task));
             task.setRetryCount(getRetryCount(task));
+            task.setFailSubExec(getFailSubExec(task));
             return task;
         }
 
@@ -124,6 +125,14 @@ public class RuleParseEngine<T> extends AbstractEngine {
                 return DefaultConfig.retryCount;
             }
             return annotation.retryCount();
+        }
+
+        public static boolean getFailSubExec(AsyncTask task) {
+            Task annotation = task.getClass().getAnnotation(Task.class);
+            if (annotation == null) {
+                return false;
+            }
+            return annotation.failSubExec();
         }
     }
 
