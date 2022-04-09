@@ -5,7 +5,7 @@ package com.gobrs.async.exception;
  * @ClassName NotTaskRuleException
  * @description:
  * @author: sizegang
- * @create: 2022-01-27 15:06
+ * @create: 2022-01-27
  * @Version 1.0
  **/
 public class NotTaskRuleException extends RuntimeException {
