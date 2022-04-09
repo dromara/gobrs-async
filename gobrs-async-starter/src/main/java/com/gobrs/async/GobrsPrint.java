@@ -14,8 +14,8 @@ import org.springframework.context.annotation.Configuration;
  * @author: sizegang
  * @create: 2022-04-09
  **/
-@Configuration
 public class GobrsPrint {
+
     static Logger logger = LoggerFactory.getLogger(GobrsPrint.class);
 
 
