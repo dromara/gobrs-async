@@ -1,6 +1,7 @@
 package com.gobrs.async.example.task;
 
 import com.gobrs.async.TaskSupport;
+import com.gobrs.async.anno.Task;
 import com.gobrs.async.task.AsyncTask;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import java.util.Map;
  * @create: 2022-03-20
  **/
 @Component
+@Task()
 public class CService extends AsyncTask<Object, Object> {
 
 

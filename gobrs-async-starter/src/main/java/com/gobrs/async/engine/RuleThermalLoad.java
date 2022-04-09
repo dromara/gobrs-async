@@ -38,7 +38,7 @@ public class RuleThermalLoad implements RuleThermal {
 
 
     @Override
-    public void loadBatch(List<Rule> ruleList) {
+    public void load(List<Rule> ruleList) {
         ruleList.stream().parallel().forEach(x -> {
             try {
                 ruleEngine.doParse(x, true);

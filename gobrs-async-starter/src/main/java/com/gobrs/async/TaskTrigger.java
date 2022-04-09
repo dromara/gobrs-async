@@ -95,8 +95,8 @@ class TaskTrigger {
 
     private Map<AsyncTask, List<AsyncTask>> copyDependTasks(Map<AsyncTask, List<AsyncTask>> handlerMap) {
         IdentityHashMap<AsyncTask, List<AsyncTask>> rt = new IdentityHashMap<>();
-        for (AsyncTask eventHandler : handlerMap.keySet()) {
-            rt.put(eventHandler, new ArrayList<>(handlerMap.get(eventHandler)));
+        for (AsyncTask asyncTask : handlerMap.keySet()) {
+            rt.put(asyncTask, new ArrayList<>(handlerMap.get(asyncTask)));
         }
         return rt;
     }

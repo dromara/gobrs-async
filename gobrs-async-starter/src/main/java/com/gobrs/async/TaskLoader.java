@@ -173,8 +173,8 @@ public class TaskLoader {
     }
 
 
-    TaskActuator getProcess(AsyncTask eventHandler) {
-        return processMap.get(eventHandler);
+    TaskActuator getProcess(AsyncTask asyncTask) {
+        return processMap.get(asyncTask);
     }
 
     void startProcess(TaskActuator taskActuator) {

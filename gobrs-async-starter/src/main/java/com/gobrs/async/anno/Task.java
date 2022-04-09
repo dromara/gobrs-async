@@ -8,20 +8,40 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @program: gobrs-async-core
- * @description: Gobrs Async annotations
- * @author: sizegang
- * @date 2022-04-07 23:43
  * @author sizegang1
+ * @program: gobrs-async-core
+ * @author: sizegang
+ * @date 2022-04-07
  **/
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Task {
-    String name() default "gobrsAsyncName";
 
+    /**
+     * task  name
+     *
+     * @return
+     */
+    String name() default DefaultConfig.TASKNAME;
+
+    /**
+     * Transaction task
+     *
+     * @return
+     */
     boolean callback() default false;
 
+    /**
+     * Whether to continue executing subtasks after a task fails
+     *
+     * @return
+     */
     boolean failSubExec() default false;
 
+    /**
+     * Retry times
+     *
+     * @return
+     */
     int retryCount() default DefaultConfig.retryCount;
 }

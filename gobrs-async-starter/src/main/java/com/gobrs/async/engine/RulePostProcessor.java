@@ -17,7 +17,7 @@ import java.util.Optional;
  * @description: Task flow resolver
  * The implementation ApplicationListener gets the Spring context, which in turn gets the Bean instance
  **/
-public class RulePostProcessor implements ApplicationListener<ContextRefreshedEvent>  {
+public class RulePostProcessor implements ApplicationListener<ContextRefreshedEvent> {
     Logger logger = LoggerFactory.getLogger(RulePostProcessor.class);
 
     @Override

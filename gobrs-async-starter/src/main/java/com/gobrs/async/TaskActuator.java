@@ -2,7 +2,7 @@ package com.gobrs.async;
 
 /**
  * @program: gobrs-async-starter
- * @ClassName EventProcess
+ * @ClassName TaskActuator
  * @description:
  * @author: sizegang
  * @create: 2022-03-16
@@ -52,14 +52,14 @@ class TaskActuator implements Runnable, Cloneable {
     private AtomicInteger state;
 
 
-    TaskActuator(AsyncTask eventHandler, int depdending, List<AsyncTask> subTasks) {
-        this.task = eventHandler;
+    TaskActuator(AsyncTask task, int depdending, List<AsyncTask> subTasks) {
+        this.task = task;
         this.unsatisfiedDepdendings = depdending;
         this.subTasks = subTasks;
     }
 
-    TaskActuator(AsyncTask eventHandler, int depdending, List<AsyncTask> subTasks, Map<AsyncTask, List<AsyncTask>> upwardTasksMap) {
-        this.task = eventHandler;
+    TaskActuator(AsyncTask asyncTask, int depdending, List<AsyncTask> subTasks, Map<AsyncTask, List<AsyncTask>> upwardTasksMap) {
+        this.task = asyncTask;
         this.unsatisfiedDepdendings = depdending;
         this.subTasks = subTasks;
         this.upwardTasksMap = upwardTasksMap;

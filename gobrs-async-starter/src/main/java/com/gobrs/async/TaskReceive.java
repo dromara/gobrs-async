@@ -35,19 +35,19 @@ public class TaskReceive {
         }
     }
 
-    public TaskReceive then(AsyncTask... eventHandlers) {
+    public TaskReceive then(AsyncTask... asyncTasks) {
         synchronized (taskFlow) {
             for (AsyncTask from : this.cacheTaskList) {
-                for (AsyncTask to : eventHandlers) {
+                for (AsyncTask to : asyncTasks) {
                     taskFlow.addDependency(from, to);
                 }
             }
-            for (AsyncTask to : eventHandlers) {
+            for (AsyncTask to : asyncTasks) {
                 taskFlow.addDependency(to, null);
             }
             this.cacheTaskList = new ArrayList<AsyncTask>(
-                    eventHandlers.length);
-            copyList(Arrays.asList(eventHandlers), this.cacheTaskList);
+                    asyncTasks.length);
+            copyList(Arrays.asList(asyncTasks), this.cacheTaskList);
             return this;
         }
     }
