@@ -2,7 +2,6 @@ package com.gobrs.async;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ansi.AnsiColor;
 import org.springframework.boot.ansi.AnsiOutput;
 import org.springframework.boot.ansi.AnsiStyle;
@@ -20,11 +19,11 @@ public class GobrsPrint {
     static Logger logger = LoggerFactory.getLogger(GobrsPrint.class);
 
 
-    private static final String DYNAMIC_THREAD_POOL = " :: Gobrs-Async :: ";
+    private static final String GOBRS_ASYNC = " :: Gobrs-Async :: ";
 
     private static final String GOBRS_ASYNC_GITHUB = "GitHub:  https://github.com/Memorydoc/gobrs-async";
 
-    private static final String GOBRS_ASYNC_SITE = "Site:    https://docs.sizegang.cn";
+    private static final String GOBRS_ASYNC_SITE = "Site:  https://docs.sizegang.cn";
 
     private static final int STRAP_LINE_SIZE = 50;
 
@@ -41,11 +40,11 @@ public class GobrsPrint {
         version = (version != null) ? " jdk (v" + version + ")" : "no version.";
 
         StringBuilder padding = new StringBuilder();
-        while (padding.length() < STRAP_LINE_SIZE - (version.length() + DYNAMIC_THREAD_POOL.length())) {
+        while (padding.length() < STRAP_LINE_SIZE - (version.length() + GOBRS_ASYNC.length())) {
             padding.append(" ");
         }
 
-        System.out.println(AnsiOutput.toString(banner, AnsiColor.GREEN, DYNAMIC_THREAD_POOL, AnsiColor.DEFAULT,
+        System.out.println(AnsiOutput.toString(banner, AnsiColor.GREEN, GOBRS_ASYNC, AnsiColor.DEFAULT,
                 padding.toString(), AnsiStyle.FAINT, version, "\n\n", GOBRS_ASYNC_GITHUB, "\n", GOBRS_ASYNC_SITE, "\n"));
         logger.info("Gobrs-Async Load Successful");
     }
