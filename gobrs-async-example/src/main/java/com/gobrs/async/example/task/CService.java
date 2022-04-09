@@ -15,10 +15,7 @@ import java.util.Map;
  * @create: 2022-03-20
  **/
 @Component
-@Task()
 public class CService extends AsyncTask<Object, Object> {
-
-
 
     int i = 10000;
 
