@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  * @create: 2022-03-20
  **/
 @Component
-@Task(callback = true, retryCount = 10)
+@Task(failSubExec = true)
 public class BService extends AsyncTask<Object, Object>  {
 
 
@@ -30,7 +30,6 @@ public class BService extends AsyncTask<Object, Object>  {
         try {
             Thread.sleep(1000);
             System.out.println("BService 开始执行");
-            System.out.println(1/0);
             for (int i1 = 0; i1 < i; i1++) {
                 i1 += i1;
             }

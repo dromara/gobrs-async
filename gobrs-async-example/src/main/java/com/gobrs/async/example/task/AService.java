@@ -29,7 +29,6 @@ public class AService extends AsyncTask<Object, Object> {
     @Override
     public Object task(Object o, TaskSupport support) {
         try {
-            System.out.println(1/0);
             Thread.sleep(300);
             for (int i1 = 0; i1 < i; i1++) {
                 i1 += i1;
@@ -38,7 +37,7 @@ public class AService extends AsyncTask<Object, Object> {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return null;
+        return "ASSS";
     }
 
     @Override

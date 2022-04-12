@@ -29,6 +29,10 @@ public class CService extends AsyncTask<Object, Object> {
     @Override
     public Object task(Object o, TaskSupport support) {
         try {
+
+            String result = getResult(support, AService.class, String.class);
+            System.out.println(result);
+
             Thread.sleep(300);
             for (int i1 = 0; i1 < i; i1++) {
                 i1 += i1;

@@ -50,7 +50,7 @@ public class GobrsAsyncProperties {
     /**
      * Whether global parameter dataContext mode  Parameter context
      */
-    private boolean paramContext = false;
+    private boolean paramContext = true;
 
 
     private boolean transaction = false;
