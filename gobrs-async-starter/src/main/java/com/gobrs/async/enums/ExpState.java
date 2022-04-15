@@ -9,7 +9,7 @@ package com.gobrs.async.enums;
  **/
 public enum ExpState {
 
-    DEFAULT(100, "默认中断");
+    DEFAULT(100, " default interrupt");
 
     private Integer code;
 

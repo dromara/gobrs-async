@@ -109,10 +109,20 @@ public class TaskLoader {
         completeLatch.countDown();
     }
 
+    /**
+     * Abnormal callback
+     *
+     * @param errorCallback Exception parameter encapsulation
+     */
     public void error(ErrorCallback errorCallback) {
         asyncExceptionInterceptor.exception(errorCallback);
     }
 
+    /**
+     * The process is interrupted by a task exception
+     *
+     * @param errorCallback
+     */
     public void errorInterrupted(ErrorCallback errorCallback) {
         this.error = errorCallback.getThrowable();
 
@@ -130,10 +140,22 @@ public class TaskLoader {
         }
     }
 
+    /**
+     * Premission interceptor
+     *
+     * @param object   task parameter
+     * @param taskName taskName
+     */
     public void preInterceptor(Object object, String taskName) {
         asyncTaskPreInterceptor.preProcess(object, taskName);
     }
 
+    /**
+     * Mission post-intercept
+     *
+     * @param object   task Result
+     * @param taskName taskName
+     */
     public void postInterceptor(Object object, String taskName) {
         asyncTaskPostInterceptor.postProcess(object, taskName);
     }
@@ -154,6 +176,9 @@ public class TaskLoader {
 
     }
 
+    /**
+     * The main process interrupts and waits for the task to flow
+     */
     private void waitIfNecessary() {
         try {
             if (timeout > 0) {
@@ -181,7 +206,7 @@ public class TaskLoader {
 
         if (timeout > 0 || taskActuator.getGobrsAsyncProperties().isTaskInterrupt()) {
             /**
-             * Only threads in a lock can be interrupted
+             * If you need to interrupt then you need to save all the task threads and you need to manipulate shared variables
              */
             lock.lock();
             try {
@@ -192,16 +217,29 @@ public class TaskLoader {
                 lock.unlock();
             }
         } else {
+            /**
+             * Run the command without setting the timeout period
+             */
             executorService.submit(taskActuator);
         }
     }
 
-
+    /**
+     * Get the task Bus
+     *
+     * @param begins Collection of subtask processes
+     * @return
+     */
     private TaskSupport getSupport(List<TaskActuator> begins) {
         return begins.get(0).getTaskSupport();
     }
 
-
+    /**
+     * Encapsulate return parameter
+     *
+     * @param begins
+     * @return
+     */
     private AsyncResult back(List<TaskActuator> begins) {
         TaskSupport support = getSupport(begins);
         AsyncResult asyncResult = new AsyncResult();

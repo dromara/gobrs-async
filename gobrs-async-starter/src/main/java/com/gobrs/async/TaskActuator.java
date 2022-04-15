@@ -33,7 +33,10 @@ class TaskActuator implements Runnable, Cloneable {
     private boolean must = true;
 
 
-    private volatile int unsatisfiedDepdendings;
+    /**
+     * Upstream dependent quantity
+     */
+    private volatile int upstreamDepdends;
 
     /**
      * depend task
@@ -54,13 +57,13 @@ class TaskActuator implements Runnable, Cloneable {
 
     TaskActuator(AsyncTask task, int depdending, List<AsyncTask> subTasks) {
         this.task = task;
-        this.unsatisfiedDepdendings = depdending;
+        this.upstreamDepdends = depdending;
         this.subTasks = subTasks;
     }
 
     TaskActuator(AsyncTask asyncTask, int depdending, List<AsyncTask> subTasks, Map<AsyncTask, List<AsyncTask>> upwardTasksMap) {
         this.task = asyncTask;
-        this.unsatisfiedDepdendings = depdending;
+        this.upstreamDepdends = depdending;
         this.subTasks = subTasks;
         this.upwardTasksMap = upwardTasksMap;
     }
@@ -140,11 +143,14 @@ class TaskActuator implements Runnable, Cloneable {
                  */
                 transaction();
 
+                /**
+                 * A single task exception interrupts the entire process
+                 */
                 if (gobrsAsyncProperties.isTaskInterrupt()) {
                     taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
                 } else {
                     taskLoader.error(errorCallback(parameter, e, support, task));
-                    if(task.isFailSubExec()){
+                    if (task.isFailSubExec()) {
                         nextTask(taskLoader);
                     }
                 }
@@ -158,7 +164,7 @@ class TaskActuator implements Runnable, Cloneable {
             if (task.getRetryCount() > 1 && task.getRetryCount() >= state.get()) {
                 state.incrementAndGet();
                 doTaskWithRetryConditional(parameter, taskLoader);
-                if(task.isFailSubExec()){
+                if (task.isFailSubExec()) {
                     nextTask(taskLoader);
                 }
                 return true;
@@ -208,8 +214,11 @@ class TaskActuator implements Runnable, Cloneable {
             for (int i = 0; i < subTasks.size(); i++) {
                 TaskActuator process = taskLoader
                         .getProcess(subTasks.get(i));
-
-                if (process.decreaseUnsatisfiedDependcies() == 0) {
+                /**
+                 * Check whether the subtask depends on a task that has been executed
+                 * The number of tasks that it depends on to get to this point minus one
+                 */
+                if (process.releasingDependency() == 0) {
                     /**
                      * Make the most of your threads
                      * Use the parent thread to perform the first child task
@@ -228,37 +237,29 @@ class TaskActuator implements Runnable, Cloneable {
         }
     }
 
-
     /**
-     * There is no dependence
+     * Gets tasks without any dependencies
      *
-     * @param process
      * @return
      */
-    private boolean noDependsOn(TaskActuator process) {
-        return process.decreaseUnsatisfiedDependcies() == 0;
-    }
-
     boolean hasUnsatisfiedDependcies() {
         lock.lock();
         try {
-            return unsatisfiedDepdendings != 0;
+            return upstreamDepdends != 0;
         } finally {
             lock.unlock();
         }
     }
 
     /**
-     * Release the dependon task
-     * <p>
-     * Gets the number of task dependencies that still need to wait
+     * Release the number of dependent tasks
      *
      * @return
      */
-    private int decreaseUnsatisfiedDependcies() {
+    private int releasingDependency() {
         lock.lock();
         try {
-            return --unsatisfiedDepdendings;
+            return --upstreamDepdends;
         } finally {
             lock.unlock();
         }
