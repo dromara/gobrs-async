@@ -33,9 +33,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.jd.gobrs</groupId>
+            <groupId>io.github.memorydoc</groupId>
             <artifactId>gobrs-async-starter</artifactId>
-            <version>0.0.6-SNAPSHOT</version>
+            <version>1.1.6-RELEASE</version>
         </dependency>
     </dependencies>
 
