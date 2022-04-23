@@ -54,6 +54,7 @@ public class TaskLoader {
 
     private final Map<AsyncTask, TaskActuator> processMap;
 
+    public TaskTrigger.AssistantTask assistantTask;
 
     private final long timeout;
 
@@ -225,6 +226,21 @@ public class TaskLoader {
     }
 
     /**
+     * End of single mission line
+     *
+     * @param taskLines
+     */
+    public void stopSingleTaskLine(Integer taskLines) {
+        TaskActuator taskActuator = processMap.get(assistantTask);
+        for (Integer i = 0; i < taskLines; i++) {
+            processMap.get(assistantTask).releasingDependency();
+        }
+        if (!taskActuator.hasUnsatisfiedDependcies()) {
+            taskActuator.run();
+        }
+    }
+
+    /**
      * Get the task Bus
      *
      * @param begins Collection of subtask processes
@@ -263,5 +279,13 @@ public class TaskLoader {
 
     public void setIsRunning(boolean isRunning) {
         this.isRunning = new AtomicBoolean(isRunning);
+    }
+
+    public TaskTrigger.AssistantTask getAssistantTask() {
+        return assistantTask;
+    }
+
+    public void setAssistantTask(TaskTrigger.AssistantTask assistantTask) {
+        this.assistantTask = assistantTask;
     }
 }

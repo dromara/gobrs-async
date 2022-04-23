@@ -3,5 +3,5 @@ server:
 spring:
   gobrs:
     async:
-      rules: '[{name: "test", content: "AService->CService->EService->GService; AService->BService->CService->FService->HService;"}]'
+      rules: '[{name: "test", content: "AService->CService->EService->GService; AService->BService->CService->FService->HService"}]'
       task-interrupt: false #局部异常是否打断主流程

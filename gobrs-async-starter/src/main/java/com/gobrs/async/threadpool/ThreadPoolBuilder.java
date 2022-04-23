@@ -215,7 +215,7 @@ public class ThreadPoolBuilder {
         }
     }
 
-    private static RejectedExecutionHandler caseReject(String rejected) {
+    public static RejectedExecutionHandler caseReject(String rejected) {
         if (rejected == null) {
             return new ThreadPoolExecutor.AbortPolicy();
         }
