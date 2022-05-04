@@ -41,10 +41,6 @@ public class GobrsAsyncProperties {
      */
     private boolean taskInterrupt = false;
 
-    /**
-     * Whether a dependency must be currently not in use
-     */
-    private String must = ":not";
 
 
     /**
@@ -116,13 +112,6 @@ public class GobrsAsyncProperties {
         this.relyDepend = relyDepend;
     }
 
-    public String getMust() {
-        return must;
-    }
-
-    public void setMust(String must) {
-        this.must = must;
-    }
 
     public boolean isParamContext() {
         return paramContext;

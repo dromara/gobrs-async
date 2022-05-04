@@ -53,19 +53,10 @@ public class RuleParseEngine<T> extends AbstractEngine {
                     String[] beanArray = taskBean.split(sp);
                     List<String> beanList = Arrays.asList(beanArray);
                     for (String tbean : beanList) {
-                        if (tbean.contains(gobrsAsyncProperties.getMust())) { // 强依赖上游 上游不返回 方法不执行
-                            tbean = tbean.replace(gobrsAsyncProperties.getMust(), "");
-                        } else {
-                            EngineExecutor.getWrapperDepend(cacheTaskWrappers, tbean, taskReceive);
-                        }
+                        EngineExecutor.getWrapperDepend(cacheTaskWrappers, tbean, taskReceive);
                     }
                 } else {
-                    if (taskBean.contains(gobrsAsyncProperties.getMust())) { // 强依赖上游 上游不返回 方法不执行
-                        taskBean = taskBean.replace(gobrsAsyncProperties.getMust(), "");
-                        EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, taskReceive, false);
-                    } else {
-                        EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, taskReceive);
-                    }
+                    EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, taskReceive);
                 }
             }
         }
@@ -82,18 +73,15 @@ public class RuleParseEngine<T> extends AbstractEngine {
             return task;
         }
 
-        public static AsyncTask getWrapperDepend(Map<String, AsyncTask> cacheTaskWrappers, String taskBean, TaskReceive taskBuilder) {
-            return getWrapperDepend(cacheTaskWrappers, taskBean, taskBuilder, true);
-        }
 
-        public static AsyncTask getWrapperDepend(Map<String, AsyncTask> cacheTaskWrappers, String taskBean, TaskReceive taskBuilder, boolean must) {
+        public static AsyncTask getWrapperDepend(Map<String, AsyncTask> cacheTaskWrappers, String taskBean, TaskReceive taskReceive) {
             return Optional.ofNullable(getAsyncTask(taskBean)).map((bean) -> Optional.ofNullable(cacheTaskWrappers.get(taskBean)).map((tk) -> {
-                taskBuilder.then(tk);
+                taskReceive.then(tk);
                 return tk;
             }).orElseGet(() -> {
                 AsyncTask asyncTask = getAsyncTask(taskBean);
                 cacheTaskWrappers.put(taskBean, asyncTask);
-                taskBuilder.then(asyncTask);
+                taskReceive.then(asyncTask);
                 return asyncTask;
             })).orElse(null);
         }

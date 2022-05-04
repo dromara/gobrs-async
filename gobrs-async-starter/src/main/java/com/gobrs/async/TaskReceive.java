@@ -45,9 +45,12 @@ public class TaskReceive {
             for (AsyncTask to : asyncTasks) {
                 taskFlow.addDependency(to, null);
             }
-            this.cacheTaskList = new ArrayList<AsyncTask>(
-                    asyncTasks.length);
-            copyList(Arrays.asList(asyncTasks), this.cacheTaskList);
+            /**
+             *     for Compatible with regular commas so note
+             */
+//            this.cacheTaskList = new ArrayList<AsyncTask>(
+//                    asyncTasks.length);
+//            copyList(Arrays.asList(asyncTasks), this.cacheTaskList);
             return this;
         }
     }

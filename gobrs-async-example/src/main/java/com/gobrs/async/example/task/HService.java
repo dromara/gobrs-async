@@ -4,8 +4,6 @@ import com.gobrs.async.TaskSupport;
 import com.gobrs.async.task.AsyncTask;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 /**
  * @program: gobrs-async-starter
  * @ClassName EService
