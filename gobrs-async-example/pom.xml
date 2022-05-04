@@ -35,7 +35,7 @@
         <dependency>
             <groupId>com.jd.gobrs</groupId>
             <artifactId>gobrs-async-starter</artifactId>
-            <version>0.0.6-SNAPSHOT</version>
+            <version>0.0.7-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

@@ -1,11 +1,9 @@
 package com.gobrs.async.example.task;
 
 import com.gobrs.async.TaskSupport;
-import com.gobrs.async.anno.Task;
 import com.gobrs.async.task.AsyncTask;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
 
 /**
  * @program: gobrs-async-starter
@@ -29,11 +27,11 @@ public class CService extends AsyncTask<Object, Object> {
     @Override
     public Object task(Object o, TaskSupport support) {
         try {
-
+            System.out.println("CService开始执行");
             String result = getResult(support, AService.class, String.class);
             System.out.println(result);
 
-            Thread.sleep(300);
+            Thread.sleep(3000);
             for (int i1 = 0; i1 < i; i1++) {
                 i1 += i1;
             }

@@ -210,7 +210,6 @@ class TaskActuator implements Runnable, Cloneable {
      */
     public void nextTask(TaskLoader taskLoader) {
         if (subTasks != null) {
-            boolean hasUsedSynRunTimeOnce = false;
             for (int i = 0; i < subTasks.size(); i++) {
                 TaskActuator process = taskLoader
                         .getProcess(subTasks.get(i));
@@ -220,16 +219,11 @@ class TaskActuator implements Runnable, Cloneable {
                  */
                 if (process.releasingDependency() == 0) {
                     /**
-                     * Make the most of your threads
-                     * Use the parent thread to perform the first child task
+                     * for thread reuse
                      */
-                    if (!hasUsedSynRunTimeOnce) {
-                        hasUsedSynRunTimeOnce = true;
+                    if(subTasks.size() == 1){
                         process.run();
-                    } else {
-                        /**
-                         * The remaining subtasks open threads using thread pools
-                         */
+                    }else{
                         taskLoader.startProcess(process);
                     }
                 }
