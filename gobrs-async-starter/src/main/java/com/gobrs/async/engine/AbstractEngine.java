@@ -19,12 +19,23 @@ import java.util.*;
  **/
 public abstract class AbstractEngine implements RuleEngine {
 
+
+    /**
+     * Process rule analysis
+     * @param rule
+     */
     @Override
     public void parse(String rule) {
         GobrsAsync gobrsAsync = GobrsSpring.getBean(GobrsAsync.class);
         List<Rule> rules = JSONArray.parseArray(rule, Rule.class);
         for (Rule r : rules) {
+            /**
+             * true rule enforcer
+             */
             doParse(r, false);
+            /**
+             * Trigger task ready to execute
+             */
             gobrsAsync.readyTo(r.getName());
         }
     }

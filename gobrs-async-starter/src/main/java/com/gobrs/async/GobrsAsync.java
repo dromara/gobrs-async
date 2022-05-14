@@ -35,7 +35,13 @@ public class GobrsAsync {
         return taskFlow.get(taskName).start(tasks);
     }
 
-
+    /**
+     * Start building the task process
+     * @param ruleName
+     * @param asyncTasks
+     * @param reload
+     * @return
+     */
     public TaskReceive begin(String ruleName, List<AsyncTask> asyncTasks, boolean reload) {
         if (taskFlow == null) {
             loadTaskFlow(ruleName);
@@ -54,9 +60,16 @@ public class GobrsAsync {
         return begin(ruleName, asyncTasks, false);
     }
 
+    /**
+     * Add subtask process
+     * @param taskName
+     * @param tasks
+     * @return
+     */
     public TaskReceive after(String taskName, AsyncTask... tasks) {
         return taskFlow.get(taskName).after(tasks);
     }
+
 
     public AsyncResult go(String ruleName, AsyncParam param, long timeout) {
         if (check(ruleName).isPresent()) {
@@ -66,6 +79,12 @@ public class GobrsAsync {
 
     }
 
+    /**
+     * Start the task process
+     * @param taskName
+     * @param param
+     * @return
+     */
     public AsyncResult go(String taskName, AsyncParam param) {
         return go(taskName, param, 0L);
     }
@@ -75,6 +94,11 @@ public class GobrsAsync {
         readyTo(ruleName, false);
     }
 
+    /**
+     * Preparing Task Process Execution
+     * @param ruleName
+     * @param reload
+     */
     public synchronized void readyTo(String ruleName, boolean reload) {
         if (trigger == null) {
             loadTrigger(ruleName);
@@ -88,6 +112,10 @@ public class GobrsAsync {
     }
 
 
+    /**
+     * Load task flow
+     * @param ruleName
+     */
     private void loadTaskFlow(String ruleName) {
         taskFlow = new HashMap<>();
         TaskFlow tf = new TaskFlow();
@@ -95,23 +123,40 @@ public class GobrsAsync {
         taskFlow.put(ruleName, tf);
     }
 
+    /**
+     * Load the first task process
+     * @param ruleName
+     */
     private void loadTaskFlowForOne(String ruleName) {
         TaskFlow tf = new TaskFlow();
         tf.setGobrsAsyncProperties(gobrsAsyncProperties);
         taskFlow.put(ruleName, tf);
     }
 
+    /**
+     * Load task trigger
+     * @param ruleName
+     */
     private void loadTrigger(String ruleName) {
         trigger = new HashMap<>();
         TaskTrigger tr = new TaskTrigger(taskFlow.get(ruleName));
         trigger.put(ruleName, tr);
     }
 
+    /**
+     * Create your first task trigger
+     * @param taskName
+     */
     private void loadTriggerForOne(String taskName) {
         TaskTrigger tr = new TaskTrigger(taskFlow.get(taskName));
         trigger.put(taskName, tr);
     }
 
+    /**
+     * Check Task Flow Rules
+     * @param ruleName
+     * @return
+     */
     private Optional<TaskTrigger> check(String ruleName) {
         return Optional.ofNullable(trigger.get(ruleName));
     }

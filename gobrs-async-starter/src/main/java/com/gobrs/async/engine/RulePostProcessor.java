@@ -23,6 +23,7 @@ import java.util.Optional;
  * The implementation ApplicationListener gets the Spring context, which in turn gets the Bean instance
  **/
 public class RulePostProcessor implements ApplicationListener<ContextRefreshedEvent> {
+
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         ApplicationContext applicationContext = event.getApplicationContext();
