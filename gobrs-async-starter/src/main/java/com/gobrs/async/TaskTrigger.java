@@ -23,6 +23,8 @@ class TaskTrigger {
 
     private IdentityHashMap<AsyncTask, TaskActuator> prepareTaskMap = new IdentityHashMap<>();
 
+    public AssistantTask assistantTask;
+
     TaskTrigger(TaskFlow taskFlow) {
         this.taskFlow = taskFlow;
         prepare();
@@ -55,7 +57,7 @@ class TaskTrigger {
         }
 
 
-        AssistantTask assistantTask = new AssistantTask();
+        assistantTask = new AssistantTask();
         /**
          * task without any subtasks
          */
@@ -109,6 +111,7 @@ class TaskTrigger {
          */
         TaskLoader loader = new TaskLoader(threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
         TaskSupport support = getSupport(param);
+        loader.setAssistantTask(assistantTask);
         support.setTaskLoader(loader);
         support.setExecutorService(threadPoolFactory.getThreadPoolExecutor());
         for (AsyncTask task : prepareTaskMap.keySet()) {
@@ -142,11 +145,12 @@ class TaskTrigger {
     }
 
     /**
-     *Assistant task, help the task process to finish properly
+     * Assistant task, help the task process to finish properly
+     *
      * @param <P>
      * @param <R>
      */
-    private class AssistantTask<P, R> extends AsyncTask<P, R> {
+    public class AssistantTask<P, R> extends AsyncTask<P, R> {
 
         @Override
         public void prepare(P p) {

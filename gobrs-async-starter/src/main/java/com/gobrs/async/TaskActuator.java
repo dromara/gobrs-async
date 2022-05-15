@@ -14,6 +14,10 @@ import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.TaskResult;
 import com.gobrs.async.enums.ResultState;
 import com.gobrs.async.task.AsyncTask;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +26,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 class TaskActuator implements Runnable, Cloneable {
-
+    Logger logger = LoggerFactory.getLogger(TaskActuator.class);
     public TaskSupport support;
 
     /**
@@ -137,7 +141,12 @@ class TaskActuator implements Runnable, Cloneable {
             if (!retryTask(parameter, taskLoader)) {
                 support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
 
-                task.onFail(support);
+                try {
+                    task.onFail(support);
+                } catch (Exception ex) {
+                    // Failed events are not processed
+                    logger.error("task onFail process is error {}", ex);
+                }
                 /**
                  * transaction task
                  */
@@ -152,6 +161,8 @@ class TaskActuator implements Runnable, Cloneable {
                     taskLoader.error(errorCallback(parameter, e, support, task));
                     if (task.isFailSubExec()) {
                         nextTask(taskLoader);
+                    } else {
+                        taskLoader.stopSingleTaskLine(subTasks.size());
                     }
                 }
             }
@@ -250,7 +261,7 @@ class TaskActuator implements Runnable, Cloneable {
      *
      * @return
      */
-    private int releasingDependency() {
+    public int releasingDependency() {
         lock.lock();
         try {
             return --upstreamDepdends;
