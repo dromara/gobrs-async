@@ -15,7 +15,7 @@ import java.util.Optional;
 /**
  * @program: gobrs-async-starter
  * @ClassName gobrs-Async
- * @description:
+ * @description: task process executor
  * @author: sizegang
  * @create: 2022-03-16
  **/
@@ -25,9 +25,14 @@ public class GobrsAsync {
     @Autowired
     private GobrsAsyncProperties gobrsAsyncProperties;
 
-    // A rule corresponds to a taskFlow
+    /**
+     * task process pipeline A rule corresponds to a taskFlow
+     */
     private Map<String, TaskFlow> taskFlow;
 
+    /**
+     * Task trigger wrapper
+     */
     private Map<String, TaskTrigger> trigger;
 
 
@@ -37,6 +42,7 @@ public class GobrsAsync {
 
     /**
      * Start building the task process
+     *
      * @param ruleName
      * @param asyncTasks
      * @param reload
@@ -49,7 +55,7 @@ public class GobrsAsync {
         if (taskFlow.get(ruleName) == null) {
             loadTaskFlowForOne(ruleName);
         }
-        if(reload){
+        if (reload) {
             loadTaskFlowForOne(ruleName);
         }
         return taskFlow.get(ruleName).start(asyncTasks);
@@ -62,6 +68,7 @@ public class GobrsAsync {
 
     /**
      * Add subtask process
+     *
      * @param taskName
      * @param tasks
      * @return
@@ -70,7 +77,14 @@ public class GobrsAsync {
         return taskFlow.get(taskName).after(tasks);
     }
 
-
+    /**
+     * Really open the task flow Multi-threaded flow master switch Have fun
+     *
+     * @param ruleName
+     * @param param
+     * @param timeout
+     * @return
+     */
     public AsyncResult go(String ruleName, AsyncParam param, long timeout) {
         if (check(ruleName).isPresent()) {
             return trigger.get(ruleName).trigger(param, timeout).load();
@@ -81,6 +95,7 @@ public class GobrsAsync {
 
     /**
      * Start the task process
+     *
      * @param taskName
      * @param param
      * @return
@@ -96,24 +111,32 @@ public class GobrsAsync {
 
     /**
      * Preparing Task Process Execution
+     *
      * @param ruleName
      * @param reload
      */
     public synchronized void readyTo(String ruleName, boolean reload) {
+        /**
+         * Initialize task trigger
+         */
         if (trigger == null) {
+            initializeTrigger(ruleName);
+        }
+        /**
+         * Load task trigger
+         */
+        if (trigger.get(ruleName) == null) {
             loadTrigger(ruleName);
         }
-        if (trigger.get(ruleName) == null) {
-            loadTriggerForOne(ruleName);
-        }
-        if(reload){
-            loadTriggerForOne(ruleName);
+        if (reload) {
+            loadTrigger(ruleName);
         }
     }
 
 
     /**
      * Load task flow
+     *
      * @param ruleName
      */
     private void loadTaskFlow(String ruleName) {
@@ -125,6 +148,7 @@ public class GobrsAsync {
 
     /**
      * Load the first task process
+     *
      * @param ruleName
      */
     private void loadTaskFlowForOne(String ruleName) {
@@ -135,9 +159,10 @@ public class GobrsAsync {
 
     /**
      * Load task trigger
+     *
      * @param ruleName
      */
-    private void loadTrigger(String ruleName) {
+    private void initializeTrigger(String ruleName) {
         trigger = new HashMap<>();
         TaskTrigger tr = new TaskTrigger(taskFlow.get(ruleName));
         trigger.put(ruleName, tr);
@@ -145,15 +170,17 @@ public class GobrsAsync {
 
     /**
      * Create your first task trigger
+     *
      * @param taskName
      */
-    private void loadTriggerForOne(String taskName) {
+    private void loadTrigger(String taskName) {
         TaskTrigger tr = new TaskTrigger(taskFlow.get(taskName));
         trigger.put(taskName, tr);
     }
 
     /**
      * Check Task Flow Rules
+     *
      * @param ruleName
      * @return
      */
