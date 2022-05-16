@@ -42,7 +42,6 @@ public class GobrsAsyncProperties {
     private boolean taskInterrupt = false;
 
 
-
     /**
      * Whether global parameter dataContext mode  Parameter context
      */
@@ -52,8 +51,7 @@ public class GobrsAsyncProperties {
     private boolean transaction = false;
 
     /**
-     * 默认总任务超时时间 3s
-     *
+     * Default timeout
      * @return
      */
     private long timeout = 3000;

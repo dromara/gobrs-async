@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.ansi.AnsiColor;
 import org.springframework.boot.ansi.AnsiOutput;
 import org.springframework.boot.ansi.AnsiStyle;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -22,10 +23,10 @@ import java.util.Optional;
  * @description: Task flow resolver
  * The implementation ApplicationListener gets the Spring context, which in turn gets the Bean instance
  **/
-public class RulePostProcessor implements ApplicationListener<ContextRefreshedEvent> {
+public class RulePostProcessor implements ApplicationListener<ApplicationReadyEvent> {
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
+    public void onApplicationEvent(ApplicationReadyEvent event) {
         ApplicationContext applicationContext = event.getApplicationContext();
         GobrsAsyncProperties properties = applicationContext.getBean(GobrsAsyncProperties.class);
         String rules = properties.getRules();
