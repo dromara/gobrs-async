@@ -34,11 +34,14 @@ public class RuleParseEngine<T> extends AbstractEngine {
 
     @Override
     public void doParse(Rule rule, boolean reload) {
+
         String[] taskFlows = rule.getContent().replaceAll("\\s+", "").split(gobrsAsyncProperties.getSplit());
+        /**
+         * cache rules
+         */
         Map<String, AsyncTask> cacheTaskWrappers = new HashMap<>();
 
         List<AsyncTask> pioneer = new ArrayList<>();
-
         for (String taskFlow : taskFlows) {
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
             pioneer.add(EngineExecutor.getAsyncTask(taskArr[0]));
@@ -47,15 +50,15 @@ public class RuleParseEngine<T> extends AbstractEngine {
          * Start the task process The sub-process in the task process is opened
          */
         gobrsAsync.begin(rule.getName(), pioneer, reload);
+
         for (String taskFlow : taskFlows) {
             /**
              * Parse tasks according to parsing rules
              */
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
-
             List<String> arrayList = Arrays.asList(taskArr);
-
             String leftTaskName = arrayList.get(0);
+
             /**
              * Set up subtasks Task tree
              */
@@ -102,6 +105,9 @@ public class RuleParseEngine<T> extends AbstractEngine {
          */
         private static AsyncTask getAsyncTask(String taskName) {
             AsyncTask task = (AsyncTask) getBean(taskName);
+            /**
+             * Parse annotation configuration
+             */
             task.setName(getName(task));
             task.setCallback(getCallBack(task));
             task.setRetryCount(getRetryCount(task));

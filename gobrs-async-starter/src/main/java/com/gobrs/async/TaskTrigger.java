@@ -55,8 +55,6 @@ class TaskTrigger {
                 upwardTasksMap.get(depended).add(task);
             }
         }
-
-
         assistantTask = new AssistantTask();
         /**
          * task without any subtasks
@@ -113,14 +111,17 @@ class TaskTrigger {
         TaskSupport support = getSupport(param);
         loader.setAssistantTask(assistantTask);
         support.setTaskLoader(loader);
+        /**
+         * The thread pool is obtained from the factory, and the thread pool parameters can be dynamically adjusted
+         */
         support.setExecutorService(threadPoolFactory.getThreadPoolExecutor());
         for (AsyncTask task : prepareTaskMap.keySet()) {
             /**
              * clone Process for Thread isolation
              */
-            TaskActuator newProcess = (TaskActuator) prepareTaskMap.get(task).clone();
-            newProcess.init(support, param);
-            newProcessMap.put(task, newProcess);
+            TaskActuator processor = (TaskActuator) prepareTaskMap.get(task).clone();
+            processor.init(support, param);
+            newProcessMap.put(task, processor);
         }
         return loader;
     }

@@ -25,7 +25,10 @@ public class GobrsAsyncThreadPoolFactory {
         return threadPoolExecutor;
     }
 
-
+    /**
+     * The user dynamically sets the thread pool parameters
+     * @param threadPoolExecutor
+     */
     public void setThreadPoolExecutor(ExecutorService threadPoolExecutor) {
         this.threadPoolExecutor = threadPoolExecutor;
     }

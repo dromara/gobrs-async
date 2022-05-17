@@ -14,8 +14,6 @@ import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.TaskResult;
 import com.gobrs.async.enums.ResultState;
 import com.gobrs.async.task.AsyncTask;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +24,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 class TaskActuator implements Runnable, Cloneable {
+
     Logger logger = LoggerFactory.getLogger(TaskActuator.class);
+
     public TaskSupport support;
 
     /**
@@ -232,9 +232,9 @@ class TaskActuator implements Runnable, Cloneable {
                     /**
                      * for thread reuse
                      */
-                    if(subTasks.size() == 1){
+                    if (subTasks.size() == 1) {
                         process.run();
-                    }else{
+                    } else {
                         taskLoader.startProcess(process);
                     }
                 }
@@ -292,7 +292,9 @@ class TaskActuator implements Runnable, Cloneable {
             if (!this.task.isCallback()) {
                 return;
             }
-
+            /**
+             * Get the parent task that the task depends on
+             */
             List<AsyncTask> asyncTaskList = upwardTasksMap.get(this.task);
             if (asyncTaskList == null || asyncTaskList.isEmpty()) {
                 return;
@@ -314,6 +316,10 @@ class TaskActuator implements Runnable, Cloneable {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+            /**
+             * Tasks that the parent task depends on recursively roll back
+             *
+             */
             List<AsyncTask> asyncTaskList = upwardTasksMap.get(asyncTask);
             rollback(asyncTaskList, support);
         }

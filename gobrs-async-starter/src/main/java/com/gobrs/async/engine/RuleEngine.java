@@ -5,7 +5,7 @@ import com.gobrs.async.rule.Rule;
 
 /**
  * @program: gobrs-async
- * @description: 规则解析引擎
+ * @description: Rules engine
  * @author: sizegang
  **/
 public interface RuleEngine extends Engine {

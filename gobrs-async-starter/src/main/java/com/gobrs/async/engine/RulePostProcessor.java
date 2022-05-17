@@ -34,7 +34,10 @@ public class RulePostProcessor implements ApplicationListener<ApplicationReadyEv
             /**
              * The primary purpose of resolving a rule is to check that the rule is correct
              * Extensible task flow resolution up
+             *
+             *  recommend : Custom rules engine can be extended using SPI
              */
+
             RuleEngine engine = applicationContext.getBean(RuleEngine.class);
             engine.parse(data);
             GobrsPrint.printBanner();
