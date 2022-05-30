@@ -49,7 +49,6 @@ class TaskTrigger {
             upwardTasksMap.put(task, new ArrayList<>(1));
         }
 
-
         for (AsyncTask task : downTasksMap.keySet()) {
             for (AsyncTask depended : downTasksMap.get(task)) {
                 upwardTasksMap.get(depended).add(task);
@@ -132,6 +131,11 @@ class TaskTrigger {
      */
     private class TerminationTask extends TaskActuator {
 
+        /**task executor
+         * @param handler
+         * @param depdending The number of tasks to depend on
+         * @param dependedTasks Array of dependent tasks
+         */
         TerminationTask(AsyncTask handler, int depdending, List<AsyncTask> dependedTasks) {
             super(handler, depdending, dependedTasks);
         }

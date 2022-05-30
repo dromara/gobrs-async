@@ -90,7 +90,6 @@ public class GobrsAsync {
             return trigger.get(ruleName).trigger(param, timeout).load();
         }
         throw new NotTaskRuleException("Gobrs Rule Name Is Error");
-
     }
 
     /**

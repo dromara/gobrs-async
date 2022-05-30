@@ -186,3 +186,24 @@ Gobrs-Async 在设计时，就充分考虑了开发者的使用习惯， 没有�
 
 
 [快速实战](https://async.sizegang.cn)
+
+对于这个项目，是否有什么不一样看法，欢迎在 Issue 一起沟通交流；
+群二维码七天会失效，可以添加作者微信进交流群
+
+
+<table>
+  <tr>
+    <td align="center" style="width: 400px;">
+      <a href="https://github.com/Memorydoc">
+        <img src="https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/1261646574221_.pic_hd.jpg?x-oss-process=image/resize,h_500,w_800" style="width: 400px;"><br>
+        <sub></sub>
+      </a><br>
+    </td>
+    <td align="center" style="width: 400px;">
+      <a href="https://github.com/Memorydoc">
+        <img src="https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/1251646574128_.pic.jpg?x-oss-process=image/resize,h_500,w_800" style="width: 400px;"><br>
+        <sub></sub>
+      </a><br>
+    </td>
+  </tr>
+</table>
