@@ -21,6 +21,27 @@
 
 如果你想详细理解任务编排的概念， 请仔细阅读文档，或者通过资源索引导航到官网了解全貌！
 
+## 场景概述
+### 场景一
+![场景一](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/type1.png)
+
+**说明**
+任务A 执行完了之后，继续执行 B、C、D
+
+### 场景二
+
+![场景二](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/type2.png)
+
+**说明**
+任务A 执行完了之后执行B 然后再执行 C、D
+
+
+### 场景三
+![场景二](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/type3.png)
+
+**说明**
+任务A 执行完了之后执行B、E 然后按照顺序 B的流程走C、D、G。 E的流程走F、G
+
 ## 为什么写这个项目
 
 在开发复杂中台业务过程中，难免会遇到调用各种中台业务数据， 而且会出现复杂的中台数据依赖关系，在这种情况下。代码的复杂程度就会增加。 如下图所示：
@@ -202,7 +223,8 @@ Gobrs-Async 在设计时，就充分考虑了开发者的使用习惯， 没有�
 任务流程传递总线，包括 请求参数、任务加载器、 响应结果， 该对象暴露给使用者，拿到匹配业务的数据信息，例如： 返回结果、主动中断任务流程等功能
 需要任务总线(<code>TaskSupport</code>)支持
 
-
+## 核心类图
+![核心类图](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/hxlt.jpg)
 
 对于这个项目，是否有什么不一样看法，欢迎在 Issue 一起沟通交流；
 群二维码七天会失效，可以添加作者微信进交流群
