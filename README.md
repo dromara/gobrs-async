@@ -1,3 +1,8 @@
+
+
+## 资源索引
+[快速开始](https://async.sizegang.cn)
+
 ## 本框架是什么
 
 [**Gobrs-Async**](https://github.com/Memorydoc/gobrs-async) 是一款功能强大、配置灵活、带有全链路异常回调、内存优化、异常状态管理于一身的高性能异步编排框架。为企业提供在复杂应用场景下动态任务编排的能力。
@@ -185,8 +190,6 @@ Gobrs-Async 在设计时，就充分考虑了开发者的使用习惯， 没有�
 需要任务总线(<code>TaskSupport</code>)支持
 
 
-## 快速实战
-[官方网址](https://async.sizegang.cn)
 
 对于这个项目，是否有什么不一样看法，欢迎在 Issue 一起沟通交流；
 群二维码七天会失效，可以添加作者微信进交流群
