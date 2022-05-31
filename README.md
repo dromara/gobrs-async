@@ -1,13 +1,10 @@
 
 
 ## 资源索引
-[快速开始](https://async.sizegang.cn/pages/793dcb/#%E5%A6%82%E4%BD%95%E8%BF%90%E8%A1%8C-demo)
-
-[文档列表](https://async.sizegang.cn/pages/52d5c3/)
-
-[项目集成](https://async.sizegang.cn/pages/2f674a/)
-
-[加群沟通](https://async.sizegang.cn/pages/dd137d/)
+-[快速开始](https://async.sizegang.cn/pages/793dcb/#%E5%A6%82%E4%BD%95%E8%BF%90%E8%A1%8C-demo)
+-[文档列表](https://async.sizegang.cn/pages/52d5c3/)
+-[项目集成](https://async.sizegang.cn/pages/2f674a/)
+-[加群沟通](https://async.sizegang.cn/pages/dd137d/)
 ## 本框架是什么
 
 [**Gobrs-Async**](https://github.com/Memorydoc/gobrs-async) 是一款功能强大、配置灵活、带有全链路异常回调、内存优化、异常状态管理于一身的高性能异步编排框架。为企业提供在复杂应用场景下动态任务编排的能力。
