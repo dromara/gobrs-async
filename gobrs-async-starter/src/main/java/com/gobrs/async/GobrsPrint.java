@@ -49,6 +49,9 @@ public class GobrsPrint {
         logger.info("Gobrs-Async Load Successful");
     }
 
+    /**
+     * get current software package version
+     */
     public static String getVersion() {
         Package pkg = Package.getPackage("java.util");
         return pkg != null ? pkg.getImplementationVersion() : "";
