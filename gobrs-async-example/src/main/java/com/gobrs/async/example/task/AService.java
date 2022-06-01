@@ -14,7 +14,6 @@ import java.util.Map;
  * @author: sizegang
  * @create: 2022-03-20
  **/
-@Component(value = "A")
 @Task(failSubExec = true)
 public class AService extends AsyncTask<Object, Object> {
 
