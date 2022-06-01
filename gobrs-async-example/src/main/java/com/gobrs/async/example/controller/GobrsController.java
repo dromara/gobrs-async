@@ -58,8 +58,10 @@ public class GobrsController {
 
     @RequestMapping("gobrsAsync")
     public void setGobrsAsync() {
+        //开始时间: 获取当前时间毫秒数
         long start = System.currentTimeMillis();
         gobrsService.gobrsAsync();
+        //结束时间: 当前时间 - 开始时间
         long coust = System.currentTimeMillis() - start;
         System.out.println("gobrs-Async " + coust);
 
