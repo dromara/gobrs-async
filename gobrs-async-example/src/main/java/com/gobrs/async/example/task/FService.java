@@ -28,7 +28,7 @@ public class FService extends AsyncTask<Object, Object> {
             for (int i1 = 0; i1 < i; i1++) {
                 i1 += i1;
             }
-            System.out.println("FService 完成");
+            System.out.println("FService Finish");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

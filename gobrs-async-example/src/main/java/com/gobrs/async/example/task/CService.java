@@ -27,7 +27,7 @@ public class CService extends AsyncTask<Object, Object> {
     @Override
     public Object task(Object o, TaskSupport support) {
         try {
-            System.out.println("CService开始执行");
+            System.out.println("CService Begin");
             String result = getResult(support, AService.class, String.class);
             System.out.println(result);
 
@@ -35,7 +35,7 @@ public class CService extends AsyncTask<Object, Object> {
             for (int i1 = 0; i1 < i; i1++) {
                 i1 += i1;
             }
-            System.out.println("CService 完成");
+            System.out.println("CService Finish");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

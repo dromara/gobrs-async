@@ -23,7 +23,7 @@ public class HService extends AsyncTask<Object, Object> {
     public Object task(Object o, TaskSupport support) {
         try {
             Thread.sleep(100);
-            System.out.println("HService 完成");
+            System.out.println("HService Finish");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

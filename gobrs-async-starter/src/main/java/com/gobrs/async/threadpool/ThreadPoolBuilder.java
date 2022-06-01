@@ -19,58 +19,58 @@ import static com.gobrs.async.def.DefaultConfig.THREADPOOLQUEUESIZE;
 public class ThreadPoolBuilder {
 
     /**
-     * 核心线程数量
+     * number of core threads
      */
     private int corePoolSize = calculateCoreNum();
 
     /**
-     * 最大线程数量
+     * maximum number of threads
      */
     private int maxPoolSize = corePoolSize + (corePoolSize >> 1);
 
     /**
-     * 线程存活时间
+     * thread survival time
      */
     private long keepAliveTime = 30000L;
 
     /**
-     * 线程存活时间单位
+     * thread survival time unit
      */
     private TimeUnit timeUnit = TimeUnit.MILLISECONDS;
 
     /**
-     * 线程执行超时时间
+     * Thread execution timeout
      */
     private long executeTimeOut = 10000L;
 
     /**
-     * 队列最大容量
+     * queue maximum capacity
      */
     private int capacity = 512;
 
 
     /**
-     * 阻塞队列
+     * blocking queue
      */
     private BlockingQueue workQueue = new LinkedBlockingQueue(capacity);
 
     /**
-     * 线程池任务满时拒绝任务策略
+     * Reject task policy when thread pool task is full
      */
     private RejectedExecutionHandler rejectedExecutionHandler = new ThreadPoolExecutor.AbortPolicy();
 
     /**
-     * 是否守护线程
+     * Whether to guard the thread
      */
     private boolean isDaemon = false;
 
     /**
-     * 线程名称前缀
+     * thread name prefix
      */
     private String threadNamePrefix;
 
     /**
-     * 允许核心线程超时
+     * Allow core threads to time out
      */
     private Boolean allowCoreThreadTimeOut = false;
 

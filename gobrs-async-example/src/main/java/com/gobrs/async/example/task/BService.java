@@ -29,7 +29,7 @@ public class BService extends AsyncTask<Object, Object>  {
     public Object task(Object o, TaskSupport support) {
         try {
             Thread.sleep(1000);
-            System.out.println("BService 开始执行");
+            System.out.println("BService Begin");
             for (int i1 = 0; i1 < i; i1++) {
                 i1 += i1;
             }

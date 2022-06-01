@@ -16,6 +16,6 @@ public class GobrsInterceptor implements AsyncTaskExceptionInterceptor {
 
     @Override
     public void exception(ErrorCallback errorCallback) {
-        System.out.println("执行了全局异常");
+        System.out.println("Execute global interceptor");
     }
 }

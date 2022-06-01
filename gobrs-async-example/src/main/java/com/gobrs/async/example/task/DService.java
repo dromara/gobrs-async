@@ -26,12 +26,12 @@ public class DService extends AsyncTask<Object, Object>  {
     @Override
     public Object task(Object o, TaskSupport support) {
         try {
-            System.out.println("DService开始执行");
+            System.out.println("DService Begin");
             Thread.sleep(200);
             for (int i1 = 0; i1 < i; i1++) {
                 i1 += i1;
             }
-            System.out.println("DService 完成");
+            System.out.println("DService Finish");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

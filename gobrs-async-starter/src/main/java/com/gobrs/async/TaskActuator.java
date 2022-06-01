@@ -3,7 +3,7 @@ package com.gobrs.async;
 /**
  * @program: gobrs-async-starter
  * @ClassName TaskActuator
- * @description:
+ * @description: task executor task decorator
  * @author: sizegang
  * @create: 2022-03-16
  **/
