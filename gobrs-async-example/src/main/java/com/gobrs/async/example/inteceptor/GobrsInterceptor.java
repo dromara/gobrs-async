@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 /**
  * @program: gobrs-async-core
  * @ClassName GobrsInterceptor
- * @description:
+ * @description: 异常拦截器
  * @author: sizegang
  * @create: 2022-03-20
  **/

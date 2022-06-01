@@ -14,7 +14,7 @@ import javax.annotation.Resource;
 /**
  * @program: gobrs-async-core
  * @ClassName GobrsController
- * @description:
+ * @description: Controller
  * @author: sizegang
  * @create: 2022-03-20
  **/

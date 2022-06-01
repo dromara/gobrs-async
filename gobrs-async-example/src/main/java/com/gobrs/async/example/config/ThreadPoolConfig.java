@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @program: gobrs-async
  * @ClassName ThreadPoolConfig
- * @description:
+ * @description: 线程池配置
  * @author: sizegang
  * @create: 2022-02-20 00:34
  * @Version 1.0

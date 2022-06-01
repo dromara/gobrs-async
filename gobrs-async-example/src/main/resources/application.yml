@@ -1,5 +1,5 @@
 server:
-  port: 8888
+  port: 8888 # 端口: 8080
 spring:
   gobrs:
     async:
