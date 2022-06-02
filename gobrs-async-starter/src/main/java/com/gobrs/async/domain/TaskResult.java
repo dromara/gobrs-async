@@ -14,6 +14,10 @@ public class TaskResult<V> {
      * 结果状态
      */
     private ResultState resultState;
+
+    /**
+     * The execution exception
+     */
     private Exception ex;
 
     public TaskResult(V result, ResultState resultState) {

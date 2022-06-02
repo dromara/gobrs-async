@@ -47,7 +47,9 @@ public class GobrsAsyncProperties {
      */
     private boolean paramContext = true;
 
-
+    /**
+     * Whether transaction task
+     */
     private boolean transaction = false;
 
     /**

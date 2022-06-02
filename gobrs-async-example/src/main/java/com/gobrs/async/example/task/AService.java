@@ -5,8 +5,6 @@ import com.gobrs.async.anno.Task;
 import com.gobrs.async.task.AsyncTask;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-
 /**
  * @program: gobrs-async-starter
  * @ClassName AService
@@ -15,6 +13,7 @@ import java.util.Map;
  * @create: 2022-03-20
  **/
 @Task(failSubExec = true)
+@Component
 public class AService extends AsyncTask<Object, Object> {
 
     int i = 10000;
