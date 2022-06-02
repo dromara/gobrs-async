@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Resource;
-
 /**
  * @program: gobrs-async-core
  * @ClassName GobrsController
@@ -29,7 +27,7 @@ public class GobrsController {
     @Autowired
     private GobrsService gobrsService;
 
-    @RequestMapping("test")
+    @RequestMapping("testGobrs")
     public String gobrsTest() {
         AsyncResult test = gobrsAsync.go("test", () -> new Object());
         return "success";
