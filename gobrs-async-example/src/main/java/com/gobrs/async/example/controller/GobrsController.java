@@ -29,7 +29,7 @@ public class GobrsController {
     @Autowired
     private GobrsService gobrsService;
 
-    @RequestMapping("test")
+    @RequestMapping("testGobrs")
     public String gobrsTest() {
         AsyncResult test = gobrsAsync.go("test", () -> new Object());
         return "success";
