@@ -11,7 +11,7 @@ public class TaskResult<V> {
      */
     private V result;
     /**
-     * 结果状态
+     * result status
      */
     private ResultState resultState;
 

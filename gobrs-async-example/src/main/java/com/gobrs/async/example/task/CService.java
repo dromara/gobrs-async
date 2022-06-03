@@ -1,6 +1,7 @@
 package com.gobrs.async.example.task;
 
 import com.gobrs.async.TaskSupport;
+import com.gobrs.async.domain.TaskResult;
 import com.gobrs.async.task.AsyncTask;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Component;
  * @create: 2022-03-20
  **/
 @Component
-public class CService extends AsyncTask<Object, Object> {
+public class CService extends AsyncTask<Object, Integer> {
 
     int i = 10000;
 
@@ -25,17 +26,17 @@ public class CService extends AsyncTask<Object, Object> {
     }
 
     @Override
-    public Object task(Object o, TaskSupport support) {
+    public Integer task(Object o, TaskSupport support) {
         try {
             System.out.println("CService Begin");
-            String result = getResult(support, AService.class, String.class);
-            System.out.println(result);
+            //获取 所依赖的父任务的结果
+            getDependResult(support, AService.class);
 
             Thread.sleep(3000);
             for (int i1 = 0; i1 < i; i1++) {
                 i1 += i1;
             }
-            //日志打印
+
             System.out.println("CService Finish");
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -51,7 +52,11 @@ public class CService extends AsyncTask<Object, Object> {
 
     @Override
     public void onSuccess(TaskSupport support) {
+        // 获取自身task 执行完成之后的结果
+        Integer result = getResult(support);
 
+        //获取 任务结果封装 包含执行状态
+        TaskResult<Integer> taskResult = getTaskResult(support);
     }
 
     @Override

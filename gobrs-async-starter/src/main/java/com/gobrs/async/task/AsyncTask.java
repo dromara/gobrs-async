@@ -61,7 +61,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * @param <R>     TaskResult<R>
      * @return
      */
-    public <R> TaskResult<R> getTaskResult(TaskSupport support, Class<? extends Task> clazz) {
+    private  <R> TaskResult<R> getTaskResult(TaskSupport support, Class<? extends Task> clazz) {
         Map<Class, TaskResult> resultMap = support.getResultMap();
         return resultMap.get(clazz) != null ? resultMap.get(clazz) : resultMap.get(depKey(clazz));
     }
@@ -146,7 +146,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
             support.taskLoader.setExpCode(new AtomicInteger(ExpState.DEFAULT.getCode()));
             support.taskLoader.errorInterrupted(errorCallback);
         } catch (Exception ex) {
-            logger.error("stopAsync error ", ex);
+            logger.error("stopAsync error {}", ex);
             return false;
         }
         return true;
@@ -161,7 +161,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
             support.taskLoader.errorInterrupted(errorCallback);
 
         } catch (Exception ex) {
-            logger.error("stopAsync error ", ex);
+            logger.error("stopAsync error {} ", ex);
             return false;
         }
         return true;
