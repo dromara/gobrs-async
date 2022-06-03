@@ -38,19 +38,98 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
     private boolean failSubExec = DefaultConfig.failSubExec;
 
     /**
-     * Gets the execution results of dependencies
+     * get result of depend on class
      *
      * @param support
-     * @param clazz
-     * @param resultClass
+     * @param clazz   depend on class
      * @param <R>
      * @return
      */
-    public <R> R getResult(TaskSupport support, Class clazz, Class<R> resultClass) {
-        Map<Class, TaskResult> resultMap = support.getResultMap();
-        TaskResult<R> taskResult = resultMap.get(clazz) != null ? resultMap.get(clazz) : resultMap.get(depKey(clazz));
+    public <R> R getResult(TaskSupport support, Class<? extends Task> clazz) {
+        TaskResult<R> taskResult = getTaskResult(support, clazz);
         if (taskResult != null) {
             return taskResult.getResult();
+        }
+        return null;
+    }
+
+    /**
+     * get taskResult of depend on class
+     *
+     * @param support
+     * @param clazz   depend on class
+     * @param <R>     TaskResult<R>
+     * @return
+     */
+    public <R> TaskResult<R> getTaskResult(TaskSupport support, Class<? extends Task> clazz) {
+        Map<Class, TaskResult> resultMap = support.getResultMap();
+        return resultMap.get(clazz) != null ? resultMap.get(clazz) : resultMap.get(depKey(clazz));
+    }
+
+    /**
+     * get result of depend on class
+     *
+     * @param support
+     * @param clazz   depend on class of AsyncTask
+     * @param <R> auto suggestion by IDE
+     * @return
+     */
+    public <R> R getDependResult(TaskSupport support, Class<? extends AsyncTask<Param, R>> clazz) {
+        TaskResult<R> taskResult = getTaskResult(support, clazz);
+        if (taskResult != null) {
+            return taskResult.getResult();
+        }
+        return null;
+    }
+
+    /**
+     * get taskResult of depend on class
+     *
+     * @param support
+     * @param clazz   depend on class of AsyncTask
+     * @param <R> auto suggestion by IDE
+     * @return
+     */
+    public <R> TaskResult<R> getDependTaskResult(TaskSupport support, Class<? extends AsyncTask<Param, R>> clazz) {
+        return getTaskResult(support, clazz);
+    }
+
+    /**
+     * get result of current task
+     *
+     * @param support
+     * @return
+     */
+    public Result getResult(TaskSupport support) {
+        TaskResult<Result> taskResult = getTaskResult(support);
+        if (taskResult != null) {
+            return taskResult.getResult();
+        }
+        return null;
+    }
+    
+    /**
+     * get taskResult of current task
+     *
+     * @param support
+     * @return
+     */
+    public TaskResult<Result> getTaskResult(TaskSupport support) {
+        Map<Class, TaskResult> resultMap = support.getResultMap();
+        Class thisResultClass = this.getClass();
+        return resultMap.get(thisResultClass) != null ? resultMap.get(thisResultClass) : resultMap.get(depKey(thisResultClass));
+    }
+
+    /**
+     * get task param
+     *
+     * @param support
+     * @return
+     */
+    public Param getParam(TaskSupport support) {
+        Object taskResult = support.getParam();
+        if (taskResult != null) {
+            return (Param) taskResult;
         }
         return null;
     }
