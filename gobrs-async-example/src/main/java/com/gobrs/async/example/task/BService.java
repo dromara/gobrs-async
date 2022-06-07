@@ -28,12 +28,12 @@ public class BService extends AsyncTask<Object, Object>  {
     @Override
     public Object task(Object o, TaskSupport support) {
         try {
-            Thread.sleep(1000);
             System.out.println("BService Begin");
+            Thread.sleep(1000);
             for (int i1 = 0; i1 < i; i1++) {
                 i1 += i1;
             }
-
+            System.out.println("BService Finish");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
