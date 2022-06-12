@@ -25,7 +25,7 @@ public class FService extends AsyncTask<Object, Object> {
     public Object task(Object o, TaskSupport support) {
         try {
             System.out.println("FService Begin");
-            Thread.sleep(200);
+            Thread.sleep(2000);
             for (int i1 = 0; i1 < i; i1++) {
                 i1 += i1;
             }

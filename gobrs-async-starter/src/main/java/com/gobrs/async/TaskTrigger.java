@@ -76,11 +76,7 @@ class TaskTrigger {
                 /**
                  * Each business task is executed using a new taskActuator
                  */
-                if (taskFlow.getGobrsAsyncProperties().isTransaction()) {
-                    process = new TaskActuator(task, upwardTasksMap.get(task).size(), downTasksMap.get(task), upwardTasksMap);
-                } else {
-                    process = new TaskActuator(task, upwardTasksMap.get(task).size(), downTasksMap.get(task));
-                }
+                process = new TaskActuator(task, upwardTasksMap.get(task).size(), downTasksMap.get(task), upwardTasksMap);
             } else {
                 /***
                  * completely  and  Termination of the task

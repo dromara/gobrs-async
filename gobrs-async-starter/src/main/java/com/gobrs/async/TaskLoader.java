@@ -14,10 +14,7 @@ import com.gobrs.async.task.AsyncTask;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
@@ -64,8 +61,9 @@ public class TaskLoader {
 
     private volatile boolean canceled = false;
 
-    private final ArrayList<Future<?>> futures;
+    public ArrayList<Future<?>> futures;
 
+    public Map<AsyncTask, Future> futuresAsync = new ConcurrentHashMap<>();
 
     private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<>(0);
 
@@ -212,7 +210,9 @@ public class TaskLoader {
             lock.lock();
             try {
                 if (!canceled) {
-                    futures.add(executorService.submit(taskActuator));
+                    Future<?> submit = executorService.submit(taskActuator);
+                    futures.add(submit);
+                    futuresAsync.put(taskActuator.task, submit);
                 }
             } finally {
                 lock.unlock();
@@ -221,7 +221,8 @@ public class TaskLoader {
             /**
              * Run the command without setting the timeout period
              */
-            executorService.submit(taskActuator);
+            Future<?> submit = executorService.submit(taskActuator);
+            futuresAsync.put(taskActuator.task, submit);
         }
     }
 

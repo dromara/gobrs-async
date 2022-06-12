@@ -13,6 +13,11 @@ import com.gobrs.async.task.AsyncTask;
 import javax.annotation.Resource;
 import java.util.*;
 
+import static com.gobrs.async.def.Constant.sp;
+import static com.gobrs.async.def.Constant.tied;
+import static com.gobrs.async.def.DefaultConfig.RULE_ANY;
+import static com.gobrs.async.def.DefaultConfig.RULE_EXCLUSIVE;
+
 /**
  * @author sizegang1
  * @program: gobrs-async
@@ -27,8 +32,6 @@ public class RuleParseEngine<T> extends AbstractEngine {
     @Resource
     private GobrsAsyncProperties gobrsAsyncProperties;
 
-
-    public static final String sp = ",";
 
     @Resource
     private GobrsAsync gobrsAsync;
@@ -45,6 +48,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
         List<AsyncTask> pioneer = new ArrayList<>();
 
         for (String taskFlow : taskFlows) {
+
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
             if (taskArr.length == 0) {
                 throw new GobrsAsyncException("rule config error !!!");
@@ -53,9 +57,9 @@ public class RuleParseEngine<T> extends AbstractEngine {
             if (door.contains(sp)) {
                 String[] childFlows = door.split(sp);
                 for (String cf : childFlows) {
-                    pioneer.add(EngineExecutor.getAsyncTask(cf));
+                    AsyncTask asyncTask = EngineExecutor.getAsyncTask(cf);
+                    pioneer.add(asyncTask);
                 }
-
             } else {
                 pioneer.add(EngineExecutor.getAsyncTask(door));
             }
@@ -72,18 +76,18 @@ public class RuleParseEngine<T> extends AbstractEngine {
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
             List<String> arrayList = Arrays.asList(taskArr);
             String leftTaskName = arrayList.get(0);
+            TaskReceive taskReceive;
             if (leftTaskName.contains(sp)) {
                 String[] split = leftTaskName.split(sp);
                 for (String s : split) {
-                    TaskReceive taskReceive = gobrsAsync.after(rule.getName(), EngineExecutor.getAsyncTask(s));
+                    taskReceive = gobrsAsync.after(rule.getName(), EngineExecutor.getAsyncTask(s));
                     doChildFlow(taskReceive, cacheTaskWrappers, arrayList);
                 }
-
             } else {
                 /**
                  * Set up subtasks Task tree
                  */
-                TaskReceive taskReceive = gobrsAsync.after(rule.getName(), EngineExecutor.getAsyncTask(leftTaskName));
+                taskReceive = gobrsAsync.after(rule.getName(), EngineExecutor.getAsyncTask(leftTaskName));
                 doChildFlow(taskReceive, cacheTaskWrappers, arrayList);
             }
         }
@@ -105,14 +109,15 @@ public class RuleParseEngine<T> extends AbstractEngine {
                 /**
                  * Load tasks from the rules engine
                  */
+                List<AsyncTask> asyncTasks = new ArrayList<>();
                 for (String tbean : beanList) {
-
-                    EngineExecutor.getWrapperDepend(cacheTaskWrappers, tbean, taskReceive, true);
+                    asyncTasks.add(EngineExecutor.getWrapperDepend(cacheTaskWrappers, tbean, taskReceive, false));
                 }
+                taskReceive.refresh(asyncTasks);
 
             } else {
 
-                EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, taskReceive, false);
+                EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, taskReceive, true);
             }
         }
     }
@@ -130,7 +135,15 @@ public class RuleParseEngine<T> extends AbstractEngine {
          * @return
          */
         private static AsyncTask getAsyncTask(String taskName) {
-            AsyncTask task = (AsyncTask) getBean(taskName);
+            String name = taskName;
+            int cursor = 0;
+            String[] preNamed = taskName.split(tied);
+            if (taskName.contains(tied)) {
+                String[] tiredNames = preNamed;
+                name = tiredNames[0];
+                cursor = tiredNames.length;
+            }
+            AsyncTask task = (AsyncTask) getBean(name);
             /**
              * Parse annotation configuration
              */
@@ -138,7 +151,12 @@ public class RuleParseEngine<T> extends AbstractEngine {
             task.setCallback(getCallBack(task));
             task.setRetryCount(getRetryCount(task));
             task.setFailSubExec(getFailSubExec(task));
-            task.setAny(isAny(task));
+            if (taskName.contains(tied) && RULE_ANY.equals(preNamed[1])) {
+                task.setAny(true);
+            }
+            if (cursor == 3 && RULE_EXCLUSIVE.equals(preNamed[2])) {
+                task.setExclusive(true);
+            }
             return task;
         }
 
@@ -152,14 +170,14 @@ public class RuleParseEngine<T> extends AbstractEngine {
          * @return
          */
         public static AsyncTask getWrapperDepend(Map<String, AsyncTask> cacheTaskWrappers, String taskBean, TaskReceive taskReceive,
-                                                 boolean split) {
+                                                 boolean clear) {
             /**
              *  parsing task rule configuration
              */
             return Optional.ofNullable(getAsyncTask(taskBean))
                     .map((bean) -> Optional.ofNullable(cacheTaskWrappers.get(taskBean))
                             .map((tk) -> {
-                                taskReceive.then(split, tk);
+                                taskReceive.then(clear, tk);
                                 return tk;
                             }).orElseGet(() -> {
                                 /**
@@ -170,7 +188,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
                                 /**
                                  * Set up subtasks
                                  */
-                                taskReceive.then(split, asyncTask);
+                                taskReceive.then(clear, asyncTask);
                                 return asyncTask;
                             })).orElse(null);
         }
@@ -235,18 +253,6 @@ public class RuleParseEngine<T> extends AbstractEngine {
             return annotation.failSubExec();
         }
 
-        /**
-         * if true => execute when any of parentTasks finished
-         * @param task
-         * @return
-         */
-        public static boolean isAny(AsyncTask task) {
-            Task annotation = task.getClass().getAnnotation(Task.class);
-            if (annotation == null) {
-                return false;
-            }
-            return annotation.any();
-        }
     }
 
 }

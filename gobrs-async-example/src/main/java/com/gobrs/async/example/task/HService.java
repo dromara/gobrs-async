@@ -22,6 +22,7 @@ public class HService extends AsyncTask<Object, Object> {
     @Override
     public Object task(Object o, TaskSupport support) {
         try {
+            System.out.println("HService Begin");
             Thread.sleep(100);
             System.out.println("HService Finish");
         } catch (InterruptedException e) {

@@ -17,8 +17,11 @@ import com.gobrs.async.task.AsyncTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -33,8 +36,6 @@ class TaskActuator implements Runnable, Cloneable {
      * Tasks to be performed
      */
     public final AsyncTask task;
-
-    private boolean must = true;
 
 
     /**
@@ -58,16 +59,18 @@ class TaskActuator implements Runnable, Cloneable {
 
     private AtomicInteger state;
 
+    private volatile AtomicInteger starting = new AtomicInteger(0);
+
 
     TaskActuator(AsyncTask asyncTask, int depends, List<AsyncTask> subTasks) {
         this.task = asyncTask;
-        this.upstreamDepdends = depends > 1 && asyncTask.isAny() ? 1 : depends;
+        this.upstreamDepdends = depends > 1 & task.isAny() ? 1 : depends;
         this.subTasks = subTasks;
     }
 
     TaskActuator(AsyncTask asyncTask, int depends, List<AsyncTask> subTasks, Map<AsyncTask, List<AsyncTask>> upwardTasksMap) {
         this.task = asyncTask;
-        this.upstreamDepdends = depends > 1 && asyncTask.isAny() ? 1 : depends;
+        this.upstreamDepdends = depends > 1 & task.isAny() ? 1 : depends;
         this.subTasks = subTasks;
         this.upwardTasksMap = upwardTasksMap;
     }
@@ -87,11 +90,9 @@ class TaskActuator implements Runnable, Cloneable {
     @Override
     public void run() {
 
-        Object parameter = param.get();
+        Object parameter = getParameter();
 
-        if (parameter instanceof Map) {
-            parameter = ((Map<?, ?>) parameter).get(this.getClass());
-        }
+        preparation();
 
         TaskLoader taskLoader = support.getTaskLoader();
         try {
@@ -168,6 +169,27 @@ class TaskActuator implements Runnable, Cloneable {
             }
 
         }
+    }
+
+    private void preparation() {
+        if (task.isExclusive()) {
+            List<AsyncTask> asyncTaskList = upwardTasksMap.get(task);
+            Map<AsyncTask, Future> futuresAsync = support.getTaskLoader().futuresAsync;
+            futuresAsync.forEach((x, y) -> {
+                if (asyncTaskList.contains(x)) {
+                    y.cancel(true);
+                }
+            });
+        }
+    }
+
+    private Object getParameter() {
+        Object parameter = param.get();
+
+        if (parameter instanceof Map) {
+            parameter = ((Map<?, ?>) parameter).get(this.getClass());
+        }
+        return parameter;
     }
 
     private boolean retryTask(Object parameter, TaskLoader taskLoader) {
@@ -363,13 +385,5 @@ class TaskActuator implements Runnable, Cloneable {
 
     public void setGobrsAsyncProperties(GobrsAsyncProperties gobrsAsyncProperties) {
         this.gobrsAsyncProperties = gobrsAsyncProperties;
-    }
-
-    public boolean isMust() {
-        return must;
-    }
-
-    public void setMust(boolean must) {
-        this.must = must;
     }
 }

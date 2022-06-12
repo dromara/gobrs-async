@@ -35,7 +35,7 @@ public class TaskReceive {
         }
     }
 
-    public TaskReceive then(boolean split, AsyncTask... asyncTasks) {
+    public TaskReceive then(boolean clear, AsyncTask... asyncTasks) {
         synchronized (taskFlow) {
             for (AsyncTask from : this.cacheTaskList) {
                 for (AsyncTask to : asyncTasks) {
@@ -48,7 +48,7 @@ public class TaskReceive {
             /**
              *     for Compatible with regular commas so note
              */
-            if (!split) {
+            if (clear) {
                 this.cacheTaskList = new ArrayList<AsyncTask>(
                         asyncTasks.length);
                 copyList(Arrays.asList(asyncTasks), this.cacheTaskList);
@@ -56,6 +56,13 @@ public class TaskReceive {
             return this;
         }
     }
+
+
+    public void refresh(List<AsyncTask> cacheTaskList) {
+        this.cacheTaskList.clear();
+        this.cacheTaskList.addAll(cacheTaskList);
+    }
+
 
     private void copyList(List<AsyncTask> src,
                           List<AsyncTask> dest) {

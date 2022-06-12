@@ -8,13 +8,16 @@ package com.gobrs.async.def;
 public interface DefaultConfig {
 
     String TASKNAME = "asyncTaskName";
-    
+
     Integer THREADPOOLQUEUESIZE = 10000;
-    
+
     Long KEEPALIVETIME = 30000L;
-    
+
     Long EXECUTETIMEOUT = 10000L;
-    
+
+    String RULE_ANY = "any";
+    String RULE_EXCLUSIVE = "exclusive";
+
     int retryCount = 1;
     /**
      * Whether to execute a subtask if it fails
@@ -24,4 +27,6 @@ public interface DefaultConfig {
      * Transaction task
      */
     boolean transaction = false;
+
+
 }
