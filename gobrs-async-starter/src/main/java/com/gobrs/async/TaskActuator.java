@@ -59,15 +59,15 @@ class TaskActuator implements Runnable, Cloneable {
     private AtomicInteger state;
 
 
-    TaskActuator(AsyncTask task, int depdending, List<AsyncTask> subTasks) {
-        this.task = task;
-        this.upstreamDepdends = depdending;
+    TaskActuator(AsyncTask asyncTask, int depends, List<AsyncTask> subTasks) {
+        this.task = asyncTask;
+        this.upstreamDepdends = depends > 1 && asyncTask.isAny() ? 1 : depends;
         this.subTasks = subTasks;
     }
 
-    TaskActuator(AsyncTask asyncTask, int depdending, List<AsyncTask> subTasks, Map<AsyncTask, List<AsyncTask>> upwardTasksMap) {
+    TaskActuator(AsyncTask asyncTask, int depends, List<AsyncTask> subTasks, Map<AsyncTask, List<AsyncTask>> upwardTasksMap) {
         this.task = asyncTask;
-        this.upstreamDepdends = depdending;
+        this.upstreamDepdends = depends > 1 && asyncTask.isAny() ? 1 : depends;
         this.subTasks = subTasks;
         this.upwardTasksMap = upwardTasksMap;
     }

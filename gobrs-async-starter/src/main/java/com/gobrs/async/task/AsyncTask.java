@@ -38,6 +38,12 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
     private boolean failSubExec = DefaultConfig.failSubExec;
 
     /**
+     * if true => execute when any of parentTasks finished
+     */
+
+    private boolean any = false;
+
+    /**
      * get result of depend on class
      *
      * @param support
@@ -198,5 +204,14 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
 
     public void setFailSubExec(boolean failSubExec) {
         this.failSubExec = failSubExec;
+    }
+
+
+    public boolean isAny() {
+        return any;
+    }
+
+    public void setAny(boolean any) {
+        this.any = any;
     }
 }
