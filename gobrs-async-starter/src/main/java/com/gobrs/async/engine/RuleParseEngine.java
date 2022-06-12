@@ -5,6 +5,7 @@ import com.gobrs.async.TaskReceive;
 import com.gobrs.async.anno.Task;
 import com.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.gobrs.async.def.DefaultConfig;
+import com.gobrs.async.exception.GobrsAsyncException;
 import com.gobrs.async.rule.Rule;
 import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
@@ -45,7 +46,19 @@ public class RuleParseEngine<T> extends AbstractEngine {
 
         for (String taskFlow : taskFlows) {
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
-            pioneer.add(EngineExecutor.getAsyncTask(taskArr[0]));
+            if (taskArr.length == 0) {
+                throw new GobrsAsyncException("rule config error !!!");
+            }
+            String door = taskArr[0];
+            if (door.contains(sp)) {
+                String[] childFlows = door.split(sp);
+                for (String cf : childFlows) {
+                    pioneer.add(EngineExecutor.getAsyncTask(cf));
+                }
+
+            } else {
+                pioneer.add(EngineExecutor.getAsyncTask(door));
+            }
         }
         /**
          * Start the task process The sub-process in the task process is opened
@@ -59,35 +72,47 @@ public class RuleParseEngine<T> extends AbstractEngine {
             String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
             List<String> arrayList = Arrays.asList(taskArr);
             String leftTaskName = arrayList.get(0);
+            if (leftTaskName.contains(sp)) {
+                String[] split = leftTaskName.split(sp);
+                for (String s : split) {
+                    TaskReceive taskReceive = gobrsAsync.after(rule.getName(), EngineExecutor.getAsyncTask(s));
+                    doChildFlow(taskReceive, cacheTaskWrappers, arrayList);
+                }
+
+            } else {
+                /**
+                 * Set up subtasks Task tree
+                 */
+                TaskReceive taskReceive = gobrsAsync.after(rule.getName(), EngineExecutor.getAsyncTask(leftTaskName));
+                doChildFlow(taskReceive, cacheTaskWrappers, arrayList);
+            }
+        }
+    }
+
+    private void doChildFlow(TaskReceive taskReceive, Map<String, AsyncTask> cacheTaskWrappers, List<String> arrayList) {
+        for (int i = 1; i < arrayList.size(); i++) {
+
+            String taskBean = arrayList.get(i);
 
             /**
-             * Set up subtasks Task tree
+             * Parse Task Rules
              */
-            TaskReceive taskReceive = gobrsAsync.after(rule.getName(), EngineExecutor.getAsyncTask(leftTaskName));
-            for (int i = 1; i < arrayList.size(); i++) {
+            if (taskBean.contains(sp)) {
 
-                String taskBean = arrayList.get(i);
+                String[] beanArray = taskBean.split(sp);
 
+                List<String> beanList = Arrays.asList(beanArray);
                 /**
-                 * Parse Task Rules
+                 * Load tasks from the rules engine
                  */
-                if (taskBean.contains(sp)) {
+                for (String tbean : beanList) {
 
-                    String[] beanArray = taskBean.split(sp);
-
-                    List<String> beanList = Arrays.asList(beanArray);
-                    /**
-                     * Load tasks from the rules engine
-                     */
-                    for (String tbean : beanList) {
-
-                        EngineExecutor.getWrapperDepend(cacheTaskWrappers, tbean, taskReceive, true);
-                    }
-
-                } else {
-
-                    EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, taskReceive, false);
+                    EngineExecutor.getWrapperDepend(cacheTaskWrappers, tbean, taskReceive, true);
                 }
+
+            } else {
+
+                EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, taskReceive, false);
             }
         }
     }
