@@ -44,4 +44,10 @@ public @interface Task {
      * @return
      */
     int retryCount() default DefaultConfig.retryCount;
+
+    /**
+     * if true => execute when any of parentTasks finished
+     */
+
+    boolean any() default false;
 }
