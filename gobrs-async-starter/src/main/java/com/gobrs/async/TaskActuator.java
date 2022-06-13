@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -185,7 +186,6 @@ class TaskActuator implements Runnable, Cloneable {
 
     private Object getParameter() {
         Object parameter = param.get();
-
         if (parameter instanceof Map) {
             parameter = ((Map<?, ?>) parameter).get(this.getClass());
         }
@@ -254,7 +254,7 @@ class TaskActuator implements Runnable, Cloneable {
                     /**
                      * for thread reuse
                      */
-                    if (subTasks.size() == 1) {
+                    if (subTasks.size() == 1 && !process.task.isExclusive()) {
                         process.run();
                     } else {
                         taskLoader.startProcess(process);
