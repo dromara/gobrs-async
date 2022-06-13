@@ -29,7 +29,7 @@ public class CService extends AsyncTask<Object, Integer> {
         try {
             System.out.println("CService Begin");
             //获取 所依赖的父任务的结果
-            getDependResult(support, AService.class);
+            AService result = getResult(support, AService.class);
 
             Thread.sleep(300);
             for (int i1 = 0; i1 < i; i1++) {
