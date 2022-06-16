@@ -1,8 +1,12 @@
 package com.gobrs.async.engine;
 
+import com.gobrs.async.GobrsAsync;
 import com.gobrs.async.GobrsPrint;
 import com.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.gobrs.async.exception.NotTaskRuleException;
+import com.gobrs.async.rule.Rule;
+import com.gobrs.async.spring.GobrsSpring;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ansi.AnsiColor;
@@ -14,6 +18,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
 import javax.annotation.Resource;
+
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -29,7 +35,8 @@ public class RulePostProcessor implements ApplicationListener<ApplicationReadyEv
     public void onApplicationEvent(ApplicationReadyEvent event) {
         ApplicationContext applicationContext = event.getApplicationContext();
         GobrsAsyncProperties properties = applicationContext.getBean(GobrsAsyncProperties.class);
-        String rules = properties.getRules();
+        GobrsAsync gobrsAsync = GobrsSpring.getBean(GobrsAsync.class);
+        List<Rule> rules = properties.getRules();
         Optional.ofNullable(rules).map((data) -> {
             /**
              * The primary purpose of resolving a rule is to check that the rule is correct
@@ -39,7 +46,10 @@ public class RulePostProcessor implements ApplicationListener<ApplicationReadyEv
              */
 
             RuleEngine engine = applicationContext.getBean(RuleEngine.class);
-            engine.parse(data);
+            for (Rule rule : rules) {
+                engine.doParse(rule, false);
+                gobrsAsync.readyTo(rule.getName());
+            }
             GobrsPrint.printBanner();
             GobrsPrint.getVersion();
             return 1;

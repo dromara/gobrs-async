@@ -26,7 +26,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
     private String name;
 
     /**
-     *Transaction task
+     * Transaction task
      */
     private boolean callback = DefaultConfig.transaction;
 
@@ -42,6 +42,11 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      */
 
     private boolean any = false;
+
+    /**
+     * Whether any interruption ends other dependent tasks
+     */
+    private boolean exclusive = false;
 
     /**
      * get result of depend on class
@@ -67,7 +72,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * @param <R>     TaskResult<R>
      * @return
      */
-    private  <R> TaskResult<R> getTaskResult(TaskSupport support, Class<? extends Task> clazz) {
+    private <R> TaskResult<R> getTaskResult(TaskSupport support, Class<? extends Task> clazz) {
         Map<Class, TaskResult> resultMap = support.getResultMap();
         return resultMap.get(clazz) != null ? resultMap.get(clazz) : resultMap.get(depKey(clazz));
     }
@@ -77,7 +82,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      *
      * @param support
      * @param clazz   depend on class of AsyncTask
-     * @param <R> auto suggestion by IDE
+     * @param <R>     auto suggestion by IDE
      * @return
      */
     public <R> R getDependResult(TaskSupport support, Class<? extends AsyncTask<Param, R>> clazz) {
@@ -93,7 +98,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      *
      * @param support
      * @param clazz   depend on class of AsyncTask
-     * @param <R> auto suggestion by IDE
+     * @param <R>     auto suggestion by IDE
      * @return
      */
     public <R> TaskResult<R> getDependTaskResult(TaskSupport support, Class<? extends AsyncTask<Param, R>> clazz) {
@@ -113,7 +118,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         }
         return null;
     }
-    
+
     /**
      * get taskResult of current task
      *
@@ -213,5 +218,13 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
 
     public void setAny(boolean any) {
         this.any = any;
+    }
+
+    public boolean isExclusive() {
+        return exclusive;
+    }
+
+    public void setExclusive(boolean exclusive) {
+        this.exclusive = exclusive;
     }
 }

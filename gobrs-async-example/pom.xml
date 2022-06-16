@@ -30,7 +30,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+<!--            <scope>test</scope>-->
         </dependency>
 <!--        <dependency>-->
 <!--            <groupId>io.github.memorydoc</groupId>-->
@@ -42,7 +42,6 @@
             <artifactId>gobrs-async-starter</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
-
     </dependencies>
 
     <build>

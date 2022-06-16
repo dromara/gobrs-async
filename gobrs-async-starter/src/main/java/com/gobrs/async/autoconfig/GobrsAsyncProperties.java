@@ -1,8 +1,12 @@
 package com.gobrs.async.autoconfig;
 
 
+import java.util.List;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+
+import com.gobrs.async.rule.Rule;
 
 /**
  * @author sizegang1
@@ -23,7 +27,7 @@ public class GobrsAsyncProperties {
     /**
      * Task rules
      */
-    private String rules;
+    private List<Rule> rules;
 
     /**
      * Task separator
@@ -88,11 +92,11 @@ public class GobrsAsyncProperties {
     }
 
 
-    public String getRules() {
+    public List<Rule> getRules() {
         return rules;
     }
 
-    public void setRules(String rules) {
+    public void setRules(List<Rule> rules) {
         this.rules = rules;
     }
 

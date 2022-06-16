@@ -26,6 +26,7 @@ public class GService extends AsyncTask<Object, Object>  {
     @Override
     public Object task(Object o, TaskSupport support) {
         try {
+            System.out.println("GService Begin");
             Thread.sleep(100);
             System.out.println("GService Finish");
         } catch (InterruptedException e) {
