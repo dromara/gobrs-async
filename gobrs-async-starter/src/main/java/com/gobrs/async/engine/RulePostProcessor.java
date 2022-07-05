@@ -23,13 +23,16 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * The type Rule post processor.
+ *
  * @author sizegang1
- * @program: gobrs-async
+ * @program: gobrs -async
  * @ClassName RulePostProcessor
- * @description: Task flow resolver
- * The implementation ApplicationListener gets the Spring context, which in turn gets the Bean instance
- **/
+ * @description: Task flow resolver The implementation ApplicationListener gets the Spring context, which in turn gets the Bean instance
+ */
+
 public class RulePostProcessor implements ApplicationListener<ApplicationReadyEvent> {
+    Logger logger = LoggerFactory.getLogger(RulePostProcessor.class);
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
@@ -45,17 +48,22 @@ public class RulePostProcessor implements ApplicationListener<ApplicationReadyEv
              *  recommend : Custom rules engine can be extended using SPI
              */
 
-            RuleEngine engine = applicationContext.getBean(RuleEngine.class);
-            for (Rule rule : rules) {
-                engine.doParse(rule, false);
-                gobrsAsync.readyTo(rule.getName());
+            try {
+                RuleEngine engine = applicationContext.getBean(RuleEngine.class);
+                for (Rule rule : rules) {
+                    engine.doParse(rule, false);
+                    gobrsAsync.readyTo(rule.getName());
+                }
+            } catch (Exception exception) {
+                logger.error("RulePostProcessor parse error{}", exception);
+
+                throw exception;
             }
             GobrsPrint.printBanner();
             GobrsPrint.getVersion();
             return 1;
-        }).orElseThrow(() -> new NotTaskRuleException("spring.gobrs.async.rules is empty"));
+        }).orElseThrow(() -> new NotTaskRuleException("spring.gobrs.async parse error"));
     }
-
 
 
 }

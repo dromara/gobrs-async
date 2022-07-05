@@ -3,9 +3,9 @@ server:
 spring:
   gobrs:
     async:
-      rules:
-        - name: "test"
-          content: "AService->BService,CService,FService; BService->FService,GService;"
-        - name: "azh"
-          content: "AService->BService,CService,FService; BService->FService,GService;"
+#      rules:
+#        - name: "test"
+#          content: "AService->BService,CService,FService; BService->FService,GService;"
+#        - name: "azh"
+#          content: "AService->BService,CService,FService; BService->FService,GService;"
       task-interrupt: false #局部异常是否打断主流程
