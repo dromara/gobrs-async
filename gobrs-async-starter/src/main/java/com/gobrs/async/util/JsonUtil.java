@@ -16,10 +16,20 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The type Json util.
+ */
 public class JsonUtil {
     private static ObjectMapper objectMapper = new ObjectMapper();
 
 
+    /**
+     * Obj 2 string string.
+     *
+     * @param <T> the type parameter
+     * @param obj the obj
+     * @return the string
+     */
     public static <T> String obj2String(T obj) {
         if(obj == null){
             return null;
@@ -33,6 +43,13 @@ public class JsonUtil {
         return s;
     }
 
+    /**
+     * Obj 2 string pretty string.
+     *
+     * @param <T> the type parameter
+     * @param obj the obj
+     * @return the string
+     */
     public static <T> String obj2StringPretty(T obj) {
         if (obj == null) {
             return null;
@@ -44,6 +61,14 @@ public class JsonUtil {
         }
     }
 
+    /**
+     * String 2 obj t.
+     *
+     * @param <T>   the type parameter
+     * @param str   the str
+     * @param clazz the clazz
+     * @return the t
+     */
     public static <T> T string2Obj(String str, Class<T> clazz) {
         if(str == null || str.length()==0 || clazz == null){
             return null;
@@ -58,7 +83,11 @@ public class JsonUtil {
     }
 
     /**
-     * 在字符串与集合对象转换时使用
+     *
+     * @param <T>           the type parameter
+     * @param str           the str
+     * @param typeReference the type reference
+     * @return the t
      */
     public static <T> T string2Obj(String str, TypeReference<T> typeReference) {
         if (str ==null || str.length() ==0 || typeReference == null) {
@@ -72,7 +101,12 @@ public class JsonUtil {
     }
 
     /**
-     * 在字符串与集合对象转换时使用
+     *
+     * @param <T>             the type parameter
+     * @param str             the str
+     * @param collectionClazz the collection clazz
+     * @param elementClazzes  the element clazzes
+     * @return the t
      */
     public static <T> T string2Obj(String str, Class<?> collectionClazz, Class<?>... elementClazzes) {
         JavaType javaType = objectMapper.getTypeFactory().constructParametricType(collectionClazz, elementClazzes);
@@ -83,20 +117,44 @@ public class JsonUtil {
         }
     }
 
+    /**
+     * Builder json util . json builder.
+     *
+     * @return the json util . json builder
+     */
     public static JsonUtil.JsonBuilder builder() {
         return new JsonUtil.JsonBuilder();
     }
 
+    /**
+     * The type Json builder.
+     */
     public static class JsonBuilder {
         private Map<String ,Object> map = new HashMap<>();
 
+        /**
+         * Instantiates a new Json builder.
+         */
         JsonBuilder() {
         }
+
+        /**
+         * Put json util . json builder.
+         *
+         * @param key   the key
+         * @param value the value
+         * @return the json util . json builder
+         */
         public JsonUtil.JsonBuilder put(String key ,Object value){
             map.put(key,value);
             return this;
         }
 
+        /**
+         * Build string.
+         *
+         * @return the string
+         */
         public String build() {
 
             ObjectMapper objectMapper = new ObjectMapper();
