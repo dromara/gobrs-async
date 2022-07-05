@@ -56,7 +56,6 @@ public class RulePostProcessor implements ApplicationListener<ApplicationReadyEv
                 }
             } catch (Exception exception) {
                 logger.error("RulePostProcessor parse error{}", exception);
-
                 throw exception;
             }
             GobrsPrint.printBanner();
