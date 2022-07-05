@@ -12,9 +12,9 @@ import com.gobrs.async.rule.Rule;
  */
 public interface RuleEngine extends Engine {
     /**
-     * 规则解析
+     * Parse.
      *
-     * @param r 待解析rules
+     * @param r the r
      * @return
      */
     void parse(String r);
