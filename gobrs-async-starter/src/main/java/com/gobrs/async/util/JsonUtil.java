@@ -11,6 +11,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -20,6 +22,7 @@ import java.util.Map;
  * The type Json util.
  */
 public class JsonUtil {
+    static Logger logger = LoggerFactory.getLogger(JsonUtil.class);
     private static ObjectMapper objectMapper = new ObjectMapper();
 
 
@@ -38,7 +41,7 @@ public class JsonUtil {
         try {
             s = obj instanceof String ? (String)obj :  objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            logger.error("JsonUtil obj2String error{}", e);
         }
         return s;
     }
@@ -77,7 +80,7 @@ public class JsonUtil {
         try {
             t = clazz.equals(String.class)? (T)str : objectMapper.readValue(str,clazz);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("JsonUtil string2Obj error{}", e);
         }
         return t;
     }
@@ -161,7 +164,7 @@ public class JsonUtil {
             try {
                 return objectMapper.writeValueAsString(this.map);
             } catch (JsonProcessingException e) {
-                e.printStackTrace();
+                logger.error("JsonUtil build error{}", e);
             }
             return "{}";
         }
