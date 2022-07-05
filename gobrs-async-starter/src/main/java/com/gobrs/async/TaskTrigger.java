@@ -21,7 +21,7 @@ class TaskTrigger {
 
     private GobrsAsyncThreadPoolFactory threadPoolFactory = GobrsSpring.getBean(GobrsAsyncThreadPoolFactory.class);
 
-    private IdentityHashMap<AsyncTask, TaskActuator> prepareTaskMap = new IdentityHashMap<>();
+    private Map<AsyncTask, TaskActuator> prepareTaskMap = Collections.synchronizedMap(new IdentityHashMap<>());
 
     public AssistantTask assistantTask;
 
@@ -110,6 +110,7 @@ class TaskTrigger {
          * The thread pool is obtained from the factory, and the thread pool parameters can be dynamically adjusted
          */
         support.setExecutorService(threadPoolFactory.getThreadPoolExecutor());
+
         for (AsyncTask task : prepareTaskMap.keySet()) {
             /**
              * clone Process for Thread isolation
