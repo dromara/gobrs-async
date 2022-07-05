@@ -296,7 +296,7 @@ class TaskActuator implements Runnable, Cloneable {
     /**
      * Gets tasks without any dependencies
      *
-     * @return boolean
+     * @return boolean boolean
      */
     boolean hasUnsatisfiedDependcies() {
         lock.lock();
@@ -310,7 +310,7 @@ class TaskActuator implements Runnable, Cloneable {
     /**
      * Release the number of dependent tasks
      *
-     * @return int
+     * @return int int
      */
     public int releasingDependency() {
         lock.lock();
