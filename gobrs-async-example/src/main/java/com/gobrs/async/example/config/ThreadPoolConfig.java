@@ -10,19 +10,24 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @program: gobrs-async
+ * The type Thread pool config.
+ *
+ * @program: gobrs -async
  * @ClassName ThreadPoolConfig
  * @description: Custom thread pool configuration
  * @author: sizegang
- * @create: 2022-02-20 00:34
+ * @create: 2022 -02-20 00:34
  * @Version 1.0
- **/
+ */
 @Configuration
 public class ThreadPoolConfig {
 
     @Autowired
     private GobrsAsyncThreadPoolFactory factory;
 
+    /**
+     * Gobrs thread pool executor.
+     */
     @PostConstruct
     public void gobrsThreadPoolExecutor(){
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(300, 500, 30, TimeUnit.SECONDS,

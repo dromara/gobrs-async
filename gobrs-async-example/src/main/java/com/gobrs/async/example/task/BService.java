@@ -6,17 +6,22 @@ import com.gobrs.async.task.AsyncTask;
 import org.springframework.stereotype.Component;
 
 /**
- * @program: gobrs-async-starter
+ * The type B service.
+ *
+ * @program: gobrs -async-starter
  * @ClassName BService
  * @description:
  * @author: sizegang
- * @create: 2022-03-20
- **/
+ * @create: 2022 -03-20
+ */
 @Component
 @Task(failSubExec = true)
 public class BService extends AsyncTask<Object, Object>  {
 
 
+    /**
+     * The .
+     */
     int i = 10000;
 
 

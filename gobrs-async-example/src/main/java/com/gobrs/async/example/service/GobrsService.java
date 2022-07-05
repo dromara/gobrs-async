@@ -14,12 +14,14 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /**
- * @program: gobrs-async-core
+ * The type Gobrs service.
+ *
+ * @program: gobrs -async-core
  * @ClassName GobrsService
  * @description:
  * @author: sizegang
- * @create: 2022-03-28
- **/
+ * @create: 2022 -03-28
+ */
 @Service
 public class GobrsService {
 
@@ -48,14 +50,23 @@ public class GobrsService {
     @Resource
     private RuleThermalLoad ruleThermalLoad;
 
+    /**
+     * The Executor service.
+     */
     ExecutorService executorService = Executors.newCachedThreadPool();
 
 
+    /**
+     * Gobrs async.
+     */
     public void gobrsAsync() {
         gobrsAsync.go("test", () -> new Object());
     }
 
 
+    /**
+     * Future.
+     */
     public void future() {
         List<AsyncTask> abList = new ArrayList<>();
         abList.add(aService);
@@ -128,6 +139,11 @@ public class GobrsService {
 
     }
 
+    /**
+     * Update rule.
+     *
+     * @param rule the rule
+     */
     public void updateRule(Rule rule) {
         Rule r = new Rule();
         r.setName("ruleName");

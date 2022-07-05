@@ -8,12 +8,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * @program: gobrs-async-core
+ * The type Gobrs interceptor.
+ *
+ * @program: gobrs -async-core
  * @ClassName GobrsInterceptor
  * @description: 异常拦截器
  * @author: sizegang
- * @create: 2022-03-20
- **/
+ * @create: 2022 -03-20
+ */
 @Slf4j
 @Component
 public class GobrsInterceptor implements AsyncTaskExceptionInterceptor {

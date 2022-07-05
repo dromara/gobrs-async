@@ -21,13 +21,14 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * @program: gobrs-async-starter
+ * The type Task loader.
+ *
+ * @program: gobrs -async-starter
  * @ClassName
  * @description:
  * @author: sizegang
- * @create: 2022-03-16
- **/
-
+ * @create: 2022 -03-16
+ */
 public class TaskLoader {
     /**
      * Interruption code
@@ -51,6 +52,9 @@ public class TaskLoader {
 
     private final Map<AsyncTask, TaskActuator> processMap;
 
+    /**
+     * The Assistant task.
+     */
     public TaskTrigger.AssistantTask assistantTask;
 
     private final long timeout;
@@ -61,12 +65,25 @@ public class TaskLoader {
 
     private volatile boolean canceled = false;
 
+    /**
+     * The Futures.
+     */
     public ArrayList<Future<?>> futures;
 
+    /**
+     * The Futures async.
+     */
     public Map<AsyncTask, Future> futuresAsync = new ConcurrentHashMap<>();
 
     private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<>(0);
 
+    /**
+     * Instantiates a new Task loader.
+     *
+     * @param executorService the executor service
+     * @param processMap      the process map
+     * @param timeout         the timeout
+     */
     TaskLoader(ExecutorService executorService, Map<AsyncTask, TaskActuator> processMap,
                long timeout) {
         this.executorService = executorService;
@@ -81,6 +98,11 @@ public class TaskLoader {
         }
     }
 
+    /**
+     * Load async result.
+     *
+     * @return the async result
+     */
     AsyncResult load() {
         ArrayList<TaskActuator> begins = getBeginProcess();
         for (TaskActuator process : begins) {
@@ -104,6 +126,9 @@ public class TaskLoader {
         return beginsWith;
     }
 
+    /**
+     * Completed.
+     */
     void completed() {
         completeLatch.countDown();
     }
@@ -120,7 +145,7 @@ public class TaskLoader {
     /**
      * The process is interrupted by a task exception
      *
-     * @param errorCallback
+     * @param errorCallback the error callback
      */
     public void errorInterrupted(ErrorCallback errorCallback) {
         this.error = errorCallback.getThrowable();
@@ -197,10 +222,21 @@ public class TaskLoader {
     }
 
 
+    /**
+     * Gets process.
+     *
+     * @param asyncTask the async task
+     * @return the process
+     */
     TaskActuator getProcess(AsyncTask asyncTask) {
         return processMap.get(asyncTask);
     }
 
+    /**
+     * Start process.
+     *
+     * @param taskActuator the task actuator
+     */
     void startProcess(TaskActuator taskActuator) {
 
         if (timeout > 0 || taskActuator.getGobrsAsyncProperties().isTaskInterrupt()) {
@@ -229,7 +265,7 @@ public class TaskLoader {
     /**
      * End of single mission line
      *
-     * @param taskLines
+     * @param taskLines the task lines
      */
     public void stopSingleTaskLine(Integer taskLines) {
         TaskActuator taskActuator = processMap.get(assistantTask);
@@ -266,26 +302,56 @@ public class TaskLoader {
         return asyncResult;
     }
 
+    /**
+     * Gets exp code.
+     *
+     * @return the exp code
+     */
     public AtomicInteger getExpCode() {
         return expCode;
     }
 
+    /**
+     * Sets exp code.
+     *
+     * @param expCode the exp code
+     */
     public void setExpCode(AtomicInteger expCode) {
         this.expCode = expCode;
     }
 
+    /**
+     * Is running atomic boolean.
+     *
+     * @return the atomic boolean
+     */
     public AtomicBoolean isRunning() {
         return isRunning;
     }
 
+    /**
+     * Sets is running.
+     *
+     * @param isRunning the is running
+     */
     public void setIsRunning(boolean isRunning) {
         this.isRunning = new AtomicBoolean(isRunning);
     }
 
+    /**
+     * Gets assistant task.
+     *
+     * @return the assistant task
+     */
     public TaskTrigger.AssistantTask getAssistantTask() {
         return assistantTask;
     }
 
+    /**
+     * Sets assistant task.
+     *
+     * @param assistantTask the assistant task
+     */
     public void setAssistantTask(TaskTrigger.AssistantTask assistantTask) {
         this.assistantTask = assistantTask;
     }

@@ -8,14 +8,16 @@ import com.gobrs.async.util.JsonUtil;
 import java.util.*;
 
 /**
+ * The type Abstract engine.
+ *
  * @author sizegang1
- * @program: gobrs-async
+ * @program: gobrs -async
  * @ClassName AbstractEngine
  * @description:
  * @author: sizegang
  * @Version 1.0
- * @date 2022-01-27 22:04
- **/
+ * @date 2022 -01-27 22:04
+ */
 public abstract class AbstractEngine implements RuleEngine {
 
 

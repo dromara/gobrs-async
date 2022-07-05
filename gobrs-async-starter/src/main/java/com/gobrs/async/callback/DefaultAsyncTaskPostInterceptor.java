@@ -1,12 +1,14 @@
 package com.gobrs.async.callback;
 
 /**
- * @program: gobrs-async-core
+ * The type Default async task post interceptor.
+ *
+ * @program: gobrs -async-core
  * @ClassName DefaultAsyncTaskPreInterceptor
  * @description:
  * @author: sizegang
- * @create: 2022-03-23
- **/
+ * @create: 2022 -03-23
+ */
 public class DefaultAsyncTaskPostInterceptor implements AsyncTaskPostInterceptor {
 
     @Override

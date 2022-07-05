@@ -9,15 +9,19 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * @program: gobrs-async-core
+ * The type Rule thermal load.
+ *
+ * @program: gobrs -async-core
  * @ClassName ThermalLoading
  * @description:
  * @author: sizegang
- * @create: 2022-04-07
- **/
-
+ * @create: 2022 -04-07
+ */
 public class RuleThermalLoad implements RuleThermal {
 
+    /**
+     * The Logger.
+     */
     Logger logger = LoggerFactory.getLogger(RuleThermalLoad.class);
     @Resource
     private RuleEngine ruleEngine;

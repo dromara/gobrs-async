@@ -7,15 +7,20 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 /**
- * @program: gobrs-async-starter
+ * The type D service.
+ *
+ * @program: gobrs -async-starter
  * @ClassName DService
  * @description:
  * @author: sizegang
- * @create: 2022-03-20
- **/
+ * @create: 2022 -03-20
+ */
 @Component
 public class DService extends AsyncTask<Object, Object>  {
 
+    /**
+     * The .
+     */
     int i = 10000;
 
     @Override

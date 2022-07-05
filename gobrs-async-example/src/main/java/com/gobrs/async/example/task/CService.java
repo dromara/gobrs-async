@@ -7,15 +7,20 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * @program: gobrs-async-starter
+ * The type C service.
+ *
+ * @program: gobrs -async-starter
  * @ClassName CService
  * @description:
  * @author: sizegang
- * @create: 2022-03-20
- **/
+ * @create: 2022 -03-20
+ */
 @Component
 public class CService extends AsyncTask<Object, Integer> {
 
+    /**
+     * The .
+     */
     int i = 10000;
 
 

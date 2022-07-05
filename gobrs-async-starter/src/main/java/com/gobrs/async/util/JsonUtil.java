@@ -1,12 +1,5 @@
 package com.gobrs.async.util;
 
-/**
- * @program: gobrs-async
- * @ClassName JsonUtil
- * @description:
- * @author: sizegang
- * @create: 2022-07-05
- **/
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
@@ -20,8 +13,17 @@ import java.util.Map;
 
 /**
  * The type Json util.
+ *
+ * @program: gobrs -async
+ * @ClassName JsonUtil
+ * @description:
+ * @author: sizegang
+ * @create: 2022 -07-05
  */
 public class JsonUtil {
+    /**
+     * The Logger.
+     */
     static Logger logger = LoggerFactory.getLogger(JsonUtil.class);
     private static ObjectMapper objectMapper = new ObjectMapper();
 
@@ -86,6 +88,7 @@ public class JsonUtil {
     }
 
     /**
+     * String 2 obj t.
      *
      * @param <T>           the type parameter
      * @param str           the str
@@ -104,6 +107,7 @@ public class JsonUtil {
     }
 
     /**
+     * String 2 obj t.
      *
      * @param <T>             the type parameter
      * @param str             the str

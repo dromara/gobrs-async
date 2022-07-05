@@ -1,16 +1,21 @@
 package com.gobrs.async.callback;
 
 /**
- * @program: gobrs-async-core
+ * The interface Async task pre interceptor.
+ *
+ * @param <P> the type parameter
+ * @program: gobrs -async-core
  * @ClassName TaskPreInterceptor
  * @description:
  * @author: sizegang
- * @create: 2022-03-23
- **/
+ * @create: 2022 -03-23
+ */
 public interface AsyncTaskPreInterceptor<P> {
 
     /**
-     * @param params task param
+     * Pre process.
+     *
+     * @param params   task param
      * @param taskName taskName
      */
     void preProcess(P params, String taskName);

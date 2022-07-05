@@ -27,10 +27,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * The type Task actuator.
+ */
 class TaskActuator implements Runnable, Cloneable {
 
+    /**
+     * The Logger.
+     */
     Logger logger = LoggerFactory.getLogger(TaskActuator.class);
 
+    /**
+     * The Support.
+     */
     public TaskSupport support;
 
     /**
@@ -49,6 +58,9 @@ class TaskActuator implements Runnable, Cloneable {
      */
     private final List<AsyncTask> subTasks;
 
+    /**
+     * The Param.
+     */
     public AsyncParam param;
 
     private Lock lock;
@@ -63,12 +75,27 @@ class TaskActuator implements Runnable, Cloneable {
     private volatile AtomicInteger starting = new AtomicInteger(0);
 
 
+    /**
+     * Instantiates a new Task actuator.
+     *
+     * @param asyncTask the async task
+     * @param depends   the depends
+     * @param subTasks  the sub tasks
+     */
     TaskActuator(AsyncTask asyncTask, int depends, List<AsyncTask> subTasks) {
         this.task = asyncTask;
         this.upstreamDepdends = depends > 1 & task.isAny() ? 1 : depends;
         this.subTasks = subTasks;
     }
 
+    /**
+     * Instantiates a new Task actuator.
+     *
+     * @param asyncTask      the async task
+     * @param depends        the depends
+     * @param subTasks       the sub tasks
+     * @param upwardTasksMap the upward tasks map
+     */
     TaskActuator(AsyncTask asyncTask, int depends, List<AsyncTask> subTasks, Map<AsyncTask, List<AsyncTask>> upwardTasksMap) {
         this.task = asyncTask;
         this.upstreamDepdends = depends > 1 & task.isAny() ? 1 : depends;
@@ -80,8 +107,8 @@ class TaskActuator implements Runnable, Cloneable {
     /**
      * Initialize the object cloned from prototype.
      *
-     * @param support
-     * @param param
+     * @param support the support
+     * @param param   the param
      */
     void init(TaskSupport support, AsyncParam param) {
         this.support = support;
@@ -240,6 +267,8 @@ class TaskActuator implements Runnable, Cloneable {
 
     /**
      * Move on to the next task
+     *
+     * @param taskLoader the task loader
      */
     public void nextTask(TaskLoader taskLoader) {
         if (subTasks != null) {
@@ -267,7 +296,7 @@ class TaskActuator implements Runnable, Cloneable {
     /**
      * Gets tasks without any dependencies
      *
-     * @return
+     * @return boolean
      */
     boolean hasUnsatisfiedDependcies() {
         lock.lock();
@@ -281,7 +310,7 @@ class TaskActuator implements Runnable, Cloneable {
     /**
      * Release the number of dependent tasks
      *
-     * @return
+     * @return int
      */
     public int releasingDependency() {
         lock.lock();
@@ -348,41 +377,96 @@ class TaskActuator implements Runnable, Cloneable {
     }
 
 
+    /**
+     * Gets task.
+     *
+     * @return the task
+     */
     public AsyncTask getTask() {
         return task;
     }
 
+    /**
+     * Gets task support.
+     *
+     * @return the task support
+     */
     public TaskSupport getTaskSupport() {
         return support;
     }
 
+    /**
+     * Sets task support.
+     *
+     * @param taskSupport the task support
+     */
     public void setTaskSupport(TaskSupport taskSupport) {
         this.support = taskSupport;
     }
 
 
+    /**
+     * Build task result task result.
+     *
+     * @param parameter   the parameter
+     * @param resultState the result state
+     * @param ex          the ex
+     * @return the task result
+     */
     public TaskResult buildTaskResult(Object parameter, ResultState resultState, Exception ex) {
         return new TaskResult(parameter, resultState, ex);
     }
 
 
+    /**
+     * Build success result task result.
+     *
+     * @param parameter the parameter
+     * @return the task result
+     */
     public TaskResult buildSuccessResult(Object parameter) {
         return new TaskResult(parameter, ResultState.SUCCESS, null);
     }
 
 
+    /**
+     * Build error result task result.
+     *
+     * @param parameter the parameter
+     * @param ex        the ex
+     * @return the task result
+     */
     public TaskResult buildErrorResult(Object parameter, Exception ex) {
         return new TaskResult(parameter, ResultState.SUCCESS, ex);
     }
 
+    /**
+     * Error callback error callback.
+     *
+     * @param parameter the parameter
+     * @param e         the e
+     * @param support   the support
+     * @param asyncTask the async task
+     * @return the error callback
+     */
     public ErrorCallback errorCallback(Object parameter, Exception e, TaskSupport support, AsyncTask asyncTask) {
         return new ErrorCallback(param, e, support, asyncTask);
     }
 
+    /**
+     * Gets gobrs async properties.
+     *
+     * @return the gobrs async properties
+     */
     public GobrsAsyncProperties getGobrsAsyncProperties() {
         return gobrsAsyncProperties;
     }
 
+    /**
+     * Sets gobrs async properties.
+     *
+     * @param gobrsAsyncProperties the gobrs async properties
+     */
     public void setGobrsAsyncProperties(GobrsAsyncProperties gobrsAsyncProperties) {
         this.gobrsAsyncProperties = gobrsAsyncProperties;
     }

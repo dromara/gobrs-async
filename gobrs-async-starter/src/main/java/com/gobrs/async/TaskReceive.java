@@ -7,12 +7,14 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @program: gobrs-async-starter
+ * The type Task receive.
+ *
+ * @program: gobrs -async-starter
  * @ClassName
  * @description:
  * @author: sizegang
- * @create: 2022-03-16
- **/
+ * @create: 2022 -03-16
+ */
 public class TaskReceive {
 
     private final TaskFlow taskFlow;
@@ -21,6 +23,12 @@ public class TaskReceive {
      */
     private List<AsyncTask> cacheTaskList;
 
+    /**
+     * Instantiates a new Task receive.
+     *
+     * @param taskFlow the task flow
+     * @param taskList the task list
+     */
     TaskReceive(TaskFlow taskFlow, List<AsyncTask> taskList) {
         synchronized (taskFlow) {
             this.taskFlow = taskFlow;
@@ -35,6 +43,13 @@ public class TaskReceive {
         }
     }
 
+    /**
+     * Then task receive.
+     *
+     * @param clear      the clear
+     * @param asyncTasks the async tasks
+     * @return the task receive
+     */
     public TaskReceive then(boolean clear, AsyncTask... asyncTasks) {
         synchronized (taskFlow) {
             for (AsyncTask from : this.cacheTaskList) {
@@ -58,6 +73,11 @@ public class TaskReceive {
     }
 
 
+    /**
+     * Refresh.
+     *
+     * @param cacheTaskList the cache task list
+     */
     public void refresh(List<AsyncTask> cacheTaskList) {
         this.cacheTaskList.clear();
         this.cacheTaskList.addAll(cacheTaskList);

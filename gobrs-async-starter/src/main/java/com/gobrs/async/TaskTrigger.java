@@ -9,12 +9,13 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 /**
- * @program: gobrs-async-starter
+ * The type Task trigger.
+ *
+ * @program: gobrs -async-starter
  * @description: Task preloader
  * @author: sizegang
- * @create: 2022-03-16
- **/
-
+ * @create: 2022 -03-16
+ */
 class TaskTrigger {
 
     private final TaskFlow taskFlow;
@@ -23,8 +24,16 @@ class TaskTrigger {
 
     private Map<AsyncTask, TaskActuator> prepareTaskMap = Collections.synchronizedMap(new IdentityHashMap<>());
 
+    /**
+     * The Assistant task.
+     */
     public AssistantTask assistantTask;
 
+    /**
+     * Instantiates a new Task trigger.
+     *
+     * @param taskFlow the task flow
+     */
     TaskTrigger(TaskFlow taskFlow) {
         this.taskFlow = taskFlow;
         prepare();
@@ -97,6 +106,13 @@ class TaskTrigger {
     }
 
 
+    /**
+     * Trigger task loader.
+     *
+     * @param param   the param
+     * @param timeout the timeout
+     * @return the task loader
+     */
     TaskLoader trigger(AsyncParam param, long timeout) {
         IdentityHashMap<AsyncTask, TaskActuator> newProcessMap = new IdentityHashMap<>(prepareTaskMap.size());
         /**
@@ -128,9 +144,11 @@ class TaskTrigger {
      */
     private class TerminationTask extends TaskActuator {
 
-        /**task executor
-         * @param handler
-         * @param depdending The number of tasks to depend on
+        /**
+         * task executor
+         *
+         * @param handler       the handler
+         * @param depdending    The number of tasks to depend on
          * @param dependedTasks Array of dependent tasks
          */
         TerminationTask(AsyncTask handler, int depdending, List<AsyncTask> dependedTasks) {
@@ -149,8 +167,8 @@ class TaskTrigger {
     /**
      * Assistant task, help the task process to finish properly
      *
-     * @param <P>
-     * @param <R>
+     * @param <P> the type parameter
+     * @param <R> the type parameter
      */
     public class AssistantTask<P, R> extends AsyncTask<P, R> {
 

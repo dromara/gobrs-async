@@ -8,11 +8,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * The interface Task.
+ *
  * @author sizegang1
- * @program: gobrs-async-core
+ * @program: gobrs -async-core
  * @author: sizegang
- * @date 2022-04-07
- **/
+ * @date 2022 -04-07
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Task {
@@ -20,28 +22,28 @@ public @interface Task {
     /**
      * task  name
      *
-     * @return
+     * @return string string
      */
     String name() default DefaultConfig.TASKNAME;
 
     /**
      * Transaction task
      *
-     * @return
+     * @return boolean boolean
      */
     boolean callback() default false;
 
     /**
      * Whether to continue executing subtasks after a task fails
      *
-     * @return
+     * @return boolean boolean
      */
     boolean failSubExec() default false;
 
     /**
      * Retry times
      *
-     * @return
+     * @return int int
      */
     int retryCount() default DefaultConfig.retryCount;
 

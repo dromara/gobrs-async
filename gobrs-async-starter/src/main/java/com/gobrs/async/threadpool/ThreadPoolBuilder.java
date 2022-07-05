@@ -10,12 +10,14 @@ import java.util.concurrent.*;
 import static com.gobrs.async.def.DefaultConfig.THREADPOOLQUEUESIZE;
 
 /**
- * @program: gobrs-async-core
+ * The type Thread pool builder.
+ *
+ * @program: gobrs -async-core
  * @ClassName Builder
  * @description:
  * @author: sizegang
- * @create: 2022-03-26
- **/
+ * @create: 2022 -03-26
+ */
 public class ThreadPoolBuilder {
 
     /**
@@ -75,106 +77,232 @@ public class ThreadPoolBuilder {
     private Boolean allowCoreThreadTimeOut = false;
 
 
+    /**
+     * Gets core pool size.
+     *
+     * @return the core pool size
+     */
     public int getCorePoolSize() {
         return corePoolSize;
     }
 
+    /**
+     * Core pool size thread pool builder.
+     *
+     * @param corePoolSize the core pool size
+     * @return the thread pool builder
+     */
     public ThreadPoolBuilder corePoolSize(int corePoolSize) {
         this.corePoolSize = corePoolSize;
         return this;
     }
 
+    /**
+     * Gets max pool size.
+     *
+     * @return the max pool size
+     */
     public int getMaxPoolSize() {
         return maxPoolSize;
     }
 
+    /**
+     * Max pool size thread pool builder.
+     *
+     * @param maxPoolSize the max pool size
+     * @return the thread pool builder
+     */
     public ThreadPoolBuilder maxPoolSize(int maxPoolSize) {
         this.maxPoolSize = maxPoolSize;
         return this;
     }
 
+    /**
+     * Gets keep alive time.
+     *
+     * @return the keep alive time
+     */
     public long getKeepAliveTime() {
         return keepAliveTime;
     }
 
+    /**
+     * Keep alive time thread pool builder.
+     *
+     * @param keepAliveTime the keep alive time
+     * @return the thread pool builder
+     */
     public ThreadPoolBuilder keepAliveTime(long keepAliveTime) {
         this.keepAliveTime = keepAliveTime;
         return this;
     }
 
+    /**
+     * Gets time unit.
+     *
+     * @return the time unit
+     */
     public TimeUnit getTimeUnit() {
         return timeUnit;
     }
 
+    /**
+     * Time unit thread pool builder.
+     *
+     * @param timeUnit the time unit
+     * @return the thread pool builder
+     */
     public ThreadPoolBuilder timeUnit(TimeUnit timeUnit) {
         this.timeUnit = timeUnit;
         return this;
     }
 
+    /**
+     * Gets execute time out.
+     *
+     * @return the execute time out
+     */
     public long getExecuteTimeOut() {
         return executeTimeOut;
     }
 
+    /**
+     * Execute time out thread pool builder.
+     *
+     * @param executeTimeOut the execute time out
+     * @return the thread pool builder
+     */
     public ThreadPoolBuilder executeTimeOut(long executeTimeOut) {
         this.executeTimeOut = executeTimeOut;
         return this;
     }
 
+    /**
+     * Gets capacity.
+     *
+     * @return the capacity
+     */
     public int getCapacity() {
         return capacity;
     }
 
+    /**
+     * Capacity thread pool builder.
+     *
+     * @param capacity the capacity
+     * @return the thread pool builder
+     */
     public ThreadPoolBuilder capacity(int capacity) {
         this.capacity = capacity;
         return this;
     }
 
+    /**
+     * Gets work queue.
+     *
+     * @return the work queue
+     */
     public BlockingQueue getWorkQueue() {
         return workQueue;
     }
 
+    /**
+     * Work queue thread pool builder.
+     *
+     * @param workQueue the work queue
+     * @return the thread pool builder
+     */
     public ThreadPoolBuilder workQueue(BlockingQueue workQueue) {
         this.workQueue = workQueue;
         return this;
     }
 
+    /**
+     * Gets rejected execution handler.
+     *
+     * @return the rejected execution handler
+     */
     public RejectedExecutionHandler getRejectedExecutionHandler() {
         return rejectedExecutionHandler;
     }
 
+    /**
+     * Rejected execution handler thread pool builder.
+     *
+     * @param rejectedExecutionHandler the rejected execution handler
+     * @return the thread pool builder
+     */
     public ThreadPoolBuilder rejectedExecutionHandler(RejectedExecutionHandler rejectedExecutionHandler) {
         this.rejectedExecutionHandler = rejectedExecutionHandler;
         return this;
     }
 
+    /**
+     * Is daemon boolean.
+     *
+     * @return the boolean
+     */
     public boolean isDaemon() {
         return isDaemon;
     }
 
+    /**
+     * Daemon thread pool builder.
+     *
+     * @param daemon the daemon
+     * @return the thread pool builder
+     */
     public ThreadPoolBuilder daemon(boolean daemon) {
         isDaemon = daemon;
         return this;
     }
 
+    /**
+     * Gets thread name prefix.
+     *
+     * @return the thread name prefix
+     */
     public String getThreadNamePrefix() {
         return threadNamePrefix;
     }
 
+    /**
+     * Thread name prefix thread pool builder.
+     *
+     * @param threadNamePrefix the thread name prefix
+     * @return the thread pool builder
+     */
     public ThreadPoolBuilder threadNamePrefix(String threadNamePrefix) {
         this.threadNamePrefix = threadNamePrefix;
         return this;
     }
 
 
+    /**
+     * Gets allow core thread time out.
+     *
+     * @return the allow core thread time out
+     */
     public Boolean getAllowCoreThreadTimeOut() {
         return allowCoreThreadTimeOut;
     }
 
+    /**
+     * Allow core thread time out thread pool builder.
+     *
+     * @param allowCoreThreadTimeOut the allow core thread time out
+     * @return the thread pool builder
+     */
     public ThreadPoolBuilder allowCoreThreadTimeOut(Boolean allowCoreThreadTimeOut) {
         this.allowCoreThreadTimeOut = allowCoreThreadTimeOut;
         return this;
     }
 
+    /**
+     * Build thread pool executor.
+     *
+     * @return the thread pool executor
+     */
     public ThreadPoolExecutor build() {
         ThreadPoolExecutor executor;
         try {
@@ -187,6 +315,12 @@ public class ThreadPoolBuilder {
     }
 
 
+    /**
+     * Build by thread pool thread pool executor.
+     *
+     * @param pool the pool
+     * @return the thread pool executor
+     */
     public static ThreadPoolExecutor buildByThreadPool(ThreadPool pool) {
         check(pool);
         ThreadPoolExecutor executor;
@@ -215,6 +349,12 @@ public class ThreadPoolBuilder {
         }
     }
 
+    /**
+     * Case reject rejected execution handler.
+     *
+     * @param rejected the rejected
+     * @return the rejected execution handler
+     */
     public static RejectedExecutionHandler caseReject(String rejected) {
         if (rejected == null) {
             return new ThreadPoolExecutor.AbortPolicy();

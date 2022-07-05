@@ -30,8 +30,10 @@ import java.util.Optional;
  * @ClassName RulePostProcessor
  * @description: Task flow resolver The implementation ApplicationListener gets the Spring context, which in turn gets the Bean instance
  */
-
 public class RulePostProcessor implements ApplicationListener<ApplicationReadyEvent> {
+    /**
+     * The Logger.
+     */
     Logger logger = LoggerFactory.getLogger(RulePostProcessor.class);
 
     @Override

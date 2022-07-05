@@ -8,15 +8,20 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 /**
- * @program: gobrs-async-starter
+ * The type G service.
+ *
+ * @program: gobrs -async-starter
  * @ClassName EService
  * @description:
  * @author: sizegang
- * @create: 2022-03-20
- **/
+ * @create: 2022 -03-20
+ */
 @Component
 @Task(callback = true)
 public class GService extends AsyncTask<Object, Object>  {
+    /**
+     * The .
+     */
     int i  = 10000;
     @Override
     public void prepare(Object o) {
