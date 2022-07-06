@@ -3,11 +3,15 @@ package com.gobrs.async.example.controller;
 import com.gobrs.async.GobrsAsync;
 import com.gobrs.async.domain.AsyncResult;
 import com.gobrs.async.example.service.GobrsService;
+import com.gobrs.async.example.task.AService;
 import com.gobrs.async.rule.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The type Gobrs controller.
@@ -35,7 +39,9 @@ public class GobrsController {
      */
     @RequestMapping("testGobrs")
     public String gobrsTest() {
-        AsyncResult test = gobrsAsync.go("test", () -> new Object());
+        Map<Class, Object> params = new HashMap<>();
+        params.put(AService.class, "A的参数");
+        AsyncResult test = gobrsAsync.go("test", () -> params);
         return "success";
     }
 

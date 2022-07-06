@@ -31,6 +31,8 @@ public class AService extends AsyncTask<Object, Object> {
 
     @Override
     public Object task(Object o, TaskSupport support) {
+        System.out.println(o);
+
         try {
             System.out.println("AService Begin");
             Thread.sleep(300);

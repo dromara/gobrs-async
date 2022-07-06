@@ -214,7 +214,7 @@ class TaskActuator implements Runnable, Cloneable {
     private Object getParameter() {
         Object parameter = param.get();
         if (parameter instanceof Map) {
-            parameter = ((Map<?, ?>) parameter).get(this.getClass());
+            parameter = ((Map<?, ?>) parameter).get(task.getClass());
         }
         return parameter;
     }
