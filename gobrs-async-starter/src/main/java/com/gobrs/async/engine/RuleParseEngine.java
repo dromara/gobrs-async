@@ -150,7 +150,8 @@ public class RuleParseEngine<T> extends AbstractEngine {
             /**
              * Parse annotation configuration
              */
-            task.setName(getName(task));
+            task.setName(taskName);
+            task.setDesc(getDesc(task));
             task.setCallback(getCallBack(task));
             task.setRetryCount(getRetryCount(task));
             task.setFailSubExec(getFailSubExec(task));
@@ -213,12 +214,12 @@ public class RuleParseEngine<T> extends AbstractEngine {
          * @param task the task
          * @return name
          */
-        public static String getName(AsyncTask task) {
+        public static String getDesc(AsyncTask task) {
             Task annotation = task.getClass().getAnnotation(Task.class);
             if (annotation == null) {
                 return null;
             }
-            return annotation.name();
+            return annotation.desc();
         }
 
         /**

@@ -3,7 +3,10 @@ package com.gobrs.async;
 import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
+import com.gobrs.async.task.Task;
 import com.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -18,6 +21,10 @@ import java.util.concurrent.ExecutorService;
  */
 class TaskTrigger {
 
+    /**
+     * The Logger.
+     */
+    Logger logger = LoggerFactory.getLogger(TaskTrigger.class);
     private final TaskFlow taskFlow;
 
     private GobrsAsyncThreadPoolFactory threadPoolFactory = GobrsSpring.getBean(GobrsAsyncThreadPoolFactory.class);
@@ -28,6 +35,11 @@ class TaskTrigger {
      * The Assistant task.
      */
     public AssistantTask assistantTask;
+
+    /**
+     * The Upward tasks map space.
+     */
+    public static Map<AsyncTask, List<AsyncTask>> upwardTasksMapSpace = new HashMap<>();
 
     /**
      * Instantiates a new Task trigger.
@@ -78,7 +90,7 @@ class TaskTrigger {
         }
         downTasksMap.put(assistantTask, new ArrayList<>(0));
         upwardTasksMap.put(assistantTask, noSubtasks);
-
+        upwardTasksMapSpace = upwardTasksMap;
         for (AsyncTask task : downTasksMap.keySet()) {
             TaskActuator process;
             if (task != assistantTask) {
@@ -114,6 +126,30 @@ class TaskTrigger {
      * @return the task loader
      */
     TaskLoader trigger(AsyncParam param, long timeout) {
+        return trigger(param, timeout, null);
+    }
+
+    /**
+     * Trigger task loader.
+     *
+     * @param param      the param
+     * @param affirTasks the affir tasks
+     * @param timeout    the timeout
+     * @return the task loader
+     */
+    TaskLoader trigger(AsyncParam param, List<String> affirTasks, long timeout) {
+        return trigger(param, timeout, affirTasks);
+    }
+
+    /**
+     * Trigger task loader.
+     *
+     * @param param      the param
+     * @param timeout    the timeout
+     * @param affirTasks the affir tasks
+     * @return the task loader
+     */
+    TaskLoader trigger(AsyncParam param, long timeout, List<String> affirTasks) {
         IdentityHashMap<AsyncTask, TaskActuator> newProcessMap = new IdentityHashMap<>(prepareTaskMap.size());
         /**
          * Create a task loader, A task flow corresponds to a taskLoader
@@ -121,6 +157,7 @@ class TaskTrigger {
         TaskLoader loader = new TaskLoader(threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
         TaskSupport support = getSupport(param);
         loader.setAssistantTask(assistantTask);
+
         support.setTaskLoader(loader);
         /**
          * The thread pool is obtained from the factory, and the thread pool parameters can be dynamically adjusted
@@ -135,9 +172,9 @@ class TaskTrigger {
             processor.init(support, param);
             newProcessMap.put(task, processor);
         }
+        Optimal.doOptimal(affirTasks, loader, upwardTasksMapSpace);
         return loader;
     }
-
 
     /**
      * Task flow End tasks
@@ -197,6 +234,19 @@ class TaskTrigger {
 
         }
     }
+
+
+    private void doProcess(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> affirTasks) {
+        if (affirTasks != null) {
+            if (affirTasks.contains(process.getTask())) {
+                taskLoader.affirCount.incrementAndGet();
+                taskLoader.startProcess(process);
+            }
+        } else {
+            taskLoader.startProcess(process);
+        }
+    }
+
 
     /**
      * Get the task support , Similar task bus

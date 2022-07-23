@@ -11,9 +11,7 @@ import com.gobrs.async.exception.TimeoutException;
 import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -50,7 +48,15 @@ public class TaskLoader {
 
     private final CountDownLatch completeLatch;
 
-    private final Map<AsyncTask, TaskActuator> processMap;
+    /**
+     * The Process map.
+     */
+    public final Map<AsyncTask, TaskActuator> processMap;
+
+    /**
+     * The Affir count.
+     */
+    public AtomicInteger affirCount = new AtomicInteger(0);
 
     /**
      * The Assistant task.
@@ -76,6 +82,8 @@ public class TaskLoader {
     public Map<AsyncTask, Future> futuresAsync = new ConcurrentHashMap<>();
 
     private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<>(0);
+
+    private Set<AsyncTask> affirTasks;
 
     /**
      * Instantiates a new Task loader.
@@ -105,6 +113,7 @@ public class TaskLoader {
      */
     AsyncResult load() {
         ArrayList<TaskActuator> begins = getBeginProcess();
+        Optimal.ifOptimal(affirTasks, processMap, assistantTask);
         for (TaskActuator process : begins) {
             /**
              * Start the thread to perform tasks without any dependencies
@@ -238,7 +247,6 @@ public class TaskLoader {
      * @param taskActuator the task actuator
      */
     void startProcess(TaskActuator taskActuator) {
-
         if (timeout > 0 || taskActuator.getGobrsAsyncProperties().isTaskInterrupt()) {
             /**
              * If you need to interrupt then you need to save all the task threads and you need to manipulate shared variables
@@ -263,6 +271,24 @@ public class TaskLoader {
     }
 
     /**
+     * Assert affir boolean.
+     *
+     * @param taskActuator the task actuator
+     * @return the boolean
+     */
+    public boolean assertAffir(TaskActuator taskActuator) {
+        if (affirTasks == null) {
+            return true;
+        }
+        taskActuator.setUpstreamDepdends(affirTasks.size());
+        boolean contains = affirTasks.contains(taskActuator.getTask());
+        if (contains) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * End of single mission line
      *
      * @param taskLines the task lines
@@ -276,6 +302,7 @@ public class TaskLoader {
             taskActuator.run();
         }
     }
+
 
     /**
      * Get the task Bus
@@ -355,4 +382,23 @@ public class TaskLoader {
     public void setAssistantTask(TaskTrigger.AssistantTask assistantTask) {
         this.assistantTask = assistantTask;
     }
+
+    /**
+     * Gets affir tasks.
+     *
+     * @return the affir tasks
+     */
+    public Set<AsyncTask> getAffirTasks() {
+        return affirTasks;
+    }
+
+    /**
+     * Sets affir tasks.
+     *
+     * @param affirTasks the affir tasks
+     */
+    public void setAffirTasks(Set<AsyncTask> affirTasks) {
+        this.affirTasks = affirTasks;
+    }
+
 }

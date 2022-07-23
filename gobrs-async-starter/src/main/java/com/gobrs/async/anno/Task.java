@@ -24,7 +24,7 @@ public @interface Task {
      *
      * @return string string
      */
-    String name() default DefaultConfig.TASKNAME;
+    String desc() default DefaultConfig.TASKNAME;
 
     /**
      * Transaction task

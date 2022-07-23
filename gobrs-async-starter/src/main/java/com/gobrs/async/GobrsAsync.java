@@ -102,11 +102,16 @@ public class GobrsAsync {
      * @return async result
      */
     public AsyncResult go(String ruleName, AsyncParam param, long timeout) {
+      return go(ruleName,param, null, timeout);
+    }
+
+    public AsyncResult go(String ruleName, AsyncParam param, List<String> affirTasks, long timeout) {
         if (check(ruleName).isPresent()) {
-            return trigger.get(ruleName).trigger(param, timeout).load();
+            return trigger.get(ruleName).trigger(param, timeout, affirTasks).load();
         }
         throw new NotTaskRuleException("Gobrs Rule Name Is Error");
     }
+
 
     /**
      * Start the task process

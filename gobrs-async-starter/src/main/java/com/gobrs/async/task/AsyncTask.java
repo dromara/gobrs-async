@@ -32,6 +32,8 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
 
     private String name;
 
+    private String desc;
+
     /**
      * Transaction task
      */
@@ -56,63 +58,6 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
     private boolean exclusive = false;
 
     /**
-     * get result of depend on class
-     *
-     * @param <R>     the type parameter
-     * @param support the support
-     * @param clazz   depend on class
-     * @return result
-     */
-    public <R> R getResult(TaskSupport support, Class<? extends Task> clazz) {
-        TaskResult<R> taskResult = getTaskResult(support, clazz);
-        if (taskResult != null) {
-            return taskResult.getResult();
-        }
-        return null;
-    }
-
-    /**
-     * get taskResult of depend on class
-     *
-     * @param support
-     * @param clazz   depend on class
-     * @param <R>     TaskResult<R>
-     * @return
-     */
-    private <R> TaskResult<R> getTaskResult(TaskSupport support, Class<? extends Task> clazz) {
-        Map<Class, TaskResult> resultMap = support.getResultMap();
-        return resultMap.get(clazz) != null ? resultMap.get(clazz) : resultMap.get(depKey(clazz));
-    }
-
-    /**
-     * get result of depend on class
-     *
-     * @param <R>     auto suggestion by IDE
-     * @param support the support
-     * @param clazz   depend on class of AsyncTask
-     * @return depend result
-     */
-    public <R> R getDependResult(TaskSupport support, Class<? extends AsyncTask<Param, R>> clazz) {
-        TaskResult<R> taskResult = getTaskResult(support, clazz);
-        if (taskResult != null) {
-            return taskResult.getResult();
-        }
-        return null;
-    }
-
-    /**
-     * get taskResult of depend on class
-     *
-     * @param <R>     auto suggestion by IDE
-     * @param support the support
-     * @param clazz   depend on class of AsyncTask
-     * @return depend task result
-     */
-    public <R> TaskResult<R> getDependTaskResult(TaskSupport support, Class<? extends AsyncTask<Param, R>> clazz) {
-        return getTaskResult(support, clazz);
-    }
-
-    /**
      * get result of current task
      *
      * @param support the support
@@ -127,6 +72,23 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
     }
 
     /**
+     * get result of depend on class
+     *
+     * @param <Result> the type parameter
+     * @param support  the support
+     * @param clazz    depend on class
+     * @return result
+     */
+    public <Result> Result getResult(TaskSupport support, Class<? extends Task> clazz, Class<Result> type) {
+        TaskResult<Result> taskResult = getTaskResult(support, clazz, type);
+        if (taskResult != null) {
+            return taskResult.getResult();
+        }
+        return null;
+    }
+
+
+    /**
      * get taskResult of current task
      *
      * @param support the support
@@ -136,6 +98,19 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         Map<Class, TaskResult> resultMap = support.getResultMap();
         Class thisResultClass = this.getClass();
         return resultMap.get(thisResultClass) != null ? resultMap.get(thisResultClass) : resultMap.get(depKey(thisResultClass));
+    }
+
+    /**
+     * get taskResult of depend on class
+     *
+     * @param support
+     * @param clazz    depend on class
+     * @param <Result> TaskResult<R>
+     * @return
+     */
+    public <Result> TaskResult<Result> getTaskResult(TaskSupport support, Class<? extends Task> clazz, Class<Result> type) {
+        Map<Class, TaskResult> resultMap = support.getResultMap();
+        return resultMap.get(clazz) != null ? resultMap.get(clazz) : resultMap.get(depKey(clazz));
     }
 
     /**
@@ -312,5 +287,13 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      */
     public void setExclusive(boolean exclusive) {
         this.exclusive = exclusive;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
     }
 }

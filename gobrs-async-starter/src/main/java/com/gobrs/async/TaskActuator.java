@@ -17,12 +17,10 @@ import com.gobrs.async.task.AsyncTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -51,7 +49,7 @@ class TaskActuator implements Runnable, Cloneable {
     /**
      * Upstream dependent quantity
      */
-    private volatile int upstreamDepdends;
+    public volatile int upstreamDepdends;
 
     /**
      * depend task
@@ -117,12 +115,14 @@ class TaskActuator implements Runnable, Cloneable {
 
     @Override
     public void run() {
+        preLoad();
 
         Object parameter = getParameter();
 
         preparation();
 
         TaskLoader taskLoader = support.getTaskLoader();
+
         try {
             /**
              * If the conditions are not met
@@ -166,6 +166,7 @@ class TaskActuator implements Runnable, Cloneable {
                 nextTask(taskLoader);
             }
         } catch (Exception e) {
+            logger.error("【Gobrs-Async print error】 taskName{} error{}", task.getName(), e);
             state = new AtomicInteger(1);
             if (!retryTask(parameter, taskLoader)) {
                 support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
@@ -197,6 +198,10 @@ class TaskActuator implements Runnable, Cloneable {
             }
 
         }
+    }
+
+    private void preLoad() {
+        Optimal.optimalCount(support.taskLoader);
     }
 
     private void preparation() {
@@ -275,6 +280,12 @@ class TaskActuator implements Runnable, Cloneable {
             for (int i = 0; i < subTasks.size(); i++) {
                 TaskActuator process = taskLoader
                         .getProcess(subTasks.get(i));
+                Set<AsyncTask> affirTasks = taskLoader.getAffirTasks();
+
+                boolean continueExec = Optimal.ifContinue(affirTasks, taskLoader, process);
+                if (!continueExec) {
+                    return;
+                }
                 /**
                  * Check whether the subtask depends on a task that has been executed
                  * The number of tasks that it depends on to get to this point minus one
@@ -286,10 +297,22 @@ class TaskActuator implements Runnable, Cloneable {
                     if (subTasks.size() == 1 && !process.task.isExclusive()) {
                         process.run();
                     } else {
-                        taskLoader.startProcess(process);
+                        doProcess(taskLoader, process, affirTasks);
                     }
                 }
             }
+        }
+    }
+
+
+
+    private void doProcess(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> affirTasks) {
+        if (affirTasks != null) {
+            if (affirTasks.contains(process.getTask())) {
+                taskLoader.startProcess(process);
+            }
+        } else {
+            taskLoader.startProcess(process);
         }
     }
 
@@ -469,5 +492,23 @@ class TaskActuator implements Runnable, Cloneable {
      */
     public void setGobrsAsyncProperties(GobrsAsyncProperties gobrsAsyncProperties) {
         this.gobrsAsyncProperties = gobrsAsyncProperties;
+    }
+
+    /**
+     * Gets upstream depdends.
+     *
+     * @return the upstream depdends
+     */
+    public int getUpstreamDepdends() {
+        return upstreamDepdends;
+    }
+
+    /**
+     * Sets upstream depdends.
+     *
+     * @param upstreamDepdends the upstream depdends
+     */
+    public void setUpstreamDepdends(int upstreamDepdends) {
+        this.upstreamDepdends = upstreamDepdends;
     }
 }

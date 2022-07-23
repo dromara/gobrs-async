@@ -3,6 +3,7 @@ package com.gobrs.async;
 import com.gobrs.async.domain.TaskResult;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
@@ -16,6 +17,8 @@ import java.util.concurrent.ExecutorService;
  * @create: 2022 -03-20
  */
 public class TaskSupport {
+
+
 
     /**
      * The Task loader.
@@ -110,4 +113,5 @@ public class TaskSupport {
     public void setExecutorService(ExecutorService executorService) {
         this.executorService = executorService;
     }
+
 }

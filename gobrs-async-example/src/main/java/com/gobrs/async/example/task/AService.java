@@ -3,6 +3,7 @@ package com.gobrs.async.example.task;
 import com.gobrs.async.TaskSupport;
 import com.gobrs.async.anno.Task;
 import com.gobrs.async.task.AsyncTask;
+import org.apache.catalina.User;
 import org.springframework.stereotype.Component;
 
 /**
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
  */
 @Task(failSubExec = true)
 @Component
-public class AService extends AsyncTask<Object, Object> {
+public class AService extends AsyncTask<String, String> {
 
     /**
      * The .
@@ -24,13 +25,13 @@ public class AService extends AsyncTask<Object, Object> {
     int i = 10000;
 
     @Override
-    public void prepare(Object o) {
+    public void prepare(String o) {
 
 
     }
 
     @Override
-    public Object task(Object o, TaskSupport support) {
+    public String task(String o, TaskSupport support) {
         System.out.println(o);
 
         try {
@@ -47,7 +48,7 @@ public class AService extends AsyncTask<Object, Object> {
     }
 
     @Override
-    public boolean nessary(Object o, TaskSupport support) {
+    public boolean nessary(String o, TaskSupport support) {
         return true;
     }
 
