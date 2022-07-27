@@ -72,7 +72,7 @@ public class Optimal {
      * @param loader              the loader
      * @param upwardTasksMapSpace the upward tasks map space
      */
-    public static void doOptimal(List<String> affirTasks, TaskLoader loader, Map<AsyncTask, List<AsyncTask>> upwardTasksMapSpace) {
+    public static void doOptimal(Set<String> affirTasks, TaskLoader loader, Map<AsyncTask, List<AsyncTask>> upwardTasksMapSpace) {
         Set<AsyncTask> asyncTaskSet = new HashSet<>();
         if (affirTasks == null) {
             return;

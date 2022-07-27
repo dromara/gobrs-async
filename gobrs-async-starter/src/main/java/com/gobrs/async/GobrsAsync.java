@@ -7,10 +7,7 @@ import com.gobrs.async.exception.NotTaskRuleException;
 import com.gobrs.async.task.AsyncTask;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * The type Gobrs async.
@@ -105,7 +102,7 @@ public class GobrsAsync {
       return go(ruleName,param, null, timeout);
     }
 
-    public AsyncResult go(String ruleName, AsyncParam param, List<String> affirTasks, long timeout) {
+    public AsyncResult go(String ruleName, AsyncParam param, Set<String> affirTasks, long timeout) {
         if (check(ruleName).isPresent()) {
             return trigger.get(ruleName).trigger(param, timeout, affirTasks).load();
         }

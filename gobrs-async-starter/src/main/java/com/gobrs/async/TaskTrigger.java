@@ -137,7 +137,7 @@ class TaskTrigger {
      * @param timeout    the timeout
      * @return the task loader
      */
-    TaskLoader trigger(AsyncParam param, List<String> affirTasks, long timeout) {
+    TaskLoader trigger(AsyncParam param, Set<String> affirTasks, long timeout) {
         return trigger(param, timeout, affirTasks);
     }
 
@@ -149,7 +149,7 @@ class TaskTrigger {
      * @param affirTasks the affir tasks
      * @return the task loader
      */
-    TaskLoader trigger(AsyncParam param, long timeout, List<String> affirTasks) {
+    TaskLoader trigger(AsyncParam param, long timeout, Set<String> affirTasks) {
         IdentityHashMap<AsyncTask, TaskActuator> newProcessMap = new IdentityHashMap<>(prepareTaskMap.size());
         /**
          * Create a task loader, A task flow corresponds to a taskLoader
