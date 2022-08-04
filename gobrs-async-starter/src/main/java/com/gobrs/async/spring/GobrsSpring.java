@@ -1,5 +1,7 @@
 package com.gobrs.async.spring;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -14,6 +16,10 @@ import org.springframework.context.ApplicationContextAware;
  */
 public class GobrsSpring implements ApplicationContextAware, BeanFactoryPostProcessor {
 
+    /**
+     * The Logger.
+     */
+    static Logger logger = LoggerFactory.getLogger(GobrsSpring.class);
     /**
      * The constant applicationContext.
      */
@@ -31,7 +37,7 @@ public class GobrsSpring implements ApplicationContextAware, BeanFactoryPostProc
      *
      * @return the application context
      */
-//获取applicationContext
+    //获取applicationContext
     public static ApplicationContext getApplicationContext() {
         return applicationContext;
     }
@@ -43,9 +49,13 @@ public class GobrsSpring implements ApplicationContextAware, BeanFactoryPostProc
      * @param name the name
      * @return the bean
      */
-//通过name获取 Bean.
     public static Object getBean(String name) {
-        return getApplicationContext() == null ? cf.getBean(name) : getApplicationContext().getBean(name);
+        try {
+            return getApplicationContext() == null ? cf.getBean(name) : getApplicationContext().getBean(name);
+        } catch (Exception ex) {
+            logger.error("Gobrs-Spring genBean error{}", ex);
+        }
+        return null;
     }
 
     /**

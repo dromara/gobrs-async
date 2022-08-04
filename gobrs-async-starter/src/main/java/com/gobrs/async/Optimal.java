@@ -8,6 +8,7 @@ package com.gobrs.async;
  * @create: 2022-07-23
  **/
 
+import com.gobrs.async.exception.GobrsAsyncException;
 import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
 import org.slf4j.Logger;
@@ -85,6 +86,9 @@ public class Optimal {
             }
             AsyncTask task = (AsyncTask) bean;
             List<AsyncTask> asyncTasks = upwardTasksMapSpace.get(task);
+            if (Objects.isNull(asyncTasks)) {
+                throw new GobrsAsyncException(String.format("gobrs-rule config exception, task %s is nessary", task.getName()));
+            }
             asyncTasks.add(task);
             asyncTaskSet.addAll(new HashSet<>(asyncTasks));
         }
