@@ -17,6 +17,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * The type Task loader.
@@ -112,8 +114,10 @@ public class TaskLoader {
      * @return the async result
      */
     AsyncResult load() {
-        ArrayList<TaskActuator> begins = getBeginProcess();
-        Optimal.ifOptimal(affirTasks, processMap, assistantTask);
+        List<TaskActuator> begins = getBeginProcess();
+
+        begins = aiirs(begins);
+
         for (TaskActuator process : begins) {
             /**
              * Start the thread to perform tasks without any dependencies
@@ -123,6 +127,21 @@ public class TaskLoader {
         // wait
         waitIfNecessary();
         return back(begins);
+    }
+
+    /**
+     * Determine whether it is the optimal solution route
+     *
+     * @param begins
+     * @return
+     */
+    private List<TaskActuator> aiirs(List<TaskActuator> begins) {
+        if (affirTasks != null && affirTasks.size() > 0) {
+            Optimal.ifOptimal(affirTasks, processMap, assistantTask);
+            Map<String, AsyncTask> aiirMap = affirTasks.stream().collect(Collectors.toMap(AsyncTask::getName, Function.identity()));
+            begins = begins.stream().filter(x -> aiirMap.get(x.getTask().getName()) != null).collect(Collectors.toList());
+        }
+        return begins;
     }
 
     private ArrayList<TaskActuator> getBeginProcess() {

@@ -60,9 +60,7 @@ public class Optimal {
      * @param assistantTask the assistant task
      */
     public static void ifOptimal(Set<AsyncTask> affirTasks, Map<AsyncTask, TaskActuator> processMap, TaskTrigger.AssistantTask assistantTask) {
-        if (affirTasks != null) {
-            processMap.get(assistantTask).setUpstreamDepdends(affirTasks.size());
-        }
+        processMap.get(assistantTask).setUpstreamDepdends(affirTasks.size());
     }
 
 
@@ -84,12 +82,20 @@ public class Optimal {
                 logger.error("【Gobrs-Async print】affir Task name empty {}", x);
                 continue;
             }
+
+            if (!(bean instanceof AsyncTask)) {
+                return;
+            }
+
             AsyncTask task = (AsyncTask) bean;
+
             List<AsyncTask> asyncTasks = upwardTasksMapSpace.get(task);
+
             if (Objects.isNull(asyncTasks)) {
-                throw new GobrsAsyncException(String.format("gobrs-rule config exception, task %s is nessary", task.getName()));
+                throw new GobrsAsyncException(String.format("task %s in  springboot yaml or properties must exist", task.getClass().getSimpleName()));
             }
             asyncTasks.add(task);
+
             asyncTaskSet.addAll(new HashSet<>(asyncTasks));
         }
         loader.setAffirTasks(asyncTaskSet);

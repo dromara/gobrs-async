@@ -25,6 +25,7 @@ public class JsonUtil {
      * The Logger.
      */
     static Logger logger = LoggerFactory.getLogger(JsonUtil.class);
+
     private static ObjectMapper objectMapper = new ObjectMapper();
 
 

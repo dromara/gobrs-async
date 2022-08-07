@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 /**
  * The type Task trigger.
@@ -93,11 +94,19 @@ class TaskTrigger {
         upwardTasksMapSpace = upwardTasksMap;
         for (AsyncTask task : downTasksMap.keySet()) {
             TaskActuator process;
+
+
             if (task != assistantTask) {
+                List<AsyncTask> circularDependency = upwardTasksMap.get(task).stream()
+                        .filter(x -> x.getName().equals(task.getName())).collect(Collectors.toList());
+                int upDepend = 0;
+                if (circularDependency.size() == 0) {
+                    upDepend = upwardTasksMap.get(task).size();
+                }
                 /**
                  * Each business task is executed using a new taskActuator
                  */
-                process = new TaskActuator(task, upwardTasksMap.get(task).size(), downTasksMap.get(task), upwardTasksMap);
+                process = new TaskActuator(task, upDepend, downTasksMap.get(task), upwardTasksMap);
             } else {
                 /***
                  * completely  and  Termination of the task

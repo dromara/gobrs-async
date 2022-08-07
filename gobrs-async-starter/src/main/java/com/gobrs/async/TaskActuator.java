@@ -14,8 +14,10 @@ import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.TaskResult;
 import com.gobrs.async.enums.ResultState;
 import com.gobrs.async.task.AsyncTask;
+import com.gobrs.async.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
@@ -115,7 +117,6 @@ class TaskActuator implements Runnable, Cloneable {
 
     @Override
     public void run() {
-        preLoad();
 
         Object parameter = getParameter();
 
@@ -142,6 +143,8 @@ class TaskActuator implements Runnable, Cloneable {
                  */
                 Object result = task.task(parameter, support);
 
+                aiirAxamination();
+
                 /**
                  * Post-processing of tasks
                  */
@@ -166,6 +169,7 @@ class TaskActuator implements Runnable, Cloneable {
                 nextTask(taskLoader);
             }
         } catch (Exception e) {
+            Optimal.optimalCount(support.taskLoader);
             logger.error("【Gobrs-Async print error】 taskName{} error{}", task.getName(), e);
             state = new AtomicInteger(1);
             if (!retryTask(parameter, taskLoader)) {
@@ -200,26 +204,37 @@ class TaskActuator implements Runnable, Cloneable {
         }
     }
 
-    private void preLoad() {
+    private void aiirAxamination() {
         Optimal.optimalCount(support.taskLoader);
     }
 
     private void preparation() {
+
         if (task.isExclusive()) {
+
             List<AsyncTask> asyncTaskList = upwardTasksMap.get(task);
+
             Map<AsyncTask, Future> futuresAsync = support.getTaskLoader().futuresAsync;
+
             futuresAsync.forEach((x, y) -> {
+
                 if (asyncTaskList.contains(x)) {
+
                     y.cancel(true);
                 }
             });
+
         }
     }
 
     private Object getParameter() {
+
         Object parameter = param.get();
+
         if (parameter instanceof Map) {
+
             parameter = ((Map<?, ?>) parameter).get(task.getClass());
+
         }
         return parameter;
     }
@@ -227,10 +242,15 @@ class TaskActuator implements Runnable, Cloneable {
     private boolean retryTask(Object parameter, TaskLoader taskLoader) {
         try {
             if (task.getRetryCount() > 1 && task.getRetryCount() >= state.get()) {
+
                 state.incrementAndGet();
+
                 doTaskWithRetryConditional(parameter, taskLoader);
+
                 if (task.isFailSubExec()) {
+
                     nextTask(taskLoader);
+
                 }
                 return true;
             }
@@ -281,8 +301,8 @@ class TaskActuator implements Runnable, Cloneable {
                 TaskActuator process = taskLoader
                         .getProcess(subTasks.get(i));
                 Set<AsyncTask> affirTasks = taskLoader.getAffirTasks();
-
                 boolean continueExec = Optimal.ifContinue(affirTasks, taskLoader, process);
+
                 if (!continueExec) {
                     return;
                 }
@@ -305,8 +325,8 @@ class TaskActuator implements Runnable, Cloneable {
     }
 
 
-
     private void doProcess(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> affirTasks) {
+
         if (affirTasks != null) {
             if (affirTasks.contains(process.getTask())) {
                 taskLoader.startProcess(process);

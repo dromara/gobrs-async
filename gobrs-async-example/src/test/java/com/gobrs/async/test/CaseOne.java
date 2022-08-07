@@ -9,10 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @program: gobrs-async
@@ -30,19 +27,15 @@ public class CaseOne {
 
     @Test
     public void tcase() {
-        List<String> cases = new ArrayList<>();
-        cases.add("CService");
-        cases.add("CService");
-        cases.add("CService");
-        cases.add("CService");
-        cases.add("CService");
+        Set<String> cases = new HashSet<>();
+        cases.add("BService");
         cases.add("GService");
 
         Map<Class, Object> params = new HashMap<>();
         params.put(AService.class, "1");
         params.put(CService.class, "2");
 
-        AsyncResult test = gobrsAsync.go("test", () -> params, cases, 300000);
+        AsyncResult test = gobrsAsync.go("aiirs", () -> params, cases, 300000);
     }
 
 }
