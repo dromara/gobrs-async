@@ -4,8 +4,8 @@ spring:
   gobrs:
     async:
       rules:
-#        - name: "test"
-#          content: "AService->BService,CService,FService; AService->FService,GService;"
+        - name: "test"
+          content: "AService->BService->CService,FService->HService"
 #        - name: "azh"
 #          content: "AService->BService,CService,FService; BService->FService,GService;"
         - name: "aiirs"

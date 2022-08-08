@@ -205,7 +205,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
          * @return the bean
          */
         public static Object getBean(String bean) {
-            return Optional.ofNullable(GobrsSpring.getBean(bean)).orElseThrow(() -> new RuntimeException("bean not found"));
+            return Optional.ofNullable(GobrsSpring.getBean(bean)).orElseThrow(() -> new RuntimeException("bean not found, name is " + bean));
         }
 
         /**
