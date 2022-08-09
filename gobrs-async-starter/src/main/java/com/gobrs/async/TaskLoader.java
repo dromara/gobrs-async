@@ -11,23 +11,24 @@ import com.gobrs.async.exception.TimeoutException;
 import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
- * @program: gobrs-async-starter
+ * The type Task loader.
+ *
+ * @program: gobrs -async-starter
  * @ClassName
  * @description:
  * @author: sizegang
- * @create: 2022-03-16
- **/
-
+ * @create: 2022 -03-16
+ */
 public class TaskLoader {
     /**
      * Interruption code
@@ -49,8 +50,19 @@ public class TaskLoader {
 
     private final CountDownLatch completeLatch;
 
-    private final Map<AsyncTask, TaskActuator> processMap;
+    /**
+     * The Process map.
+     */
+    public final Map<AsyncTask, TaskActuator> processMap;
 
+    /**
+     * The Affir count.
+     */
+    public AtomicInteger affirCount = new AtomicInteger(0);
+
+    /**
+     * The Assistant task.
+     */
     public TaskTrigger.AssistantTask assistantTask;
 
     private final long timeout;
@@ -61,12 +73,27 @@ public class TaskLoader {
 
     private volatile boolean canceled = false;
 
+    /**
+     * The Futures.
+     */
     public ArrayList<Future<?>> futures;
 
+    /**
+     * The Futures async.
+     */
     public Map<AsyncTask, Future> futuresAsync = new ConcurrentHashMap<>();
 
     private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<>(0);
 
+    private Set<AsyncTask> affirTasks;
+
+    /**
+     * Instantiates a new Task loader.
+     *
+     * @param executorService the executor service
+     * @param processMap      the process map
+     * @param timeout         the timeout
+     */
     TaskLoader(ExecutorService executorService, Map<AsyncTask, TaskActuator> processMap,
                long timeout) {
         this.executorService = executorService;
@@ -81,8 +108,16 @@ public class TaskLoader {
         }
     }
 
+    /**
+     * Load async result.
+     *
+     * @return the async result
+     */
     AsyncResult load() {
-        ArrayList<TaskActuator> begins = getBeginProcess();
+        List<TaskActuator> begins = getBeginProcess();
+
+        begins = aiirs(begins);
+
         for (TaskActuator process : begins) {
             /**
              * Start the thread to perform tasks without any dependencies
@@ -92,6 +127,21 @@ public class TaskLoader {
         // wait
         waitIfNecessary();
         return back(begins);
+    }
+
+    /**
+     * Determine whether it is the optimal solution route
+     *
+     * @param begins
+     * @return
+     */
+    private List<TaskActuator> aiirs(List<TaskActuator> begins) {
+        if (affirTasks != null && affirTasks.size() > 0) {
+            Optimal.ifOptimal(affirTasks, processMap, assistantTask);
+            Map<String, AsyncTask> aiirMap = affirTasks.stream().collect(Collectors.toMap(AsyncTask::getName, Function.identity()));
+            begins = begins.stream().filter(x -> aiirMap.get(x.getTask().getName()) != null).collect(Collectors.toList());
+        }
+        return begins;
     }
 
     private ArrayList<TaskActuator> getBeginProcess() {
@@ -104,6 +154,9 @@ public class TaskLoader {
         return beginsWith;
     }
 
+    /**
+     * Completed.
+     */
     void completed() {
         completeLatch.countDown();
     }
@@ -120,7 +173,7 @@ public class TaskLoader {
     /**
      * The process is interrupted by a task exception
      *
-     * @param errorCallback
+     * @param errorCallback the error callback
      */
     public void errorInterrupted(ErrorCallback errorCallback) {
         this.error = errorCallback.getThrowable();
@@ -197,12 +250,22 @@ public class TaskLoader {
     }
 
 
+    /**
+     * Gets process.
+     *
+     * @param asyncTask the async task
+     * @return the process
+     */
     TaskActuator getProcess(AsyncTask asyncTask) {
         return processMap.get(asyncTask);
     }
 
+    /**
+     * Start process.
+     *
+     * @param taskActuator the task actuator
+     */
     void startProcess(TaskActuator taskActuator) {
-
         if (timeout > 0 || taskActuator.getGobrsAsyncProperties().isTaskInterrupt()) {
             /**
              * If you need to interrupt then you need to save all the task threads and you need to manipulate shared variables
@@ -227,19 +290,35 @@ public class TaskLoader {
     }
 
     /**
+     * Assert affir boolean.
+     *
+     * @param taskActuator the task actuator
+     * @return the boolean
+     */
+    public boolean assertAffir(TaskActuator taskActuator) {
+        if (affirTasks == null) {
+            return true;
+        }
+        taskActuator.setUpstreamDepdends(affirTasks.size());
+        boolean contains = affirTasks.contains(taskActuator.getTask());
+        if (contains) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * End of single mission line
      *
-     * @param taskLines
      */
-    public void stopSingleTaskLine(Integer taskLines) {
+    public void stopSingleTaskLine() {
         TaskActuator taskActuator = processMap.get(assistantTask);
-        for (Integer i = 0; i < taskLines; i++) {
-            processMap.get(assistantTask).releasingDependency();
-        }
+        taskActuator.releasingDependency();
         if (!taskActuator.hasUnsatisfiedDependcies()) {
             taskActuator.run();
         }
     }
+
 
     /**
      * Get the task Bus
@@ -266,27 +345,76 @@ public class TaskLoader {
         return asyncResult;
     }
 
+    /**
+     * Gets exp code.
+     *
+     * @return the exp code
+     */
     public AtomicInteger getExpCode() {
         return expCode;
     }
 
+    /**
+     * Sets exp code.
+     *
+     * @param expCode the exp code
+     */
     public void setExpCode(AtomicInteger expCode) {
         this.expCode = expCode;
     }
 
+    /**
+     * Is running atomic boolean.
+     *
+     * @return the atomic boolean
+     */
     public AtomicBoolean isRunning() {
         return isRunning;
     }
 
+    /**
+     * Sets is running.
+     *
+     * @param isRunning the is running
+     */
     public void setIsRunning(boolean isRunning) {
         this.isRunning = new AtomicBoolean(isRunning);
     }
 
+    /**
+     * Gets assistant task.
+     *
+     * @return the assistant task
+     */
     public TaskTrigger.AssistantTask getAssistantTask() {
         return assistantTask;
     }
 
+    /**
+     * Sets assistant task.
+     *
+     * @param assistantTask the assistant task
+     */
     public void setAssistantTask(TaskTrigger.AssistantTask assistantTask) {
         this.assistantTask = assistantTask;
     }
+
+    /**
+     * Gets affir tasks.
+     *
+     * @return the affir tasks
+     */
+    public Set<AsyncTask> getAffirTasks() {
+        return affirTasks;
+    }
+
+    /**
+     * Sets affir tasks.
+     *
+     * @param affirTasks the affir tasks
+     */
+    public void setAffirTasks(Set<AsyncTask> affirTasks) {
+        this.affirTasks = affirTasks;
+    }
+
 }

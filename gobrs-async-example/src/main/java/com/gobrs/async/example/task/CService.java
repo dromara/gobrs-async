@@ -3,34 +3,42 @@ package com.gobrs.async.example.task;
 import com.gobrs.async.TaskSupport;
 import com.gobrs.async.domain.TaskResult;
 import com.gobrs.async.task.AsyncTask;
+import org.apache.catalina.User;
 import org.springframework.stereotype.Component;
 
 
 /**
- * @program: gobrs-async-starter
+ * The type C service.
+ *
+ * @program: gobrs -async-starter
  * @ClassName CService
  * @description:
  * @author: sizegang
- * @create: 2022-03-20
- **/
+ * @create: 2022 -03-20
+ */
 @Component
-public class CService extends AsyncTask<Object, Integer> {
+public class CService extends AsyncTask<String, Integer> {
 
+    /**
+     * The .
+     */
     int i = 10000;
 
 
     @Override
-    public void prepare(Object o) {
+    public void prepare(String o) {
 
     }
 
     @Override
-    public Integer task(Object o, TaskSupport support) {
+    public Integer task(String o, TaskSupport support) {
         try {
             System.out.println("CService Begin");
             //获取 所依赖的父任务的结果
-            AService result = getResult(support, AService.class);
-
+            Integer rt = getResult(support);
+            String result = getResult(support, AService.class, String.class);
+            TaskResult<Integer> tk = getTaskResult(support);
+            TaskResult<String> taskResult = getTaskResult(support, AService.class, String.class);
             Thread.sleep(300);
             for (int i1 = 0; i1 < i; i1++) {
                 i1 += i1;
@@ -44,7 +52,7 @@ public class CService extends AsyncTask<Object, Integer> {
     }
 
     @Override
-    public boolean nessary(Object o, TaskSupport support) {
+    public boolean nessary(String o, TaskSupport support) {
         return true;
     }
 
@@ -60,6 +68,5 @@ public class CService extends AsyncTask<Object, Integer> {
 
     @Override
     public void onFail(TaskSupport support) {
-        System.out.println(1/0);
     }
 }

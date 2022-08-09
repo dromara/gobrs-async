@@ -5,14 +5,19 @@ import com.gobrs.async.task.AsyncTask;
 import org.springframework.stereotype.Component;
 
 /**
- * @program: gobrs-async-starter
+ * The type H service.
+ *
+ * @program: gobrs -async-starter
  * @ClassName EService
  * @description:
  * @author: sizegang
- * @create: 2022-03-20
- **/
+ * @create: 2022 -03-20
+ */
 @Component
 public class HService extends AsyncTask<Object, Object> {
+    /**
+     * The .
+     */
     int i  = 10000;
     @Override
     public void prepare(Object o) {

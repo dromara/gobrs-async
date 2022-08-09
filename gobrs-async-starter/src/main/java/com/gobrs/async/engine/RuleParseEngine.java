@@ -19,14 +19,17 @@ import static com.gobrs.async.def.DefaultConfig.RULE_ANY;
 import static com.gobrs.async.def.DefaultConfig.RULE_EXCLUSIVE;
 
 /**
+ * The type Rule parse engine.
+ *
+ * @param <T> the type parameter
  * @author sizegang1
- * @program: gobrs-async
+ * @program: gobrs -async
  * @ClassName RuleParseEngine
  * @description:
  * @author: sizegang
  * @Version 1.0
- * @date 2022-02-05 12:07
- **/
+ * @date 2022 -02-05 12:07
+ */
 public class RuleParseEngine<T> extends AbstractEngine {
 
     @Resource
@@ -147,7 +150,8 @@ public class RuleParseEngine<T> extends AbstractEngine {
             /**
              * Parse annotation configuration
              */
-            task.setName(getName(task));
+            task.setName(taskName);
+            task.setDesc(getDesc(task));
             task.setCallback(getCallBack(task));
             task.setRetryCount(getRetryCount(task));
             task.setFailSubExec(getFailSubExec(task));
@@ -164,10 +168,11 @@ public class RuleParseEngine<T> extends AbstractEngine {
         /**
          * Get packaging tasks
          *
-         * @param cacheTaskWrappers
-         * @param taskBean
-         * @param taskReceive
-         * @return
+         * @param cacheTaskWrappers the cache task wrappers
+         * @param taskBean          the task bean
+         * @param taskReceive       the task receive
+         * @param clear             the clear
+         * @return wrapper depend
          */
         public static AsyncTask getWrapperDepend(Map<String, AsyncTask> cacheTaskWrappers, String taskBean, TaskReceive taskReceive,
                                                  boolean clear) {
@@ -193,29 +198,35 @@ public class RuleParseEngine<T> extends AbstractEngine {
                             })).orElse(null);
         }
 
+        /**
+         * Gets bean.
+         *
+         * @param bean the bean
+         * @return the bean
+         */
         public static Object getBean(String bean) {
-            return Optional.ofNullable(GobrsSpring.getBean(bean)).orElseThrow(() -> new RuntimeException("bean not found"));
+            return Optional.ofNullable(GobrsSpring.getBean(bean)).orElseThrow(() -> new RuntimeException("bean not found, name is " + bean));
         }
 
         /**
          * Get the task name from the Task annotation
          *
-         * @param task
-         * @return
+         * @param task the task
+         * @return name
          */
-        public static String getName(AsyncTask task) {
+        public static String getDesc(AsyncTask task) {
             Task annotation = task.getClass().getAnnotation(Task.class);
             if (annotation == null) {
                 return null;
             }
-            return annotation.name();
+            return annotation.desc();
         }
 
         /**
          * transaction task
          *
-         * @param task
-         * @return
+         * @param task the task
+         * @return call back
          */
         public static boolean getCallBack(AsyncTask task) {
             Task annotation = task.getClass().getAnnotation(Task.class);
@@ -228,8 +239,8 @@ public class RuleParseEngine<T> extends AbstractEngine {
         /**
          * task retries
          *
-         * @param task
-         * @return
+         * @param task the task
+         * @return retry count
          */
         public static int getRetryCount(AsyncTask task) {
             Task annotation = task.getClass().getAnnotation(Task.class);
@@ -242,8 +253,8 @@ public class RuleParseEngine<T> extends AbstractEngine {
         /**
          * Whether to continue the sub-process if the task execution fails
          *
-         * @param task
-         * @return
+         * @param task the task
+         * @return fail sub exec
          */
         public static boolean getFailSubExec(AsyncTask task) {
             Task annotation = task.getClass().getAnnotation(Task.class);

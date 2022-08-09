@@ -10,12 +10,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @program: gobrs-async-starter
+ * The type Task flow.
+ *
+ * @program: gobrs -async-starter
  * @ClassName Task bus Responsible for task handling flow
  * @description: Task flow
  * @author: sizegang
- * @create: 2022-03-16
- **/
+ * @create: 2022 -03-16
+ */
 public class TaskFlow {
 
 
@@ -26,6 +28,12 @@ public class TaskFlow {
      */
     private final IdentityHashMap<AsyncTask, List<AsyncTask>> denpendedTasks = new IdentityHashMap<>();
 
+    /**
+     * After task receive.
+     *
+     * @param asyncTasks the async tasks
+     * @return the task receive
+     */
     synchronized TaskReceive after(final AsyncTask... asyncTasks) {
 
         for (AsyncTask handler : asyncTasks) {
@@ -37,6 +45,12 @@ public class TaskFlow {
         return start(asyncTasks);
     }
 
+    /**
+     * Start task receive.
+     *
+     * @param asyncTasks the async tasks
+     * @return the task receive
+     */
     synchronized TaskReceive start(AsyncTask... asyncTasks) {
         /**
          * Building task groups
@@ -45,6 +59,12 @@ public class TaskFlow {
         return builder;
     }
 
+    /**
+     * Start task receive.
+     *
+     * @param asyncTasks the async tasks
+     * @return the task receive
+     */
     synchronized TaskReceive start(List<AsyncTask> asyncTasks) {
         /**
          * Building task groups
@@ -53,11 +73,22 @@ public class TaskFlow {
         return builder;
     }
 
+    /**
+     * Gets depends tasks.
+     *
+     * @return the depends tasks
+     */
     synchronized Map<AsyncTask, List<AsyncTask>> getDependsTasks() {
         return denpendedTasks;
     }
 
 
+    /**
+     * Add dependency.
+     *
+     * @param from the from
+     * @param to   the to
+     */
     void addDependency(AsyncTask from, AsyncTask to) {
         // create
         if (!denpendedTasks.containsKey(from)) {
@@ -69,10 +100,20 @@ public class TaskFlow {
         }
     }
 
+    /**
+     * Gets gobrs async properties.
+     *
+     * @return the gobrs async properties
+     */
     public GobrsAsyncProperties getGobrsAsyncProperties() {
         return gobrsAsyncProperties;
     }
 
+    /**
+     * Sets gobrs async properties.
+     *
+     * @param gobrsAsyncProperties the gobrs async properties
+     */
     public void setGobrsAsyncProperties(GobrsAsyncProperties gobrsAsyncProperties) {
         this.gobrsAsyncProperties = gobrsAsyncProperties;
     }

@@ -5,13 +5,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * @program: gobrs-async-starter
+ * The type Gobrs async thread pool factory.
+ *
+ * @program: gobrs -async-starter
  * @ClassName GobrsAsyncThreadPoolFactory
  * @description: Thread pool factory
  * @author: sizegang
- * @create: 2022-02-20
+ * @create: 2022 -02-20
  * @Version 1.0
- **/
+ */
 public class GobrsAsyncThreadPoolFactory {
 
     /**
@@ -21,13 +23,19 @@ public class GobrsAsyncThreadPoolFactory {
 
     private ExecutorService threadPoolExecutor = defaultThreadPool();
 
+    /**
+     * Gets thread pool executor.
+     *
+     * @return the thread pool executor
+     */
     public ExecutorService getThreadPoolExecutor() {
         return threadPoolExecutor;
     }
 
     /**
      * The user dynamically sets the thread pool parameters
-     * @param threadPoolExecutor
+     *
+     * @param threadPoolExecutor the thread pool executor
      */
     public void setThreadPoolExecutor(ExecutorService threadPoolExecutor) {
         this.threadPoolExecutor = threadPoolExecutor;

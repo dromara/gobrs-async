@@ -7,18 +7,17 @@ import com.gobrs.async.exception.NotTaskRuleException;
 import com.gobrs.async.task.AsyncTask;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
- * @program: gobrs-async-starter
- * @ClassName gobrs-Async
+ * The type Gobrs async.
+ *
+ * @program: gobrs -async-starter
+ * @ClassName gobrs -Async
  * @description: task process executor
  * @author: sizegang
- * @create: 2022-03-16
- **/
+ * @create: 2022 -03-16
+ */
 public class GobrsAsync {
 
 
@@ -36,6 +35,13 @@ public class GobrsAsync {
     private Map<String, TaskTrigger> trigger;
 
 
+    /**
+     * Begin task receive.
+     *
+     * @param taskName the task name
+     * @param tasks    the tasks
+     * @return the task receive
+     */
     public TaskReceive begin(String taskName, AsyncTask... tasks) {
         return taskFlow.get(taskName).start(tasks);
     }
@@ -43,10 +49,10 @@ public class GobrsAsync {
     /**
      * Start building the task process
      *
-     * @param ruleName
-     * @param asyncTasks
-     * @param reload
-     * @return
+     * @param ruleName   the rule name
+     * @param asyncTasks the async tasks
+     * @param reload     the reload
+     * @return task receive
      */
     public TaskReceive begin(String ruleName, List<AsyncTask> asyncTasks, boolean reload) {
         if (taskFlow == null) {
@@ -62,6 +68,13 @@ public class GobrsAsync {
     }
 
 
+    /**
+     * Begin task receive.
+     *
+     * @param ruleName   the rule name
+     * @param asyncTasks the async tasks
+     * @return the task receive
+     */
     public TaskReceive begin(String ruleName, List<AsyncTask> asyncTasks) {
         return begin(ruleName, asyncTasks, false);
     }
@@ -69,9 +82,9 @@ public class GobrsAsync {
     /**
      * Add subtask process
      *
-     * @param taskName
-     * @param tasks
-     * @return
+     * @param taskName the task name
+     * @param tasks    the tasks
+     * @return task receive
      */
     public TaskReceive after(String taskName, AsyncTask... tasks) {
         return taskFlow.get(taskName).after(tasks);
@@ -80,30 +93,40 @@ public class GobrsAsync {
     /**
      * Really open the task flow Multi-threaded flow master switch Have fun
      *
-     * @param ruleName
-     * @param param
-     * @param timeout
-     * @return
+     * @param ruleName the rule name
+     * @param param    the param
+     * @param timeout  the timeout
+     * @return async result
      */
     public AsyncResult go(String ruleName, AsyncParam param, long timeout) {
+      return go(ruleName,param, null, timeout);
+    }
+
+    public AsyncResult go(String ruleName, AsyncParam param, Set<String> affirTasks, long timeout) {
         if (check(ruleName).isPresent()) {
-            return trigger.get(ruleName).trigger(param, timeout).load();
+            return trigger.get(ruleName).trigger(param, timeout, affirTasks).load();
         }
         throw new NotTaskRuleException("Gobrs Rule Name Is Error");
     }
 
+
     /**
      * Start the task process
      *
-     * @param taskName
-     * @param param
-     * @return
+     * @param taskName the task name
+     * @param param    the param
+     * @return async result
      */
     public AsyncResult go(String taskName, AsyncParam param) {
         return go(taskName, param, 0L);
     }
 
 
+    /**
+     * Ready to.
+     *
+     * @param ruleName the rule name
+     */
     public synchronized void readyTo(String ruleName) {
         readyTo(ruleName, false);
     }
@@ -111,8 +134,8 @@ public class GobrsAsync {
     /**
      * Preparing Task Process Execution
      *
-     * @param ruleName
-     * @param reload
+     * @param ruleName the rule name
+     * @param reload   the reload
      */
     public synchronized void readyTo(String ruleName, boolean reload) {
         /**

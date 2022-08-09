@@ -14,23 +14,32 @@ import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.TaskResult;
 import com.gobrs.async.enums.ResultState;
 import com.gobrs.async.task.AsyncTask;
+import com.gobrs.async.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * The type Task actuator.
+ */
 class TaskActuator implements Runnable, Cloneable {
 
+    /**
+     * The Logger.
+     */
     Logger logger = LoggerFactory.getLogger(TaskActuator.class);
 
+    /**
+     * The Support.
+     */
     public TaskSupport support;
 
     /**
@@ -42,13 +51,16 @@ class TaskActuator implements Runnable, Cloneable {
     /**
      * Upstream dependent quantity
      */
-    private volatile int upstreamDepdends;
+    public volatile int upstreamDepdends;
 
     /**
      * depend task
      */
     private final List<AsyncTask> subTasks;
 
+    /**
+     * The Param.
+     */
     public AsyncParam param;
 
     private Lock lock;
@@ -63,12 +75,27 @@ class TaskActuator implements Runnable, Cloneable {
     private volatile AtomicInteger starting = new AtomicInteger(0);
 
 
+    /**
+     * Instantiates a new Task actuator.
+     *
+     * @param asyncTask the async task
+     * @param depends   the depends
+     * @param subTasks  the sub tasks
+     */
     TaskActuator(AsyncTask asyncTask, int depends, List<AsyncTask> subTasks) {
         this.task = asyncTask;
         this.upstreamDepdends = depends > 1 & task.isAny() ? 1 : depends;
         this.subTasks = subTasks;
     }
 
+    /**
+     * Instantiates a new Task actuator.
+     *
+     * @param asyncTask      the async task
+     * @param depends        the depends
+     * @param subTasks       the sub tasks
+     * @param upwardTasksMap the upward tasks map
+     */
     TaskActuator(AsyncTask asyncTask, int depends, List<AsyncTask> subTasks, Map<AsyncTask, List<AsyncTask>> upwardTasksMap) {
         this.task = asyncTask;
         this.upstreamDepdends = depends > 1 & task.isAny() ? 1 : depends;
@@ -80,8 +107,8 @@ class TaskActuator implements Runnable, Cloneable {
     /**
      * Initialize the object cloned from prototype.
      *
-     * @param support
-     * @param param
+     * @param support the support
+     * @param param   the param
      */
     void init(TaskSupport support, AsyncParam param) {
         this.support = support;
@@ -96,6 +123,7 @@ class TaskActuator implements Runnable, Cloneable {
         preparation();
 
         TaskLoader taskLoader = support.getTaskLoader();
+
         try {
             /**
              * If the conditions are not met
@@ -114,6 +142,8 @@ class TaskActuator implements Runnable, Cloneable {
                  * Perform a task
                  */
                 Object result = task.task(parameter, support);
+
+                aiirAxamination();
 
                 /**
                  * Post-processing of tasks
@@ -139,6 +169,8 @@ class TaskActuator implements Runnable, Cloneable {
                 nextTask(taskLoader);
             }
         } catch (Exception e) {
+            Optimal.optimalCount(support.taskLoader);
+            logger.error("【Gobrs-Async print error】 taskName{} error{}", task.getName(), e);
             state = new AtomicInteger(1);
             if (!retryTask(parameter, taskLoader)) {
                 support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
@@ -164,7 +196,7 @@ class TaskActuator implements Runnable, Cloneable {
                     if (task.isFailSubExec()) {
                         nextTask(taskLoader);
                     } else {
-                        taskLoader.stopSingleTaskLine(subTasks.size());
+                        taskLoader.stopSingleTaskLine();
                     }
                 }
             }
@@ -172,22 +204,37 @@ class TaskActuator implements Runnable, Cloneable {
         }
     }
 
+    private void aiirAxamination() {
+        Optimal.optimalCount(support.taskLoader);
+    }
+
     private void preparation() {
+
         if (task.isExclusive()) {
+
             List<AsyncTask> asyncTaskList = upwardTasksMap.get(task);
+
             Map<AsyncTask, Future> futuresAsync = support.getTaskLoader().futuresAsync;
+
             futuresAsync.forEach((x, y) -> {
+
                 if (asyncTaskList.contains(x)) {
+
                     y.cancel(true);
                 }
             });
+
         }
     }
 
     private Object getParameter() {
+
         Object parameter = param.get();
+
         if (parameter instanceof Map) {
-            parameter = ((Map<?, ?>) parameter).get(this.getClass());
+
+            parameter = ((Map<?, ?>) parameter).get(task.getClass());
+
         }
         return parameter;
     }
@@ -195,10 +242,15 @@ class TaskActuator implements Runnable, Cloneable {
     private boolean retryTask(Object parameter, TaskLoader taskLoader) {
         try {
             if (task.getRetryCount() > 1 && task.getRetryCount() >= state.get()) {
+
                 state.incrementAndGet();
+
                 doTaskWithRetryConditional(parameter, taskLoader);
+
                 if (task.isFailSubExec()) {
+
                     nextTask(taskLoader);
+
                 }
                 return true;
             }
@@ -240,12 +292,20 @@ class TaskActuator implements Runnable, Cloneable {
 
     /**
      * Move on to the next task
+     *
+     * @param taskLoader the task loader
      */
     public void nextTask(TaskLoader taskLoader) {
         if (subTasks != null) {
             for (int i = 0; i < subTasks.size(); i++) {
                 TaskActuator process = taskLoader
                         .getProcess(subTasks.get(i));
+                Set<AsyncTask> affirTasks = taskLoader.getAffirTasks();
+                boolean continueExec = Optimal.ifContinue(affirTasks, taskLoader, process);
+
+                if (!continueExec) {
+                    return;
+                }
                 /**
                  * Check whether the subtask depends on a task that has been executed
                  * The number of tasks that it depends on to get to this point minus one
@@ -257,17 +317,29 @@ class TaskActuator implements Runnable, Cloneable {
                     if (subTasks.size() == 1 && !process.task.isExclusive()) {
                         process.run();
                     } else {
-                        taskLoader.startProcess(process);
+                        doProcess(taskLoader, process, affirTasks);
                     }
                 }
             }
         }
     }
 
+
+    private void doProcess(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> affirTasks) {
+
+        if (affirTasks != null) {
+            if (affirTasks.contains(process.getTask())) {
+                taskLoader.startProcess(process);
+            }
+        } else {
+            taskLoader.startProcess(process);
+        }
+    }
+
     /**
      * Gets tasks without any dependencies
      *
-     * @return
+     * @return boolean boolean
      */
     boolean hasUnsatisfiedDependcies() {
         lock.lock();
@@ -281,7 +353,7 @@ class TaskActuator implements Runnable, Cloneable {
     /**
      * Release the number of dependent tasks
      *
-     * @return
+     * @return int int
      */
     public int releasingDependency() {
         lock.lock();
@@ -348,42 +420,115 @@ class TaskActuator implements Runnable, Cloneable {
     }
 
 
+    /**
+     * Gets task.
+     *
+     * @return the task
+     */
     public AsyncTask getTask() {
         return task;
     }
 
+    /**
+     * Gets task support.
+     *
+     * @return the task support
+     */
     public TaskSupport getTaskSupport() {
         return support;
     }
 
+    /**
+     * Sets task support.
+     *
+     * @param taskSupport the task support
+     */
     public void setTaskSupport(TaskSupport taskSupport) {
         this.support = taskSupport;
     }
 
 
+    /**
+     * Build task result task result.
+     *
+     * @param parameter   the parameter
+     * @param resultState the result state
+     * @param ex          the ex
+     * @return the task result
+     */
     public TaskResult buildTaskResult(Object parameter, ResultState resultState, Exception ex) {
         return new TaskResult(parameter, resultState, ex);
     }
 
 
+    /**
+     * Build success result task result.
+     *
+     * @param parameter the parameter
+     * @return the task result
+     */
     public TaskResult buildSuccessResult(Object parameter) {
         return new TaskResult(parameter, ResultState.SUCCESS, null);
     }
 
 
+    /**
+     * Build error result task result.
+     *
+     * @param parameter the parameter
+     * @param ex        the ex
+     * @return the task result
+     */
     public TaskResult buildErrorResult(Object parameter, Exception ex) {
         return new TaskResult(parameter, ResultState.SUCCESS, ex);
     }
 
+    /**
+     * Error callback error callback.
+     *
+     * @param parameter the parameter
+     * @param e         the e
+     * @param support   the support
+     * @param asyncTask the async task
+     * @return the error callback
+     */
     public ErrorCallback errorCallback(Object parameter, Exception e, TaskSupport support, AsyncTask asyncTask) {
         return new ErrorCallback(param, e, support, asyncTask);
     }
 
+    /**
+     * Gets gobrs async properties.
+     *
+     * @return the gobrs async properties
+     */
     public GobrsAsyncProperties getGobrsAsyncProperties() {
         return gobrsAsyncProperties;
     }
 
+    /**
+     * Sets gobrs async properties.
+     *
+     * @param gobrsAsyncProperties the gobrs async properties
+     */
     public void setGobrsAsyncProperties(GobrsAsyncProperties gobrsAsyncProperties) {
         this.gobrsAsyncProperties = gobrsAsyncProperties;
+    }
+
+    /**
+     * Gets upstream depdends.
+     *
+     * @return the upstream depdends
+     */
+    public int getUpstreamDepdends() {
+        return upstreamDepdends;
+    }
+
+    /**
+     * Sets upstream depdends.
+     *
+     * @param upstreamDepdends the upstream depdends
+     */
+    public void setUpstreamDepdends(int upstreamDepdends) {
+        this.upstreamDepdends = upstreamDepdends;
     }
 }

@@ -3,12 +3,14 @@ package com.gobrs.async.task;
 import com.gobrs.async.TaskSupport;
 
 /**
- * @program: gobrs-async-core
+ * The type Proxy task.
+ *
+ * @program: gobrs -async-core
  * @ClassName ProxyTask
  * @description:
  * @author: sizegang
- * @create: 2022-04-17
- **/
+ * @create: 2022 -04-17
+ */
 public class ProxyTask implements GobrsTask{
 
     private AsyncTask asyncTask;

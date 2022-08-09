@@ -8,14 +8,19 @@ import org.springframework.boot.ansi.AnsiStyle;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @program: gobrs-async-core
+ * The type Gobrs print.
+ *
+ * @program: gobrs -async-core
  * @ClassName GobrsPrint
  * @description:
  * @author: sizegang
- * @create: 2022-04-09
- **/
+ * @create: 2022 -04-09
+ */
 public class GobrsPrint {
 
+    /**
+     * The Logger.
+     */
     static Logger logger = LoggerFactory.getLogger(GobrsPrint.class);
 
 
@@ -28,6 +33,9 @@ public class GobrsPrint {
     private static final int STRAP_LINE_SIZE = 50;
 
 
+    /**
+     * Print banner.
+     */
     public static void printBanner() {
         String banner = "              ___.                             _____                               \n" +
                 "   ____   ____\\_ |_________  ______           /  _  \\   _________.__. ____   ____  \n" +
@@ -51,6 +59,8 @@ public class GobrsPrint {
 
     /**
      * get current software package version
+     *
+     * @return the version
      */
     public static String getVersion() {
         Package pkg = Package.getPackage("java.util");
