@@ -310,13 +310,31 @@ public class TaskLoader {
     /**
      * End of single mission line
      *
+     * @param subtasks the subtasks
      */
-    public void stopSingleTaskLine() {
+    public void stopSingleTaskLine(List<AsyncTask> subtasks) {
         TaskActuator taskActuator = processMap.get(assistantTask);
-        taskActuator.releasingDependency();
-        if (!taskActuator.hasUnsatisfiedDependcies()) {
-            taskActuator.run();
+        for (AsyncTask subtask : subtasks) {
+            rtDept(subtask, taskActuator);
         }
+    }
+
+
+    /**
+     * Rt dept.
+     *
+     * @param task   the task
+     * @param assist the assist
+     */
+    public void rtDept(AsyncTask task, TaskActuator assist) {
+        if (task instanceof TaskTrigger.AssistantTask) {
+            assist.releasingDependency();
+            if (!assist.hasUnsatisfiedDependcies()) {
+                assist.run();
+            }
+            return;
+        }
+        stopSingleTaskLine(processMap.get(task).subTasks);
     }
 
 

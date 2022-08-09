@@ -56,7 +56,7 @@ class TaskActuator implements Runnable, Cloneable {
     /**
      * depend task
      */
-    private final List<AsyncTask> subTasks;
+    public final List<AsyncTask> subTasks;
 
     /**
      * The Param.
@@ -196,7 +196,7 @@ class TaskActuator implements Runnable, Cloneable {
                     if (task.isFailSubExec()) {
                         nextTask(taskLoader);
                     } else {
-                        taskLoader.stopSingleTaskLine();
+                        taskLoader.stopSingleTaskLine(subTasks);
                     }
                 }
             }
