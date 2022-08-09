@@ -310,13 +310,10 @@ public class TaskLoader {
     /**
      * End of single mission line
      *
-     * @param taskLines the task lines
      */
-    public void stopSingleTaskLine(Integer taskLines) {
+    public void stopSingleTaskLine() {
         TaskActuator taskActuator = processMap.get(assistantTask);
-        for (Integer i = 0; i < taskLines; i++) {
-            processMap.get(assistantTask).releasingDependency();
-        }
+        taskActuator.releasingDependency();
         if (!taskActuator.hasUnsatisfiedDependcies()) {
             taskActuator.run();
         }

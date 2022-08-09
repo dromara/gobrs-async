@@ -35,7 +35,7 @@ public class CaseOne {
         params.put(AService.class, "1");
         params.put(CService.class, "2");
 
-        AsyncResult test = gobrsAsync.go("test", () -> params, 300000);
+        AsyncResult test = gobrsAsync.go("aiirs", () -> params, 300000);
     }
 
 }

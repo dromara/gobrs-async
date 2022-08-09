@@ -94,8 +94,6 @@ class TaskTrigger {
         upwardTasksMapSpace = upwardTasksMap;
         for (AsyncTask task : downTasksMap.keySet()) {
             TaskActuator process;
-
-
             if (task != assistantTask) {
                 List<AsyncTask> circularDependency = upwardTasksMap.get(task).stream()
                         .filter(x -> x.getName().equals(task.getName())).collect(Collectors.toList());

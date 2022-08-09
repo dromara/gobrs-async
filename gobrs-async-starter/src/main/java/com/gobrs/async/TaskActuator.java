@@ -196,7 +196,7 @@ class TaskActuator implements Runnable, Cloneable {
                     if (task.isFailSubExec()) {
                         nextTask(taskLoader);
                     } else {
-                        taskLoader.stopSingleTaskLine(subTasks.size());
+                        taskLoader.stopSingleTaskLine();
                     }
                 }
             }
