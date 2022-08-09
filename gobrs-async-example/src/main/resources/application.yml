@@ -5,9 +5,5 @@ spring:
     async:
       rules:
         - name: "test"
-          content: "AService->BService;FService->HService,EService,GService"
-#        - name: "azh"
-#          content: "AService->BService,CService,FService; BService->FService,GService;"
-        - name: "aiirs"
-          content: "AService->BService,CService->DService; FService->FService,GService;"
+          content: "AService->BService->FService;HService,EService,GService"
       task-interrupt: false #局部异常是否打断主流程
