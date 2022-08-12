@@ -100,8 +100,8 @@ public class GobrsAutoConfiguration {
      * @return the gobrs async
      */
     @Bean
-    public GobrsAsync gobrsAsync() {
-        return new GobrsAsync();
+    public GobrsAsync gobrsAsync(GobrsAsyncProperties gobrsAsyncProperties) {
+        return new GobrsAsync(gobrsAsyncProperties);
     }
 
     /**

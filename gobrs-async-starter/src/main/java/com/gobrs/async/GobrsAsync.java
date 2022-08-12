@@ -21,8 +21,11 @@ import java.util.*;
 public class GobrsAsync {
 
 
-    @Autowired
     private GobrsAsyncProperties gobrsAsyncProperties;
+
+    public GobrsAsync(GobrsAsyncProperties gobrsAsyncProperties) {
+        this.gobrsAsyncProperties = gobrsAsyncProperties;
+    }
 
     /**
      * task process pipeline A rule corresponds to a taskFlow
@@ -99,7 +102,7 @@ public class GobrsAsync {
      * @return async result
      */
     public AsyncResult go(String ruleName, AsyncParam param, long timeout) {
-      return go(ruleName,param, null, timeout);
+        return go(ruleName, param, null, timeout);
     }
 
     public AsyncResult go(String ruleName, AsyncParam param, Set<String> affirTasks, long timeout) {
