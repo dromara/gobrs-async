@@ -341,7 +341,7 @@ public class TaskLoader {
         AsyncResult asyncResult = new AsyncResult();
         asyncResult.setResultMap(support.getResultMap());
         asyncResult.setExpCode(expCode.get());
-        asyncResult.setSuccess(true);
+        asyncResult.setSuccess(support.getResultMap().values().stream().allMatch(r -> r.getResultState().equals(ResultState.SUCCESS)));
         return asyncResult;
     }
 
