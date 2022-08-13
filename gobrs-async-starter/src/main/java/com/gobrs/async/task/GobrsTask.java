@@ -31,12 +31,17 @@ public interface GobrsTask<Param, Result> extends Task {
 
     /**
      * Whether a task needs to be executed
+     * <p>
+     * The condition determines whether the task is executed or not.
+     * This method is set as the default method because the user wants to return true by default, that is, the default selection is executed.
      *
      * @param param   the param
      * @param support the support
      * @return boolean boolean
      */
-    boolean nessary(Param param, TaskSupport support);
+    default boolean nessary(Param param, TaskSupport support) {
+        return true;
+    }
 
     /**
      * Task Executed Successfully
@@ -54,6 +59,7 @@ public interface GobrsTask<Param, Result> extends Task {
 
     /**
      * rollback
+     * Rewrite the method to complete the task task Equivalent to TCC's two-phase submission transaction compensation
      *
      * @param param the param
      */
