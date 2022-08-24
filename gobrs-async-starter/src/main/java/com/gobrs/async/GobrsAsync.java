@@ -70,17 +70,17 @@ public class GobrsAsync {
         return taskFlow.get(ruleName).start(asyncTasks);
     }
 
-//
-//    /**
-//     * Begin task receive.
-//     *
-//     * @param ruleName   the rule name
-//     * @param asyncTasks the async tasks
-//     * @return the task receive
-//     */
-//    public TaskReceive begin(String ruleName, List<AsyncTask> asyncTasks) {
-//        return begin(ruleName, asyncTasks, false);
-//    }
+
+    /**
+     * Begin task receive.
+     *
+     * @param ruleName   the rule name
+     * @param asyncTasks the async tasks
+     * @return the task receive
+     */
+    public TaskReceive begin(String ruleName, List<AsyncTask> asyncTasks) {
+        return begin(ruleName, asyncTasks, false);
+    }
 
     /**
      * Add subtask process
