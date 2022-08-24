@@ -18,8 +18,8 @@ public interface GobrsTask<Param, Result> extends Task {
      *
      * @param param the param
      */
-    void prepare(Param param);
-
+    default void prepare(Param param) {
+    }
     /**
      * Tasks to be performed
      *
@@ -48,15 +48,16 @@ public interface GobrsTask<Param, Result> extends Task {
      *
      * @param support the support
      */
-    void onSuccess(TaskSupport support);
+    default void onSuccess(TaskSupport support) {
+    }
 
     /**
      * Task execution failure
      *
      * @param support the support
      */
-    void onFail(TaskSupport support);
-
+    default void onFail(TaskSupport support) {
+    }
     /**
      * rollback
      * Rewrite the method to complete the task task Equivalent to TCC's two-phase submission transaction compensation
