@@ -52,4 +52,25 @@ public interface DefaultConfig {
     boolean transaction = false;
 
 
+    /**
+     * The constant CORE_SIZE.
+     */
+    Integer CORE_SIZE = 100;
+
+    /**
+     * The constant MAX_SIZE.
+     */
+    Integer MAX_SIZE = 200;
+
+    /**
+     * The constant REJECT.
+     */
+    String REJECT = "AbortPolicy";
+    /**
+     * The constant QUEUE.
+     */
+    String QUEUE_SIZE = "";
+
+
+
 }

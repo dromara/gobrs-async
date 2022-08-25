@@ -66,8 +66,8 @@ public class GobrsAutoConfiguration {
      * @return the gobrs async thread pool factory
      */
     @Bean
-    public GobrsAsyncThreadPoolFactory gobrsAsyncThreadPoolFactory() {
-        return new GobrsAsyncThreadPoolFactory();
+    public GobrsAsyncThreadPoolFactory gobrsAsyncThreadPoolFactory(GobrsAsyncProperties grabrsAsyncProperties) {
+        return new GobrsAsyncThreadPoolFactory(grabrsAsyncProperties);
     }
 
 
