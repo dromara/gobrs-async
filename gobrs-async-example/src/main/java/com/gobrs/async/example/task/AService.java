@@ -15,9 +15,9 @@ import org.springframework.stereotype.Component;
  * @author: sizegang
  * @create: 2022 -03-20
  */
-@Task(failSubExec = true)
+@Task(failSubExec = true, repeatable = true)
 @Component
-public class AService extends AsyncTask<String, String> {
+public class AService extends AsyncTask<Object, String> {
 
     /**
      * The .
@@ -25,13 +25,13 @@ public class AService extends AsyncTask<String, String> {
     int i = 10000;
 
     @Override
-    public void prepare(String o) {
+    public void prepare(Object o) {
 
 
     }
 
     @Override
-    public String task(String o, TaskSupport support) {
+    public String task(Object o, TaskSupport support) {
         System.out.println(o);
 
         try {
@@ -48,7 +48,7 @@ public class AService extends AsyncTask<String, String> {
     }
 
     @Override
-    public boolean nessary(String o, TaskSupport support) {
+    public boolean nessary(Object o, TaskSupport support) {
         return true;
     }
 

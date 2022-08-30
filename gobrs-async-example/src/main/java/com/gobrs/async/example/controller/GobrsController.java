@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The type Gobrs controller.
@@ -41,6 +43,11 @@ public class GobrsController {
     public String gobrsTest() {
         Map<Class, Object> params = new HashMap<>();
         params.put(AService.class, "A的参数");
+        Set<String> objects = new HashSet<>();
+        objects.add("FService");
+        objects.add("DService");
+        objects.add("GService");
+        objects.add("EService");
         AsyncResult test = gobrsAsync.go("test", () -> params);
         return "success";
     }

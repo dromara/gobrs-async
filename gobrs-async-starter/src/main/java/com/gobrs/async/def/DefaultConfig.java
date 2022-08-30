@@ -71,6 +71,8 @@ public interface DefaultConfig {
      */
     String QUEUE_SIZE = "";
 
+    boolean repeatable = false;
+
 
 
 }

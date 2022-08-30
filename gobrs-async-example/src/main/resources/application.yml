@@ -1,9 +1,10 @@
 server:
-  port: 8888 # 端口: 8080
+  port: 9999 # 端口: 8080
 spring:
   gobrs:
     async:
       rules:
         - name: "test"
-          content: "AService->BService->FService;HService,EService,GService"
+          content: "AService->BService->FService->GService->HService;EService->CService;AService"
       task-interrupt: false #局部异常是否打断主流程
+

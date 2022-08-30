@@ -3,6 +3,7 @@ package com.gobrs.async.threadpool;
 import org.slf4j.MDC;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -38,7 +39,9 @@ public class MDCThreadPoolExecutor extends ThreadPoolExecutor {
         Runnable finalRunnable = runnable;
         super.execute(() -> {
             // 将父线程的MDC内容传给子线程
-            MDC.setContextMap(context);
+            if(Objects.nonNull(context)){
+                MDC.setContextMap(context);
+            }
             try {
                 // 执行异步操作
                 finalRunnable.run();

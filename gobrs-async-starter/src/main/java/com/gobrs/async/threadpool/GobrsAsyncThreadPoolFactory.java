@@ -29,14 +29,16 @@ public class GobrsAsyncThreadPoolFactory {
      */
     public GobrsAsyncThreadPoolFactory(GobrsAsyncProperties gobrsAsyncProperties) {
         this.gobrsAsyncProperties = gobrsAsyncProperties;
+        this.COMMON_POOL = TtlExecutors.getTtlExecutorService(createDefaultThreadPool());
+        this.threadPoolExecutor = defaultThreadPool();
     }
 
     /**
      * The default thread pool is not long
      */
-    private final ExecutorService COMMON_POOL = TtlExecutors.getTtlExecutorService(createDefaultThreadPool());
+    private final ExecutorService COMMON_POOL;
 
-    private ExecutorService threadPoolExecutor = defaultThreadPool();
+    private ExecutorService threadPoolExecutor;
 
     /**
      * Gets thread pool executor.

@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
@@ -40,7 +41,7 @@ class TaskTrigger {
     /**
      * The Upward tasks map space.
      */
-    public static Map<AsyncTask, List<AsyncTask>> upwardTasksMapSpace = new HashMap<>();
+    public static Map<AsyncTask, List<AsyncTask>> upwardTasksMapSpace = new ConcurrentHashMap<>();
 
     /**
      * Instantiates a new Task trigger.

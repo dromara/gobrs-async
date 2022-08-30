@@ -18,9 +18,11 @@ import com.gobrs.async.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -129,7 +131,7 @@ class TaskActuator implements Runnable, Cloneable {
              * If the conditions are not met
              * no execution is performed
              */
-            if (task.nessary(parameter, support) && support.getResultMap().get(task.getClass()) == null) {
+            if (task.nessary(parameter, support) && (support.getResultMap().get(task.getClass()) == null || task.isRepeatable())) {
 
                 task.prepare(parameter);
 
@@ -196,7 +198,11 @@ class TaskActuator implements Runnable, Cloneable {
                     if (task.isFailSubExec()) {
                         nextTask(taskLoader);
                     } else {
-                        taskLoader.stopSingleTaskLine(subTasks);
+                        if (CollectionUtils.isEmpty(taskLoader.getAffirTasks())) {
+                            taskLoader.stopSingleTaskLine(subTasks);
+                        } else {
+                            nextTask(taskLoader);
+                        }
                     }
                 }
             }
@@ -233,8 +239,14 @@ class TaskActuator implements Runnable, Cloneable {
 
         if (parameter instanceof Map) {
 
-            parameter = ((Map<?, ?>) parameter).get(task.getClass());
+            Object param = ((Map<?, ?>) parameter).get(task.getClass());
 
+            if (Objects.isNull(param)) {
+
+                param = ((Map<?, ?>) parameter).get(task.getClass().getName());
+
+                return param == null ? ((Map<?, ?>) parameter).get(task.getClass().getSimpleName()) : param;
+            }
         }
         return parameter;
     }
@@ -301,6 +313,7 @@ class TaskActuator implements Runnable, Cloneable {
                 TaskActuator process = taskLoader
                         .getProcess(subTasks.get(i));
                 Set<AsyncTask> affirTasks = taskLoader.getAffirTasks();
+
                 boolean continueExec = Optimal.ifContinue(affirTasks, taskLoader, process);
 
                 if (!continueExec) {
