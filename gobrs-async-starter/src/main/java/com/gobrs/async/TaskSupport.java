@@ -5,6 +5,7 @@ import com.gobrs.async.domain.TaskResult;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -39,7 +40,7 @@ public class TaskSupport {
     /**
      * Task result encapsulation
      */
-    private Map<Class, TaskResult> resultMap = new HashMap();
+    private Map<Class, TaskResult> resultMap = new ConcurrentHashMap<>();
 
 
     /**
