@@ -33,6 +33,9 @@ public interface DefaultConfig {
      * The constant RULE_ANY.
      */
     String RULE_ANY = "any";
+
+    String RULE_ANY_CONDITION = "anyCondition";
+
     /**
      * The constant RULE_EXCLUSIVE.
      */
@@ -50,6 +53,29 @@ public interface DefaultConfig {
      * Transaction task
      */
     boolean transaction = false;
+
+
+    /**
+     * The constant CORE_SIZE.
+     */
+    Integer CORE_SIZE = 100;
+
+    /**
+     * The constant MAX_SIZE.
+     */
+    Integer MAX_SIZE = 200;
+
+    /**
+     * The constant REJECT.
+     */
+    String REJECT = "AbortPolicy";
+    /**
+     * The constant QUEUE.
+     */
+    String QUEUE_SIZE = "";
+
+    boolean repeatable = false;
+
 
 
 }

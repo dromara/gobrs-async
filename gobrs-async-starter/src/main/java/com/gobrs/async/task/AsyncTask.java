@@ -34,6 +34,10 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
 
     private String desc;
 
+    private boolean repeatable;
+
+
+
     /**
      * Transaction task
      */
@@ -52,6 +56,8 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
 
     private boolean any = false;
 
+    private boolean anyCondition = false;
+
     /**
      * Whether any interruption ends other dependent tasks
      */
@@ -61,7 +67,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * get result of current task
      *
      * @param support the support
-     * @return result
+     * @return result result
      */
     public Result getResult(TaskSupport support) {
         TaskResult<Result> taskResult = getTaskResult(support);
@@ -77,7 +83,8 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * @param <Result> the type parameter
      * @param support  the support
      * @param clazz    depend on class
-     * @return result
+     * @param type     the type
+     * @return result result
      */
     public <Result> Result getResult(TaskSupport support, Class<? extends Task> clazz, Class<Result> type) {
         TaskResult<Result> taskResult = getTaskResult(support, clazz, type);
@@ -103,10 +110,11 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
     /**
      * get taskResult of depend on class
      *
-     * @param support
-     * @param clazz    depend on class
      * @param <Result> TaskResult<R>
-     * @return
+     * @param support  the support
+     * @param clazz    depend on class
+     * @param type     the type
+     * @return task result
      */
     public <Result> TaskResult<Result> getTaskResult(TaskSupport support, Class<? extends Task> clazz, Class<Result> type) {
         Map<Class, TaskResult> resultMap = support.getResultMap();
@@ -117,7 +125,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * get task param
      *
      * @param support the support
-     * @return param
+     * @return param param
      */
     public Param getParam(TaskSupport support) {
         Object taskResult = support.getParam();
@@ -289,11 +297,57 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         this.exclusive = exclusive;
     }
 
+    /**
+     * Gets desc.
+     *
+     * @return the desc
+     */
     public String getDesc() {
         return desc;
     }
 
+    /**
+     * Sets desc.
+     *
+     * @param desc the desc
+     */
     public void setDesc(String desc) {
         this.desc = desc;
+    }
+
+    /**
+     * Is repeatable boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isRepeatable() {
+        return repeatable;
+    }
+
+    /**
+     * Sets repeatable.
+     *
+     * @param repeatable the repeatable
+     */
+    public void setRepeatable(boolean repeatable) {
+        this.repeatable = repeatable;
+    }
+
+    /**
+     * Is any condition boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isAnyCondition() {
+        return anyCondition;
+    }
+
+    /**
+     * Sets any condition.
+     *
+     * @param anyCondition the any condition
+     */
+    public void setAnyCondition(boolean anyCondition) {
+        this.anyCondition = anyCondition;
     }
 }

@@ -47,4 +47,11 @@ public @interface Task {
      */
     int retryCount() default DefaultConfig.retryCount;
 
+    /**
+     * Repeatable boolean.
+     *
+     * @return the boolean
+     */
+    boolean repeatable() default DefaultConfig.repeatable;
+
 }

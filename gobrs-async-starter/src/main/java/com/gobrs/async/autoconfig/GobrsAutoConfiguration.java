@@ -63,11 +63,12 @@ public class GobrsAutoConfiguration {
     /**
      * Gobrs async thread pool factory gobrs async thread pool factory.
      *
+     * @param grabrsAsyncProperties the grabrs async properties
      * @return the gobrs async thread pool factory
      */
     @Bean
-    public GobrsAsyncThreadPoolFactory gobrsAsyncThreadPoolFactory() {
-        return new GobrsAsyncThreadPoolFactory();
+    public GobrsAsyncThreadPoolFactory gobrsAsyncThreadPoolFactory(GobrsAsyncProperties grabrsAsyncProperties) {
+        return new GobrsAsyncThreadPoolFactory(grabrsAsyncProperties);
     }
 
 
@@ -97,11 +98,12 @@ public class GobrsAutoConfiguration {
     /**
      * Gobrs async gobrs async.
      *
+     * @param gobrsAsyncProperties the gobrs async properties
      * @return the gobrs async
      */
     @Bean
-    public GobrsAsync gobrsAsync() {
-        return new GobrsAsync();
+    public GobrsAsync gobrsAsync(GobrsAsyncProperties gobrsAsyncProperties) {
+        return new GobrsAsync(gobrsAsyncProperties);
     }
 
     /**

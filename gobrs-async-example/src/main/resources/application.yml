@@ -1,13 +1,13 @@
 server:
-  port: 8888 # 端口: 8080
+  port: 9999 # 端口: 8080
 spring:
   gobrs:
     async:
+      enable: false
       rules:
-        - name: "test"
-          content: "AService->BService->CService,FService->HService"
-#        - name: "azh"
-#          content: "AService->BService,CService,FService; BService->FService,GService;"
-        - name: "aiirs"
-          content: "AService->BService,CService->DService; FService->FService,GService;"
+        - name: "general"
+          content: "AService->BService->FService->GService->HService;EService->CService;AService"
+        - name: "anyConditionRule"
+          content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition"
       task-interrupt: false #局部异常是否打断主流程
+

@@ -6,6 +6,8 @@ import com.gobrs.async.task.AsyncTask;
 import org.apache.catalina.User;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.LinkedBlockingQueue;
+
 /**
  * The type A service.
  *
@@ -15,9 +17,9 @@ import org.springframework.stereotype.Component;
  * @author: sizegang
  * @create: 2022 -03-20
  */
-@Task(failSubExec = true)
+@Task(failSubExec = true, repeatable = true)
 @Component
-public class AService extends AsyncTask<String, String> {
+public class AService extends AsyncTask<Object, String> {
 
     /**
      * The .
@@ -25,14 +27,13 @@ public class AService extends AsyncTask<String, String> {
     int i = 10000;
 
     @Override
-    public void prepare(String o) {
+    public void prepare(Object o) {
 
 
     }
 
     @Override
-    public String task(String o, TaskSupport support) {
-        System.out.println(o);
+    public String task(Object o, TaskSupport support) {
 
         try {
             System.out.println("AService Begin");
@@ -48,7 +49,7 @@ public class AService extends AsyncTask<String, String> {
     }
 
     @Override
-    public boolean nessary(String o, TaskSupport support) {
+    public boolean nessary(Object o, TaskSupport support) {
         return true;
     }
 
@@ -62,4 +63,5 @@ public class AService extends AsyncTask<String, String> {
     public void onFail(TaskSupport support) {
 
     }
+
 }

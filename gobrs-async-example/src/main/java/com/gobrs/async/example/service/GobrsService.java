@@ -25,35 +25,12 @@ import java.util.concurrent.*;
 @Service
 public class GobrsService {
 
-    @Autowired
-    private AService aService;
 
-    @Autowired
-    private BService bService;
-    @Autowired
-    private CService cService;
-    @Autowired
-    private DService dService;
 
-    @Autowired
-    private EService eService;
-
-    @Autowired
-    private FService fService;
-
-    @Autowired
-    private GService gService;
-
-    @Autowired
+    @Autowired(required = false)
     private GobrsAsync gobrsAsync;
 
-    @Resource
-    private RuleThermalLoad ruleThermalLoad;
 
-    /**
-     * The Executor service.
-     */
-    ExecutorService executorService = Executors.newCachedThreadPool();
 
 
     /**
@@ -67,87 +44,12 @@ public class GobrsService {
     /**
      * Future.
      */
-    public void future() {
-        List<AsyncTask> abList = new ArrayList<>();
-        abList.add(aService);
-        abList.add(bService);
-        List<Future> futures = new ArrayList<>();
-        for (AsyncTask task : abList) {
-            Future<Object> submit = executorService.submit(() -> task.task(new Object(), null));
-            futures.add(submit);
-        }
 
-        for (Future future : futures) {
-            try {
-                Object o = future.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-        }
-
-        List<AsyncTask> cdList = new ArrayList<>();
-        cdList.add(cService);
-        cdList.add(dService);
-        List<Future> futurescd = new ArrayList<>();
-        for (AsyncTask task : cdList) {
-            Future<Object> submit = executorService.submit(() -> task.task(new Object(), null));
-            futurescd.add(submit);
-        }
-
-        for (Future future : futurescd) {
-            try {
-                Object o = future.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        List<AsyncTask> efList = new ArrayList<>();
-        efList.add(eService);
-        efList.add(fService);
-        List<Future> futuresef = new ArrayList<>();
-        for (AsyncTask task : efList) {
-            Future<Object> submit = executorService.submit(() -> task.task(new Object(), null));
-            futuresef.add(submit);
-        }
-
-        for (Future future : futuresef) {
-            try {
-                Object o = future.get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-        Future<Object> submit = executorService.submit(() -> gService.task(new Object(), null));
-        try {
-            submit.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
-
-
-    }
 
     /**
      * Update rule.
      *
      * @param rule the rule
      */
-    public void updateRule(Rule rule) {
-        Rule r = new Rule();
-        r.setName("ruleName");
-        r.setContent("AService->CService->EService->GService; BService->DService->FService->HService;");
-        ruleThermalLoad.load(rule);
-    }
+
 }

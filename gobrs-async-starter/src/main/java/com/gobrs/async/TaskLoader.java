@@ -10,6 +10,7 @@ import com.gobrs.async.exception.GobrsAsyncException;
 import com.gobrs.async.exception.TimeoutException;
 import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -136,7 +137,7 @@ public class TaskLoader {
      * @return
      */
     private List<TaskActuator> aiirs(List<TaskActuator> begins) {
-        if (affirTasks != null && affirTasks.size() > 0) {
+        if (!CollectionUtils.isEmpty(affirTasks)) {
             Optimal.ifOptimal(affirTasks, processMap, assistantTask);
             Map<String, AsyncTask> aiirMap = affirTasks.stream().collect(Collectors.toMap(AsyncTask::getName, Function.identity()));
             begins = begins.stream().filter(x -> aiirMap.get(x.getTask().getName()) != null).collect(Collectors.toList());
@@ -310,13 +311,31 @@ public class TaskLoader {
     /**
      * End of single mission line
      *
+     * @param subtasks the subtasks
      */
-    public void stopSingleTaskLine() {
+    public void stopSingleTaskLine(List<AsyncTask> subtasks) {
         TaskActuator taskActuator = processMap.get(assistantTask);
-        taskActuator.releasingDependency();
-        if (!taskActuator.hasUnsatisfiedDependcies()) {
-            taskActuator.run();
+        for (AsyncTask subtask : subtasks) {
+            rtDept(subtask, taskActuator);
         }
+    }
+
+
+    /**
+     * Rt dept.
+     *
+     * @param task   the task
+     * @param terminationTask the terminationTask
+     */
+    public void rtDept(AsyncTask task, TaskActuator terminationTask) {
+        if (task instanceof TaskTrigger.AssistantTask) {
+            terminationTask.releasingDependency();
+            if (!terminationTask.hasUnsatisfiedDependcies()) {
+                terminationTask.run();
+            }
+            return;
+        }
+        stopSingleTaskLine(processMap.get(task).subTasks);
     }
 
 

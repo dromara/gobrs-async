@@ -12,11 +12,11 @@ import com.gobrs.async.task.AsyncTask;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.gobrs.async.def.Constant.sp;
 import static com.gobrs.async.def.Constant.tied;
-import static com.gobrs.async.def.DefaultConfig.RULE_ANY;
-import static com.gobrs.async.def.DefaultConfig.RULE_EXCLUSIVE;
+import static com.gobrs.async.def.DefaultConfig.*;
 
 /**
  * The type Rule parse engine.
@@ -38,6 +38,8 @@ public class RuleParseEngine<T> extends AbstractEngine {
 
     @Resource
     private GobrsAsync gobrsAsync;
+
+    private static AtomicInteger current = new AtomicInteger(0);
 
     @Override
     public void doParse(Rule rule, boolean reload) {
@@ -155,9 +157,15 @@ public class RuleParseEngine<T> extends AbstractEngine {
             task.setCallback(getCallBack(task));
             task.setRetryCount(getRetryCount(task));
             task.setFailSubExec(getFailSubExec(task));
+            task.setRepeatable(getRepeatable(task));
             if (taskName.contains(tied) && RULE_ANY.equals(preNamed[1])) {
                 task.setAny(true);
             }
+
+            if (taskName.contains(tied) && RULE_ANY_CONDITION.equals(preNamed[1])) {
+                task.setAnyCondition(true);
+            }
+
             if (cursor == 3 && RULE_EXCLUSIVE.equals(preNamed[2])) {
                 task.setExclusive(true);
             }
@@ -264,6 +272,24 @@ public class RuleParseEngine<T> extends AbstractEngine {
             return annotation.failSubExec();
         }
 
+
+        /**
+         * Whether to continue the sub-process if the task execution fails
+         *
+         * @param task the task
+         * @return fail sub exec
+         */
+        public static boolean getRepeatable(AsyncTask task) {
+            Task annotation = task.getClass().getAnnotation(Task.class);
+            if (annotation == null) {
+                return false;
+            }
+            return annotation.repeatable();
+        }
+
+
     }
+
+
 
 }

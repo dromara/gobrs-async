@@ -1,4 +1,4 @@
-package com.gobrs.async.example.task;
+package com.gobrs.async.example.task.condition;
 
 import com.gobrs.async.TaskSupport;
 import com.gobrs.async.anno.Task;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Task
-public class BService extends AsyncTask<Object, Object> {
+public class BServiceCondition extends AsyncTask<Object, Boolean> {
 
 
     /**
@@ -31,14 +31,15 @@ public class BService extends AsyncTask<Object, Object> {
     }
 
     @Override
-    public Object task(Object o, TaskSupport support) {
-        System.out.println("BService Begin");
+    public Boolean task(Object o, TaskSupport support) {
+        System.out.println("BServiceCondition Begin");
         for (int i1 = 0; i1 < i; i1++) {
             i1 += i1;
         }
+
         System.out.println(1 / 0);
-        System.out.println("BService Finish");
-        return null;
+        System.out.println("BServiceCondition Finish");
+        return false;
     }
 
     @Override

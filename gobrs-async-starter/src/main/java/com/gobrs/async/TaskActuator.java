@@ -13,24 +13,30 @@ import com.gobrs.async.callback.ErrorCallback;
 import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.TaskResult;
 import com.gobrs.async.enums.ResultState;
+import com.gobrs.async.exception.GobrsAsyncException;
 import com.gobrs.async.task.AsyncTask;
 import com.gobrs.async.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static com.gobrs.async.util.TaskUtil.multipleDependencies;
+
 /**
  * The type Task actuator.
  */
-class TaskActuator implements Runnable, Cloneable {
+public class TaskActuator implements Runnable, Cloneable {
 
     /**
      * The Logger.
@@ -56,7 +62,7 @@ class TaskActuator implements Runnable, Cloneable {
     /**
      * depend task
      */
-    private final List<AsyncTask> subTasks;
+    public final List<AsyncTask> subTasks;
 
     /**
      * The Param.
@@ -129,7 +135,8 @@ class TaskActuator implements Runnable, Cloneable {
              * If the conditions are not met
              * no execution is performed
              */
-            if (task.nessary(parameter, support) && support.getResultMap().get(task.getClass()) == null) {
+            Object result = null;
+            if (task.nessary(parameter, support) && (support.getResultMap().get(task.getClass()) == null || task.isRepeatable())) {
 
                 task.prepare(parameter);
 
@@ -141,7 +148,7 @@ class TaskActuator implements Runnable, Cloneable {
                 /**
                  * Perform a task
                  */
-                Object result = task.task(parameter, support);
+                result = task.task(parameter, support);
 
                 aiirAxamination();
 
@@ -166,7 +173,8 @@ class TaskActuator implements Runnable, Cloneable {
              * Determine whether the process is interrupted
              */
             if (taskLoader.isRunning().get()) {
-                nextTask(taskLoader);
+                nextTaskByCase(taskLoader, result);
+
             }
         } catch (Exception e) {
             Optimal.optimalCount(support.taskLoader);
@@ -194,14 +202,33 @@ class TaskActuator implements Runnable, Cloneable {
                 } else {
                     taskLoader.error(errorCallback(parameter, e, support, task));
                     if (task.isFailSubExec()) {
-                        nextTask(taskLoader);
+                        nextTask(taskLoader, false);
                     } else {
-                        taskLoader.stopSingleTaskLine();
+                        if (!CollectionUtils.isEmpty(taskLoader.getAffirTasks()) || multipleDependencies(upwardTasksMap, subTasks)) {
+                            nextTask(taskLoader, false);
+                        } else {
+                            taskLoader.stopSingleTaskLine(subTasks);
+                        }
+
                     }
                 }
             }
 
         }
+    }
+
+    /**
+     * Execute tasks based on conditions
+     *
+     * @param taskLoader
+     * @param result
+     */
+    private void nextTaskByCase(TaskLoader taskLoader, Object result) {
+        if (result instanceof Boolean) {
+            nextTask(taskLoader, (Boolean) result);
+            return;
+        }
+        nextTask(taskLoader);
     }
 
     private void aiirAxamination() {
@@ -233,11 +260,17 @@ class TaskActuator implements Runnable, Cloneable {
 
         if (parameter instanceof Map) {
 
-            parameter = ((Map<?, ?>) parameter).get(task.getClass());
+            Object param = ((Map<?, ?>) parameter).get(task.getClass());
 
+            if (Objects.nonNull(param)) {
+                param = ((Map<?, ?>) parameter).get(task.getClass());
+
+                return param == null ? ((Map<?, ?>) parameter).get(task.getClass().getName()) : param;
+            }
         }
         return parameter;
     }
+
 
     private boolean retryTask(Object parameter, TaskLoader taskLoader) {
         try {
@@ -296,11 +329,22 @@ class TaskActuator implements Runnable, Cloneable {
      * @param taskLoader the task loader
      */
     public void nextTask(TaskLoader taskLoader) {
+        nextTask(taskLoader, true);
+    }
+
+    /**
+     * Next task.
+     *
+     * @param taskLoader       the task loader
+     * @param taskResultStatue the task result statue
+     */
+    public void nextTask(TaskLoader taskLoader, boolean taskResultStatue) {
         if (subTasks != null) {
             for (int i = 0; i < subTasks.size(); i++) {
                 TaskActuator process = taskLoader
                         .getProcess(subTasks.get(i));
                 Set<AsyncTask> affirTasks = taskLoader.getAffirTasks();
+
                 boolean continueExec = Optimal.ifContinue(affirTasks, taskLoader, process);
 
                 if (!continueExec) {
@@ -310,17 +354,32 @@ class TaskActuator implements Runnable, Cloneable {
                  * Check whether the subtask depends on a task that has been executed
                  * The number of tasks that it depends on to get to this point minus one
                  */
-                if (process.releasingDependency() == 0) {
-                    /**
-                     * for thread reuse
-                     */
-                    if (subTasks.size() == 1 && !process.task.isExclusive()) {
-                        process.run();
-                    } else {
-                        doProcess(taskLoader, process, affirTasks);
+                if (process.task.isAnyCondition()) {
+                    if (taskResultStatue) {
+                        if (starting.compareAndSet(0, 1)) {
+                            doTask(taskLoader, process, affirTasks);
+                        }
+                    }
+                    process.releasingDependency();
+                } else {
+                    if (process.releasingDependency() == 0) {
+                        doTask(taskLoader, process, affirTasks);
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * @param taskLoader
+     * @param process
+     * @param affirTasks
+     */
+    private void doTask(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> affirTasks) {
+        if (subTasks.size() == 1 && !process.task.isExclusive()) {
+            process.run();
+        } else {
+            doProcess(taskLoader, process, affirTasks);
         }
     }
 

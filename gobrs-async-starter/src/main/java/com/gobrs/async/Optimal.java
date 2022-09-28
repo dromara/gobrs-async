@@ -13,6 +13,7 @@ import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 
@@ -73,9 +74,11 @@ public class Optimal {
      */
     public static void doOptimal(Set<String> affirTasks, TaskLoader loader, Map<AsyncTask, List<AsyncTask>> upwardTasksMapSpace) {
         Set<AsyncTask> asyncTaskSet = new HashSet<>();
+
         if (affirTasks == null) {
             return;
         }
+
         for (String x : affirTasks) {
             Object bean = GobrsSpring.getBean(x);
             if (bean == null) {
@@ -84,21 +87,35 @@ public class Optimal {
             }
 
             if (!(bean instanceof AsyncTask)) {
-                return;
+                continue;
             }
 
             AsyncTask task = (AsyncTask) bean;
 
-            List<AsyncTask> asyncTasks = upwardTasksMapSpace.get(task);
+            recursionUpward(upwardTasksMapSpace, task, asyncTaskSet);
 
-            if (Objects.isNull(asyncTasks)) {
+            if (Objects.isNull(asyncTaskSet)) {
                 throw new GobrsAsyncException(String.format("task %s in  springboot yaml or properties must exist", task.getClass().getSimpleName()));
             }
-            asyncTasks.add(task);
 
-            asyncTaskSet.addAll(new HashSet<>(asyncTasks));
+            asyncTaskSet.add(task);
         }
         loader.setAffirTasks(asyncTaskSet);
+    }
+
+    private static void recursionUpward(Map<AsyncTask, List<AsyncTask>> upwardTasksMapSpace, AsyncTask task, Set<AsyncTask> allTask) {
+
+        List<AsyncTask> asyncTasks = upwardTasksMapSpace.get(task);
+
+        if (CollectionUtils.isEmpty(asyncTasks)) {
+            return;
+        }
+
+        allTask.addAll(asyncTasks);
+
+        for (AsyncTask asyncTask : asyncTasks) {
+            recursionUpward(upwardTasksMapSpace, asyncTask, allTask);
+        }
     }
 
 
