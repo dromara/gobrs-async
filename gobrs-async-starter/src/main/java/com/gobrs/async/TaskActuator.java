@@ -539,7 +539,7 @@ public class TaskActuator implements Runnable, Cloneable {
      * @return the task result
      */
     public TaskResult buildErrorResult(Object parameter, Exception ex) {
-        return new TaskResult(parameter, ResultState.SUCCESS, ex);
+        return new TaskResult(parameter, ResultState.EXCEPTION, ex);
     }
 
     /**
