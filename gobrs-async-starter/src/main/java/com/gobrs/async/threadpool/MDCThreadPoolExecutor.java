@@ -10,12 +10,14 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @program: m-detail
+ * The type Mdc thread pool executor.
+ *
+ * @program: m -detail
  * @ClassName MDCThreadPoolExecutor
  * @description:
  * @author: sizegang
- * @create: 2022-04-23
- **/
+ * @create: 2022 -04-23
+ */
 public class MDCThreadPoolExecutor extends ThreadPoolExecutor {
     /**
      * Instantiates a new Mdc thread pool executor.
@@ -34,19 +36,30 @@ public class MDCThreadPoolExecutor extends ThreadPoolExecutor {
 
     @Override
     public void execute(Runnable runnable) {
-        // 获取父线程MDC中的内容，必须在run方法之前，否则等异步线程执行的时候有可能MDC里面的值已经被清空了，这个时候就会返回null
+        /**
+         * The content in the MDC of the parent thread must be obtained before the run method,
+         * otherwise the value in the MDC may have been cleared when the asynchronous thread is executed, and null will be returned at this time.
+         */
         final Map<String, String> context = MDC.getCopyOfContextMap();
+
         Runnable finalRunnable = runnable;
+
         super.execute(() -> {
-            // 将父线程的MDC内容传给子线程
+            /**
+             * Pass the MDC content of the parent thread to the child thread
+             */
             if(Objects.nonNull(context)){
                 MDC.setContextMap(context);
             }
             try {
-                // 执行异步操作
+                /**
+                 * perform asynchronous operations
+                 */
                 finalRunnable.run();
             } finally {
-                // 清空MDC内容
+                /**
+                 * clear
+                 */
                 MDC.clear();
             }
         });

@@ -4,9 +4,7 @@ import com.alibaba.ttl.threadpool.TtlExecutors;
 import com.gobrs.async.autoconfig.GobrsAsyncProperties;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * The type Gobrs async thread pool factory.
