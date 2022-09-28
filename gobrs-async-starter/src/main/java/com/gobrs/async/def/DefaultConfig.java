@@ -48,7 +48,7 @@ public interface DefaultConfig {
     /**
      * Whether to execute a subtask if it fails
      */
-    boolean failSubExec = true;
+    boolean failSubExec = false;
     /**
      * Transaction task
      */
