@@ -325,13 +325,13 @@ public class TaskLoader {
      * Rt dept.
      *
      * @param task   the task
-     * @param assist the assist
+     * @param terminationTask the terminationTask
      */
-    public void rtDept(AsyncTask task, TaskActuator assist) {
+    public void rtDept(AsyncTask task, TaskActuator terminationTask) {
         if (task instanceof TaskTrigger.AssistantTask) {
-            assist.releasingDependency();
-            if (!assist.hasUnsatisfiedDependcies()) {
-                assist.run();
+            terminationTask.releasingDependency();
+            if (!terminationTask.hasUnsatisfiedDependcies()) {
+                terminationTask.run();
             }
             return;
         }

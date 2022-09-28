@@ -28,7 +28,7 @@ import java.util.Set;
 @RequestMapping("gobrs")
 public class GobrsController {
 
-    @Autowired
+    @Autowired(required = false)
     private GobrsAsync gobrsAsync;
 
     @Autowired
@@ -58,11 +58,7 @@ public class GobrsController {
      */
     @RequestMapping("future")
     public void future() {
-        long start = System.currentTimeMillis();
-        gobrsService.future();
 
-        long coust = System.currentTimeMillis() - start;
-        System.out.println("future " + coust);
 
     }
 

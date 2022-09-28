@@ -63,6 +63,7 @@ public class GobrsAutoConfiguration {
     /**
      * Gobrs async thread pool factory gobrs async thread pool factory.
      *
+     * @param grabrsAsyncProperties the grabrs async properties
      * @return the gobrs async thread pool factory
      */
     @Bean
@@ -97,6 +98,7 @@ public class GobrsAutoConfiguration {
     /**
      * Gobrs async gobrs async.
      *
+     * @param gobrsAsyncProperties the gobrs async properties
      * @return the gobrs async
      */
     @Bean

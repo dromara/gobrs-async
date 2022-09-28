@@ -56,6 +56,8 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
 
     private boolean any = false;
 
+    private boolean anyCondition = false;
+
     /**
      * Whether any interruption ends other dependent tasks
      */
@@ -329,5 +331,23 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      */
     public void setRepeatable(boolean repeatable) {
         this.repeatable = repeatable;
+    }
+
+    /**
+     * Is any condition boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isAnyCondition() {
+        return anyCondition;
+    }
+
+    /**
+     * Sets any condition.
+     *
+     * @param anyCondition the any condition
+     */
+    public void setAnyCondition(boolean anyCondition) {
+        this.anyCondition = anyCondition;
     }
 }

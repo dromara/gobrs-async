@@ -16,8 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.gobrs.async.def.Constant.sp;
 import static com.gobrs.async.def.Constant.tied;
-import static com.gobrs.async.def.DefaultConfig.RULE_ANY;
-import static com.gobrs.async.def.DefaultConfig.RULE_EXCLUSIVE;
+import static com.gobrs.async.def.DefaultConfig.*;
 
 /**
  * The type Rule parse engine.
@@ -162,6 +161,11 @@ public class RuleParseEngine<T> extends AbstractEngine {
             if (taskName.contains(tied) && RULE_ANY.equals(preNamed[1])) {
                 task.setAny(true);
             }
+
+            if (taskName.contains(tied) && RULE_ANY_CONDITION.equals(preNamed[1])) {
+                task.setAnyCondition(true);
+            }
+
             if (cursor == 3 && RULE_EXCLUSIVE.equals(preNamed[2])) {
                 task.setExclusive(true);
             }

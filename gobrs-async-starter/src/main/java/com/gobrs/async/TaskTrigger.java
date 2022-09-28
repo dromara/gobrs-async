@@ -27,6 +27,7 @@ class TaskTrigger {
      * The Logger.
      */
     Logger logger = LoggerFactory.getLogger(TaskTrigger.class);
+
     private final TaskFlow taskFlow;
 
     private GobrsAsyncThreadPoolFactory threadPoolFactory = GobrsSpring.getBean(GobrsAsyncThreadPoolFactory.class);

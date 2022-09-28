@@ -1,6 +1,7 @@
 package com.gobrs.async.example.config;
 
 import com.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
+import com.gobrs.async.threadpool.GobrsThreadPoolConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
@@ -20,19 +21,12 @@ import java.util.concurrent.TimeUnit;
  * @Version 1.0
  */
 @Configuration
-public class ThreadPoolConfig {
+public class ThreadPoolConfig extends GobrsThreadPoolConfiguration {
 
-    @Autowired
-    private GobrsAsyncThreadPoolFactory factory;
-
-    /**
-     * Gobrs thread pool executor.
-     */
-    @PostConstruct
-    public void gobrsThreadPoolExecutor(){
+    @Override
+    protected void doInitialize(GobrsAsyncThreadPoolFactory factory) {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(300, 500, 30, TimeUnit.SECONDS,
                 new LinkedBlockingQueue());
         factory.setThreadPoolExecutor(threadPoolExecutor);
     }
-
 }

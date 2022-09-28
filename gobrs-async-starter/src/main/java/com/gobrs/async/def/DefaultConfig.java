@@ -33,6 +33,9 @@ public interface DefaultConfig {
      * The constant RULE_ANY.
      */
     String RULE_ANY = "any";
+
+    String RULE_ANY_CONDITION = "anyCondition";
+
     /**
      * The constant RULE_EXCLUSIVE.
      */
@@ -45,7 +48,7 @@ public interface DefaultConfig {
     /**
      * Whether to execute a subtask if it fails
      */
-    boolean failSubExec = false;
+    boolean failSubExec = true;
     /**
      * Transaction task
      */

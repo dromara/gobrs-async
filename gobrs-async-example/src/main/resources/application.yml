@@ -3,8 +3,11 @@ server:
 spring:
   gobrs:
     async:
+      enable: false
       rules:
-        - name: "test"
+        - name: "general"
           content: "AService->BService->FService->GService->HService;EService->CService;AService"
+        - name: "anyConditionRule"
+          content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition"
       task-interrupt: false #局部异常是否打断主流程
 
