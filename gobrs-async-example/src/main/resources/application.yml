@@ -3,7 +3,7 @@ server:
 spring:
   gobrs:
     async:
-      enable: false
+#      enable: false
       rules:
         - name: "general"
           content: "AService->BService->FService->GService->HService;EService->CService;AService"

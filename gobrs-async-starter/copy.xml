@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.memorydoc</groupId>
     <artifactId>gobrs-async-starter</artifactId>
-    <version>1.2.1-RELEASE</version>
+    <version>1.2.2-RELEASE</version>
     <name>${project.artifactId}</name>
     <description>🔥 强大异步任务编排工具（没有依赖中间件）</description>
     <url>https://github.com/Memorydoc/gobrs-async-starter</url>
@@ -55,6 +55,7 @@
         <revision>1.0.0-beta.3</revision>
         <maven.javadoc.plugin.version>3.0.0</maven.javadoc.plugin.version>
         <maven.compiler.plugin.version>3.6.1</maven.compiler.plugin.version>
+        <ttl.version>2.11.2</ttl.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -79,6 +80,11 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>transmittable-thread-local</artifactId>
+            <version>${ttl.version}</version>
         </dependency>
     </dependencies>
     <build>

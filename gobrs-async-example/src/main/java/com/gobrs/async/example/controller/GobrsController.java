@@ -76,14 +76,4 @@ public class GobrsController {
         System.out.println("gobrs-Async " + coust);
 
     }
-
-    /**
-     * Update rule.
-     *
-     * @param rule the rule
-     */
-    @RequestMapping("updateRule")
-    public void updateRule(@RequestBody Rule rule) {
-        gobrsService.updateRule(rule);
-    }
 }
