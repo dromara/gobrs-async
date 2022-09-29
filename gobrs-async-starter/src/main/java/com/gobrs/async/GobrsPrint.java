@@ -26,7 +26,7 @@ public class GobrsPrint {
 
     private static final String GOBRS_ASYNC = " :: Gobrs-Async :: ";
 
-    private static final String GOBRS_ASYNC_GITHUB = "GitHub:  https://github.com/Memorydoc/gobrs-async";
+    private static final String GOBRS_ASYNC_GITHUB = "GitHub:  https://gitee.com/dromara/gobrs-async";
 
     private static final String GOBRS_ASYNC_SITE = "Site:  https://docs.sizegang.cn";
 
