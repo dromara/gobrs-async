@@ -10,22 +10,11 @@ import org.springframework.stereotype.Component;
  * @program: gobrs -async-starter
  * @ClassName DService
  * @description:
- * 任务依赖类型
- *  AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition
- *
- *  简化配置
- *
- *  A,B,C->D:anyCondition
- *
- *  D根据 A,B,C 返回的任务结果中的 AnyCondition 的state状态 进行判断是否继续执行 子任务
- *
- *
- *
  * @author: sizegang
  * @create: 2022 -03-20
  */
 @Component
-public class DServiceCondition extends AsyncTask<Object, Boolean> {
+public class EServiceCondition extends AsyncTask<Object, Boolean> {
 
     /**
      * The .
@@ -39,11 +28,11 @@ public class DServiceCondition extends AsyncTask<Object, Boolean> {
 
     @Override
     public Boolean task(Object o, TaskSupport support) {
-        System.out.println("DServiceCondition Begin");
+        System.out.println("EServiceCondition Begin");
         for (int i1 = 0; i1 < i; i1++) {
             i1 += i1;
         }
-        System.out.println("DServiceCondition Finish");
+        System.out.println("EServiceCondition Finish");
         return true;
     }
 

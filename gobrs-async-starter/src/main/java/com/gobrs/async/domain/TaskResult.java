@@ -40,7 +40,11 @@ public class TaskResult<V> {
      * @param ex          the ex
      */
     public TaskResult(V result, ResultState resultState, Exception ex) {
-        this.result = result;
+        if (result instanceof AnyConditionResult) {
+            this.result = (V) ((AnyConditionResult<?>) result).getResult();
+        } else {
+            this.result = result;
+        }
         this.resultState = resultState;
         this.ex = ex;
     }

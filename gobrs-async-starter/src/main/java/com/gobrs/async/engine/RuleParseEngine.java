@@ -157,7 +157,6 @@ public class RuleParseEngine<T> extends AbstractEngine {
             task.setCallback(getCallBack(task));
             task.setRetryCount(getRetryCount(task));
             task.setFailSubExec(getFailSubExec(task));
-            task.setRepeatable(getRepeatable(task));
             if (taskName.contains(tied) && RULE_ANY.equals(preNamed[1])) {
                 task.setAny(true);
             }
@@ -273,23 +272,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
         }
 
 
-        /**
-         * Whether to continue the sub-process if the task execution fails
-         *
-         * @param task the task
-         * @return fail sub exec
-         */
-        public static boolean getRepeatable(AsyncTask task) {
-            Task annotation = task.getClass().getAnnotation(Task.class);
-            if (annotation == null) {
-                return false;
-            }
-            return annotation.repeatable();
-        }
-
-
     }
-
 
 
 }

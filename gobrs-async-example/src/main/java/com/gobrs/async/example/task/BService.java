@@ -24,7 +24,6 @@ public class BService extends AsyncTask<Object, Object> {
      */
     int i = 10000;
 
-
     @Override
     public void prepare(Object o) {
 

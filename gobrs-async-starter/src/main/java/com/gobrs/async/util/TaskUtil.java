@@ -1,12 +1,11 @@
 package com.gobrs.async.util;
 
-import com.gobrs.async.TaskActuator;
+import com.gobrs.async.domain.AnyConditionResult;
 import com.gobrs.async.task.AsyncTask;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * The type Task util.
@@ -33,6 +32,25 @@ public class TaskUtil {
             }
         }
         return false;
+    }
+
+    /**
+     * Default any condition any condition.
+     *
+     * @return the any condition
+     */
+    public static AnyConditionResult defaultAnyCondition() {
+        return AnyConditionResult.builder().setState(false).build();
+    }
+
+    /**
+     * Default any condition any condition.
+     *
+     * @param state the state
+     * @return the any condition
+     */
+    public static AnyConditionResult defaultAnyCondition(boolean state) {
+        return AnyConditionResult.builder().setState(state).build();
     }
 
 }

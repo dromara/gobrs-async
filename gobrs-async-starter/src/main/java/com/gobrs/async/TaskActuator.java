@@ -10,27 +10,25 @@ package com.gobrs.async;
 
 import com.gobrs.async.autoconfig.GobrsAsyncProperties;
 import com.gobrs.async.callback.ErrorCallback;
+import com.gobrs.async.domain.AnyConditionResult;
 import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.domain.TaskResult;
 import com.gobrs.async.enums.ResultState;
-import com.gobrs.async.exception.GobrsAsyncException;
 import com.gobrs.async.task.AsyncTask;
-import com.gobrs.async.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static com.gobrs.async.util.TaskUtil.defaultAnyCondition;
 import static com.gobrs.async.util.TaskUtil.multipleDependencies;
 
 /**
@@ -136,7 +134,7 @@ public class TaskActuator implements Runnable, Cloneable {
              * no execution is performed
              */
             Object result = null;
-            if (task.nessary(parameter, support) && (support.getResultMap().get(task.getClass()) == null || task.isRepeatable())) {
+            if (task.nessary(parameter, support) && (support.getResultMap().get(task.getClass()) == null)) {
 
                 task.prepare(parameter);
 
@@ -202,10 +200,10 @@ public class TaskActuator implements Runnable, Cloneable {
                 } else {
                     taskLoader.error(errorCallback(parameter, e, support, task));
                     if (task.isFailSubExec()) {
-                        nextTask(taskLoader, false);
+                        nextTask(taskLoader, defaultAnyCondition(false));
                     } else {
                         if (!CollectionUtils.isEmpty(taskLoader.getAffirTasks()) || multipleDependencies(upwardTasksMap, subTasks)) {
-                            nextTask(taskLoader, false);
+                            nextTask(taskLoader, defaultAnyCondition(false));
                         } else {
                             taskLoader.stopSingleTaskLine(subTasks);
                         }
@@ -224,8 +222,8 @@ public class TaskActuator implements Runnable, Cloneable {
      * @param result
      */
     private void nextTaskByCase(TaskLoader taskLoader, Object result) {
-        if (result instanceof Boolean) {
-            nextTask(taskLoader, (Boolean) result);
+        if (result instanceof AnyConditionResult) {
+            nextTask(taskLoader, (AnyConditionResult) result);
             return;
         }
         nextTask(taskLoader);
@@ -284,6 +282,7 @@ public class TaskActuator implements Runnable, Cloneable {
                 return true;
             }
             return false;
+
         } catch (Exception exception) {
             return retryTask(parameter, taskLoader);
         }
@@ -308,7 +307,6 @@ public class TaskActuator implements Runnable, Cloneable {
             if (gobrsAsyncProperties.isParamContext()) {
                 support.getResultMap().put(task.getClass(), buildSuccessResult(result));
             }
-
             /**
              * Success callback
              */
@@ -325,16 +323,16 @@ public class TaskActuator implements Runnable, Cloneable {
      * @param taskLoader the task loader
      */
     public void nextTask(TaskLoader taskLoader) {
-        nextTask(taskLoader, true);
+        nextTask(taskLoader, defaultAnyCondition());
     }
 
     /**
      * Next task.
      *
-     * @param taskLoader       the task loader
-     * @param taskResultStatue the task result statue
+     * @param taskLoader      the task loader
+     * @param conditionResult the task conditionResult
      */
-    public void nextTask(TaskLoader taskLoader, boolean taskResultStatue) {
+    public void nextTask(TaskLoader taskLoader, AnyConditionResult conditionResult) {
         if (subTasks != null) {
             for (int i = 0; i < subTasks.size(); i++) {
                 TaskActuator process = taskLoader
@@ -351,7 +349,7 @@ public class TaskActuator implements Runnable, Cloneable {
                  * The number of tasks that it depends on to get to this point minus one
                  */
                 if (process.task.isAnyCondition()) {
-                    if (taskResultStatue) {
+                    if (conditionResult.getState()) {
                         if (starting.compareAndSet(0, 1)) {
                             doTask(taskLoader, process, affirTasks);
                         }
@@ -519,35 +517,35 @@ public class TaskActuator implements Runnable, Cloneable {
     /**
      * Build success result task result.
      *
-     * @param parameter the parameter
+     * @param result the result
      * @return the task result
      */
-    public TaskResult buildSuccessResult(Object parameter) {
-        return new TaskResult(parameter, ResultState.SUCCESS, null);
+    public TaskResult buildSuccessResult(Object result) {
+        return new TaskResult(result, ResultState.SUCCESS, null);
     }
 
 
     /**
      * Build error result task result.
      *
-     * @param parameter the parameter
-     * @param ex        the ex
+     * @param result the result
+     * @param ex     the ex
      * @return the task result
      */
-    public TaskResult buildErrorResult(Object parameter, Exception ex) {
-        return new TaskResult(parameter, ResultState.EXCEPTION, ex);
+    public TaskResult buildErrorResult(Object result, Exception ex) {
+        return new TaskResult(result, ResultState.SUCCESS, ex);
     }
 
     /**
      * Error callback error callback.
      *
-     * @param parameter the parameter
+     * @param result the parameter
      * @param e         the e
      * @param support   the support
      * @param asyncTask the async task
      * @return the error callback
      */
-    public ErrorCallback errorCallback(Object parameter, Exception e, TaskSupport support, AsyncTask asyncTask) {
+    public ErrorCallback errorCallback(Object result, Exception e, TaskSupport support, AsyncTask asyncTask) {
         return new ErrorCallback(param, e, support, asyncTask);
     }
 

@@ -2,8 +2,10 @@ package com.gobrs.async.test;
 
 import com.gobrs.async.GobrsAsync;
 import com.gobrs.async.domain.AsyncResult;
+import com.gobrs.async.domain.TaskResult;
 import com.gobrs.async.example.GobrsAsyncExampleApplication;
 import com.gobrs.async.example.task.condition.AServiceCondition;
+import com.gobrs.async.example.task.condition.BServiceCondition;
 import com.gobrs.async.example.task.condition.CServiceCondition;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +26,7 @@ import java.util.Set;
  * @create: 2022 -09-28
  */
 @SpringBootTest(classes = GobrsAsyncExampleApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CaseAnyCondition {
+public class CaseAnyConditionResult {
 
     @Autowired(required = false)
     private GobrsAsync gobrsAsync;
@@ -43,5 +45,26 @@ public class CaseAnyCondition {
         params.put(CServiceCondition.class, "2");
 
         AsyncResult result = gobrsAsync.go("anyConditionRule", () -> params, 300000);
+
+        TaskResult taskResult = result.getResultMap().get(CServiceCondition.class);
+        taskResult.getResult();
+    }
+
+    @Test
+    public void testConditionAppend() {
+        Set<String> cases = new HashSet<>();
+        cases.add("BService");
+        cases.add("GService");
+
+        Map<Class, Object> params = new HashMap<>();
+        params.put(AServiceCondition.class, "1");
+        params.put(CServiceCondition.class, "2");
+
+        AsyncResult result = gobrsAsync.go("anyConditionRuleAppend", () -> params, 300000);
+
+        TaskResult aResult = result.getResultMap().get(AServiceCondition.class);
+        TaskResult bResult = result.getResultMap().get(BServiceCondition.class);
+        TaskResult cResult = result.getResultMap().get(CServiceCondition.class);
+
     }
 }

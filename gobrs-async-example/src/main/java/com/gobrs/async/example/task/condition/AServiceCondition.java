@@ -2,6 +2,7 @@ package com.gobrs.async.example.task.condition;
 
 import com.gobrs.async.TaskSupport;
 import com.gobrs.async.anno.Task;
+import com.gobrs.async.domain.AnyConditionResult;
 import com.gobrs.async.task.AsyncTask;
 import org.springframework.stereotype.Component;
 
@@ -11,12 +12,21 @@ import org.springframework.stereotype.Component;
  * @program: gobrs -async-starter
  * @ClassName AService
  * @description:
+ * 任务依赖类型
+ *  AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition
+ *
+ *  简化配置
+ *
+ *  A,B,C->D:anyCondition
+ *
+ *  D根据 A,B,C 返回的任务结果中的 AnyCondition 的state状态 进行判断是否继续执行 子任务
+ *
  * @author: sizegang
  * @create: 2022 -03-20
  */
-@Task(failSubExec = true, repeatable = true)
+@Task(failSubExec = true)
 @Component
-public class AServiceCondition extends AsyncTask<Object, Boolean> {
+public class AServiceCondition extends AsyncTask<Object, AnyConditionResult> {
 
     /**
      * The .
@@ -30,8 +40,8 @@ public class AServiceCondition extends AsyncTask<Object, Boolean> {
     }
 
     @Override
-    public Boolean task(Object o, TaskSupport support) {
-
+    public AnyConditionResult<String> task(Object o, TaskSupport support) {
+        AnyConditionResult.Builder<String> builder = AnyConditionResult.builder();
         try {
             System.out.println("AServiceCondition Begin");
             Thread.sleep(300);
@@ -41,8 +51,9 @@ public class AServiceCondition extends AsyncTask<Object, Boolean> {
             System.out.println("AServiceCondition Finish");
         } catch (InterruptedException e) {
             e.printStackTrace();
+            builder.setState(false);
         }
-        return false;
+        return builder.build();
     }
 
     @Override
