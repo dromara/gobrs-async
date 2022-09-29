@@ -44,4 +44,17 @@ public class CaseAnyCondition {
 
         AsyncResult result = gobrsAsync.go("anyConditionRule", () -> params, 300000);
     }
+
+    @Test
+    public void testConditionAppend() {
+        Set<String> cases = new HashSet<>();
+        cases.add("BService");
+        cases.add("GService");
+
+        Map<Class, Object> params = new HashMap<>();
+        params.put(AServiceCondition.class, "1");
+        params.put(CServiceCondition.class, "2");
+
+        AsyncResult result = gobrsAsync.go("anyConditionRuleAppend", () -> params, 300000);
+    }
 }
