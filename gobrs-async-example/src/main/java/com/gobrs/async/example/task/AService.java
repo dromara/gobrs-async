@@ -17,7 +17,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author: sizegang
  * @create: 2022 -03-20
  */
-@Task(failSubExec = true, repeatable = true)
+@Task(failSubExec = true)
 @Component
 public class AService extends AsyncTask<Object, String> {
 

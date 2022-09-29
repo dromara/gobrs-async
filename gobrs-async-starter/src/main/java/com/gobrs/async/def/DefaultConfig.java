@@ -34,6 +34,9 @@ public interface DefaultConfig {
      */
     String RULE_ANY = "any";
 
+    /**
+     * The constant RULE_ANY_CONDITION.
+     */
     String RULE_ANY_CONDITION = "anyCondition";
 
     /**
@@ -53,6 +56,11 @@ public interface DefaultConfig {
      * Transaction task
      */
     boolean transaction = false;
+
+    /**
+     * The constant anyConditionState.
+     */
+    boolean anyConditionState = true;
 
 
     /**
@@ -74,8 +82,10 @@ public interface DefaultConfig {
      */
     String QUEUE_SIZE = "";
 
+    /**
+     * The constant repeatable.
+     */
     boolean repeatable = false;
-
 
 
 }

@@ -4,6 +4,7 @@ package com.gobrs.async.task;
 import com.gobrs.async.TaskSupport;
 import com.gobrs.async.callback.ErrorCallback;
 import com.gobrs.async.def.DefaultConfig;
+import com.gobrs.async.domain.AnyConditionResult;
 import com.gobrs.async.domain.TaskResult;
 import com.gobrs.async.enums.ExpState;
 import org.slf4j.Logger;
@@ -35,7 +36,6 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
     private String desc;
 
     private boolean repeatable;
-
 
 
     /**
@@ -70,12 +70,20 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * @return result result
      */
     public Result getResult(TaskSupport support) {
+        return getResult(support, false);
+    }
+
+    public Result getResult(TaskSupport support, boolean anyCondition) {
         TaskResult<Result> taskResult = getTaskResult(support);
+        if (anyCondition == true && taskResult != null) {
+            return (Result) AnyConditionResult.builder().setResult(taskResult.getResult()).build();
+        }
         if (taskResult != null) {
             return taskResult.getResult();
         }
         return null;
     }
+
 
     /**
      * get result of depend on class
@@ -315,23 +323,6 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         this.desc = desc;
     }
 
-    /**
-     * Is repeatable boolean.
-     *
-     * @return the boolean
-     */
-    public boolean isRepeatable() {
-        return repeatable;
-    }
-
-    /**
-     * Sets repeatable.
-     *
-     * @param repeatable the repeatable
-     */
-    public void setRepeatable(boolean repeatable) {
-        this.repeatable = repeatable;
-    }
 
     /**
      * Is any condition boolean.
