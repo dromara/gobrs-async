@@ -172,7 +172,6 @@ public class TaskActuator implements Runnable, Cloneable {
              */
             if (taskLoader.isRunning().get()) {
                 nextTaskByCase(taskLoader, result);
-
             }
         } catch (Exception e) {
             Optimal.optimalCount(support.taskLoader);
@@ -349,12 +348,15 @@ public class TaskActuator implements Runnable, Cloneable {
                  * The number of tasks that it depends on to get to this point minus one
                  */
                 if (process.task.isAnyCondition()) {
-                    if (conditionResult.getState()) {
-                        if (starting.compareAndSet(0, 1)) {
-                            doTask(taskLoader, process, affirTasks);
+                    if (process.releasingDependency() == 0 || conditionResult.getState()) {
+                        synchronized (process.task) {
+                            Boolean aBoolean = taskLoader.anyConditionProx.get(process);
+                            if (Objects.isNull(aBoolean)) {
+                                taskLoader.anyConditionProx.put(process, true);
+                                doTask(taskLoader, process, affirTasks);
+                            }
                         }
                     }
-                    process.releasingDependency();
                 } else {
                     if (process.releasingDependency() == 0) {
                         doTask(taskLoader, process, affirTasks);
@@ -379,7 +381,6 @@ public class TaskActuator implements Runnable, Cloneable {
 
 
     private void doProcess(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> affirTasks) {
-
         if (affirTasks != null) {
             if (affirTasks.contains(process.getTask())) {
                 taskLoader.startProcess(process);
@@ -539,7 +540,7 @@ public class TaskActuator implements Runnable, Cloneable {
     /**
      * Error callback error callback.
      *
-     * @param result the parameter
+     * @param result    the parameter
      * @param e         the e
      * @param support   the support
      * @param asyncTask the async task

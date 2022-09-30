@@ -7,6 +7,8 @@ spring:
       rules:
         - name: "general"
           content: "AService->BService->FService->GService->HService;EService->CService;AService"
+        - name: "anyConditionGeneral"
+          content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition"
         - name: "anyConditionRule"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition"
         - name: "anyConditionRuleAppend"

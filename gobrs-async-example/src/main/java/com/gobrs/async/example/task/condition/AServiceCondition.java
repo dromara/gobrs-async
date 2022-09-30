@@ -53,7 +53,7 @@ public class AServiceCondition extends AsyncTask<Object, AnyConditionResult> {
             e.printStackTrace();
             builder.setState(false);
         }
-        return builder.build();
+        return builder.setState(true).build();
     }
 
     @Override

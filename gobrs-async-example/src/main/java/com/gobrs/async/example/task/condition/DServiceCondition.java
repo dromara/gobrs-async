@@ -30,7 +30,7 @@ public class DServiceCondition extends AsyncTask<Object, Boolean> {
     /**
      * The .
      */
-    int i = 10000;
+    int i = 1;
 
     @Override
     public void prepare(Object o) {
