@@ -4,6 +4,7 @@ import com.gobrs.async.TaskSupport;
 import com.gobrs.async.domain.AnyConditionResult;
 import com.gobrs.async.domain.TaskResult;
 import com.gobrs.async.task.AsyncTask;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
 
@@ -31,7 +32,7 @@ public class CServiceCondition extends AsyncTask<String, AnyConditionResult<Stri
     /**
      * The .
      */
-    int i = 10000;
+    int i = 1;
 
 
     @Override
@@ -39,43 +40,39 @@ public class CServiceCondition extends AsyncTask<String, AnyConditionResult<Stri
 
     }
 
+    @SneakyThrows
     @Override
     public AnyConditionResult<String> task(String o, TaskSupport support) {
         AnyConditionResult.Builder<String> builder = AnyConditionResult.builder();
-        try {
 
             System.out.println("CServiceCondition Begin");
-            /**
-             * 获取 所依赖的父任务的结果
-             */
-            String result = getResult(support, AServiceCondition.class, String.class);
+        /**
+         * 获取 所依赖的父任务的结果
+         */
+        String result = getResult(support, AServiceCondition.class, String.class);
 
-            /**
-             * 获取自身任务的返回结果 这里获取 结果值为 null
-             */
-            TaskResult<AnyConditionResult<String>> tk = getTaskResult(support);
+        /**
+         * 获取自身任务的返回结果 这里获取 结果值为 null
+         */
+        TaskResult<AnyConditionResult<String>> tk = getTaskResult(support);
 
-            /**
-             * 尝试获取 AServiceCondition 任务的返回结果
-             */
-            TaskResult<String> taskResult = getTaskResult(support, AServiceCondition.class, String.class);
-            /**
-             *  设置任务返回结果
-             */
-            if (taskResult != null) {
-                builder.setResult(taskResult.getResult());
-            } else {
-                builder.setResult("Mock CServiceCondition Result ");
-            }
-            Thread.sleep(5000);
-            for (int i1 = 0; i1 < i; i1++) {
-                i1 += i1;
-            }
-            System.out.println("CServiceCondition Finish");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            builder.setState(false);
+        /**
+         * 尝试获取 AServiceCondition 任务的返回结果
+         */
+        TaskResult<String> taskResult = getTaskResult(support, AServiceCondition.class, String.class);
+        /**
+         *  设置任务返回结果
+         */
+        if (taskResult != null) {
+            builder.setResult(taskResult.getResult());
+        } else {
+            builder.setResult("Mock CServiceCondition Result ");
         }
+            Thread.sleep(2000);
+        for (int i1 = 0; i1 < i; i1++) {
+            i1 += i1;
+        }
+            System.out.println("CServiceCondition Finish");
         return builder.build();
 
     }

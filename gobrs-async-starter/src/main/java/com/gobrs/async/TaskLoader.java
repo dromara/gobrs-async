@@ -6,6 +6,7 @@ import com.gobrs.async.callback.ErrorCallback;
 import com.gobrs.async.domain.AsyncResult;
 import com.gobrs.async.callback.AsyncTaskExceptionInterceptor;
 import com.gobrs.async.enums.ExpState;
+import com.gobrs.async.enums.ResultState;
 import com.gobrs.async.exception.GobrsAsyncException;
 import com.gobrs.async.exception.TimeoutException;
 import com.gobrs.async.spring.GobrsSpring;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
  * @author: sizegang
  * @create: 2022 -03-16
  */
-public class TaskLoader {
+public class TaskLoader{
     /**
      * Interruption code
      */
@@ -50,6 +51,7 @@ public class TaskLoader {
     private AsyncTaskPostInterceptor asyncTaskPostInterceptor = GobrsSpring.getBean(AsyncTaskPostInterceptor.class);
 
     private final CountDownLatch completeLatch;
+
 
     /**
      * The Process map.
@@ -88,6 +90,8 @@ public class TaskLoader {
 
     private Set<AsyncTask> affirTasks;
 
+    public Map<TaskActuator, Boolean> anyConditionProx = new ConcurrentHashMap();
+
     /**
      * Instantiates a new Task loader.
      *
@@ -125,6 +129,7 @@ public class TaskLoader {
              */
             startProcess(process);
         }
+
         // wait
         waitIfNecessary();
         return back(begins);
@@ -324,7 +329,7 @@ public class TaskLoader {
     /**
      * Rt dept.
      *
-     * @param task   the task
+     * @param task            the task
      * @param terminationTask the terminationTask
      */
     public void rtDept(AsyncTask task, TaskActuator terminationTask) {

@@ -48,7 +48,7 @@ public class Optimal {
      * @param taskLoader the task loader
      */
     public static void optimalCount(TaskLoader taskLoader) {
-        if (taskLoader.getAffirTasks() != null) {
+        if (Objects.nonNull(taskLoader.getAffirTasks())) {
             taskLoader.affirCount.incrementAndGet();
         }
     }
@@ -73,9 +73,10 @@ public class Optimal {
      * @param upwardTasksMapSpace the upward tasks map space
      */
     public static void doOptimal(Set<String> affirTasks, TaskLoader loader, Map<AsyncTask, List<AsyncTask>> upwardTasksMapSpace) {
+
         Set<AsyncTask> asyncTaskSet = new HashSet<>();
 
-        if (affirTasks == null) {
+        if (CollectionUtils.isEmpty(affirTasks)) {
             return;
         }
 
