@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * @author: sizegang
  * @create: 2022 -03-16
  */
-public class TaskLoader{
+public class TaskLoader {
     /**
      * Interruption code
      */
@@ -90,6 +90,9 @@ public class TaskLoader{
 
     private Set<AsyncTask> affirTasks;
 
+    /**
+     * The Any condition prox.
+     */
     public Map<TaskActuator, Boolean> anyConditionProx = new ConcurrentHashMap();
 
     /**
@@ -119,6 +122,7 @@ public class TaskLoader{
      * @return the async result
      */
     AsyncResult load() {
+
         List<TaskActuator> begins = getBeginProcess();
 
         begins = aiirs(begins);
@@ -276,8 +280,8 @@ public class TaskLoader{
             /**
              * If you need to interrupt then you need to save all the task threads and you need to manipulate shared variables
              */
-            lock.lock();
             try {
+                lock.lock();
                 if (!canceled) {
                     Future<?> submit = executorService.submit(taskActuator);
                     futures.add(submit);

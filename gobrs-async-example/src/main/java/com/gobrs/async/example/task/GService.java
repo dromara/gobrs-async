@@ -53,9 +53,4 @@ public class GService extends AsyncTask<Object, Object>  {
     public void onSuccess(TaskSupport support) {
 
     }
-
-    @Override
-    public void onFail(TaskSupport support) {
-
-    }
 }

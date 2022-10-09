@@ -4,9 +4,11 @@ import com.gobrs.async.GobrsAsync;
 import com.gobrs.async.domain.AsyncResult;
 import com.gobrs.async.domain.TaskResult;
 import com.gobrs.async.example.GobrsAsyncExampleApplication;
+import com.gobrs.async.example.task.AService;
+import com.gobrs.async.example.task.CService;
 import com.gobrs.async.example.task.condition.AServiceCondition;
-import com.gobrs.async.example.task.condition.BServiceCondition;
 import com.gobrs.async.example.task.condition.CServiceCondition;
+import com.gobrs.async.threadpool.GobrsThreadLocal;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,37 +24,31 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * The type Case any condition.
- *
- * @program: gobrs -async
- * @ClassName CaseAnyCondition
+ * @program: gobrs-async
+ * @ClassName ThreadLocalTest
  * @description:
  * @author: sizegang
- * @create: 2022 -09-28
- */
+ * @create: 2022-10-09
+ **/
 @SpringBootTest(classes = GobrsAsyncExampleApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CaseAnyCondition {
+public class ThreadLocalTest {
 
     @Autowired(required = false)
     private GobrsAsync gobrsAsync;
 
-    public static ExecutorService executorService = Executors.newCachedThreadPool();
-
     public Integer count = 1000;
 
-    /**
-     * Test condition.
-     */
-    @Test
-    public void testCondition() {
-        Set<String> cases = new HashSet<>();
+    public static ExecutorService executorService = Executors.newCachedThreadPool();
 
+    @Test
+    public void threadLocalTest(){
+        Set<String> cases = new HashSet<>();
         cases.add("BService");
         cases.add("GService");
 
         Map<Class, Object> params = new HashMap<>();
-        params.put(AServiceCondition.class, "1");
-        params.put(CServiceCondition.class, "2");
+        params.put(AService.class, "1");
+        params.put(CService.class, "2");
 
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
@@ -60,7 +56,7 @@ public class CaseAnyCondition {
             executorService.submit(() -> {
                 StopWatch stopWatch = new StopWatch();
                 stopWatch.start();
-                AsyncResult result = gobrsAsync.go("anyConditionGeneral", () -> params, 10000);
+                AsyncResult result = gobrsAsync.go("general", () -> params, 10000);
                 stopWatch.stop();
                 System.out.println(stopWatch.getTotalTimeMillis());
                 TaskResult taskResult = result.getResultMap().get(CServiceCondition.class);
@@ -77,21 +73,4 @@ public class CaseAnyCondition {
 
     }
 
-    @Test
-    public void testConditionAppend() {
-        Set<String> cases = new HashSet<>();
-        cases.add("BService");
-        cases.add("GService");
-
-        Map<Class, Object> params = new HashMap<>();
-        params.put(AServiceCondition.class, "1");
-        params.put(CServiceCondition.class, "2");
-
-        AsyncResult result = gobrsAsync.go("anyConditionRuleAppend", () -> params, 300000);
-
-        TaskResult aResult = result.getResultMap().get(AServiceCondition.class);
-        TaskResult bResult = result.getResultMap().get(BServiceCondition.class);
-        TaskResult cResult = result.getResultMap().get(CServiceCondition.class);
-
-    }
 }

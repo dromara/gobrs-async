@@ -39,11 +39,11 @@ public class DServiceCondition extends AsyncTask<Object, Boolean> {
 
     @Override
     public Boolean task(Object o, TaskSupport support) {
-        System.out.println("DServiceCondition Begin");
+//        System.out.println("DServiceCondition Begin");
         for (int i1 = 0; i1 < i; i1++) {
             i1 += i1;
         }
-        System.out.println("DServiceCondition Finish");
+//        System.out.println("DServiceCondition Finish");
         return true;
     }
 
@@ -58,8 +58,4 @@ public class DServiceCondition extends AsyncTask<Object, Boolean> {
 
     }
 
-    @Override
-    public void onFail(TaskSupport support) {
-
-    }
 }

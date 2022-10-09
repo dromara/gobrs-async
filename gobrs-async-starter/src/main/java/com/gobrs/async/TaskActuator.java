@@ -181,10 +181,10 @@ public class TaskActuator implements Runnable, Cloneable {
                 support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
 
                 try {
-                    task.onFail(support);
+                    task.onFailureTrace(support, e);
                 } catch (Exception ex) {
                     // Failed events are not processed
-                    logger.error("task onFail process is error {}", ex);
+                    logger.error("task onFailureTrace process is error {}", ex);
                 }
                 /**
                  * transaction task

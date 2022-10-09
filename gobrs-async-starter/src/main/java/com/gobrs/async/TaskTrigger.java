@@ -5,6 +5,9 @@ import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
 import com.gobrs.async.task.Task;
 import com.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
+import com.gobrs.async.threadpool.GobrsThreadLocal;
+import com.gobrs.async.util.IdWorker;
+import com.gobrs.async.util.TraceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,6 +162,7 @@ class TaskTrigger {
      * @return the task loader
      */
     TaskLoader trigger(AsyncParam param, long timeout, Set<String> affirTasks) {
+        traceId();
         IdentityHashMap<AsyncTask, TaskActuator> newProcessMap = new IdentityHashMap<>(prepareTaskMap.size());
         /**
          * Create a task loader, A task flow corresponds to a taskLoader
@@ -183,6 +187,10 @@ class TaskTrigger {
         }
         Optimal.doOptimal(affirTasks, loader, upwardTasksMapSpace);
         return loader;
+    }
+
+    private void traceId() {
+        TraceUtil.set(IdWorker.nextId());
     }
 
     /**
@@ -239,7 +247,7 @@ class TaskTrigger {
         }
 
         @Override
-        public void onFail(TaskSupport support) {
+        public void onFail(TaskSupport support, Exception exception) {
 
         }
     }

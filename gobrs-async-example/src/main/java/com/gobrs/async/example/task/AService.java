@@ -59,9 +59,4 @@ public class AService extends AsyncTask<Object, String> {
 
     }
 
-    @Override
-    public void onFail(TaskSupport support) {
-
-    }
-
 }

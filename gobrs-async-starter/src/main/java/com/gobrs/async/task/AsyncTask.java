@@ -7,6 +7,8 @@ import com.gobrs.async.def.DefaultConfig;
 import com.gobrs.async.domain.AnyConditionResult;
 import com.gobrs.async.domain.TaskResult;
 import com.gobrs.async.enums.ExpState;
+import com.gobrs.async.threadpool.GobrsThreadLocal;
+import com.gobrs.async.util.TraceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +75,13 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         return getResult(support, false);
     }
 
+    /**
+     * Gets result.
+     *
+     * @param support      the support
+     * @param anyCondition the any condition
+     * @return the result
+     */
     public Result getResult(TaskSupport support, boolean anyCondition) {
         TaskResult<Result> taskResult = getTaskResult(support);
         if (anyCondition == true && taskResult != null) {
@@ -84,6 +93,17 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         return null;
     }
 
+
+    /**
+     * On failure trace.
+     *
+     * @param support   the support
+     * @param exception the exception
+     */
+    public void onFailureTrace(TaskSupport support, Exception exception) {
+        logger.error("[traceId:{}] task {} error {}", TraceUtil.get(), this.getName(), exception);
+        onFail(support, exception);
+    }
 
     /**
      * get result of depend on class
@@ -341,4 +361,5 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
     public void setAnyCondition(boolean anyCondition) {
         this.anyCondition = anyCondition;
     }
+
 }

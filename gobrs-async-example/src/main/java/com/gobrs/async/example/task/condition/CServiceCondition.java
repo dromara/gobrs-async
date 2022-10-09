@@ -13,16 +13,14 @@ import org.springframework.stereotype.Component;
  *
  * @program: gobrs -async-starter
  * @ClassName CService
- * @description:
- * 任务依赖类型
- *  AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition
- *
- *  简化配置
- *
- *  A,B,C->D:anyCondition
- *
- *  D根据 A,B,C 返回的任务结果中的 AnyCondition 的state状态 进行判断是否继续执行 子任务
- *
+ * @description: 任务依赖类型
+ * AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition
+ * <p>
+ * 简化配置
+ * <p>
+ * A,B,C->D:anyCondition
+ * <p>
+ * D根据 A,B,C 返回的任务结果中的 AnyCondition 的state状态 进行判断是否继续执行 子任务
  * @author: sizegang
  * @create: 2022 -03-20
  */
@@ -43,9 +41,9 @@ public class CServiceCondition extends AsyncTask<String, AnyConditionResult<Stri
     @SneakyThrows
     @Override
     public AnyConditionResult<String> task(String o, TaskSupport support) {
-        AnyConditionResult.Builder<String> builder = AnyConditionResult.builder();
+        AnyConditionResult.Builder<String> condition = AnyConditionResult.builder();
 
-            System.out.println("CServiceCondition Begin");
+//            System.out.println("CServiceCondition Begin");
         /**
          * 获取 所依赖的父任务的结果
          */
@@ -64,16 +62,16 @@ public class CServiceCondition extends AsyncTask<String, AnyConditionResult<Stri
          *  设置任务返回结果
          */
         if (taskResult != null) {
-            builder.setResult(taskResult.getResult());
+            condition.setResult(taskResult.getResult());
         } else {
-            builder.setResult("Mock CServiceCondition Result ");
+            condition.setResult("Mock CServiceCondition Result ");
         }
-            Thread.sleep(2000);
+        Thread.sleep(2000);
         for (int i1 = 0; i1 < i; i1++) {
             i1 += i1;
         }
-            System.out.println("CServiceCondition Finish");
-        return builder.build();
+//            System.out.println("CServiceCondition Finish");
+        return condition.build();
 
     }
 
@@ -97,7 +95,4 @@ public class CServiceCondition extends AsyncTask<String, AnyConditionResult<Stri
         TaskResult<AnyConditionResult<String>> taskResult = getTaskResult(support);
     }
 
-    @Override
-    public void onFail(TaskSupport support) {
-    }
 }

@@ -66,7 +66,4 @@ public class CService extends AsyncTask<String, Integer> {
         TaskResult<Integer> taskResult = getTaskResult(support);
     }
 
-    @Override
-    public void onFail(TaskSupport support) {
-    }
 }

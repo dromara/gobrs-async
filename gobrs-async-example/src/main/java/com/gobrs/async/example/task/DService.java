@@ -54,8 +54,4 @@ public class DService extends AsyncTask<Object, Object>  {
 
     }
 
-    @Override
-    public void onFail(TaskSupport support) {
-
-    }
 }
