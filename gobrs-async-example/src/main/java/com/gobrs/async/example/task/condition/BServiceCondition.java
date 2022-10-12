@@ -61,9 +61,4 @@ public class BServiceCondition extends AsyncTask<Object, AnyConditionResult<Stri
     public void onSuccess(TaskSupport support) {
 
     }
-
-    @Override
-    public void onFail(TaskSupport support, Exception exception) {
-        support.getTraceId();
-    }
 }
