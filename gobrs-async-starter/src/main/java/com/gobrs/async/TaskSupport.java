@@ -20,7 +20,6 @@ import java.util.concurrent.ExecutorService;
 public class TaskSupport {
 
 
-
     /**
      * The Task loader.
      */
@@ -35,6 +34,8 @@ public class TaskSupport {
      * The task parameters
      */
     private Object param;
+
+    private long traceId;
 
 
     /**
@@ -115,4 +116,21 @@ public class TaskSupport {
         this.executorService = executorService;
     }
 
+    /**
+     * Gets trace id.
+     *
+     * @return the trace id
+     */
+    public long getTraceId() {
+        return traceId;
+    }
+
+    /**
+     * Sets trace id.
+     *
+     * @param traceId the trace id
+     */
+    public void setTraceId(long traceId) {
+        this.traceId = traceId;
+    }
 }

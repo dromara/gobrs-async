@@ -162,13 +162,14 @@ class TaskTrigger {
      * @return the task loader
      */
     TaskLoader trigger(AsyncParam param, long timeout, Set<String> affirTasks) {
-        traceId();
+
         IdentityHashMap<AsyncTask, TaskActuator> newProcessMap = new IdentityHashMap<>(prepareTaskMap.size());
         /**
          * Create a task loader, A task flow corresponds to a taskLoader
          */
         TaskLoader loader = new TaskLoader(threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
         TaskSupport support = getSupport(param);
+        traceId(support);
         loader.setAssistantTask(assistantTask);
 
         support.setTaskLoader(loader);
@@ -189,8 +190,14 @@ class TaskTrigger {
         return loader;
     }
 
-    private void traceId() {
-        TraceUtil.set(IdWorker.nextId());
+    /**
+     * traceId
+     * @param support
+     */
+    private void traceId(TaskSupport support) {
+        long traceId = IdWorker.nextId();
+        TraceUtil.set(traceId);
+        support.setTraceId(traceId);
     }
 
     /**

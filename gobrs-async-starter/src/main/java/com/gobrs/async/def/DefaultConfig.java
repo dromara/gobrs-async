@@ -82,10 +82,5 @@ public interface DefaultConfig {
      */
     String QUEUE_SIZE = "";
 
-    /**
-     * The constant repeatable.
-     */
-    boolean repeatable = false;
-
 
 }

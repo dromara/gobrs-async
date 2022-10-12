@@ -32,16 +32,16 @@
             <artifactId>spring-boot-starter-test</artifactId>
 <!--            <scope>test</scope>-->
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>io.github.memorydoc</groupId>-->
-<!--            <artifactId>gobrs-async-starter</artifactId>-->
-<!--            <version>1.1.7-RELEASE</version>-->
-<!--        </dependency>-->
         <dependency>
-            <groupId>com.jd.gobrs</groupId>
+            <groupId>io.github.memorydoc</groupId>
             <artifactId>gobrs-async-starter</artifactId>
-            <version>1.0.5-SNAPSHOT</version>
+            <version>1.2.3-RELEASE</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.jd.gobrs</groupId>-->
+<!--            <artifactId>gobrs-async-starter</artifactId>-->
+<!--            <version>1.0.5-SNAPSHOT</version>-->
+<!--        </dependency>-->
     </dependencies>
 
     <build>
