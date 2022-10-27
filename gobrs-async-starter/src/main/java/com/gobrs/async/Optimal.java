@@ -29,13 +29,13 @@ public class Optimal {
     /**
      * If continue boolean.
      *
-     * @param affirTasks the affir tasks
-     * @param taskLoader the task loader
-     * @param process    the process
+     * @param optionalTasks the optional tasks
+     * @param taskLoader    the task loader
+     * @param process       the process
      * @return the boolean
      */
-    public static boolean ifContinue(Set<AsyncTask> affirTasks, TaskLoader taskLoader, TaskActuator process) {
-        if (affirTasks != null && taskLoader.affirCount.get() == taskLoader.getAffirTasks().size()) {
+    public static boolean ifContinue(Set<AsyncTask> optionalTasks, TaskLoader taskLoader, TaskActuator process) {
+        if (optionalTasks != null && taskLoader.oplCount.get() == taskLoader.getOptionalTasks().size()) {
             taskLoader.processMap.get(taskLoader.assistantTask).run();
             return false;
         }
@@ -48,8 +48,8 @@ public class Optimal {
      * @param taskLoader the task loader
      */
     public static void optimalCount(TaskLoader taskLoader) {
-        if (Objects.nonNull(taskLoader.getAffirTasks())) {
-            taskLoader.affirCount.incrementAndGet();
+        if (Objects.nonNull(taskLoader.getOptionalTasks())) {
+            taskLoader.oplCount.incrementAndGet();
         }
     }
 
@@ -68,19 +68,19 @@ public class Optimal {
     /**
      * Do optimal.
      *
-     * @param affirTasks          the affir tasks
+     * @param optionalTasks       the optional tasks
      * @param loader              the loader
      * @param upwardTasksMapSpace the upward tasks map space
      */
-    public static void doOptimal(Set<String> affirTasks, TaskLoader loader, Map<AsyncTask, List<AsyncTask>> upwardTasksMapSpace) {
+    public static void doOptimal(Set<String> optionalTasks, TaskLoader loader, Map<AsyncTask, List<AsyncTask>> upwardTasksMapSpace) {
 
         Set<AsyncTask> asyncTaskSet = new HashSet<>();
 
-        if (CollectionUtils.isEmpty(affirTasks)) {
+        if (CollectionUtils.isEmpty(optionalTasks)) {
             return;
         }
 
-        for (String x : affirTasks) {
+        for (String x : optionalTasks) {
             Object bean = GobrsSpring.getBean(x);
             if (bean == null) {
                 logger.error("【Gobrs-Async print】affir Task name empty {}", x);
@@ -101,7 +101,7 @@ public class Optimal {
 
             asyncTaskSet.add(task);
         }
-        loader.setAffirTasks(asyncTaskSet);
+        loader.setOptionalTasks(asyncTaskSet);
     }
 
     private static void recursionUpward(Map<AsyncTask, List<AsyncTask>> upwardTasksMapSpace, AsyncTask task, Set<AsyncTask> allTask) {

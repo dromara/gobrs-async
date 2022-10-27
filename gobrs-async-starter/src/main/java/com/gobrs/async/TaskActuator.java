@@ -74,9 +74,10 @@ public class TaskActuator implements Runnable, Cloneable {
 
     private GobrsAsyncProperties gobrsAsyncProperties;
 
+    /**
+     * 执行状态
+     */
     private AtomicInteger state;
-
-    private volatile AtomicInteger starting = new AtomicInteger(0);
 
 
     /**
@@ -134,29 +135,43 @@ public class TaskActuator implements Runnable, Cloneable {
              * no execution is performed
              */
             Object result = null;
+
+            /**
+             * 判断任务是否有必要执行
+             * 1、nessary 返回true
+             * 2、如果具备执行结果 则无需执行
+             */
             if (task.nessary(parameter, support) && (support.getResultMap().get(task.getClass()) == null)) {
 
                 task.prepare(parameter);
 
                 /**
                  * Unified front intercept
+                 * 统一前置处理
                  */
                 taskLoader.preInterceptor(parameter, task.getName());
 
                 /**
                  * Perform a task
+                 * 执行核心任务处理
                  */
                 result = task.task(parameter, support);
 
-                aiirAxamination();
+
+                /**
+                 * 数量统计
+                 */
+                statisticsOptimalCount();
 
                 /**
                  * Post-processing of tasks
+                 * 后置任务
                  */
                 taskLoader.postInterceptor(result, task.getName());
 
                 /**
                  * Setting Task Results
+                 * 设置任务结果
                  */
                 if (gobrsAsyncProperties.isParamContext()) {
                     support.getResultMap().put(task.getClass(), buildSuccessResult(result));
@@ -164,19 +179,25 @@ public class TaskActuator implements Runnable, Cloneable {
 
                 /**
                  * Success callback
+                 * 执行成功回调
                  */
                 task.onSuccess(support);
             }
             /**
              * Determine whether the process is interrupted
+             * 判断当前任务是否已经执行过
              */
             if (taskLoader.isRunning().get()) {
                 nextTaskByCase(taskLoader, result);
             }
         } catch (Exception e) {
+
             Optimal.optimalCount(support.taskLoader);
+
             logger.error("【Gobrs-Async print error】 taskName{} error{}", task.getName(), e);
+
             state = new AtomicInteger(1);
+
             if (!retryTask(parameter, taskLoader)) {
                 support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
 
@@ -188,20 +209,29 @@ public class TaskActuator implements Runnable, Cloneable {
                 }
                 /**
                  * transaction task
+                 * 事物任务
                  */
                 transaction();
 
                 /**
                  * A single task exception interrupts the entire process
+                 * 配置 taskInterrupt = true 则某一任务异常后结束整个任务流程 默认 false
                  */
                 if (gobrsAsyncProperties.isTaskInterrupt()) {
+
                     taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
+
                 } else {
+
                     taskLoader.error(errorCallback(parameter, e, support, task));
+
+                    /**
+                     * 当然任务失败 是否继续执行子任务
+                     */
                     if (task.isFailSubExec()) {
                         nextTask(taskLoader, defaultAnyCondition(false));
                     } else {
-                        if (!CollectionUtils.isEmpty(taskLoader.getAffirTasks()) || multipleDependencies(upwardTasksMap, subTasks)) {
+                        if (!CollectionUtils.isEmpty(taskLoader.getOptionalTasks()) || multipleDependencies(upwardTasksMap, subTasks)) {
                             nextTask(taskLoader, defaultAnyCondition(false));
                         } else {
                             taskLoader.stopSingleTaskLine(subTasks);
@@ -216,6 +246,7 @@ public class TaskActuator implements Runnable, Cloneable {
 
     /**
      * Execute tasks based on conditions
+     * 根据条件执行任务
      *
      * @param taskLoader
      * @param result
@@ -228,10 +259,17 @@ public class TaskActuator implements Runnable, Cloneable {
         nextTask(taskLoader);
     }
 
-    private void aiirAxamination() {
+
+    /**
+     * 数量统计
+     */
+    private void statisticsOptimalCount() {
         Optimal.optimalCount(support.taskLoader);
     }
 
+    /**
+     * 执行任务准备阶段
+     */
     private void preparation() {
 
         if (task.isExclusive()) {
@@ -251,6 +289,11 @@ public class TaskActuator implements Runnable, Cloneable {
         }
     }
 
+    /**
+     * 获取任务参数
+     *
+     * @return
+     */
     private Object getParameter() {
 
         Object parameter = param.get();
@@ -331,18 +374,20 @@ public class TaskActuator implements Runnable, Cloneable {
 
     /**
      * Next task.
+     * 执行下一任务 （子任务）
      *
      * @param taskLoader      the task loader
      * @param conditionResult the task conditionResult
      */
     public void nextTask(TaskLoader taskLoader, AnyConditionResult conditionResult) {
+
         if (subTasks != null) {
             for (int i = 0; i < subTasks.size(); i++) {
                 TaskActuator process = taskLoader
                         .getProcess(subTasks.get(i));
-                Set<AsyncTask> affirTasks = taskLoader.getAffirTasks();
+                Set<AsyncTask> optionalTasks = taskLoader.getOptionalTasks();
 
-                boolean continueExec = Optimal.ifContinue(affirTasks, taskLoader, process);
+                boolean continueExec = Optimal.ifContinue(optionalTasks, taskLoader, process);
 
                 if (!continueExec) {
                     return;
@@ -357,13 +402,13 @@ public class TaskActuator implements Runnable, Cloneable {
                             Boolean aBoolean = taskLoader.anyConditionProx.get(process);
                             if (Objects.isNull(aBoolean)) {
                                 taskLoader.anyConditionProx.put(process, true);
-                                doTask(taskLoader, process, affirTasks);
+                                doTask(taskLoader, process, optionalTasks);
                             }
                         }
                     }
                 } else {
                     if (process.releasingDependency() == 0) {
-                        doTask(taskLoader, process, affirTasks);
+                        doTask(taskLoader, process, optionalTasks);
                     }
                 }
             }
@@ -396,6 +441,7 @@ public class TaskActuator implements Runnable, Cloneable {
 
     /**
      * Gets tasks without any dependencies
+     * 是否还有自身所依赖的任务
      *
      * @return boolean boolean
      */
@@ -410,6 +456,7 @@ public class TaskActuator implements Runnable, Cloneable {
 
     /**
      * Release the number of dependent tasks
+     * 释放一个依赖任务
      *
      * @return int int
      */
@@ -437,6 +484,7 @@ public class TaskActuator implements Runnable, Cloneable {
 
     /**
      * Data transaction
+     * 事务
      */
     private void transaction() {
         if (gobrsAsyncProperties.isTransaction()) {
@@ -457,6 +505,12 @@ public class TaskActuator implements Runnable, Cloneable {
     }
 
 
+    /**
+     * 业务回滚
+     *
+     * @param asyncTasks
+     * @param support
+     */
     private void rollback(List<AsyncTask> asyncTasks, TaskSupport support) {
         for (AsyncTask asyncTask : asyncTasks) {
             try {

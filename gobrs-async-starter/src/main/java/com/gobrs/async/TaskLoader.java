@@ -61,7 +61,7 @@ public class TaskLoader {
     /**
      * The Affir count.
      */
-    public AtomicInteger affirCount = new AtomicInteger(0);
+    public AtomicInteger oplCount = new AtomicInteger(0);
 
     /**
      * The Assistant task.
@@ -88,7 +88,7 @@ public class TaskLoader {
 
     private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<>(0);
 
-    private Set<AsyncTask> affirTasks;
+    private Set<AsyncTask> optionalTasks;
 
     /**
      * The Any condition prox.
@@ -146,9 +146,9 @@ public class TaskLoader {
      * @return
      */
     private List<TaskActuator> aiirs(List<TaskActuator> begins) {
-        if (!CollectionUtils.isEmpty(affirTasks)) {
-            Optimal.ifOptimal(affirTasks, processMap, assistantTask);
-            Map<String, AsyncTask> aiirMap = affirTasks.stream().collect(Collectors.toMap(AsyncTask::getName, Function.identity()));
+        if (!CollectionUtils.isEmpty(optionalTasks)) {
+            Optimal.ifOptimal(optionalTasks, processMap, assistantTask);
+            Map<String, AsyncTask> aiirMap = optionalTasks.stream().collect(Collectors.toMap(AsyncTask::getName, Function.identity()));
             begins = begins.stream().filter(x -> aiirMap.get(x.getTask().getName()) != null).collect(Collectors.toList());
         }
         return begins;
@@ -306,11 +306,11 @@ public class TaskLoader {
      * @return the boolean
      */
     public boolean assertAffir(TaskActuator taskActuator) {
-        if (affirTasks == null) {
+        if (optionalTasks == null) {
             return true;
         }
-        taskActuator.setUpstreamDepdends(affirTasks.size());
-        boolean contains = affirTasks.contains(taskActuator.getTask());
+        taskActuator.setUpstreamDepdends(optionalTasks.size());
+        boolean contains = optionalTasks.contains(taskActuator.getTask());
         if (contains) {
             return true;
         }
@@ -319,6 +319,7 @@ public class TaskLoader {
 
     /**
      * End of single mission line
+     * 结束单条任务链
      *
      * @param subtasks the subtasks
      */
@@ -428,21 +429,20 @@ public class TaskLoader {
     }
 
     /**
-     * Gets affir tasks.
+     * Gets optional tasks.
      *
-     * @return the affir tasks
+     * @return the optional tasks
      */
-    public Set<AsyncTask> getAffirTasks() {
-        return affirTasks;
+    public Set<AsyncTask> getOptionalTasks() {
+        return optionalTasks;
     }
 
     /**
-     * Sets affir tasks.
+     * Sets optional tasks.
      *
-     * @param affirTasks the affir tasks
+     * @param optionalTasks the optional tasks
      */
-    public void setAffirTasks(Set<AsyncTask> affirTasks) {
-        this.affirTasks = affirTasks;
+    public void setOptionalTasks(Set<AsyncTask> optionalTasks) {
+        this.optionalTasks = optionalTasks;
     }
-
 }

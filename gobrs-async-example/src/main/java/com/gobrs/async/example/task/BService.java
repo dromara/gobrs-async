@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
  * @author: sizegang
  * @create: 2022 -03-20
  */
-@Component
+@Component(value = "A")
 @Task
 public class BService extends AsyncTask<Object, Object> {
 

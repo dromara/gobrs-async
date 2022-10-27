@@ -156,20 +156,23 @@ class TaskTrigger {
     /**
      * Trigger task loader.
      *
-     * @param param      the param
-     * @param timeout    the timeout
-     * @param affirTasks the affir tasks
+     * @param param         the param
+     * @param timeout       the timeout
+     * @param optionalTasks the optional tasks
      * @return the task loader
      */
-    TaskLoader trigger(AsyncParam param, long timeout, Set<String> affirTasks) {
+    TaskLoader trigger(AsyncParam param, long timeout, Set<String> optionalTasks) {
 
         IdentityHashMap<AsyncTask, TaskActuator> newProcessMap = new IdentityHashMap<>(prepareTaskMap.size());
         /**
          * Create a task loader, A task flow corresponds to a taskLoader
          */
         TaskLoader loader = new TaskLoader(threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
+
         TaskSupport support = getSupport(param);
+
         traceId(support);
+
         loader.setAssistantTask(assistantTask);
 
         support.setTaskLoader(loader);
@@ -186,7 +189,7 @@ class TaskTrigger {
             processor.init(support, param);
             newProcessMap.put(task, processor);
         }
-        Optimal.doOptimal(affirTasks, loader, upwardTasksMapSpace);
+        Optimal.doOptimal(optionalTasks, loader, upwardTasksMapSpace);
         return loader;
     }
 
@@ -203,7 +206,7 @@ class TaskTrigger {
     /**
      * Task flow End tasks
      */
-    private class TerminationTask extends TaskActuator {
+    private class TerminationTask<P,R> extends TaskActuator {
 
         /**
          * task executor
