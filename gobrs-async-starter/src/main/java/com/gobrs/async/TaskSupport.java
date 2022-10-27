@@ -21,16 +21,18 @@ public class TaskSupport {
 
 
     /**
+     * 任务加载器
      * The Task loader.
      */
     public TaskLoader taskLoader;
 
-    /**
+    /** 执行线程池
      * The Executor service.
      */
     public ExecutorService executorService;
 
     /**
+     * 任务参数封装
      * The task parameters
      */
     private Object param;
@@ -40,6 +42,7 @@ public class TaskSupport {
 
     /**
      * Task result encapsulation
+     * 任务结果
      */
     private Map<Class, TaskResult> resultMap = new ConcurrentHashMap<>();
 

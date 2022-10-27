@@ -309,6 +309,12 @@ public class TaskActuator implements Runnable, Cloneable {
     }
 
 
+    /**
+     * 任务重试 必须注解开启
+     * @param parameter
+     * @param taskLoader
+     * @return
+     */
     private boolean retryTask(Object parameter, TaskLoader taskLoader) {
         try {
             if (task.getRetryCount() > 1 && task.getRetryCount() >= state.get()) {
@@ -331,6 +337,11 @@ public class TaskActuator implements Runnable, Cloneable {
         }
     }
 
+    /**
+     * 根据条件 选择性任务重试
+     * @param parameter
+     * @param taskLoader
+     */
     private void doTaskWithRetryConditional(Object parameter, TaskLoader taskLoader) {
 
         /**
@@ -414,6 +425,10 @@ public class TaskActuator implements Runnable, Cloneable {
     }
 
     /**
+     *  hasUsedSynRunTimeOnce 线程复用
+     *  A->C,D
+     *  此时 C会使用A的线程继续执行任务 而不会再开启线程 节省了线程开销和线程上下文切换
+     *
      * @param taskLoader
      * @param process
      * @param optionalTasks

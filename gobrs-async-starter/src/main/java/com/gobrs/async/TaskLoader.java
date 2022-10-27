@@ -88,6 +88,15 @@ public class TaskLoader {
 
     private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<>(0);
 
+    /**
+     * 可选择的任务执行
+     * 1、整个任务流程中 假如有 A->B->C
+     *
+     * 如果我只想拿到 B的执行结果就结束
+     *
+     * 那么 可以通过设置 选择B要执行，框架会自动选择B所依赖的所有任务执行完成之后 执行B 然后结束 返回结果
+     *
+     */
     private Set<AsyncTask> optionalTasks;
 
     /**
@@ -122,11 +131,19 @@ public class TaskLoader {
      * @return the async result
      */
     AsyncResult load() {
-
+        /**
+         * 获取任务链初始任务
+         */
         List<TaskActuator> begins = getBeginProcess();
 
+        /**
+         * 可选任务
+         */
         begins = preOptimal(begins);
 
+        /**
+         * 并发开始执行每条任务链
+         */
         for (TaskActuator process : begins) {
             /**
              * Start the thread to perform tasks without any dependencies
@@ -154,6 +171,10 @@ public class TaskLoader {
         return begins;
     }
 
+    /**
+     * 获取每条任务链的初始节点
+     * @return
+     */
     private ArrayList<TaskActuator> getBeginProcess() {
         ArrayList<TaskActuator> beginsWith = new ArrayList<>(1);
         for (TaskActuator process : processMap.values()) {
@@ -240,6 +261,7 @@ public class TaskLoader {
 
     /**
      * The main process interrupts and waits for the task to flow
+     * 主线程等待
      */
     private void waitIfNecessary() {
         try {
@@ -272,7 +294,7 @@ public class TaskLoader {
 
     /**
      * Start process.
-     *
+     * 开启线程执行任务
      * @param taskActuator the task actuator
      */
     void startProcess(TaskActuator taskActuator) {
@@ -284,6 +306,9 @@ public class TaskLoader {
                 lock.lock();
                 if (!canceled) {
                     Future<?> submit = executorService.submit(taskActuator);
+                    /**
+                     * 保存返回future 提供中断 能力
+                     */
                     futureLists.add(submit);
                     futureMaps.put(taskActuator.task, submit);
                 }
@@ -297,24 +322,6 @@ public class TaskLoader {
             Future<?> submit = executorService.submit(taskActuator);
             futureMaps.put(taskActuator.task, submit);
         }
-    }
-
-    /**
-     * Assert affir boolean.
-     *
-     * @param taskActuator the task actuator
-     * @return the boolean
-     */
-    public boolean assertAffir(TaskActuator taskActuator) {
-        if (optionalTasks == null) {
-            return true;
-        }
-        taskActuator.setUpstreamDepdends(optionalTasks.size());
-        boolean contains = optionalTasks.contains(taskActuator.getTask());
-        if (contains) {
-            return true;
-        }
-        return false;
     }
 
     /**

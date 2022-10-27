@@ -57,6 +57,8 @@ class TaskTrigger {
 
     /**
      * Build task dependencies Load the cache for the first time when a project is started, subsequent cache processing is performed only once
+     * 预加载任务依赖关系
+     * 缓存依赖任务配置、维护 任务所依赖的任务数量和任务对象
      */
     private void prepare() {
 
@@ -159,6 +161,10 @@ class TaskTrigger {
 
     /**
      * Trigger task loader.
+     * 触发任务加载 环境准备
+     * 链路日志
+     * 线程池配置
+     * 从缓存好的预加载配置中 clone副本 浅clone 只备份基本类型
      *
      * @param param         the param
      * @param timeout       the timeout
@@ -209,6 +215,7 @@ class TaskTrigger {
     }
 
     /**
+     * 终止任务 在整个任务流程结束后 会调用该任务类执行 completed()
      * Task flow End tasks
      */
     private class TerminationTask<P, R> extends TaskActuator {
@@ -235,6 +242,8 @@ class TaskTrigger {
 
     /**
      * Assistant task, help the task process to finish properly
+     * 助理任务 通过助理任务可以协助组装任务依赖配置
+     *
      *
      * @param <P> the type parameter
      * @param <R> the type parameter
@@ -282,7 +291,8 @@ class TaskTrigger {
 
     /**
      * Get the task support , Similar task bus
-     *
+     *  获取任务流程 总线
+     *  support 封装流程中重要的 配置信息和任务执行过程中的流转信息
      * @param param
      * @return
      */

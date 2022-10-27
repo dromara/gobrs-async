@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * The type Mdc thread pool executor.
- *
+ * log 跨线程传递
  * @program: m -detail
  * @ClassName MDCThreadPoolExecutor
  * @description:

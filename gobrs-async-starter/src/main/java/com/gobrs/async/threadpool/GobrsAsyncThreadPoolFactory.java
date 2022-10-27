@@ -62,7 +62,7 @@ public class GobrsAsyncThreadPoolFactory {
 
     /**
      * Create default thread pool thread pool executor.
-     *
+     * 创建默认线程池
      * @return the thread pool executor
      */
     ThreadPoolExecutor createDefaultThreadPool() {

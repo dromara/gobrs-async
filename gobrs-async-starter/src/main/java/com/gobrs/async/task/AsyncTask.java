@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The type Async task.
+ * 每一个任务需要继承此 抽象类
  *
  * @param <Param>  the type parameter
  * @param <Result> the type parameter
@@ -96,11 +97,12 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
 
     /**
      * On failure trace.
-     *
+     * 执行失败 回调
      * @param support   the support
      * @param exception the exception
      */
     public void onFailureTrace(TaskSupport support, Exception exception) {
+        // todo  通过配置方式 开启日志打印模式
         logger.error("[traceId:{}] task {} error {}", TraceUtil.get(), this.getName(), exception);
         onFail(support, exception);
     }
@@ -177,7 +179,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
 
     /**
      * Stop async boolean.
-     *
+     * 主动中断任务流程 API调用
      * @param support the support
      * @return the boolean
      */
