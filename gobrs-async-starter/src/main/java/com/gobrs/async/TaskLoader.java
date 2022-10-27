@@ -281,14 +281,14 @@ public class TaskLoader {
              * If you need to interrupt then you need to save all the task threads and you need to manipulate shared variables
              */
             try {
-//                lock.lock();
+                lock.lock();
                 if (!canceled) {
                     Future<?> submit = executorService.submit(taskActuator);
                     futureLists.add(submit);
                     futureMaps.put(taskActuator.task, submit);
                 }
             } finally {
-//                lock.unlock();
+                lock.unlock();
             }
         } else {
             /**
