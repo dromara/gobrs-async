@@ -131,9 +131,8 @@ public class IdWorker {
     }
 
     /**
-     * @Description:
+     * @Description: 下一个ID生成算法
      **/
-    //下一个ID生成算法
     public static long nextId() {
         long time = System.currentTimeMillis();
         if (lastTime > time) {

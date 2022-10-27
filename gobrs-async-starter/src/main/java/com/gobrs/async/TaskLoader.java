@@ -79,12 +79,12 @@ public class TaskLoader {
     /**
      * The Futures.
      */
-    public ArrayList<Future<?>> futures;
+    public ArrayList<Future<?>> futureLists;
 
     /**
      * The Futures async.
      */
-    public Map<AsyncTask, Future> futuresAsync = new ConcurrentHashMap<>();
+    public Map<AsyncTask, Future> futureMaps = new ConcurrentHashMap<>();
 
     private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<>(0);
 
@@ -110,9 +110,9 @@ public class TaskLoader {
         this.timeout = timeout;
 
         if (this.timeout > 0) {
-            futures = new ArrayList<>(1);
+            futureLists = new ArrayList<>(1);
         } else {
-            futures = EmptyFutures;
+            futureLists = EmptyFutures;
         }
     }
 
@@ -125,7 +125,7 @@ public class TaskLoader {
 
         List<TaskActuator> begins = getBeginProcess();
 
-        begins = aiirs(begins);
+        begins = preOptimal(begins);
 
         for (TaskActuator process : begins) {
             /**
@@ -145,11 +145,11 @@ public class TaskLoader {
      * @param begins
      * @return
      */
-    private List<TaskActuator> aiirs(List<TaskActuator> begins) {
+    private List<TaskActuator> preOptimal(List<TaskActuator> begins) {
         if (!CollectionUtils.isEmpty(optionalTasks)) {
             Optimal.ifOptimal(optionalTasks, processMap, assistantTask);
-            Map<String, AsyncTask> aiirMap = optionalTasks.stream().collect(Collectors.toMap(AsyncTask::getName, Function.identity()));
-            begins = begins.stream().filter(x -> aiirMap.get(x.getTask().getName()) != null).collect(Collectors.toList());
+            Map<String, AsyncTask> optMap = optionalTasks.stream().collect(Collectors.toMap(AsyncTask::getName, Function.identity()));
+            begins = begins.stream().filter(x -> optMap.get(x.getTask().getName()) != null).collect(Collectors.toList());
         }
         return begins;
     }
@@ -226,7 +226,7 @@ public class TaskLoader {
         lock.lock();
         try {
             canceled = true;
-            for (Future<?> future : futures) {
+            for (Future<?> future : futureLists) {
                 /**
                  * Enforced interruptions
                  */
@@ -281,21 +281,21 @@ public class TaskLoader {
              * If you need to interrupt then you need to save all the task threads and you need to manipulate shared variables
              */
             try {
-                lock.lock();
+//                lock.lock();
                 if (!canceled) {
                     Future<?> submit = executorService.submit(taskActuator);
-                    futures.add(submit);
-                    futuresAsync.put(taskActuator.task, submit);
+                    futureLists.add(submit);
+                    futureMaps.put(taskActuator.task, submit);
                 }
             } finally {
-                lock.unlock();
+//                lock.unlock();
             }
         } else {
             /**
              * Run the command without setting the timeout period
              */
             Future<?> submit = executorService.submit(taskActuator);
-            futuresAsync.put(taskActuator.task, submit);
+            futureMaps.put(taskActuator.task, submit);
         }
     }
 

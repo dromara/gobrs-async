@@ -53,7 +53,6 @@ public class GobrsAsyncThreadPoolFactory {
      * @param threadPoolExecutor the thread pool executor
      */
     public void setThreadPoolExecutor(ExecutorService threadPoolExecutor) {
-
         this.threadPoolExecutor = TtlExecutors.getTtlExecutorService(threadPoolExecutor);
     }
 

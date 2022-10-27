@@ -6,9 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 /**
  * The type Thread pool config.
@@ -25,8 +23,13 @@ public class ThreadPoolConfig extends GobrsThreadPoolConfiguration {
 
     @Override
     protected void doInitialize(GobrsAsyncThreadPoolFactory factory) {
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(300, 500, 30, TimeUnit.SECONDS,
-                new LinkedBlockingQueue());
-        factory.setThreadPoolExecutor(threadPoolExecutor);
+        /**
+         * 自定义线程池
+         */
+//        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(300, 500, 30, TimeUnit.SECONDS,
+//                new LinkedBlockingQueue());
+
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        factory.setThreadPoolExecutor(executorService);
     }
 }

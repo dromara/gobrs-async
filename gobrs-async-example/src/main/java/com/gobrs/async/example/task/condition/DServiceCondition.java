@@ -9,18 +9,14 @@ import org.springframework.stereotype.Component;
  *
  * @program: gobrs -async-starter
  * @ClassName DService
- * @description:
- * 任务依赖类型
- *  AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition
- *
- *  简化配置
- *
- *  A,B,C->D:anyCondition
- *
- *  D根据 A,B,C 返回的任务结果中的 AnyCondition 的state状态 进行判断是否继续执行 子任务
- *
- *
- *
+ * @description: 任务依赖类型
+ * AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition
+ * <p>
+ * 简化配置
+ * <p>
+ * A,B,C->D:anyCondition
+ * <p>
+ * D根据 A,B,C 返回的任务结果中的 AnyCondition 的state状态 进行判断是否继续执行 子任务
  * @author: sizegang
  * @create: 2022 -03-20
  */
@@ -30,7 +26,7 @@ public class DServiceCondition extends AsyncTask<Object, Boolean> {
     /**
      * The .
      */
-    int i = 1;
+    int sums = 1;
 
     @Override
     public void prepare(Object o) {
@@ -39,11 +35,11 @@ public class DServiceCondition extends AsyncTask<Object, Boolean> {
 
     @Override
     public Boolean task(Object o, TaskSupport support) {
-//        System.out.println("DServiceCondition Begin");
-        for (int i1 = 0; i1 < i; i1++) {
+//      System.out.println("DServiceCondition Begin");
+        for (int i1 = 0; i1 < sums; i1++) {
             i1 += i1;
         }
-//        System.out.println("DServiceCondition Finish");
+//      System.out.println("DServiceCondition Finish");
         return true;
     }
 

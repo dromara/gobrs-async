@@ -3,17 +3,15 @@ package com.gobrs.async;
 import com.gobrs.async.domain.AsyncParam;
 import com.gobrs.async.spring.GobrsSpring;
 import com.gobrs.async.task.AsyncTask;
-import com.gobrs.async.task.Task;
 import com.gobrs.async.threadpool.GobrsAsyncThreadPoolFactory;
-import com.gobrs.async.threadpool.GobrsThreadLocal;
 import com.gobrs.async.util.IdWorker;
+import com.gobrs.async.util.JsonUtil;
 import com.gobrs.async.util.TraceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 /**
@@ -81,7 +79,9 @@ class TaskTrigger {
                 upwardTasksMap.get(depended).add(task);
             }
         }
+
         assistantTask = new AssistantTask();
+
         /**
          * task without any subtasks
          */
@@ -94,6 +94,7 @@ class TaskTrigger {
                 downTasksMap.get(task).add(assistantTask);
             }
         }
+
         downTasksMap.put(assistantTask, new ArrayList<>(0));
         upwardTasksMap.put(assistantTask, noSubtasks);
         upwardTasksMapSpace = upwardTasksMap;
@@ -118,6 +119,9 @@ class TaskTrigger {
             }
             process.setGobrsAsyncProperties(taskFlow.getGobrsAsyncProperties());
             prepareTaskMap.put(task, process);
+        }
+        if (logger.isInfoEnabled()) {
+            logger.info("prepareTaskMap build success {}", JsonUtil.obj2String(prepareTaskMap));
         }
     }
 
@@ -195,6 +199,7 @@ class TaskTrigger {
 
     /**
      * traceId
+     *
      * @param support
      */
     private void traceId(TaskSupport support) {
@@ -206,7 +211,7 @@ class TaskTrigger {
     /**
      * Task flow End tasks
      */
-    private class TerminationTask<P,R> extends TaskActuator {
+    private class TerminationTask<P, R> extends TaskActuator {
 
         /**
          * task executor
@@ -266,7 +271,7 @@ class TaskTrigger {
     private void doProcess(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> affirTasks) {
         if (affirTasks != null) {
             if (affirTasks.contains(process.getTask())) {
-                taskLoader.affirCount.incrementAndGet();
+                taskLoader.oplCount.incrementAndGet();
                 taskLoader.startProcess(process);
             }
         } else {

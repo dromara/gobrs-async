@@ -38,7 +38,7 @@ public class CaseAnyCondition {
 
     public static ExecutorService executorService = Executors.newCachedThreadPool();
 
-    public Integer count = 1000;
+    public Integer count = 100;
 
     /**
      * Test condition.
@@ -60,7 +60,7 @@ public class CaseAnyCondition {
             executorService.submit(() -> {
                 StopWatch stopWatch = new StopWatch();
                 stopWatch.start();
-                AsyncResult result = gobrsAsync.go("anyConditionGeneral", () -> params, 10000);
+                AsyncResult result = gobrsAsync.go("anyConditionRule", () -> params, 10000);
                 stopWatch.stop();
                 System.out.println(stopWatch.getTotalTimeMillis());
                 TaskResult taskResult = result.getResultMap().get(CServiceCondition.class);
@@ -69,7 +69,7 @@ public class CaseAnyCondition {
         }
 
         try {
-            countDownLatch.await(100, TimeUnit.SECONDS);
+            countDownLatch.await(1000, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

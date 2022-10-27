@@ -4,8 +4,11 @@ import com.gobrs.async.GobrsAsync;
 import com.gobrs.async.domain.AsyncResult;
 import com.gobrs.async.example.service.GobrsService;
 import com.gobrs.async.example.task.AService;
+import com.gobrs.async.example.task.condition.AServiceCondition;
+import com.gobrs.async.example.task.condition.CServiceCondition;
 import com.gobrs.async.rule.Rule;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,13 +45,13 @@ public class GobrsController {
     @RequestMapping("testGobrs")
     public String gobrsTest() {
         Map<Class, Object> params = new HashMap<>();
-        params.put(AService.class, "A的参数");
-        Set<String> objects = new HashSet<>();
-        objects.add("FService");
-        objects.add("DService");
-        objects.add("GService");
-        objects.add("EService");
-        AsyncResult test = gobrsAsync.go("test", () -> params);
+        params.put(AServiceCondition.class, "1");
+        params.put(CServiceCondition.class, "2");
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        AsyncResult test = gobrsAsync.go("anyConditionGeneral", () -> params);
+        stopWatch.stop();
+        System.out.println(stopWatch.getTotalTimeMillis());
         return "success";
     }
 

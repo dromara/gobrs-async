@@ -19,10 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
@@ -141,7 +138,7 @@ public class TaskActuator implements Runnable, Cloneable {
              * 1、nessary 返回true
              * 2、如果具备执行结果 则无需执行
              */
-            if (task.nessary(parameter, support) && (support.getResultMap().get(task.getClass()) == null)) {
+            if (task.nessary(parameter, support) && (Objects.isNull(support.getResultMap().get(task.getClass())))) {
 
                 task.prepare(parameter);
 
@@ -276,7 +273,7 @@ public class TaskActuator implements Runnable, Cloneable {
 
             List<AsyncTask> asyncTaskList = upwardTasksMap.get(task);
 
-            Map<AsyncTask, Future> futuresAsync = support.getTaskLoader().futuresAsync;
+            Map<AsyncTask, Future> futuresAsync = support.getTaskLoader().futureMaps;
 
             futuresAsync.forEach((x, y) -> {
 
@@ -381,7 +378,8 @@ public class TaskActuator implements Runnable, Cloneable {
      */
     public void nextTask(TaskLoader taskLoader, AnyConditionResult conditionResult) {
 
-        if (subTasks != null) {
+        if (!CollectionUtils.isEmpty(subTasks)) {
+            boolean hasUsedSynRunTimeOnce = false;
             for (int i = 0; i < subTasks.size(); i++) {
                 TaskActuator process = taskLoader
                         .getProcess(subTasks.get(i));
@@ -402,13 +400,13 @@ public class TaskActuator implements Runnable, Cloneable {
                             Boolean aBoolean = taskLoader.anyConditionProx.get(process);
                             if (Objects.isNull(aBoolean)) {
                                 taskLoader.anyConditionProx.put(process, true);
-                                doTask(taskLoader, process, optionalTasks);
+                                doTask(taskLoader, process, optionalTasks, hasUsedSynRunTimeOnce);
                             }
                         }
                     }
                 } else {
                     if (process.releasingDependency() == 0) {
-                        doTask(taskLoader, process, optionalTasks);
+                        doTask(taskLoader, process, optionalTasks, hasUsedSynRunTimeOnce);
                     }
                 }
             }
@@ -418,20 +416,21 @@ public class TaskActuator implements Runnable, Cloneable {
     /**
      * @param taskLoader
      * @param process
-     * @param affirTasks
+     * @param optionalTasks
      */
-    private void doTask(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> affirTasks) {
-        if (subTasks.size() == 1 && !process.task.isExclusive()) {
+    private void doTask(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks, boolean hasUsedSynRunTimeOnce) {
+        if (!hasUsedSynRunTimeOnce && !process.task.isExclusive()) {
+            hasUsedSynRunTimeOnce = true;
             process.run();
         } else {
-            doProcess(taskLoader, process, affirTasks);
+            doProcess(taskLoader, process, optionalTasks);
         }
     }
 
 
-    private void doProcess(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> affirTasks) {
-        if (affirTasks != null) {
-            if (affirTasks.contains(process.getTask())) {
+    private void doProcess(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks) {
+        if (Objects.nonNull(optionalTasks)) {
+            if (optionalTasks.contains(process.getTask())) {
                 taskLoader.startProcess(process);
             }
         } else {
