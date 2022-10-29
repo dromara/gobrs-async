@@ -61,7 +61,6 @@ public class TaskActuator implements Runnable, Cloneable {
     private Map<AsyncTask, List<AsyncTask>> upwardTasksMap;
 
 
-    private GobrsAsyncProperties gobrsAsyncProperties;
 
     private Rule rule;
 
@@ -164,7 +163,7 @@ public class TaskActuator implements Runnable, Cloneable {
                  * Setting Task Results
                  * 设置任务结果
                  */
-                if (gobrsAsyncProperties.isParamContext()) {
+                if (ConfigManager.getGlobalConfig().isParamContext()) {
                     support.getResultMap().put(task.getClass(), buildSuccessResult(result));
                 }
 
@@ -354,7 +353,7 @@ public class TaskActuator implements Runnable, Cloneable {
             /**
              * Setting Task Results
              */
-            if (gobrsAsyncProperties.isParamContext()) {
+            if (ConfigManager.getGlobalConfig().isParamContext()) {
                 support.getResultMap().put(task.getClass(), buildSuccessResult(result));
             }
             /**
@@ -497,7 +496,7 @@ public class TaskActuator implements Runnable, Cloneable {
      * 事务
      */
     private void transaction() {
-        if (gobrsAsyncProperties.isTransaction()) {
+        if (ConfigManager.getGlobalConfig().isTransaction()) {
 
             if (!this.task.isCallback()) {
                 return;
@@ -616,24 +615,6 @@ public class TaskActuator implements Runnable, Cloneable {
      */
     public ErrorCallback errorCallback(Object result, Exception e, TaskSupport support, AsyncTask asyncTask) {
         return new ErrorCallback(param, e, support, asyncTask);
-    }
-
-    /**
-     * Gets gobrs async properties.
-     *
-     * @return the gobrs async properties
-     */
-    public GobrsAsyncProperties getGobrsAsyncProperties() {
-        return gobrsAsyncProperties;
-    }
-
-    /**
-     * Sets gobrs async properties.
-     *
-     * @param gobrsAsyncProperties the gobrs async properties
-     */
-    public void setGobrsAsyncProperties(GobrsAsyncProperties gobrsAsyncProperties) {
-        this.gobrsAsyncProperties = gobrsAsyncProperties;
     }
 
     /**

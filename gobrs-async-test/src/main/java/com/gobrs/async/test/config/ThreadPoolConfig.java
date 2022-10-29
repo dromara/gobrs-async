@@ -1,4 +1,4 @@
-package com.gobrs.async.test.task.config;
+package com.gobrs.async.test.config;
 
 import com.gobrs.async.core.threadpool.GobrsAsyncThreadPoolFactory;
 import com.gobrs.async.core.threadpool.GobrsThreadPoolConfiguration;

@@ -1,4 +1,4 @@
-package com.gobrs.async.test.task.inteceptor;
+package com.gobrs.async.test.inteceptor;
 
 import com.gobrs.async.core.callback.AsyncTaskExceptionInterceptor;
 import com.gobrs.async.core.callback.ErrorCallback;

@@ -32,7 +32,7 @@ public class GobrsAsyncProperties {
     /**
      * The constant PREFIX.
      */
-    public static final String PREFIX = "com.gobrs.async.spring.gobrs.async";
+    public static final String PREFIX = "spring.gobrs.async";
 
     /**
      * Task rules

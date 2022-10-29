@@ -56,8 +56,6 @@ public class GobrsController {
      */
     @RequestMapping("future")
     public void future() {
-
-
     }
 
 
