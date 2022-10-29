@@ -26,9 +26,6 @@ import java.util.Map;
 @RequestMapping("gobrs")
 public class GobrsController {
 
-    @Autowired(required = false)
-    private GobrsAsync gobrsAsync;
-
     @Autowired
     private GobrsService gobrsService;
 
@@ -39,14 +36,7 @@ public class GobrsController {
      */
     @RequestMapping("testGobrs")
     public String gobrsTest() {
-        Map<Class, Object> params = new HashMap<>();
-        params.put(AServiceCondition.class, "1");
-        params.put(CServiceCondition.class, "2");
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start();
-        AsyncResult test = gobrsAsync.go("anyConditionGeneral", () -> params);
-        stopWatch.stop();
-        System.out.println(stopWatch.getTotalTimeMillis());
+        gobrsService.gobrsTest();
         return "success";
     }
 
