@@ -9,8 +9,8 @@
         <version>0.2.2-beta</version>
     </parent>
     <groupId>com.jd.gobrs</groupId>
-    <artifactId>gobrs-async-starter</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <artifactId>gobrs-async-test</artifactId>
+    <version>1.0.0</version>
     <name>${project.artifactId}</name>
     <description>🔥 强大异步任务编排工具（没有依赖中间件）</description>
     <url>https://github.com/Memorydoc/gobrs-async-starter</url>
@@ -28,19 +28,6 @@
             <organization>jd</organization>
         </developer>
     </developers>
-    <distributionManagement>
-        <repository>
-            <id>libs-releases-local</id>
-            <name>Release Repository</name>
-            <url>http://artifactory.jd.com/libs-releases-local</url>
-        </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>Snapshot Repository</name>
-            <url>http://artifactory.jd.com/libs-snapshots-local</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <properties>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
         <java.version>1.8</java.version>
@@ -68,26 +55,37 @@
         </dependencies>
     </dependencyManagement>
 
-
     <dependencies>
-
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>transmittable-thread-local</artifactId>
-            <version>${ttl.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!-- 公网-->
+        <!--        <dependency>-->
+        <!--            <groupId>io.github.memorydoc</groupId>-->
+        <!--            <artifactId>gobrs-async-starter</artifactId>-->
+        <!--            <version>1.2.3-RELEASE</version>-->
+        <!--        </dependency>-->
+
+        <!-- 京东内网-->
+        <dependency>
             <groupId>com.jd.gobrs</groupId>
-            <artifactId>gobrs-async-core</artifactId>
-            <version>${gobrs.asnyc.version}</version>
+            <artifactId>gobrs-async-starter</artifactId>
+            <version>1.0.5-SNAPSHOT</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
     <build>

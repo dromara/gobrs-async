@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.jd.gobrs</groupId>
     <artifactId>gobrs-async-example</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>gobrs-async-example</name>
     <description>gobrs-async-example</description>
     <properties>
@@ -25,19 +25,23 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-<!--            <scope>test</scope>-->
+            <!--            <scope>test</scope>-->
+        </dependency>
+        <dependency>
+            <groupId>com.jd.gobrs</groupId>
+            <artifactId>gobrs-async-test</artifactId>
+            <version>1.0.0</version>
         </dependency>
         <!-- 公网-->
-<!--        <dependency>-->
-<!--            <groupId>io.github.memorydoc</groupId>-->
-<!--            <artifactId>gobrs-async-starter</artifactId>-->
-<!--            <version>1.2.3-RELEASE</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>io.github.memorydoc</groupId>-->
+        <!--            <artifactId>gobrs-async-starter</artifactId>-->
+        <!--            <version>1.2.3-RELEASE</version>-->
+        <!--        </dependency>-->
 
         <!-- 京东内网-->
         <dependency>
