@@ -6,7 +6,7 @@ import com.gobrs.async.core.common.anno.Task;
 import com.gobrs.async.core.config.GobrsAsyncProperties;
 import com.gobrs.async.core.common.def.Constant;
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
-import com.gobrs.async.core.rule.Rule;
+import com.gobrs.async.core.config.RuleConfig;
 import com.gobrs.async.core.holder.BeanHolder;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.common.def.DefaultConfig;
@@ -41,7 +41,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
     private static AtomicInteger current = new AtomicInteger(0);
 
     @Override
-    public void doParse(Rule rule, boolean reload) {
+    public void doParse(RuleConfig rule, boolean reload) {
 
         String[] taskFlows = rule.getContent().replaceAll("\\s+", "").split(gobrsAsyncProperties.getSplit());
         /**

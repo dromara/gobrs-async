@@ -1,5 +1,5 @@
 package com.gobrs.async.core.engine;
-import com.gobrs.async.core.rule.Rule;
+import com.gobrs.async.core.config.RuleConfig;
 import java.util.List;
 
 /**
@@ -19,14 +19,14 @@ public interface RuleThermal {
      *
      * @param rule the com.gobrs.async.rule
      */
-    void load(Rule rule);
+    void load(RuleConfig rule);
 
     /**
      * Load.
      *
      * @param ruleList the com.gobrs.async.rule list
      */
-    void load(List<Rule> ruleList);
+    void load(List<RuleConfig> ruleList);
 
 
 }

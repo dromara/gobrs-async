@@ -7,7 +7,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import com.gobrs.async.core.rule.Rule;
+import com.gobrs.async.core.common.constant.ConfigPropertiesConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -32,12 +32,13 @@ public class GobrsAsyncProperties {
     /**
      * The constant PREFIX.
      */
-    public static final String PREFIX = "spring.gobrs.async";
+    public static final String PREFIX = ConfigPropertiesConstant.PREFIX;
+
 
     /**
      * Task rules
      */
-    private List<Rule> rules;
+    private List<RuleConfig> rules;
 
     /**
      * Task separator
@@ -135,7 +136,7 @@ public class GobrsAsyncProperties {
      *
      * @return the rules
      */
-    public List<Rule> getRules() {
+    public List<RuleConfig> getRules() {
         return rules;
     }
 
@@ -144,7 +145,7 @@ public class GobrsAsyncProperties {
      *
      * @param rules the rules
      */
-    public void setRules(List<Rule> rules) {
+    public void setRules(List<RuleConfig> rules) {
         this.rules = rules;
     }
 

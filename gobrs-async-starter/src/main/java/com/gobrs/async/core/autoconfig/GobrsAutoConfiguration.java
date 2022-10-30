@@ -2,9 +2,7 @@ package com.gobrs.async.core.autoconfig;
 
 import com.gobrs.async.core.GobrsAsync;
 import com.gobrs.async.core.TaskFlow;
-import com.gobrs.async.core.config.ConfigFactory;
-import com.gobrs.async.core.config.ConfigManager;
-import com.gobrs.async.core.config.GobrsAsyncProperties;
+import com.gobrs.async.core.config.*;
 import com.gobrs.async.core.callback.*;
 import com.gobrs.async.core.engine.RuleEngine;
 import com.gobrs.async.core.engine.RulePostProcessor;
@@ -18,7 +16,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 
 
 /**
@@ -32,7 +29,7 @@ import org.springframework.context.annotation.DependsOn;
  * @Version 1.0
  */
 @Configuration
-@EnableConfigurationProperties(GobrsAsyncProperties.class)
+@EnableConfigurationProperties({GobrsAsyncProperties.class, RuleConfig.class, LogConfig.class})
 @ConditionalOnProperty(prefix = GobrsAsyncProperties.PREFIX, value = "enable", matchIfMissing = true, havingValue = "true")
 public class GobrsAutoConfiguration {
 
@@ -87,6 +84,12 @@ public class GobrsAutoConfiguration {
         return new RuleParseEngine<>();
     }
 
+    /**
+     * Config factory config factory.
+     *
+     * @param gobrsAsyncProperties the gobrs async properties
+     * @return the config factory
+     */
     @Bean
     public ConfigFactory configFactory(GobrsAsyncProperties gobrsAsyncProperties) {
         return new ConfigFactory(gobrsAsyncProperties);
@@ -107,6 +110,7 @@ public class GobrsAutoConfiguration {
     /**
      * Rule com.gobrs.async.engine post processor com.gobrs.async.rule post processor.
      *
+     * @param configManager the config manager
      * @return the com.gobrs.async.rule post processor
      */
     @Bean
@@ -126,7 +130,7 @@ public class GobrsAutoConfiguration {
     }
 
     /**
-     * Gobrs com.gobrs.async.spring gobrs com.gobrs.async.spring.
+     * Gobrs spring bean holder.
      *
      * @return the gobrs com.gobrs.async.spring
      */

@@ -35,4 +35,5 @@ public class TraceUtil {
     public static void set(long traceId) {
         gobrsThreadLocal.set(traceId);
     }
+
 }

@@ -1,7 +1,11 @@
 package com.gobrs.async.core;
 
 import com.gobrs.async.core.common.domain.AsyncParam;
+import com.gobrs.async.core.common.util.SystemClock;
+import com.gobrs.async.core.config.ConfigManager;
+import com.gobrs.async.core.config.RuleConfig;
 import com.gobrs.async.core.holder.BeanHolder;
+import com.gobrs.async.core.log.LogWrapper;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.threadpool.GobrsAsyncThreadPoolFactory;
 import com.gobrs.async.core.common.util.IdWorker;
@@ -52,6 +56,7 @@ class TaskTrigger<P, R> {
     /**
      * Instantiates a new Task trigger.
      *
+     * @param ruleName the rule name
      * @param taskFlow the com.gobrs.async.com.gobrs.async.test.task flow
      */
     TaskTrigger(String ruleName, TaskFlow taskFlow) {
@@ -178,30 +183,23 @@ class TaskTrigger<P, R> {
      */
     TaskLoader trigger(AsyncParam<P> param, long timeout, Set<String> optionalTasks) {
 
+
         IdentityHashMap<AsyncTask, TaskActuator> newProcessMap = new IdentityHashMap<>(prepareTaskMap.size());
         /**
          * Create a com.gobrs.async.com.gobrs.async.test.task loader, A com.gobrs.async.com.gobrs.async.test.task flow corresponds to a taskLoader
          */
         TaskLoader<P, R> loader = new TaskLoader<P, R>(ruleName, threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
 
-        TaskSupport support = getSupport(param);
-
-        traceId(support);
-
-        loader.setAssistantTask(assistantTask);
-
-        support.setTaskLoader(loader);
-        /**
-         * The thread pool is obtained from the factory, and the thread pool parameters can be dynamically adjusted
-         */
-        support.setExecutorService(threadPoolFactory.getThreadPoolExecutor());
+        TaskSupport support = related(param, loader);
 
         for (AsyncTask task : prepareTaskMap.keySet()) {
             /**
              * clone Process for Thread isolation
              */
             TaskActuator processor = (TaskActuator) prepareTaskMap.get(task).clone();
+
             processor.init(support, param);
+
             newProcessMap.put(task, processor);
         }
 
@@ -210,14 +208,30 @@ class TaskTrigger<P, R> {
     }
 
     /**
-     * traceId
+     * 设置 任务总线和任务加载器关联关系
+     * 配置设置 环境加载
      *
-     * @param support
+     * @param param
+     * @param loader
+     * @return
      */
-    private void traceId(TaskSupport support) {
-        long traceId = IdWorker.nextId();
-        TraceUtil.set(traceId);
+    private TaskSupport related(AsyncParam<P> param, TaskLoader<P, R> loader) {
+
+        TaskSupport support = getSupport(param);
+
+        support.setTaskLoader(loader);
+
+        logAdvance(support);
+
+        loader.setAssistantTask(assistantTask);
+
+        /**
+         * The thread pool is obtained from the factory, and the thread pool parameters can be dynamically adjusted
+         */
+        support.setExecutorService(threadPoolFactory.getThreadPoolExecutor());
+        return support;
     }
+
 
     /**
      * 终止任务 在整个任务流程结束后 会调用该任务类执行 completed()
@@ -281,11 +295,37 @@ class TaskTrigger<P, R> {
      * @return
      */
     private TaskSupport getSupport(AsyncParam param) {
-        TaskSupport taskSupport = new TaskSupport();
-        taskSupport.setParam(param.get());
-        return taskSupport;
+        return new TaskSupport().
+                setParam(param)
+                .setRuleName(ruleName);
     }
 
+
+    /**
+     * 1、traceId
+     * 2、日志
+     *
+     * @param support
+     */
+    private void logAdvance(TaskSupport support) {
+
+        long traceId = IdWorker.nextId();
+        TraceUtil.set(traceId);
+
+        boolean costLogabled = ConfigManager.Action.costLogabled(ruleName);
+        if (costLogabled) {
+            LogWrapper.TimeCollector timeCollector =
+                    LogWrapper.TimeCollector.builder()
+                            .startTime(SystemClock.now())
+                            .build();
+            LogWrapper logWrapper = new LogWrapper()
+                    .setTraceId(traceId)
+                    .setTimeCollector(timeCollector);
+            support.setLogWrapper(logWrapper);
+            support.getTaskLoader().setLogWrapper(logWrapper);
+        }
+
+    }
 
     /**
      * @param rulename

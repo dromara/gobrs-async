@@ -9,9 +9,12 @@ import com.gobrs.async.core.common.enums.ExpState;
 import com.gobrs.async.core.common.enums.ResultState;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.holder.BeanHolder;
+import com.gobrs.async.core.log.LogCreator;
+import com.gobrs.async.core.log.LogWrapper;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
 import com.gobrs.async.core.common.exception.TimeoutException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -34,6 +37,7 @@ import java.util.stream.Collectors;
  * @author: sizegang
  * @create: 2022 -03-16
  */
+@Slf4j
 public class TaskLoader<P, R> {
     /**
      * Interruption code
@@ -88,6 +92,8 @@ public class TaskLoader<P, R> {
      */
     public Map<AsyncTask, Future> futureMaps = new ConcurrentHashMap<>();
 
+    private LogWrapper logWrapper;
+
     private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<>(0);
 
     /**
@@ -122,8 +128,6 @@ public class TaskLoader<P, R> {
         this.processMap = processMap;
         completeLatch = new CountDownLatch(1);
         this.timeout = timeout;
-
-
         if (this.timeout > 0) {
             futureLists = new ArrayList<>(1);
         } else {
@@ -159,8 +163,24 @@ public class TaskLoader<P, R> {
 
         // wait
         waitIfNecessary();
-        return back(begins);
+        AsyncResult result = back(begins);
+        return postProcess(result);
     }
+
+    /**
+     * 后置处理
+     *
+     * @param result
+     * @return
+     */
+    private AsyncResult postProcess(AsyncResult result) {
+        if (ConfigManager.Action.costLogabled(ruleName) && log.isInfoEnabled()) {
+            String printContent = LogCreator.processLogs(logWrapper);
+            log.info(printContent);
+        }
+        return result;
+    }
+
 
     /**
      * Determine whether it is the optimal solution route
@@ -459,5 +479,23 @@ public class TaskLoader<P, R> {
      */
     public void setOptionalTasks(Set<AsyncTask> optionalTasks) {
         this.optionalTasks = optionalTasks;
+    }
+
+    /**
+     * Gets log wrapper.
+     *
+     * @return the log wrapper
+     */
+    public LogWrapper getLogWrapper() {
+        return logWrapper;
+    }
+
+    /**
+     * Sets log wrapper.
+     *
+     * @param logWrapper the log wrapper
+     */
+    public void setLogWrapper(LogWrapper logWrapper) {
+        this.logWrapper = logWrapper;
     }
 }

@@ -2,10 +2,9 @@ package com.gobrs.async.core;
 
 import com.gobrs.async.core.callback.ErrorCallback;
 import com.gobrs.async.core.config.ConfigManager;
-import com.gobrs.async.core.config.GobrsAsyncProperties;
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.enums.ResultState;
-import com.gobrs.async.core.rule.Rule;
+import com.gobrs.async.core.config.RuleConfig;
 import com.gobrs.async.core.task.TaskUtil;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.TaskResult;
@@ -62,7 +61,7 @@ public class TaskActuator implements Runnable, Cloneable {
 
 
 
-    private Rule rule;
+    private RuleConfig rule;
 
     /**
      * 执行状态
@@ -114,6 +113,8 @@ public class TaskActuator implements Runnable, Cloneable {
     public void run() {
 
         Object parameter = getParameter();
+
+
 
         preparation();
 
@@ -184,19 +185,14 @@ public class TaskActuator implements Runnable, Cloneable {
 
             Optimal.optimalCount(support.taskLoader);
 
-            logger.error("【Gobrs-Async print error】 taskName{} error{}", task.getName(), e);
-
             state = new AtomicInteger(1);
 
             if (!retryTask(parameter, taskLoader)) {
+
                 support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
 
-                try {
-                    task.onFailureTrace(support, e);
-                } catch (Exception ex) {
-                    // Failed events are not processed
-                    logger.error("com.gobrs.async.com.gobrs.async.test.task onFailureTrace process is error {}", ex);
-                }
+                task.onFailureTrace(support, e);
+
                 /**
                  * transaction com.gobrs.async.com.gobrs.async.test.task
                  * 事物任务
@@ -640,7 +636,7 @@ public class TaskActuator implements Runnable, Cloneable {
      *
      * @return the rule
      */
-    public Rule getRule() {
+    public RuleConfig getRule() {
         return rule;
     }
 
@@ -649,7 +645,7 @@ public class TaskActuator implements Runnable, Cloneable {
      *
      * @param rule the rule
      */
-    public void setRule(Rule rule) {
+    public void setRule(RuleConfig rule) {
         this.rule = rule;
     }
 }

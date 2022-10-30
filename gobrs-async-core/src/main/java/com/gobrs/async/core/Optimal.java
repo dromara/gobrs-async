@@ -9,6 +9,7 @@ package com.gobrs.async.core; /**
 import com.gobrs.async.core.holder.BeanHolder;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
@@ -18,14 +19,12 @@ import java.util.*;
 /**
  * The type com.gobrs.async.Optimal.
  */
+@Slf4j
 public class Optimal {
-    /**
-     * The Logger.
-     */
-    static Logger logger = LoggerFactory.getLogger(Optimal.class);
 
     /**
      * If continue boolean.
+     * 可选的任务是否有资格继续执行
      *
      * @param optionalTasks the optional tasks
      * @param taskLoader    the com.gobrs.async.com.gobrs.async.test.task loader
@@ -54,12 +53,12 @@ public class Optimal {
     /**
      * ifOptimal
      *
-     * @param affirTasks    the affir tasks
+     * @param optionalTasks the optional tasks
      * @param processMap    the process map
      * @param assistantTask the assistant com.gobrs.async.com.gobrs.async.test.task
      */
-    public static void ifOptimal(Set<AsyncTask> affirTasks, Map<AsyncTask, TaskActuator> processMap, TaskTrigger.AssistantTask assistantTask) {
-        processMap.get(assistantTask).setUpstreamDepdends(affirTasks.size());
+    public static void ifOptimal(Set<AsyncTask> optionalTasks, Map<AsyncTask, TaskActuator> processMap, TaskTrigger.AssistantTask assistantTask) {
+        processMap.get(assistantTask).setUpstreamDepdends(optionalTasks.size());
     }
 
 
@@ -81,7 +80,7 @@ public class Optimal {
         for (String x : optionalTasks) {
             Object bean = BeanHolder.getBean(x);
             if (bean == null) {
-                logger.error("【Gobrs-Async print】affir Task name empty {}", x);
+                log.error("【Gobrs-Async print】affir Task name empty {}", x);
                 continue;
             }
 

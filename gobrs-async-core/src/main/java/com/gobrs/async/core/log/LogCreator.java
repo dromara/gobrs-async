@@ -1,8 +1,8 @@
 package com.gobrs.async.core.log;
 
-import com.gobrs.async.core.task.AsyncTask;
+import com.gobrs.async.core.common.util.SystemClock;
 
-import java.util.LinkedHashMap;
+import java.util.*;
 
 /**
  * The type Log creator.
@@ -28,14 +28,35 @@ public class LogCreator {
     }
 
     /**
-     * Process logs string.
+     * Process logs string
      *
-     * @param tracers the tracers
+     * @param logWrapper the log wrapper
      * @return the string
      */
-    public String processLogs(LinkedHashMap<AsyncTask, LogTracer> tracers) {
-        // todo 构建任务流程的日志信息
-        return null;
+    public static String processLogs(LogWrapper logWrapper) {
+        StringBuilder printContent = new StringBuilder();
+        List<LogTracer> logTracerList = new ArrayList<>();
+        Long processStartTime = logWrapper.getTimeCollector().getStartTime();
+        logWrapper.getTracerQueue().drainTo(logTracerList);
+        printContent.append("任务总耗时: ")
+                .append(SystemClock.now() - processStartTime)
+                .append("ms")
+                .append(" | ")
+                .append("traceId = ")
+                .append(logWrapper.getTraceId())
+                .append(" | ");
+        for (LogTracer tracer : logTracerList) {
+            printContent
+                    .append("【")
+                    .append(tracer.getTaskName())
+                    .append("】")
+                    .append(":")
+                    .append(tracer.getTaskCost())
+                    .append("ms")
+                    .append("; =>");
+        }
+
+        return printContent.substring(0, printContent.length() - 2);
     }
 
 }

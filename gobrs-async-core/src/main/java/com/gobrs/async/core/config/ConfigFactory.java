@@ -1,7 +1,5 @@
 package com.gobrs.async.core.config;
 
-import com.gobrs.async.core.rule.Rule;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,7 +17,7 @@ public class ConfigFactory {
     /**
      * 任务流程独特配置
      */
-    private Map<String, Rule> processRules = new ConcurrentHashMap();
+    private Map<String, RuleConfig> processRules = new ConcurrentHashMap();
 
     /**
      * 全局配置
@@ -31,7 +29,7 @@ public class ConfigFactory {
      *
      * @return the process rules
      */
-    public Map<String, Rule> getProcessRules() {
+    public Map<String, RuleConfig> getProcessRules() {
         return processRules;
     }
 
@@ -40,7 +38,7 @@ public class ConfigFactory {
      *
      * @param processRules the process rules
      */
-    public void setProcessRules(Map<String, Rule> processRules) {
+    public void setProcessRules(Map<String, RuleConfig> processRules) {
         this.processRules = processRules;
     }
 
@@ -78,7 +76,7 @@ public class ConfigFactory {
      * @param rule     the rule
      * @return the rule
      */
-    public Rule addRule(String ruleName, Rule rule) {
+    public RuleConfig addRule(String ruleName, RuleConfig rule) {
         return this.processRules.put(ruleName, rule);
     }
 }

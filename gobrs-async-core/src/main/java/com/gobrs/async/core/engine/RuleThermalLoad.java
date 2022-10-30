@@ -1,7 +1,7 @@
 package com.gobrs.async.core.engine;
 
 import com.gobrs.async.core.GobrsAsync;
-import com.gobrs.async.core.rule.Rule;
+import com.gobrs.async.core.config.RuleConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,11 +30,11 @@ public class RuleThermalLoad implements RuleThermal {
     private GobrsAsync gobrsAsync;
 
     @Override
-    public void load(Rule rule) {
+    public void load(RuleConfig rule) {
         try {
             ruleEngine.doParse(rule, true);
             gobrsAsync.readyTo(rule.getName(), true);
-            logger.info("com.gobrs.async.rule {} update success", rule.getName());
+            logger.info("gobrs.async.rule {} update success", rule.getName());
         } catch (Exception ex) {
             logger.error("com.gobrs.async.rule {} update fail {}", rule.getName(), ex);
         }
@@ -42,14 +42,14 @@ public class RuleThermalLoad implements RuleThermal {
 
 
     @Override
-    public void load(List<Rule> ruleList) {
+    public void load(List<RuleConfig> ruleList) {
         ruleList.stream().parallel().forEach(x -> {
             try {
                 ruleEngine.doParse(x, true);
                 gobrsAsync.readyTo(x.getName(), true);
-                logger.info("com.gobrs.async.rule {} update success", x.getName());
+                logger.info("gobrs.async.rule {} update success !!!", x.getName());
             } catch (Exception ex) {
-                logger.error("com.gobrs.async.rule {} update fail {}", x.getName(), ex);
+                logger.error("gobrs.async.rule {} update fail", x.getName(), ex);
             }
         });
     }

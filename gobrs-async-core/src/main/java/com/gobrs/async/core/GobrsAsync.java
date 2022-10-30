@@ -2,7 +2,6 @@ package com.gobrs.async.core;
 
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.AsyncResult;
-import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.common.exception.NotTaskRuleException;
 
@@ -101,15 +100,15 @@ public class GobrsAsync {
     /**
      * Go async result.
      *
-     * @param ruleName   the rule name
-     * @param param      the param
-     * @param affirTasks the affir tasks
-     * @param timeout    the timeout
+     * @param ruleName      the rule name
+     * @param param         the param
+     * @param optionalTasks the optional tasks
+     * @param timeout       the timeout
      * @return the async result
      */
-    public AsyncResult go(String ruleName, AsyncParam param, Set<String> affirTasks, long timeout) {
+    public AsyncResult go(String ruleName, AsyncParam param, Set<String> optionalTasks, long timeout) {
         if (check(ruleName).isPresent()) {
-            return trigger.get(ruleName).trigger(param, timeout, affirTasks).load();
+            return trigger.get(ruleName).trigger(param, timeout, optionalTasks).load();
         }
         throw new NotTaskRuleException("Gobrs Rule Name Is Error");
     }

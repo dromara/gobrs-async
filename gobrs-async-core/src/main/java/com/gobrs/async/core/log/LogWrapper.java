@@ -1,8 +1,10 @@
 package com.gobrs.async.core.log;
 
-import com.gobrs.async.core.task.AsyncTask;
+import lombok.Builder;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
-import java.util.LinkedHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 
 /**
@@ -14,53 +16,47 @@ import java.util.LinkedHashMap;
  * @author: sizegang
  * @create: 2022 -10-28
  */
+@Accessors(chain = true)
+@Data
 public class LogWrapper {
 
     private Long traceId;
 
-    private LinkedHashMap<AsyncTask, LogTracer> traceMap;
+    private final LinkedBlockingQueue<LogTracer> tracerQueue = new LinkedBlockingQueue<>();
+
+    private TimeCollector timeCollector;
+
+    private Long processCost;
+
 
     /**
-     * Gets trace map.
+     * Add trace.
      *
-     * @return the trace map
+     * @param logTracer the log tracer
      */
-    public LinkedHashMap<AsyncTask, LogTracer> getTraceMap() {
-        return traceMap;
-    }
-
-    /**
-     * Sets trace map.
-     *
-     * @param traceMap the trace map
-     */
-    public void setTraceMap(LinkedHashMap<AsyncTask, LogTracer> traceMap) {
-        this.traceMap = traceMap;
+    public void addTrace(LogTracer logTracer) {
+        tracerQueue.add(logTracer);
     }
 
     /**
-     * Instantiates a new Log wrapper.
-     *
-     * @param traceMap the trace map
+     * The type Time collector.
      */
-    public LogWrapper(LinkedHashMap<AsyncTask, LogTracer> traceMap) {
-        this.traceMap = traceMap;
-    }
+    @Builder
+    @Data
+    public static class TimeCollector {
 
+        private Long startTime;
 
-    public Long getTraceId() {
-        return traceId;
-    }
-
-    public void setTraceId(Long traceId) {
-        this.traceId = traceId;
+        private Long endTime;
     }
 
     @Override
     public String toString() {
         return "LogWrapper{" +
                 "traceId=" + traceId +
-                ", traceMap=" + traceMap +
+                ", tracerQueue=" + tracerQueue +
+                ", timeCollector=" + timeCollector +
+                ", processCost=" + processCost +
                 '}';
     }
 }

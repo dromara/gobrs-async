@@ -63,11 +63,12 @@ public class GobrsAsyncThreadPoolFactory {
     /**
      * Create default thread pool thread pool executor.
      * 创建默认线程池
+     *
      * @return the thread pool executor
      */
     ThreadPoolExecutor createDefaultThreadPool() {
         GobrsAsyncProperties.ThreadPool threadPool = gobrsAsyncProperties.getThreadPool();
-        return new MDCThreadPoolExecutor(threadPool.getCorePoolSize(),
+        return new ThreadPoolExecutor(threadPool.getCorePoolSize(),
                 threadPool.getMaxPoolSize(), threadPool.getKeepAliveTime(), threadPool.getTimeUnit(),
                 threadPool.getWorkQueue(), ThreadPoolBuilder.caseReject(threadPool.getRejectedExecutionHandler()));
     }

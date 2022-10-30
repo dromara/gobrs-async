@@ -2,6 +2,9 @@ package com.gobrs.async.core;
 
 import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.core.log.LogWrapper;
+import lombok.Builder;
+import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,6 +19,8 @@ import java.util.concurrent.ExecutorService;
  * @author: sizegang
  * @create: 2022 -03-20
  */
+@Data
+@Accessors(chain = true)
 public class TaskSupport {
 
 
@@ -26,6 +31,11 @@ public class TaskSupport {
     public TaskLoader taskLoader;
 
     /**
+     * 规则名称
+     */
+    private String ruleName;
+
+    /**
      * 执行线程池
      * The Executor service.
      */
@@ -34,7 +44,7 @@ public class TaskSupport {
     /**
      * 日志封装
      */
-    private LogWrapper logWrapper;
+    private volatile LogWrapper logWrapper;
 
 
     /**
@@ -48,98 +58,4 @@ public class TaskSupport {
      * 任务结果
      */
     private Map<Class, TaskResult> resultMap = new ConcurrentHashMap<>();
-
-
-    /**
-     * Gets param.
-     *
-     * @return the param
-     */
-    public Object getParam() {
-        return param;
-    }
-
-    /**
-     * Sets param.
-     *
-     * @param param the param
-     */
-    public void setParam(Object param) {
-        this.param = param;
-    }
-
-    /**
-     * Gets result map.
-     *
-     * @return the result map
-     */
-    public Map<Class, TaskResult> getResultMap() {
-        return resultMap;
-    }
-
-    /**
-     * Sets result map.
-     *
-     * @param resultMap the result map
-     */
-    public void setResultMap(Map<Class, TaskResult> resultMap) {
-        this.resultMap = resultMap;
-    }
-
-    /**
-     * Gets com.gobrs.async.com.gobrs.async.test.task loader.
-     *
-     * @return the com.gobrs.async.com.gobrs.async.test.task loader
-     */
-    public TaskLoader getTaskLoader() {
-        return taskLoader;
-    }
-
-    /**
-     * Sets com.gobrs.async.com.gobrs.async.test.task loader.
-     *
-     * @param taskLoader the com.gobrs.async.com.gobrs.async.test.task loader
-     */
-    public void setTaskLoader(TaskLoader taskLoader) {
-        this.taskLoader = taskLoader;
-    }
-
-    /**
-     * Gets executor service.
-     *
-     * @return the executor service
-     */
-    public ExecutorService getExecutorService() {
-        return executorService;
-    }
-
-    /**
-     * Sets executor service.
-     *
-     * @param executorService the executor service
-     */
-    public void setExecutorService(ExecutorService executorService) {
-        this.executorService = executorService;
-    }
-
-
-    /**
-     * Gets com.gobrs.async.log wrapper.
-     *
-     * @return the com.gobrs.async.log wrapper
-     */
-    public LogWrapper getLogWrapper() {
-        return logWrapper;
-    }
-
-    /**
-     * Sets com.gobrs.async.log wrapper.
-     *
-     * @param logWrapper the com.gobrs.async.log wrapper
-     */
-    public void setLogWrapper(LogWrapper logWrapper) {
-        this.logWrapper = logWrapper;
-    }
-
-
 }

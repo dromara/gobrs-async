@@ -2,7 +2,6 @@ package com.gobrs.async.core.config;
 
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
 import com.gobrs.async.core.holder.BeanHolder;
-import com.gobrs.async.core.rule.Rule;
 
 import java.util.Objects;
 
@@ -18,6 +17,9 @@ import java.util.Objects;
 public class ConfigManager {
 
 
+    /**
+     * The constant configFactory.
+     */
     public static ConfigFactory configFactory = BeanHolder.getBean(ConfigFactory.class);
 
     /**
@@ -44,9 +46,10 @@ public class ConfigManager {
      * @param ruleName the rule name
      * @return the rule
      */
-    public static Rule getRule(String ruleName) {
+    public static RuleConfig getRule(String ruleName) {
         return checkAndGet().getProcessRules().get(ruleName);
     }
+
 
     /**
      * @return
@@ -62,8 +65,44 @@ public class ConfigManager {
     }
 
 
-    public void addRule(String ruleName, Rule rule) {
+    /**
+     * Add rule.
+     *
+     * @param ruleName the rule name
+     * @param rule     the rule
+     */
+    public void addRule(String ruleName, RuleConfig rule) {
         configFactory.addRule(ruleName, rule);
+    }
+
+
+    /**
+     * The type Action.
+     */
+    public static class Action {
+        /**
+         * Logable boolean.
+         * 执行异常 打印
+         * 包含traceId
+         *
+         * @param ruleName the rule name
+         * @return the boolean
+         */
+        public static boolean errLogabled(String ruleName) {
+            return getRule(ruleName).getLogConfig().getLogable();
+        }
+
+        /**
+         * Cost boolean.
+         * 执行链路打印
+         * 执行时长
+         *
+         * @param ruleName the rule name
+         * @return the boolean
+         */
+        public static boolean costLogabled(String ruleName) {
+            return getRule(ruleName).getLogConfig().getCostable();
+        }
     }
 
 }

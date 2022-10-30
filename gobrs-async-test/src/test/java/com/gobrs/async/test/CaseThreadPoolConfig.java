@@ -1,7 +1,7 @@
 package com.gobrs.async.test;
 
 import com.gobrs.async.core.engine.RuleThermalLoad;
-import com.gobrs.async.core.rule.Rule;
+import com.gobrs.async.core.config.RuleConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,8 +26,8 @@ public class CaseThreadPoolConfig {
      * @param rule the com.gobrs.async.rule
      */
     @Test
-    public void updateRule(Rule rule) {
-        Rule r = new Rule();
+    public void updateRule(RuleConfig rule) {
+        RuleConfig r = new RuleConfig();
         r.setName("ruleName");
         r.setContent("AService->CService->EService->GService; BService->DService->FService->HService;");
         ruleThermalLoad.load(rule);

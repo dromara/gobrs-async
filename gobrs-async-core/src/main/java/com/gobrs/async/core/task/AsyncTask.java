@@ -4,6 +4,10 @@ package com.gobrs.async.core.task;
 import com.gobrs.async.core.TaskSupport;
 import com.gobrs.async.core.callback.ErrorCallback;
 import com.gobrs.async.core.common.enums.ExpState;
+import com.gobrs.async.core.common.util.SystemClock;
+import com.gobrs.async.core.config.ConfigManager;
+import com.gobrs.async.core.log.LogTracer;
+import com.gobrs.async.core.log.LogWrapper;
 import com.gobrs.async.core.log.TraceUtil;
 import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
@@ -12,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -106,7 +111,26 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * @return the result
      */
     public Result taskAdapter(Param param, TaskSupport support) {
-        Result task = task(param, support);
+        Long startTime = SystemClock.now();
+        Result task;
+        try {
+            task = task(param, support);
+        } catch (Exception exception) {
+            throw exception;
+        } finally {
+            boolean costLogabled = ConfigManager.Action.costLogabled(support.getRuleName());
+            if (costLogabled &&
+                    Objects.nonNull(support.getLogWrapper())) {
+                long costTime = SystemClock.now() - startTime;
+                LogTracer logTracer = LogTracer.builder()
+                        .taskName(this.getName())
+                        .taskCost(costTime)
+                        .build();
+                LogWrapper logWrapper = support.getLogWrapper();
+                logWrapper.addTrace(logTracer);
+                logWrapper.setProcessCost(costTime);
+            }
+        }
         return task;
     }
 
@@ -128,8 +152,10 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * @param exception the com.gobrs.async.exception
      */
     public void onFailureTrace(TaskSupport support, Exception exception) {
-        // todo  通过配置方式 开启日志打印模式
-        logger.error("[traceId:{}] com.gobrs.async.com.gobrs.async.test.task {} error {}", TraceUtil.get(), this.getName(), exception);
+        boolean logable = ConfigManager.Action.errLogabled(support.getRuleName());
+        if (logable) {
+            logger.error("[traceId:{}] {} 任务执行失败", TraceUtil.get(), this.getName(), exception);
+        }
         onFail(support, exception);
     }
 
