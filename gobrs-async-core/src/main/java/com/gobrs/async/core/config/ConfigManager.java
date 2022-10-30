@@ -89,7 +89,7 @@ public class ConfigManager {
          * @return the boolean
          */
         public static boolean errLogabled(String ruleName) {
-            return getRule(ruleName).getLogConfig().getLogable();
+            return getRule(ruleName).getLogConfig().getErrLogabled();
         }
 
         /**
@@ -101,7 +101,7 @@ public class ConfigManager {
          * @return the boolean
          */
         public static boolean costLogabled(String ruleName) {
-            return getRule(ruleName).getLogConfig().getCostable();
+            return getRule(ruleName).getLogConfig().getCostLogabled();
         }
     }
 
