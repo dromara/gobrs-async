@@ -1,16 +1,19 @@
-server:
-  port: 9999 # 端口: 8080
-spring:
-  gobrs:
-    async:
-      #      enable: false
+gobrs:
+  async:
+    config:
       rules:
         - name: "general"
           content: "AService->BService->FService->GService->HService;EService->CService;AService"
         - name: "anyConditionGeneral"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition"
+          logConfig:
+            costLogabled: false
+            errLogabled: true
         - name: "anyConditionRule"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition"
         - name: "anyConditionRuleAppend"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition->EServiceCondition"
+server:
+  port: 9999 # 端口: 8080
+
 
