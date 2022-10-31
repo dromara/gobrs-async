@@ -33,7 +33,8 @@ gobrs:
           logConfig:
             costLogabled: false # 关闭耗时任务打印
         - name: "caseFive"
-          content: "caseFourTaskA,caseFourTaskB,caseFourTaskC->caseFourTaskD:any:exclusive"
+          content: "caseFourTaskA,caseFourTaskB,caseFourTaskC->caseFourTaskD:any:exclusive" # any 任意一个任务（A、B、C）执行完成后 则执行D任务
+          # exclusive 避免任务执行浪费 所以 D执行完成之后 会主动 中断 未完成的任务
 server:
   port: 9999 # 端口: 8080
 
