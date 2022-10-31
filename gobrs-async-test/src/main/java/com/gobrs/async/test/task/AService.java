@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
  * @create: 2022 -03-20
  */
 @Task(failSubExec = true)
-@Component
 public class AService extends AsyncTask {
 
     /**

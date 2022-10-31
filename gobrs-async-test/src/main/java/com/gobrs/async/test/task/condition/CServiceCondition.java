@@ -1,6 +1,7 @@
 package com.gobrs.async.test.task.condition;
 
 import com.gobrs.async.core.TaskSupport;
+import com.gobrs.async.core.anno.Task;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.core.task.AsyncTask;
@@ -24,7 +25,7 @@ import org.springframework.stereotype.Component;
  * @author: sizegang
  * @create: 2022 -03-20
  */
-@Component
+@Task
 public class CServiceCondition extends AsyncTask<String, AnyConditionResult<String>> {
 
     /**

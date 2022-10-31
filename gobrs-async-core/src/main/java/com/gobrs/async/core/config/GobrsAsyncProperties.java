@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.gobrs.async.core.common.constant.ConfigPropertiesConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import static com.gobrs.async.core.common.def.DefaultConfig.*;
@@ -26,7 +27,7 @@ import static com.gobrs.async.core.common.def.DefaultConfig.*;
  * @date 2022 -01-27 22:04
  */
 @ConfigurationProperties(prefix = GobrsAsyncProperties.PREFIX)
-@Component
+@Primary
 public class GobrsAsyncProperties {
 
     /**

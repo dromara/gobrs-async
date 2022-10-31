@@ -23,7 +23,6 @@ import org.springframework.stereotype.Component;
  * @author: sizegang
  * @create: 2022 -03-20
  */
-@Component
 @Task
 public class BServiceCondition extends AsyncTask {
 

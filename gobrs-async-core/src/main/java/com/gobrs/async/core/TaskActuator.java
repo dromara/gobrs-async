@@ -59,7 +59,6 @@ public class TaskActuator implements Runnable, Cloneable {
     private Map<AsyncTask, List<AsyncTask>> upwardTasksMap;
 
 
-
     private RuleConfig rule;
 
     /**
@@ -112,7 +111,6 @@ public class TaskActuator implements Runnable, Cloneable {
     public void run() {
 
         Object parameter = getParameter();
-
 
 
         preparation();
@@ -380,7 +378,6 @@ public class TaskActuator implements Runnable, Cloneable {
     public void nextTask(TaskLoader taskLoader, AnyConditionResult conditionResult) {
 
         if (!CollectionUtils.isEmpty(subTasks)) {
-            boolean hasUsedSynRunTimeOnce = false;
             for (int i = 0; i < subTasks.size(); i++) {
                 TaskActuator process = taskLoader
                         .getProcess(subTasks.get(i));
@@ -401,13 +398,13 @@ public class TaskActuator implements Runnable, Cloneable {
                             Boolean aBoolean = (Boolean) taskLoader.anyConditionProx.get(process);
                             if (Objects.isNull(aBoolean)) {
                                 taskLoader.anyConditionProx.put(process, true);
-                                doTask(taskLoader, process, optionalTasks, hasUsedSynRunTimeOnce);
+                                doTask(taskLoader, process, optionalTasks);
                             }
                         }
                     }
                 } else {
                     if (process.releasingDependency() == 0) {
-                        doTask(taskLoader, process, optionalTasks, hasUsedSynRunTimeOnce);
+                        doTask(taskLoader, process, optionalTasks);
                     }
                 }
             }
@@ -423,13 +420,8 @@ public class TaskActuator implements Runnable, Cloneable {
      * @param process
      * @param optionalTasks
      */
-    private void doTask(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks, boolean hasUsedSynRunTimeOnce) {
-        if (!hasUsedSynRunTimeOnce && !process.task.isExclusive()) {
-            hasUsedSynRunTimeOnce = true;
-            process.run();
-        } else {
-            doProcess(taskLoader, process, optionalTasks);
-        }
+    private void doTask(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks) {
+        doProcess(taskLoader, process, optionalTasks);
     }
 
 

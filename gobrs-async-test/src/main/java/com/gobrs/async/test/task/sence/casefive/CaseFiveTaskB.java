@@ -1,4 +1,4 @@
-package com.gobrs.async.test.task.sence.casefour;
+package com.gobrs.async.test.task.sence.casefive;
 
 import com.gobrs.async.core.TaskSupport;
 import com.gobrs.async.core.anno.Task;
@@ -12,11 +12,11 @@ import com.gobrs.async.core.task.AsyncTask;
  * @create: 2022-10-31
  **/
 @Task
-public class CaseFourTaskK extends AsyncTask {
+public class CaseFiveTaskB extends AsyncTask {
 
     @Override
     public Object task(Object o, TaskSupport support) {
-        System.out.println("K任务执行");
-        return "KResult";
+        System.out.println("B任务执行");
+        return "BResult";
     }
 }

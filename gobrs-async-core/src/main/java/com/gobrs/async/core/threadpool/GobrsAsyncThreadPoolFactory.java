@@ -2,6 +2,7 @@ package com.gobrs.async.core.threadpool;
 
 import com.alibaba.ttl.threadpool.TtlExecutors;
 import com.gobrs.async.core.config.GobrsAsyncProperties;
+import org.springframework.context.annotation.Primary;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;

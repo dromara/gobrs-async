@@ -17,7 +17,7 @@ import java.util.Map;
  * @create: 2022-10-31
  **/
 @SpringBootTest(classes = GobrsAsyncTestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CaseFour {
+public class CaseFive {
 
     /**
      * A -> B,C,D
@@ -28,9 +28,9 @@ public class CaseFour {
 
 
     @Test
-    public void caseFour() {
+    public void caseFive() {
         Map<String, Object> params = new HashMap<>();
-        gobrsAsync.go("caseFour", () -> params);
+        gobrsAsync.go("caseFive", () -> params);
     }
 
 }

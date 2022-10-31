@@ -2,14 +2,15 @@ gobrs:
   async:
     config:
       rules:
+        # 规则 是数组类型的 多组规则
         - name: "general"
           content: "AService->BService->FService->GService->HService;EService->CService;AService"
 
         - name: "anyConditionGeneral"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition"
           logConfig:
-            costLogabled: false
-            errLogabled: true
+            costLogabled: false # 开启任务耗时打印 log日志级别需要为 error
+            errLogabled: true # 开启任务异常打印
         - name: "anyConditionRule"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition"
 
@@ -29,6 +30,10 @@ gobrs:
         - name: "caseFour"
           content: "caseFourTaskA->caseFourTaskB->caseFourTaskC,caseFourTaskD,caseFourTaskE;
                     caseFourTaskA->caseFourTaskH->caseFourTaskI,caseFourTaskJ,caseFourTaskK;"
+          logConfig:
+            costLogabled: false # 关闭耗时任务打印
+        - name: "caseFive"
+          content: "caseFourTaskA,caseFourTaskB,caseFourTaskC->caseFourTaskD:any:exclusive"
 server:
   port: 9999 # 端口: 8080
 

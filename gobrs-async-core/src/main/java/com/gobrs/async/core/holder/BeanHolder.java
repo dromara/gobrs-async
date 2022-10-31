@@ -51,8 +51,6 @@ public class BeanHolder implements ApplicationContextAware, BeanFactoryPostProce
      * @return the bean
      */
     public static Object getBean(String name) {
-
-
         try {
             return getApplicationContext() == null ? cf.getBean(name) : getApplicationContext().getBean(name);
         } catch (NoSuchBeanDefinitionException noSuchBeanDefinitionException) {
