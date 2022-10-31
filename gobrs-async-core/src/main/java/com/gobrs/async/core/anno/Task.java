@@ -19,8 +19,9 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Component
+@Indexed
 public @interface Task {
-
+    @AliasFor(annotation = Component.class, attribute = "value")
     String value() default "";
 
     /**

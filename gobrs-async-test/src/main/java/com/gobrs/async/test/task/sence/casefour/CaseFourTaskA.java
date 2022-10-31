@@ -1,4 +1,4 @@
-package com.gobrs.async.test.task.sence.casethree;
+package com.gobrs.async.test.task.sence.casefour;
 
 import com.gobrs.async.core.TaskSupport;
 import com.gobrs.async.core.anno.Task;
@@ -12,7 +12,7 @@ import com.gobrs.async.core.task.AsyncTask;
  * @create: 2022-10-31
  **/
 @Task
-public class CaseThreeTaskA extends AsyncTask {
+public class CaseFourTaskA extends AsyncTask {
 
     @Override
     public Object task(Object o, TaskSupport support) {

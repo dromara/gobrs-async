@@ -4,6 +4,7 @@ gobrs:
       rules:
         - name: "general"
           content: "AService->BService->FService->GService->HService;EService->CService;AService"
+
         - name: "anyConditionGeneral"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition"
           logConfig:
@@ -11,15 +12,23 @@ gobrs:
             errLogabled: true
         - name: "anyConditionRule"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition"
+
         - name: "anyConditionRuleAppend"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition->EServiceCondition"
+
         - name: "caseOne"
           content: "caseOneTaskA->caseOneTaskB,caseOneTaskC,caseOneTaskD"
+
         - name: "caseTwo"
           content: "caseTwoTaskA->caseTwoTaskB->caseTwoTaskC,caseTwoTaskD"
+
         - name: "caseThree"
-          content: "caseThreeTaskA->caseThreeTaskB,caseThreeTaskC,caseThreeTaskD->caseThreeTaskG;
+          content: "caseThreeTaskA->caseThreeTaskB,caseThreeTaskC,caseFourTaskD->caseThreeTaskG;
                     caseThreeTaskA->caseThreeTaskE,caseThreeTaskF->caseThreeTaskG;"
+
+        - name: "caseFour"
+          content: "caseFourTaskA->caseFourTaskB->caseFourTaskC,caseFourTaskD,caseFourTaskE;
+                    caseFourTaskA->caseFourTaskH->caseFourTaskI,caseFourTaskJ,caseFourTaskK;"
 server:
   port: 9999 # 端口: 8080
 

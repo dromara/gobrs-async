@@ -2,6 +2,7 @@ package com.gobrs.async.test.task.sence.casetwo;
 
 import com.gobrs.async.core.TaskSupport;
 import com.gobrs.async.core.anno.Task;
+import com.gobrs.async.core.task.AsyncTask;
 
 /**
  * @program: gobrs-async
@@ -11,7 +12,7 @@ import com.gobrs.async.core.anno.Task;
  * @create: 2022-10-31
  **/
 @Task
-public class CaseTwoTaskC extends com.gobrs.async.core.task.AsyncTask {
+public class CaseTwoTaskC extends AsyncTask {
 
 
     @Override
