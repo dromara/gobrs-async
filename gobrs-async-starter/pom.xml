@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.jd.gobrs</groupId>
     <artifactId>gobrs-async-starter</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.0.5</version>
     <name>${project.artifactId}</name>
     <description>🔥 强大异步任务编排工具（没有依赖中间件）</description>
     <url>https://github.com/Memorydoc/gobrs-async-starter</url>

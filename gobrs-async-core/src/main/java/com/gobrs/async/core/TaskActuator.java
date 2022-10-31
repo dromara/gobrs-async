@@ -9,8 +9,7 @@ import com.gobrs.async.core.task.TaskUtil;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.core.task.AsyncTask;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -22,12 +21,12 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * The type Task actuator.
  */
+@Slf4j
 public class TaskActuator implements Runnable, Cloneable {
 
     /**
      * The Logger.
      */
-    Logger logger = LoggerFactory.getLogger(TaskActuator.class);
 
     /**
      * The Support.

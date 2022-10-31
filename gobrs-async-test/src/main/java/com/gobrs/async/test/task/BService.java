@@ -1,8 +1,7 @@
 package com.gobrs.async.test.task;
 
 import com.gobrs.async.core.TaskSupport;
-import com.gobrs.async.core.common.anno.Task;
-import com.gobrs.async.core.task.AsyncTask;
+import com.gobrs.async.core.anno.AsyncTask;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,8 +14,8 @@ import org.springframework.stereotype.Component;
  * @create: 2022 -03-20
  */
 @Component
-@Task
-public class BService extends AsyncTask<Object, Object> {
+@AsyncTask
+public class BService extends com.gobrs.async.core.task.AsyncTask {
 
 
     /**

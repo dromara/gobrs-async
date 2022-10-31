@@ -1,9 +1,8 @@
 package com.gobrs.async.test.task.condition;
 
 import com.gobrs.async.core.TaskSupport;
-import com.gobrs.async.core.common.anno.Task;
+import com.gobrs.async.core.anno.AsyncTask;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
-import com.gobrs.async.core.task.AsyncTask;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,8 +23,8 @@ import org.springframework.stereotype.Component;
  * @create: 2022 -03-20
  */
 @Component
-@Task
-public class BServiceCondition extends AsyncTask<Object, AnyConditionResult<String>> {
+@AsyncTask
+public class BServiceCondition extends com.gobrs.async.core.task.AsyncTask {
 
     int i = 10000;
 

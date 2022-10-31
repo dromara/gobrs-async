@@ -1,11 +1,11 @@
-package com.gobrs.async.core.common.anno;
+package com.gobrs.async.core.anno;
 
 import com.gobrs.async.core.common.def.DefaultConfig;
+import org.springframework.core.annotation.AliasFor;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Indexed;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * The interface Task.
@@ -15,9 +15,15 @@ import java.lang.annotation.Target;
  * @author: sizegang
  * @date 2022 -04-07
  */
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Task {
+@Documented
+@Component
+@Indexed
+public @interface AsyncTask {
+
+    @AliasFor(annotation = Component.class, attribute = "value")
+    String value() default "";
 
     /**
      * com.gobrs.async.com.gobrs.async.test.task  name

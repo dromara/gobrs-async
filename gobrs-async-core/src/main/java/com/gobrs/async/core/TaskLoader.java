@@ -169,12 +169,13 @@ public class TaskLoader<P, R> {
 
     /**
      * 后置处理
+     * 开启日志 error 级别
      *
      * @param result
      * @return
      */
     private AsyncResult postProcess(AsyncResult result) {
-        if (ConfigManager.Action.costLogabled(ruleName) && log.isInfoEnabled()) {
+        if (ConfigManager.Action.costLogabled(ruleName) && log.isErrorEnabled()) {
             String printContent = LogCreator.processLogs(logWrapper);
             log.info(printContent);
         }

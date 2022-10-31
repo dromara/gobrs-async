@@ -84,7 +84,7 @@
         <dependency>
             <groupId>com.jd.gobrs</groupId>
             <artifactId>gobrs-async-starter</artifactId>
-            <version>1.0.5-SNAPSHOT</version>
+            <version>1.0.5</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

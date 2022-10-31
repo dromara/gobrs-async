@@ -1,8 +1,7 @@
 package com.gobrs.async.test.task.condition;
 import com.gobrs.async.core.TaskSupport;
-import com.gobrs.async.core.common.anno.Task;
+import com.gobrs.async.core.anno.AsyncTask;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
-import com.gobrs.async.core.task.AsyncTask;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,9 +20,9 @@ import org.springframework.stereotype.Component;
  * @author: sizegang
  * @create: 2022 -03-20
  */
-@Task(failSubExec = true)
+@AsyncTask(failSubExec = true)
 @Component
-public class AServiceCondition extends AsyncTask<Object, AnyConditionResult> {
+public class AServiceCondition extends com.gobrs.async.core.task.AsyncTask {
 
     /**
      * The .
