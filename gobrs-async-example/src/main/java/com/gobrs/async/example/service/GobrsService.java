@@ -1,4 +1,4 @@
-package com.gobrs.async.core.example.service;
+package com.gobrs.async.example.service;
 
 import com.gobrs.async.core.GobrsAsync;
 import com.gobrs.async.core.common.domain.AsyncResult;

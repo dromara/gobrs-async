@@ -1,17 +1,9 @@
-package com.gobrs.async.core.example.controller;
+package com.gobrs.async.example.controller;
 
-import com.gobrs.async.core.GobrsAsync;
-import com.gobrs.async.core.common.domain.AsyncResult;
-import com.gobrs.async.test.task.condition.AServiceCondition;
-import com.gobrs.async.test.task.condition.CServiceCondition;
-import com.gobrs.async.core.example.service.GobrsService;
+import com.gobrs.async.example.service.GobrsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The type Gobrs controller.
