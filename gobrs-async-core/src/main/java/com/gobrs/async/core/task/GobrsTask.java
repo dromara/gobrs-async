@@ -12,7 +12,7 @@ import com.gobrs.async.core.TaskSupport;
  * @author: sizegang
  * @create: 2022 -03-23 23:31
  */
-public interface GobrsTask<Param, Result> {
+public interface GobrsTask<Param, Result> extends ITask {
     /**
      * Before the mission begins
      *

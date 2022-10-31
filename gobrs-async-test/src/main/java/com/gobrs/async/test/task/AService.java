@@ -1,7 +1,7 @@
 package com.gobrs.async.test.task;
 
 import com.gobrs.async.core.TaskSupport;
-import com.gobrs.async.core.anno.AsyncTask;
+import com.gobrs.async.core.anno.Task;
 import org.springframework.stereotype.Component;
 
 /**
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
  * @author: sizegang
  * @create: 2022 -03-20
  */
-@AsyncTask(failSubExec = true)
+@Task(failSubExec = true)
 @Component
 public class AService extends com.gobrs.async.core.task.AsyncTask {
 

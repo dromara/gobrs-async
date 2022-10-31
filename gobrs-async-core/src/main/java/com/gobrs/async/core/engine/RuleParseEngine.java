@@ -2,7 +2,7 @@ package com.gobrs.async.core.engine;
 
 import com.gobrs.async.core.GobrsAsync;
 import com.gobrs.async.core.TaskReceive;
-import com.gobrs.async.core.anno.AsyncTask;
+import com.gobrs.async.core.anno.Task;
 import com.gobrs.async.core.config.GobrsAsyncProperties;
 import com.gobrs.async.core.common.def.Constant;
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
@@ -224,7 +224,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
          * @return name
          */
         public static String getDesc(com.gobrs.async.core.task.AsyncTask task) {
-            AsyncTask annotation = task.getClass().getAnnotation(AsyncTask.class);
+            Task annotation = task.getClass().getAnnotation(Task.class);
             if (annotation == null) {
                 return null;
             }
@@ -233,7 +233,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
 
 
         public static String getName(com.gobrs.async.core.task.AsyncTask task) {
-            AsyncTask annotation = task.getClass().getAnnotation(AsyncTask.class);
+            Task annotation = task.getClass().getAnnotation(Task.class);
             if (annotation == null) {
                 return null;
             }
@@ -247,7 +247,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
          * @return call back
          */
         public static boolean getCallBack(com.gobrs.async.core.task.AsyncTask task) {
-            AsyncTask annotation = task.getClass().getAnnotation(AsyncTask.class);
+            Task annotation = task.getClass().getAnnotation(Task.class);
             if (annotation == null) {
                 return false;
             }
@@ -261,7 +261,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
          * @return retry count
          */
         public static int getRetryCount(com.gobrs.async.core.task.AsyncTask task) {
-            AsyncTask annotation = task.getClass().getAnnotation(AsyncTask.class);
+            Task annotation = task.getClass().getAnnotation(Task.class);
             if (annotation == null) {
                 return DefaultConfig.retryCount;
             }
@@ -275,7 +275,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
          * @return fail sub exec
          */
         public static boolean getFailSubExec(com.gobrs.async.core.task.AsyncTask task) {
-            AsyncTask annotation = task.getClass().getAnnotation(AsyncTask.class);
+            Task annotation = task.getClass().getAnnotation(Task.class);
             if (annotation == null) {
                 return false;
             }

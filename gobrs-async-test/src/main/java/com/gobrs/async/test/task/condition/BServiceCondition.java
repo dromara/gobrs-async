@@ -1,7 +1,7 @@
 package com.gobrs.async.test.task.condition;
 
 import com.gobrs.async.core.TaskSupport;
-import com.gobrs.async.core.anno.AsyncTask;
+import com.gobrs.async.core.anno.Task;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import org.springframework.stereotype.Component;
 
@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  * @create: 2022 -03-20
  */
 @Component
-@AsyncTask
+@Task
 public class BServiceCondition extends com.gobrs.async.core.task.AsyncTask {
 
     int i = 10000;

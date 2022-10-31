@@ -1,8 +1,8 @@
 package com.gobrs.async.test.task.sence.caseone;
 
 import com.gobrs.async.core.TaskSupport;
-import com.gobrs.async.core.anno.AsyncTask;
-import org.springframework.stereotype.Component;
+import com.gobrs.async.core.anno.Task;
+import com.gobrs.async.core.task.AsyncTask;
 
 /**
  * @program: gobrs-async
@@ -11,9 +11,8 @@ import org.springframework.stereotype.Component;
  * @author: sizegang
  * @create: 2022-10-31
  **/
-@AsyncTask
-@Component
-public class CaseOneTaskA extends com.gobrs.async.core.task.AsyncTask {
+@Task
+public class CaseOneTaskA extends AsyncTask {
 
     @Override
     public Object task(Object o, TaskSupport support) {

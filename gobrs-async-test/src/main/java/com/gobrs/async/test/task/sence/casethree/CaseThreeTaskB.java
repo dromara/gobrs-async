@@ -1,7 +1,7 @@
 package com.gobrs.async.test.task.sence.casethree;
 
 import com.gobrs.async.core.TaskSupport;
-import com.gobrs.async.core.anno.AsyncTask;
+import com.gobrs.async.core.anno.Task;
 
 /**
  * @program: gobrs-async
@@ -10,7 +10,7 @@ import com.gobrs.async.core.anno.AsyncTask;
  * @author: sizegang
  * @create: 2022-10-31
  **/
-@AsyncTask
+@Task
 public class CaseThreeTaskB extends com.gobrs.async.core.task.AsyncTask {
 
     @Override
