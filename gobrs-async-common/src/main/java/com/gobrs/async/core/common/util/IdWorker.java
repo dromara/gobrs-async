@@ -1,8 +1,6 @@
 package com.gobrs.async.core.common.util;
 
-
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -17,11 +15,11 @@ import java.util.Enumeration;
  * @author sizegang
  * @version 1.0
  */
+@Slf4j
 public class IdWorker {
     /**
      * @Description:
      **/
-    private static final Logger log = LoggerFactory.getLogger(IdWorker.class);
 
     /**
      * @Description:

@@ -41,6 +41,8 @@ class TaskTrigger<P, R> {
 
     private Map<AsyncTask, TaskActuator> prepareTaskMap = Collections.synchronizedMap(new IdentityHashMap<>());
 
+    private Map<AsyncTask, TaskActuator> prepareTaskMapWrite = new IdentityHashMap<>();
+
     private String ruleName;
 
     /**
@@ -72,6 +74,7 @@ class TaskTrigger<P, R> {
      * 缓存依赖任务配置、维护 任务所依赖的任务数量和任务对象
      */
     private void prepare() {
+
 
         /**
          * Subtasks under a com.gobrs.async.com.gobrs.async.test.task
@@ -111,6 +114,7 @@ class TaskTrigger<P, R> {
         downTasksMap.put(assistantTask, new ArrayList<>(0));
         upwardTasksMap.put(assistantTask, noSubtasks);
         upwardTasksMapSpace = upwardTasksMap;
+        clear();
         for (AsyncTask task : downTasksMap.keySet()) {
             TaskActuator process;
             if (task != assistantTask) {
@@ -130,11 +134,22 @@ class TaskTrigger<P, R> {
                  */
                 process = new TerminationTask(task, upwardTasksMap.get(task).size(), downTasksMap.get(task));
             }
-            prepareTaskMap.put(task, process);
+            prepareTaskMapWrite.put(task, process);
         }
+        /**
+         * 读写分离
+         */
+        prepareTaskMap = prepareTaskMapWrite;
         if (logger.isInfoEnabled()) {
             logger.info("prepareTaskMap build success {}", JsonUtil.obj2String(prepareTaskMap));
         }
+    }
+
+    /**
+     * 清空写配置缓存
+     */
+    private void clear() {
+        prepareTaskMapWrite.clear();
     }
 
     private Map<AsyncTask, List<AsyncTask>> copyDependTasks(Map<AsyncTask, List<AsyncTask>> handlerMap) {

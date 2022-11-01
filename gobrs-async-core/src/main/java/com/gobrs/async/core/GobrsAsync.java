@@ -110,7 +110,7 @@ public class GobrsAsync {
         if (check(ruleName).isPresent()) {
             return trigger.get(ruleName).trigger(param, timeout, optionalTasks).load();
         }
-        throw new NotTaskRuleException("Gobrs Rule Name Is Error");
+        throw new NotTaskRuleException("Gobrs Rule Name Is Error!!!");
     }
 
 
@@ -145,13 +145,13 @@ public class GobrsAsync {
         /**
          * Initialize com.gobrs.async.com.gobrs.async.test.task trigger
          */
-        if (trigger == null) {
+        if (Objects.isNull(trigger)) {
             initializeTrigger(ruleName);
         }
         /**
          * Load com.gobrs.async.com.gobrs.async.test.task trigger
          */
-        if (trigger.get(ruleName) == null) {
+        if (Objects.isNull(trigger.get(ruleName))) {
             loadTrigger(ruleName);
         }
         if (reload) {

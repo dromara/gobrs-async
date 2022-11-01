@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  * @create: 2022-10-09
  **/
 @SpringBootTest(classes = GobrsAsyncTestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ThreadLocalTest {
+public class ParalCountDownLatch {
 
     @Autowired(required = false)
     private GobrsAsync gobrsAsync;

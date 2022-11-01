@@ -3,21 +3,23 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>gobrs-async</artifactId>
     <groupId>com.jd.gobrs.async</groupId>
+    <version>1.0.5-SNAPSHOT</version>
     <packaging>pom</packaging>
+
     <modules>
         <module>gobrs-async-common</module>
         <module>gobrs-async-core</module>
         <module>gobrs-async-starter</module>
         <module>gobrs-async-test</module>
-        <module>gobrs-async-example</module>
     </modules>
 
     <properties>
         <jdk.version>1.6</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <gobrs.asnyc.version>1.0.5</gobrs.asnyc.version>
+        <gobrs.asnyc.version>1.0.5-SNAPSHOT</gobrs.asnyc.version>
     </properties>
+
     <distributionManagement>
         <repository>
             <id>libs-releases-local</id>
@@ -30,6 +32,7 @@
             <url>http://artifactory.jd.com/libs-snapshots-local</url>
         </snapshotRepository>
     </distributionManagement>
+
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
         <testSourceDirectory>src/test/java</testSourceDirectory>

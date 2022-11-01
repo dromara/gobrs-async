@@ -4,8 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -20,11 +19,11 @@ import java.util.Map;
  * @author: sizegang
  * @create: 2022 -07-05
  */
+@Slf4j
 public class JsonUtil {
     /**
      * The Logger.
      */
-    static Logger logger = LoggerFactory.getLogger(JsonUtil.class);
 
     private static ObjectMapper objectMapper = new ObjectMapper();
 
@@ -44,7 +43,7 @@ public class JsonUtil {
         try {
             s = obj instanceof String ? (String)obj :  objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            logger.error("JsonUtil obj2String error{}", e);
+            log.error("JsonUtil obj2String error{}", e);
         }
         return s;
     }
@@ -83,7 +82,7 @@ public class JsonUtil {
         try {
             t = clazz.equals(String.class)? (T)str : objectMapper.readValue(str,clazz);
         } catch (IOException e) {
-            logger.error("JsonUtil string2Obj error{}", e);
+            log.error("JsonUtil string2Obj error{}", e);
         }
         return t;
     }
@@ -169,7 +168,7 @@ public class JsonUtil {
             try {
                 return objectMapper.writeValueAsString(this.map);
             } catch (JsonProcessingException e) {
-                logger.error("JsonUtil build error{}", e);
+                log.error("JsonUtil build error{}", e);
             }
             return "{}";
         }

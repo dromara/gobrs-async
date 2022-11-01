@@ -39,6 +39,10 @@ public class RuleConfig implements Serializable {
      */
     private boolean taskInterrupt = false;
 
+    /**
+     * 流程事务
+     */
+    boolean transaction = false;
 
 
     /**
@@ -122,5 +126,23 @@ public class RuleConfig implements Serializable {
      */
     public void setLogConfig(LogConfig logConfig) {
         this.logConfig = logConfig;
+    }
+
+    /**
+     * Is transaction boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isTransaction() {
+        return transaction;
+    }
+
+    /**
+     * Sets transaction.
+     *
+     * @param transaction the transaction
+     */
+    public void setTransaction(boolean transaction) {
+        this.transaction = transaction;
     }
 }

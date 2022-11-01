@@ -60,10 +60,6 @@ public class GobrsAsyncProperties {
      */
     private boolean paramContext = true;
 
-    /**
-     * Whether transaction com.gobrs.async.com.gobrs.async.test.task
-     */
-    private boolean transaction = false;
 
     /**
      * Default timeout
@@ -186,24 +182,6 @@ public class GobrsAsyncProperties {
      */
     public void setParamContext(boolean paramContext) {
         this.paramContext = paramContext;
-    }
-
-    /**
-     * Is transaction boolean.
-     *
-     * @return the boolean
-     */
-    public boolean isTransaction() {
-        return transaction;
-    }
-
-    /**
-     * Sets transaction.
-     *
-     * @param transaction the transaction
-     */
-    public void setTransaction(boolean transaction) {
-        this.transaction = transaction;
     }
 
     /**

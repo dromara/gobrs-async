@@ -483,7 +483,7 @@ public class TaskActuator implements Runnable, Cloneable {
      * 事务
      */
     private void transaction() {
-        if (ConfigManager.getGlobalConfig().isTransaction()) {
+        if (ConfigManager.getRule(rule.getName()).isTransaction()) {
 
             if (!this.task.isCallback()) {
                 return;
