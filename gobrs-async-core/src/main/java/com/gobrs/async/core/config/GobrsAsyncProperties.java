@@ -27,7 +27,6 @@ import static com.gobrs.async.core.common.def.DefaultConfig.*;
  * @date 2022 -01-27 22:04
  */
 @ConfigurationProperties(prefix = GobrsAsyncProperties.PREFIX)
-@Primary
 public class GobrsAsyncProperties {
 
     /**

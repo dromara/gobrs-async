@@ -49,13 +49,11 @@ public class LogCreator {
                 .append(" | ");
         for (LogTracer tracer : logTracerList) {
             printContent = printContent
-                    .append("【")
+                    .append("【task】")
                     .append(tracer.getTaskName())
-                    .append("】")
-                    .append("cost ")
+                    .append(" cost ")
                     .append(":")
                     .append(tracer.getTaskCost())
-                    .append(";")
                     .append("ms");
 
             if (!tracer.getExecuteState()) {
@@ -67,7 +65,7 @@ public class LogCreator {
                 printContent.append("【state】：")
                         .append("success");
             }
-            printContent.append("; =>");
+            printContent.append("; ->");
         }
 
         return printContent.substring(0, printContent.length() - 2);
