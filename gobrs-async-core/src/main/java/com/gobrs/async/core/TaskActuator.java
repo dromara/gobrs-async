@@ -180,50 +180,68 @@ public class TaskActuator implements Runnable, Cloneable {
             }
         } catch (Exception e) {
 
-            Optimal.optimalCount(support.taskLoader);
-
-            state = new AtomicInteger(1);
-
-            if (!retryTask(parameter, taskLoader)) {
-
-                support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
-
-                task.onFailureTrace(support, e);
-
-                /**
-                 * transaction com.gobrs.async.com.gobrs.async.test.task
-                 * 事物任务
-                 */
-                transaction();
-
-                /**
-                 * A single com.gobrs.async.com.gobrs.async.test.task com.gobrs.async.exception interrupts the entire process
-                 * 配置 taskInterrupt = true 则某一任务异常后结束整个任务流程 默认 false
-                 */
-                if (ConfigManager.getRule(rule.getName()).isTaskInterrupt()) {
-
-                    taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
-
-                } else {
-
-                    taskLoader.error(errorCallback(parameter, e, support, task));
-
-                    /**
-                     * 当然任务失败 是否继续执行子任务
-                     */
-                    if (task.isFailSubExec()) {
-                        nextTask(taskLoader, TaskUtil.defaultAnyCondition(false));
-                    } else {
-                        if (!CollectionUtils.isEmpty(taskLoader.getOptionalTasks()) || TaskUtil.multipleDependencies(upwardTasksMap, subTasks)) {
-                            nextTask(taskLoader, TaskUtil.defaultAnyCondition(false));
-                        } else {
-                            taskLoader.stopSingleTaskLine(subTasks);
-                        }
-
-                    }
+            try {
+                exceptionProcess(parameter, taskLoader, e);
+            } catch (Exception exception) {
+                if (log.isErrorEnabled()) {
+                    log.error(" gobrs exceptionProcess error task is ", task.getName(), exception);
                 }
+                taskLoader.stopSingleTaskLine(subTasks);
             }
 
+        }
+    }
+
+    /**
+     * 异常处理
+     *
+     * @param parameter
+     * @param taskLoader
+     * @param e
+     */
+    private void exceptionProcess(Object parameter, TaskLoader taskLoader, Exception e) {
+        Optimal.optimalCount(support.taskLoader);
+
+        state = new AtomicInteger(1);
+
+        if (!retryTask(parameter, taskLoader)) {
+
+            support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
+
+            task.onFailureTrace(support, e);
+
+            /**
+             * transaction com.gobrs.async.com.gobrs.async.test.task
+             * 事物任务
+             */
+            transaction(taskLoader);
+
+            /**
+             * A single com.gobrs.async.com.gobrs.async.test.task com.gobrs.async.exception interrupts the entire process
+             * 配置 taskInterrupt = true 则某一任务异常后结束整个任务流程 默认 false
+             */
+            if (ConfigManager.getRule(taskLoader.getRuleName()).isTaskInterrupt()) {
+
+                taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
+
+            } else {
+
+                taskLoader.error(errorCallback(parameter, e, support, task));
+
+                /**
+                 * 当然任务失败 是否继续执行子任务
+                 */
+                if (task.isFailSubExec()) {
+                    nextTask(taskLoader, TaskUtil.defaultAnyCondition(false));
+                } else {
+                    if (!CollectionUtils.isEmpty(taskLoader.getOptionalTasks()) || TaskUtil.multipleDependencies(upwardTasksMap, subTasks)) {
+                        nextTask(taskLoader, TaskUtil.defaultAnyCondition(false));
+                    } else {
+                        taskLoader.stopSingleTaskLine(subTasks);
+                    }
+
+                }
+            }
         }
     }
 
@@ -284,7 +302,7 @@ public class TaskActuator implements Runnable, Cloneable {
         if (parameter instanceof Map) {
 
             Object param = ((Map<?, ?>) parameter).get(task.getClass());
-            
+
             return param == null ? ((Map<?, ?>) parameter).get(task.getClass().getName()) : param;
         }
         return parameter;
@@ -478,8 +496,8 @@ public class TaskActuator implements Runnable, Cloneable {
      * Data transaction
      * 事务
      */
-    private void transaction() {
-        if (ConfigManager.getRule(rule.getName()).isTransaction()) {
+    private void transaction(TaskLoader taskLoader) {
+        if (ConfigManager.getRule(taskLoader.getRuleName()).isTransaction()) {
 
             if (!this.task.isCallback()) {
                 return;
@@ -616,23 +634,5 @@ public class TaskActuator implements Runnable, Cloneable {
      */
     public void setUpstreamDepdends(int upstreamDepdends) {
         this.upstreamDepdends = upstreamDepdends;
-    }
-
-    /**
-     * Gets rule.
-     *
-     * @return the rule
-     */
-    public RuleConfig getRule() {
-        return rule;
-    }
-
-    /**
-     * Sets rule.
-     *
-     * @param rule the rule
-     */
-    public void setRule(RuleConfig rule) {
-        this.rule = rule;
     }
 }

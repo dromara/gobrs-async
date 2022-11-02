@@ -39,7 +39,7 @@ public class BServiceCondition extends AsyncTask {
         for (int i1 = 0; i1 < i; i1++) {
             i1 += i1;
         }
-        System.out.println(1 / 0);
+//        System.out.println(1 / 0);
 //      System.out.println("BServiceCondition Finish");
         builder.setState(false);
         return builder.build();

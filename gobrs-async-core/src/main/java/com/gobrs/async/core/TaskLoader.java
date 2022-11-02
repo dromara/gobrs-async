@@ -144,27 +144,33 @@ public class TaskLoader<P, R> {
         /**
          * 获取任务链初始任务
          */
-        List<TaskActuator> begins = getBeginProcess();
+        AsyncResult result = null;
+        try {
+            List<TaskActuator> begins = getBeginProcess();
 
-        /**
-         * 可选任务
-         */
-        begins = preOptimal(begins);
-
-        /**
-         * 并发开始执行每条任务链
-         */
-        for (TaskActuator process : begins) {
             /**
-             * Start the thread to perform tasks without any dependencies
+             * 可选任务
              */
-            startProcess(process);
-        }
+            begins = preOptimal(begins);
 
-        // wait
-        waitIfNecessary();
-        AsyncResult result = back(begins);
-        return postProcess(result);
+            /**
+             * 并发开始执行每条任务链
+             */
+            for (TaskActuator process : begins) {
+                /**
+                 * Start the thread to perform tasks without any dependencies
+                 */
+                startProcess(process);
+            }
+
+            // wait
+            waitIfNecessary();
+            back(begins);
+        } catch (Exception exception) {
+            throw exception;
+        } finally {
+            return postProcess(result);
+        }
     }
 
     /**
@@ -498,5 +504,23 @@ public class TaskLoader<P, R> {
      */
     public void setLogWrapper(LogWrapper logWrapper) {
         this.logWrapper = logWrapper;
+    }
+
+    /**
+     * Gets rule name.
+     *
+     * @return the rule name
+     */
+    public String getRuleName() {
+        return ruleName;
+    }
+
+    /**
+     * Sets rule name.
+     *
+     * @param ruleName the rule name
+     */
+    public void setRuleName(String ruleName) {
+        this.ruleName = ruleName;
     }
 }

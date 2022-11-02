@@ -40,6 +40,10 @@ gobrs:
         - name: "caseFive"
           content: "caseFourTaskA,caseFourTaskB,caseFourTaskC->caseFourTaskD:any:exclusive" # any 任意一个任务（A、B、C）执行完成后 则执行D任务
           # exclusive 避免任务执行浪费 所以 D执行完成之后 会主动 中断 未完成的任务
+        # 任务异常中断 https://async.sizegang.cn/pages/2f844de/#%E5%8F%AF%E9%85%8D%E7%BD%AE%E7%9A%84%E5%85%A8%E5%B1%80%E5%BC%82%E5%B8%B8%E6%8B%A6%E6%88%AA%E5%99%A8
+        - name: "taskInterrupt"
+          content: "interruptTaskA->interruptTaskB;interruptTaskC->interruptTaskD"
+          task-interrupt: true # 局部异常是否打断主流程 默认 false
 server:
   port: 9999 # 端口: 8080
 

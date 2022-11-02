@@ -4,13 +4,14 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>gobrs-async</artifactId>
-        <groupId>com.jd.gobrs.async</groupId>
-        <version>1.0.5-SNAPSHOT</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.6.3</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.jd.gobrs</groupId>
     <artifactId>gobrs-async-test</artifactId>
-    <version>${gobrs.asnyc.version}</version>
+    <version>1.0.1</version>
     <name>${project.artifactId}</name>
     <description>🔥 强大异步任务编排工具（没有依赖中间件）</description>
     <url>https://github.com/Memorydoc/gobrs-async-starter</url>

@@ -13,7 +13,6 @@ public interface DefaultConfig {
      * The constant TASKNAME.
      */
     String TASKNAME = "asyncTaskName";
-
     /**
      * The constant THREADPOOLQUEUESIZE.
      */

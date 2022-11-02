@@ -34,7 +34,7 @@
         <dependency>
             <groupId>com.jd.gobrs</groupId>
             <artifactId>gobrs-async-test</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
         <!-- 公网-->
         <!--        <dependency>-->

@@ -33,6 +33,12 @@ public class GobrsController {
     }
 
 
+    @RequestMapping("updateRule")
+    public String updateRule() {
+        gobrsService.updateRule();
+        return "success";
+    }
+
     /**
      * Future.
      */

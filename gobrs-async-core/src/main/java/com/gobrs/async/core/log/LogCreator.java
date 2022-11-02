@@ -38,7 +38,9 @@ public class LogCreator {
         List<LogTracer> logTracerList = new ArrayList<>();
         Long processStartTime = logWrapper.getTimeCollector().getStartTime();
         logWrapper.getTracerQueue().drainTo(logTracerList);
-        printContent.append("任务总耗时: ")
+        printContent
+                .append("【ProcessTrace】")
+                .append("Total cost: ")
                 .append(SystemClock.now() - processStartTime)
                 .append("ms")
                 .append(" | ")
@@ -46,14 +48,26 @@ public class LogCreator {
                 .append(logWrapper.getTraceId())
                 .append(" | ");
         for (LogTracer tracer : logTracerList) {
-            printContent
+            printContent = printContent
                     .append("【")
                     .append(tracer.getTaskName())
                     .append("】")
+                    .append("cost ")
                     .append(":")
                     .append(tracer.getTaskCost())
-                    .append("ms")
-                    .append("; =>");
+                    .append(";")
+                    .append("ms");
+
+            if (!tracer.getExecuteState()) {
+                printContent.append("【state】：")
+                        .append("fail")
+                        .append("【errMsg】: ")
+                        .append(tracer.getErrorMessage());
+            } else {
+                printContent.append("【state】：")
+                        .append("success");
+            }
+            printContent.append("; =>");
         }
 
         return printContent.substring(0, printContent.length() - 2);
