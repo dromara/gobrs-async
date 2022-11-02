@@ -68,7 +68,7 @@
         List<Future> list = new ArrayList<>();
         for (AsyncTask asyncTask : paraExectors) {
             Future<?> submit = gobrsThreadPoolExecutor.submit(() -> {
-                asyncTask.task(dataContext, null);
+                asyncTask.com.gobrs.async.com.gobrs.async.test.task(dataContext, null);
             });
             list.add(submit);
         }
@@ -85,7 +85,7 @@
         List<Future> ser = new ArrayList<>();
         for (AsyncTask asyncTask : serExectors) {
             Future<?> submit = gobrsThreadPoolExecutor.submit(() -> {
-                asyncTask.task(dataContext, null);
+                asyncTask.com.gobrs.async.com.gobrs.async.test.task(dataContext, null);
             });
             ser.add(submit);
         }
@@ -213,7 +213,7 @@ Gobrs-Async 在设计时，就充分考虑了开发者的使用习惯， 没有�
 最终的任务执行，每一个任务对应一个<code>TaskActuator</code> 任务的 拦截、异常、执行、线程复用 等必要条件判断都在这里处理
 * prepare 任务前置处理
 * preInterceptor 统一任务前置处理
-* task 核心任务方法，业务执行内容
+* com.gobrs.async.com.gobrs.async.test.task 核心任务方法，业务执行内容
 * postInterceptor 统一后置处理
 * onSuccess 任务执行成功回调
 * onFail 任务执行失败回调

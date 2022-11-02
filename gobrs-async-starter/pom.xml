@@ -3,9 +3,14 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>gobrs-async</artifactId>
+        <groupId>com.jd.gobrs.async</groupId>
+        <version>1.0.5-SNAPSHOT</version>
+    </parent>
     <groupId>com.jd.gobrs</groupId>
     <artifactId>gobrs-async-starter</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>${gobrs.asnyc.version}</version>
     <name>${project.artifactId}</name>
     <description>🔥 强大异步任务编排工具（没有依赖中间件）</description>
     <url>https://github.com/Memorydoc/gobrs-async-starter</url>
@@ -67,11 +72,8 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -81,6 +83,11 @@
             <groupId>com.alibaba</groupId>
             <artifactId>transmittable-thread-local</artifactId>
             <version>${ttl.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.jd.gobrs</groupId>
+            <artifactId>gobrs-async-core</artifactId>
+            <version>${gobrs.asnyc.version}</version>
         </dependency>
     </dependencies>
     <build>
@@ -153,6 +160,14 @@
                 </executions>
                 <configuration>
                     <attach>true</attach>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,17 +1,15 @@
 package com.gobrs.async.example.service;
 
-import com.gobrs.async.GobrsAsync;
-import com.gobrs.async.engine.RuleThermalLoad;
-import com.gobrs.async.example.task.*;
-import com.gobrs.async.rule.Rule;
-import com.gobrs.async.task.AsyncTask;
+import com.gobrs.async.core.GobrsAsync;
+import com.gobrs.async.core.common.domain.AsyncResult;
+import com.gobrs.async.test.task.condition.AServiceCondition;
+import com.gobrs.async.test.task.condition.CServiceCondition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The type Gobrs service.
@@ -26,12 +24,8 @@ import java.util.concurrent.*;
 public class GobrsService {
 
 
-
     @Autowired(required = false)
     private GobrsAsync gobrsAsync;
-
-
-
 
     /**
      * Gobrs async.
@@ -40,16 +34,20 @@ public class GobrsService {
         gobrsAsync.go("test", () -> new Object());
     }
 
-
     /**
-     * Future.
-     */
-
-
-    /**
-     * Update rule.
+     * Gobrs test async result.
      *
-     * @param rule the rule
+     * @return the async result
      */
-
+    public AsyncResult gobrsTest() {
+        Map<Class, Object> params = new HashMap<>();
+        params.put(AServiceCondition.class, "1");
+        params.put(CServiceCondition.class, "2");
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        AsyncResult resp = gobrsAsync.go("anyConditionGeneral", () -> params);
+        stopWatch.stop();
+        System.out.println(stopWatch.getTotalTimeMillis());
+        return resp;
+    }
 }
