@@ -25,6 +25,6 @@ public class GobrsInterceptor implements AsyncTaskExceptionInterceptor {
     @Override
     public void exception(ErrorCallback errorCallback) {
 
-        log.error("Execute global interceptor  error{}", JsonUtil.obj2String(errorCallback.getThrowable()));
+        log.error("Execute global interceptor  error", errorCallback.getThrowable());
     }
 }

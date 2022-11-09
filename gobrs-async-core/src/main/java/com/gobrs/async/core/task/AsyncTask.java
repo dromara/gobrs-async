@@ -2,6 +2,7 @@ package com.gobrs.async.core.task;
 
 
 import com.gobrs.async.core.TaskSupport;
+import com.gobrs.async.core.anno.Task;
 import com.gobrs.async.core.callback.ErrorCallback;
 import com.gobrs.async.core.common.enums.ExpState;
 import com.gobrs.async.core.common.util.SystemClock;
@@ -17,6 +18,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -102,7 +107,6 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         return null;
     }
 
-
     /**
      * Task adapter result.
      *
@@ -113,9 +117,11 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
     public Result taskAdapter(Param param, TaskSupport support) {
         Long startTime = SystemClock.now();
         Result task;
+        Exception exeError = null;
         try {
             task = task(param, support);
         } catch (Exception exception) {
+            exeError = exception;
             throw exception;
         } finally {
             boolean costLogabled = ConfigManager.Action.costLogabled(support.getRuleName());
@@ -125,6 +131,8 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
                 LogTracer logTracer = LogTracer.builder()
                         .taskName(this.getName())
                         .taskCost(costTime)
+                        .executeState(exeError == null ? true : false)
+                        .errorMessage(exeError == null ? "" : exeError.getMessage())
                         .build();
                 LogWrapper logWrapper = support.getLogWrapper();
                 logWrapper.addTrace(logTracer);
@@ -185,8 +193,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      */
     public TaskResult<Result> getTaskResult(TaskSupport support) {
         Map<Class, TaskResult> resultMap = support.getResultMap();
-        Class thisResultClass = this.getClass();
-        return resultMap.get(thisResultClass) != null ? resultMap.get(thisResultClass) : resultMap.get(depKey(thisResultClass));
+        return resultMap.get(this.getClass()) != null ? resultMap.get(this.getClass()) : resultMap.get(depKey(this.getClass()));
     }
 
     /**
@@ -216,6 +223,49 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         }
         return null;
     }
+
+
+    /**
+     * Gets task future.
+     *
+     * @param <Result> the type parameter
+     * @param support  the support
+     * @param clazz    the clazz
+     * @param type     the type
+     * @return the task future
+     */
+    public <Result> Future<Result> getTaskFuture(TaskSupport support, Class<? extends ITask> clazz, Class<Result> type) {
+        Object o = support.getTaskLoader().futureMaps.get(clazz);
+        if (Objects.nonNull(o)) {
+            return ((Future<Result>) o);
+        }
+        return null;
+    }
+
+
+    /**
+     * Gets task future result.
+     *
+     * @param <Result> the type parameter
+     * @param support  the support
+     * @param clazz    the clazz
+     * @param type     the type
+     * @param timeout  the timeout
+     * @param unit     the unit
+     * @return the task future result
+     */
+    public <Result> Object getTaskFutureResult(TaskSupport support, Class<? extends ITask> clazz, Class<Result> type, long timeout, TimeUnit unit) {
+        Object o = support.getTaskLoader().futureMaps.get(clazz);
+        if (o != null) {
+            try {
+                return ((Future<Result>) o).get(timeout, unit);
+            } catch (Exception e) {
+                logger.error("task {} getTaskFuture error {}", this.getName(), e);
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Dep key string.

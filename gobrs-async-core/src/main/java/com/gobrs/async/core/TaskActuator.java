@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
@@ -22,7 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * The type Task actuator.
  */
 @Slf4j
-public class TaskActuator implements Runnable, Cloneable {
+public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
     /**
      * The Logger.
@@ -108,7 +109,7 @@ public class TaskActuator implements Runnable, Cloneable {
     }
 
     @Override
-    public void run() {
+    public Result call() {
 
         Object parameter = getParameter();
 
@@ -117,12 +118,13 @@ public class TaskActuator implements Runnable, Cloneable {
 
         TaskLoader taskLoader = support.getTaskLoader();
 
+        /**
+         * If the conditions are not met
+         * no execution is performed
+         */
+        Object result = null;
         try {
-            /**
-             * If the conditions are not met
-             * no execution is performed
-             */
-            Object result = null;
+
 
             /**
              * 判断任务是否有必要执行
@@ -179,51 +181,68 @@ public class TaskActuator implements Runnable, Cloneable {
                 nextTaskByCase(taskLoader, result);
             }
         } catch (Exception e) {
+            try {
+                exceptionProcess(parameter, taskLoader, e);
+            } catch (Exception exception) {
+                if (log.isErrorEnabled()) {
+                    log.error(" gobrs exceptionProcess error task is ", task.getName(), exception);
+                }
+                taskLoader.stopSingleTaskLine(subTasks);
+            }
+        }
+        return (Result) result;
+    }
 
-            Optimal.optimalCount(support.taskLoader);
+    /**
+     * 异常处理
+     *
+     * @param parameter
+     * @param taskLoader
+     * @param e
+     */
+    private void exceptionProcess(Object parameter, TaskLoader taskLoader, Exception e) {
+        Optimal.optimalCount(support.taskLoader);
 
-            state = new AtomicInteger(1);
+        state = new AtomicInteger(1);
 
-            if (!retryTask(parameter, taskLoader)) {
+        if (!retryTask(parameter, taskLoader)) {
 
-                support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
+            support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
 
-                task.onFailureTrace(support, e);
+            task.onFailureTrace(support, e);
+
+            /**
+             * transaction com.gobrs.async.com.gobrs.async.test.task
+             * 事物任务
+             */
+            transaction(taskLoader);
+
+            /**
+             * A single com.gobrs.async.com.gobrs.async.test.task com.gobrs.async.exception interrupts the entire process
+             * 配置 taskInterrupt = true 则某一任务异常后结束整个任务流程 默认 false
+             */
+            if (ConfigManager.getRule(taskLoader.getRuleName()).isTaskInterrupt()) {
+
+                taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
+
+            } else {
+
+                taskLoader.error(errorCallback(parameter, e, support, task));
 
                 /**
-                 * transaction com.gobrs.async.com.gobrs.async.test.task
-                 * 事物任务
+                 * 当然任务失败 是否继续执行子任务
                  */
-                transaction();
-
-                /**
-                 * A single com.gobrs.async.com.gobrs.async.test.task com.gobrs.async.exception interrupts the entire process
-                 * 配置 taskInterrupt = true 则某一任务异常后结束整个任务流程 默认 false
-                 */
-                if (ConfigManager.getRule(rule.getName()).isTaskInterrupt()) {
-
-                    taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
-
+                if (task.isFailSubExec()) {
+                    nextTask(taskLoader, TaskUtil.defaultAnyCondition(false));
                 } else {
-
-                    taskLoader.error(errorCallback(parameter, e, support, task));
-
-                    /**
-                     * 当然任务失败 是否继续执行子任务
-                     */
-                    if (task.isFailSubExec()) {
+                    if (!CollectionUtils.isEmpty(taskLoader.getOptionalTasks()) || TaskUtil.multipleDependencies(upwardTasksMap, subTasks)) {
                         nextTask(taskLoader, TaskUtil.defaultAnyCondition(false));
                     } else {
-                        if (!CollectionUtils.isEmpty(taskLoader.getOptionalTasks()) || TaskUtil.multipleDependencies(upwardTasksMap, subTasks)) {
-                            nextTask(taskLoader, TaskUtil.defaultAnyCondition(false));
-                        } else {
-                            taskLoader.stopSingleTaskLine(subTasks);
-                        }
-
+                        taskLoader.stopSingleTaskLine(subTasks);
                     }
+
                 }
             }
-
         }
     }
 
@@ -284,7 +303,7 @@ public class TaskActuator implements Runnable, Cloneable {
         if (parameter instanceof Map) {
 
             Object param = ((Map<?, ?>) parameter).get(task.getClass());
-            
+
             return param == null ? ((Map<?, ?>) parameter).get(task.getClass().getName()) : param;
         }
         return parameter;
@@ -478,8 +497,8 @@ public class TaskActuator implements Runnable, Cloneable {
      * Data transaction
      * 事务
      */
-    private void transaction() {
-        if (ConfigManager.getRule(rule.getName()).isTransaction()) {
+    private void transaction(TaskLoader taskLoader) {
+        if (ConfigManager.getRule(taskLoader.getRuleName()).isTransaction()) {
 
             if (!this.task.isCallback()) {
                 return;
@@ -618,21 +637,4 @@ public class TaskActuator implements Runnable, Cloneable {
         this.upstreamDepdends = upstreamDepdends;
     }
 
-    /**
-     * Gets rule.
-     *
-     * @return the rule
-     */
-    public RuleConfig getRule() {
-        return rule;
-    }
-
-    /**
-     * Sets rule.
-     *
-     * @param rule the rule
-     */
-    public void setRule(RuleConfig rule) {
-        this.rule = rule;
-    }
 }

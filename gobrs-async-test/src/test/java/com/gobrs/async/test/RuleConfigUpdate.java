@@ -28,7 +28,7 @@ public class RuleConfigUpdate {
     @Test
     public void updateRule(RuleConfig rule) {
         RuleConfig r = new RuleConfig();
-        r.setName("ruleName");
+        r.setName("anyConditionGeneral");
         r.setContent("AService->CService->EService->GService; BService->DService->FService->HService;");
         ruleThermalLoad.load(rule);
     }

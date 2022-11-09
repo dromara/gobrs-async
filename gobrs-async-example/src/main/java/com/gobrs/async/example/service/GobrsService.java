@@ -2,6 +2,8 @@ package com.gobrs.async.example.service;
 
 import com.gobrs.async.core.GobrsAsync;
 import com.gobrs.async.core.common.domain.AsyncResult;
+import com.gobrs.async.core.config.RuleConfig;
+import com.gobrs.async.core.engine.RuleThermalLoad;
 import com.gobrs.async.test.task.condition.AServiceCondition;
 import com.gobrs.async.test.task.condition.CServiceCondition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ public class GobrsService {
     @Autowired(required = false)
     private GobrsAsync gobrsAsync;
 
+    @Autowired(required = false)
+    private RuleThermalLoad ruleThermalLoad;
+
     /**
      * Gobrs async.
      */
@@ -49,5 +54,17 @@ public class GobrsService {
         stopWatch.stop();
         System.out.println(stopWatch.getTotalTimeMillis());
         return resp;
+    }
+
+    /**
+     * gobrsTest 可以使用 jmeter 一直访问着
+     * 然后在浏览器调用 http://localhost:9999/gobrs/updateRule  看规则变更效果
+     */
+    public void updateRule() {
+        RuleConfig r = new RuleConfig();
+        r.setName("anyConditionGeneral");
+        r.setContent("AService->CService->EService->GService; BService->DService->FService->HService;");
+        ruleThermalLoad.load(r);
+
     }
 }

@@ -176,8 +176,6 @@ Gobrs-Async 项目目录及其精简
 
 
 
-
-
 Gobrs-Async 在设计时，就充分考虑了开发者的使用习惯， 没有依赖任何中间件。 对并发框架做了良好的封装。主要使用
 <code>CountDownLatch</code> 、<code>ReentrantLock</code> 、<code>volatile</code> 等一系列并发技术开发设计。
 
@@ -213,7 +211,7 @@ Gobrs-Async 在设计时，就充分考虑了开发者的使用习惯， 没有�
 最终的任务执行，每一个任务对应一个<code>TaskActuator</code> 任务的 拦截、异常、执行、线程复用 等必要条件判断都在这里处理
 * prepare 任务前置处理
 * preInterceptor 统一任务前置处理
-* com.gobrs.async.com.gobrs.async.test.task 核心任务方法，业务执行内容
+* task 核心任务方法，业务执行内容
 * postInterceptor 统一后置处理
 * onSuccess 任务执行成功回调
 * onFail 任务执行失败回调
@@ -246,3 +244,9 @@ Gobrs-Async 在设计时，就充分考虑了开发者的使用习惯， 没有�
     </td>
   </tr>
 </table>
+
+## 贡献者
+
+<a href="https://github.com/dromara/gobrs-async/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=dromara/gobrs-async" />
+</a>

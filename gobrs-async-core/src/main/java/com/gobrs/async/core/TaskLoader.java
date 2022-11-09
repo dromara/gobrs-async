@@ -14,6 +14,7 @@ import com.gobrs.async.core.log.LogWrapper;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
 import com.gobrs.async.core.common.exception.TimeoutException;
+import com.gobrs.async.core.task.TaskUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
@@ -51,11 +52,11 @@ public class TaskLoader<P, R> {
 
     private final ExecutorService executorService;
 
-    private AsyncTaskExceptionInterceptor<P> asyncExceptionInterceptor = BeanHolder.getBean(AsyncTaskExceptionInterceptor.class);
+    private final AsyncTaskExceptionInterceptor<P> asyncExceptionInterceptor = BeanHolder.getBean(AsyncTaskExceptionInterceptor.class);
 
-    private AsyncTaskPreInterceptor<P> asyncTaskPreInterceptor = BeanHolder.getBean(AsyncTaskPreInterceptor.class);
+    private final AsyncTaskPreInterceptor<P> asyncTaskPreInterceptor = BeanHolder.getBean(AsyncTaskPreInterceptor.class);
 
-    private AsyncTaskPostInterceptor<P> asyncTaskPostInterceptor = BeanHolder.getBean(AsyncTaskPostInterceptor.class);
+    private final AsyncTaskPostInterceptor<P> asyncTaskPostInterceptor = BeanHolder.getBean(AsyncTaskPostInterceptor.class);
 
     private final CountDownLatch completeLatch;
 
@@ -67,7 +68,7 @@ public class TaskLoader<P, R> {
     /**
      * The Affir count.
      */
-    public AtomicInteger oplCount = new AtomicInteger(0);
+    public final AtomicInteger oplCount = new AtomicInteger(0);
 
     /**
      * The Assistant com.gobrs.async.com.gobrs.async.test.task.
@@ -90,7 +91,7 @@ public class TaskLoader<P, R> {
     /**
      * The Futures async.
      */
-    public Map<AsyncTask, Future> futureMaps = new ConcurrentHashMap<>();
+    public final Map<Class<?>, Future> futureMaps = new ConcurrentHashMap<>();
 
     private LogWrapper logWrapper;
 
@@ -144,27 +145,33 @@ public class TaskLoader<P, R> {
         /**
          * 获取任务链初始任务
          */
-        List<TaskActuator> begins = getBeginProcess();
+        AsyncResult result = null;
+        try {
+            List<TaskActuator> begins = getBeginProcess();
 
-        /**
-         * 可选任务
-         */
-        begins = preOptimal(begins);
-
-        /**
-         * 并发开始执行每条任务链
-         */
-        for (TaskActuator process : begins) {
             /**
-             * Start the thread to perform tasks without any dependencies
+             * 可选任务
              */
-            startProcess(process);
-        }
+            begins = preOptimal(begins);
 
-        // wait
-        waitIfNecessary();
-        AsyncResult result = back(begins);
-        return postProcess(result);
+            /**
+             * 并发开始执行每条任务链
+             */
+            for (TaskActuator process : begins) {
+                /**
+                 * Start the thread to perform tasks without any dependencies
+                 */
+                startProcess(process);
+            }
+
+            // wait
+            waitIfNecessary();
+            back(begins);
+        } catch (Exception exception) {
+            throw exception;
+        } finally {
+            return postProcess(result);
+        }
     }
 
     /**
@@ -339,7 +346,7 @@ public class TaskLoader<P, R> {
                      * 保存返回future 提供中断 能力
                      */
                     futureLists.add(submit);
-                    futureMaps.put(taskActuator.task, submit);
+                    futureMaps.put(taskActuator.task.getClass(), submit);
                 }
             } finally {
                 lock.unlock();
@@ -349,7 +356,7 @@ public class TaskLoader<P, R> {
              * Run the command without setting the timeout period
              */
             Future<?> submit = executorService.submit(taskActuator);
-            futureMaps.put(taskActuator.task, submit);
+            futureMaps.put(taskActuator.task.getClass(), submit);
         }
     }
 
@@ -377,7 +384,7 @@ public class TaskLoader<P, R> {
         if (task instanceof TaskTrigger.AssistantTask) {
             terminationTask.releasingDependency();
             if (!terminationTask.hasUnsatisfiedDependcies()) {
-                terminationTask.run();
+                terminationTask.call();
             }
             return;
         }
@@ -498,5 +505,23 @@ public class TaskLoader<P, R> {
      */
     public void setLogWrapper(LogWrapper logWrapper) {
         this.logWrapper = logWrapper;
+    }
+
+    /**
+     * Gets rule name.
+     *
+     * @return the rule name
+     */
+    public String getRuleName() {
+        return ruleName;
+    }
+
+    /**
+     * Sets rule name.
+     *
+     * @param ruleName the rule name
+     */
+    public void setRuleName(String ruleName) {
+        this.ruleName = ruleName;
     }
 }

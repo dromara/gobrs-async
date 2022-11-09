@@ -269,8 +269,9 @@ class TaskTrigger<P, R> {
          * Task completion interrupt the main thread blocks
          */
         @Override
-        public void run() {
+        public Object call() {
             support.taskLoader.completed();
+            return null;
         }
     }
 
