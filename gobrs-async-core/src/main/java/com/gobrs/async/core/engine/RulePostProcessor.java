@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationListener;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The type Rule post processor.
@@ -28,17 +29,26 @@ public class RulePostProcessor implements ApplicationListener<ApplicationReadyEv
     /**
      * The Logger.
      */
-    Logger logger = LoggerFactory.getLogger(RulePostProcessor.class);
+    private final Logger logger = LoggerFactory.getLogger(RulePostProcessor.class);
 
     private ConfigManager configManager;
 
+    private final AtomicBoolean initialized = new AtomicBoolean(false);
+
+    /**
+     * Instantiates a new Rule post processor.
+     *
+     * @param configManager the config manager
+     */
     public RulePostProcessor(ConfigManager configManager) {
         this.configManager = configManager;
     }
 
     @Override
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        init();
+        if (initialized.compareAndSet(false, true)) {
+            init();
+        }
     }
 
     private void init() {
