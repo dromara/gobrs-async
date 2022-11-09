@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
@@ -22,7 +23,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * The type Task actuator.
  */
 @Slf4j
-public class TaskActuator implements Runnable, Cloneable {
+public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
     /**
      * The Logger.
@@ -108,7 +109,7 @@ public class TaskActuator implements Runnable, Cloneable {
     }
 
     @Override
-    public void run() {
+    public Result call() {
 
         Object parameter = getParameter();
 
@@ -117,12 +118,13 @@ public class TaskActuator implements Runnable, Cloneable {
 
         TaskLoader taskLoader = support.getTaskLoader();
 
+        /**
+         * If the conditions are not met
+         * no execution is performed
+         */
+        Object result = null;
         try {
-            /**
-             * If the conditions are not met
-             * no execution is performed
-             */
-            Object result = null;
+
 
             /**
              * 判断任务是否有必要执行
@@ -179,7 +181,6 @@ public class TaskActuator implements Runnable, Cloneable {
                 nextTaskByCase(taskLoader, result);
             }
         } catch (Exception e) {
-
             try {
                 exceptionProcess(parameter, taskLoader, e);
             } catch (Exception exception) {
@@ -188,8 +189,8 @@ public class TaskActuator implements Runnable, Cloneable {
                 }
                 taskLoader.stopSingleTaskLine(subTasks);
             }
-
         }
+        return (Result) result;
     }
 
     /**
@@ -635,4 +636,5 @@ public class TaskActuator implements Runnable, Cloneable {
     public void setUpstreamDepdends(int upstreamDepdends) {
         this.upstreamDepdends = upstreamDepdends;
     }
+
 }

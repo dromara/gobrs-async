@@ -1,10 +1,13 @@
 package com.gobrs.async.core.task;
 
 import com.gobrs.async.core.common.domain.AnyConditionResult;
+import com.gobrs.async.core.common.domain.TaskResult;
+import com.gobrs.async.core.common.enums.ResultState;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 /**
  * The type Task com.gobrs.async.util.
@@ -50,6 +53,10 @@ public class TaskUtil {
      */
     public static AnyConditionResult defaultAnyCondition(boolean state) {
         return AnyConditionResult.builder().setState(state).build();
+    }
+
+    public static TaskResult buildFutureTaskResult(Future result) {
+        return new TaskResult(result, ResultState.SUCCESS, null);
     }
 
 }
