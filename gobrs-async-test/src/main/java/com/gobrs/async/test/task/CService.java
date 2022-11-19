@@ -24,10 +24,8 @@ public class CService extends AsyncTask<String, Integer> {
      */
     int i = 10000;
 
-
     @Override
     public void prepare(String o) {
-
     }
 
     @Override

@@ -20,16 +20,39 @@
         <gobrs.asnyc.version>1.0.5-SNAPSHOT</gobrs.asnyc.version>
     </properties>
 
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Memorydoc</name>
+            <email>17615195790@163.com</email>
+            <organization>Github</organization>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:git@github.com:Memorydoc/gobrs-async-starter.git</connection>
+        <developerConnection>scm:git:git@github.com:Memorydoc/gobrs-async-starter.git</developerConnection>
+        <tag>master</tag>
+        <url>git@github.com:Memorydoc/gobrs-async-starter.git</url>
+    </scm>
+    <issueManagement>
+        <system>Github Issue</system>
+        <url>https://github.com/Memorydoc/gobrs-async-starter/issues</url>
+    </issueManagement>
     <distributionManagement>
         <repository>
-            <id>libs-releases-local</id>
-            <name>Release Repository</name>
-            <url>http://artifactory.jd.com/libs-releases-local</url>
+            <id>sonatype-nexus-staging</id>
+            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
         <snapshotRepository>
-            <id>snapshots</id>
-            <name>Snapshot Repository</name>
-            <url>http://artifactory.jd.com/libs-snapshots-local</url>
+            <id>sonatype-nexus-snapshots</id>
+            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 

@@ -50,14 +50,14 @@ public class GobrsAsync {
      * @return com.gobrs.async.com.gobrs.async.test.task receive
      */
     public TaskReceive begin(String ruleName, List<AsyncTask> asyncTasks, boolean reload) {
-        if (taskFlow == null) {
+        if (Objects.isNull(taskFlow)) {
             loadTaskFlow(ruleName);
         }
-        if (taskFlow.get(ruleName) == null) {
-            loadTaskFlowForOne(ruleName);
+        if (Objects.isNull(taskFlow.get(ruleName))) {
+            loadTaskFlowFirst(ruleName);
         }
         if (reload) {
-            loadTaskFlowForOne(ruleName);
+            loadTaskFlowFirst(ruleName);
         }
         return taskFlow.get(ruleName).start(asyncTasks);
     }
@@ -146,16 +146,16 @@ public class GobrsAsync {
          * Initialize com.gobrs.async.com.gobrs.async.test.task trigger
          */
         if (Objects.isNull(trigger)) {
-            initializeTrigger(ruleName);
+            initialize(ruleName);
         }
         /**
          * Load com.gobrs.async.com.gobrs.async.test.task trigger
          */
         if (Objects.isNull(trigger.get(ruleName))) {
-            loadTrigger(ruleName);
+            load(ruleName);
         }
         if (reload) {
-            loadTrigger(ruleName);
+            load(ruleName);
         }
     }
 
@@ -176,7 +176,7 @@ public class GobrsAsync {
      *
      * @param ruleName
      */
-    private void loadTaskFlowForOne(String ruleName) {
+    private void loadTaskFlowFirst(String ruleName) {
         TaskFlow tf = new TaskFlow();
         taskFlow.put(ruleName, tf);
     }
@@ -186,7 +186,7 @@ public class GobrsAsync {
      *
      * @param ruleName
      */
-    private void initializeTrigger(String ruleName) {
+    private void initialize(String ruleName) {
         trigger = new HashMap<>();
         TaskTrigger tr = new TaskTrigger(ruleName, taskFlow.get(ruleName));
         trigger.put(ruleName, tr);
@@ -197,7 +197,7 @@ public class GobrsAsync {
      *
      * @param ruleName
      */
-    private void loadTrigger(String ruleName) {
+    private void load(String ruleName) {
         TaskTrigger tr = new TaskTrigger(ruleName, taskFlow.get(ruleName));
         trigger.put(ruleName, tr);
     }

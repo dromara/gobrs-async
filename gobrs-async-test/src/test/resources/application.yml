@@ -4,7 +4,7 @@ gobrs:
       rules:
         # 规则 是数组类型的 多组规则
         - name: "general"
-          content: "AService->BService->CService"
+          content: "AService->BService->FService"
 #          task-interrupt: true # 局部异常是否打断主流程 默认false
 #          transaction: true
         - name: "anyConditionGeneral"
