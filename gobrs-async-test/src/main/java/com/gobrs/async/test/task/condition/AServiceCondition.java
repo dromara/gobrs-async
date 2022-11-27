@@ -1,4 +1,5 @@
 package com.gobrs.async.test.task.condition;
+
 import com.gobrs.async.core.TaskSupport;
 import com.gobrs.async.core.anno.Task;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
@@ -38,17 +39,17 @@ public class AServiceCondition extends AsyncTask {
     public AnyConditionResult<String> task(Object o, TaskSupport support) {
         AnyConditionResult.Builder<String> builder = AnyConditionResult.builder();
         try {
-//      System.out.println("AServiceCondition Begin");
+            System.out.println("AServiceCondition Begin");
             Thread.sleep(300);
             for (int i1 = 0; i1 < sums; i1++) {
                 i1 += i1;
             }
-//      System.out.println("AServiceCondition Finish");
+            System.out.println("AServiceCondition Finish");
         } catch (InterruptedException e) {
             e.printStackTrace();
             builder.setState(false);
         }
-        return builder.setState(true).build();
+        return builder.setState(false).build();
     }
 
     @Override

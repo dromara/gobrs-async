@@ -14,7 +14,8 @@ import org.springframework.stereotype.Component;
  * @author: sizegang
  * @create: 2022 -03-20
  */
-@Task
+
+@Task(failSubExec = true)
 public class BService extends AsyncTask {
 
 
@@ -34,7 +35,7 @@ public class BService extends AsyncTask {
         for (int i1 = 0; i1 < i; i1++) {
             i1 += i1;
         }
-        System.out.println(1 / 0);
+//        System.out.println(1 / 0);
         System.out.println("BService Finish");
         return null;
     }

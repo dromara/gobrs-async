@@ -173,13 +173,9 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                  */
                 task.onSuccess(support);
             }
-            /**
-             * Determine whether the process is interrupted
-             * 判断当前任务是否已经执行过
-             */
-            if (taskLoader.isRunning().get()) {
-                nextTaskByCase(taskLoader, result);
-            }
+
+            noRepeat(taskLoader, result);
+
         } catch (Exception e) {
             try {
                 exceptionProcess(parameter, taskLoader, e);
@@ -191,6 +187,16 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
             }
         }
         return (Result) result;
+    }
+
+    /**
+     * Determine whether the process is interrupted
+     * 判断当前任务是否已经执行过
+     */
+    private void noRepeat(TaskLoader taskLoader, Object result) {
+        if (taskLoader.isRunning().get()) {
+            nextTaskByCase(taskLoader, result);
+        }
     }
 
     /**

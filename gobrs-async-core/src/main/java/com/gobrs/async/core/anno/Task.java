@@ -28,7 +28,7 @@ public @interface Task {
      *
      * @return string string
      */
-    String desc() default DefaultConfig.TASKNAME;
+    String desc() default "";
 
     /**
      * Transaction com.gobrs.async.com.gobrs.async.test.task

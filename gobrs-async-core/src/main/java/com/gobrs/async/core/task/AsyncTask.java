@@ -218,7 +218,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      */
     public Param getParam(TaskSupport support) {
         Object taskResult = support.getParam();
-        if (taskResult != null) {
+        if (Objects.nonNull(taskResult)) {
             return (Param) taskResult;
         }
         return null;
@@ -256,7 +256,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      */
     public <Result> Object getTaskFutureResult(TaskSupport support, Class<? extends ITask> clazz, Class<Result> type, long timeout, TimeUnit unit) {
         Object o = support.getTaskLoader().futureMaps.get(clazz);
-        if (o != null) {
+        if (Objects.nonNull(o)) {
             try {
                 return ((Future<Result>) o).get(timeout, unit);
             } catch (Exception e) {
@@ -288,7 +288,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      */
     public boolean stopAsync(TaskSupport support) {
         try {
-            ErrorCallback errorCallback = new ErrorCallback(() -> support.getParam(), null, support, this);
+            ErrorCallback<Param> errorCallback = new ErrorCallback<Param>(() -> support.getParam(), null, support, this);
             support.taskLoader.setExpCode(new AtomicInteger(ExpState.DEFAULT.getCode()));
             support.taskLoader.errorInterrupted(errorCallback);
         } catch (Exception ex) {
@@ -310,7 +310,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
             support.taskLoader.setIsRunning(false);
             support.taskLoader.setExpCode(new AtomicInteger(expCode));
 
-            ErrorCallback errorCallback = new ErrorCallback(() -> support.getParam(), null, support, this);
+            ErrorCallback<Param> errorCallback = new ErrorCallback<Param>(() -> support.getParam(), null, support, this);
             support.taskLoader.errorInterrupted(errorCallback);
 
         } catch (Exception ex) {
@@ -467,4 +467,13 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         this.anyCondition = anyCondition;
     }
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
 }
