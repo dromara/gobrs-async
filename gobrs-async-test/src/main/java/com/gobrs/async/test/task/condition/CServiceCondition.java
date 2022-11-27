@@ -78,7 +78,7 @@ public class CServiceCondition extends AsyncTask<String, AnyConditionResult<Stri
     }
 
     @Override
-    public boolean nessary(String o, TaskSupport support) {
+    public boolean necessary(String o, TaskSupport support) {
         return true;
     }
 

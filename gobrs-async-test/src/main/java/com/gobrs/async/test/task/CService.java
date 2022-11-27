@@ -50,7 +50,7 @@ public class CService extends AsyncTask<String, Integer> {
     }
 
     @Override
-    public boolean nessary(String o, TaskSupport support) {
+    public boolean necessary(String o, TaskSupport support) {
         return true;
     }
 

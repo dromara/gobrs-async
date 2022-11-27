@@ -128,10 +128,10 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
             /**
              * 判断任务是否有必要执行
-             * 1、nessary 返回true
+             * 1、necessary 返回true
              * 2、如果具备执行结果 则无需执行
              */
-            if (task.nessary(parameter, support) && (Objects.isNull(support.getResultMap().get(task.getClass())))) {
+            if (task.necessary(parameter, support) && (Objects.isNull(support.getResultMap().get(task.getClass())))) {
 
                 task.prepare(parameter);
 

@@ -33,7 +33,7 @@ public interface GobrsTask<Param, Result> extends ITask {
      * @param support the support
      * @return boolean boolean
      */
-    default boolean nessary(Param param, TaskSupport support) {
+    default boolean necessary(Param param, TaskSupport support) {
         return true;
     }
 

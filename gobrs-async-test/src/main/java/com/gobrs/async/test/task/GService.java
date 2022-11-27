@@ -42,7 +42,7 @@ public class GService extends AsyncTask {
     }
 
     @Override
-    public boolean nessary(Object o, TaskSupport support) {
+    public boolean necessary(Object o, TaskSupport support) {
         return true;
     }
 
