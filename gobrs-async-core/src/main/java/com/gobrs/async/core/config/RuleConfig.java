@@ -1,6 +1,5 @@
 package com.gobrs.async.core.config;
 
-import com.gobrs.async.core.common.constant.ConfigPropertiesConstant;
 import com.gobrs.async.core.holder.BeanHolder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -28,11 +27,6 @@ public class RuleConfig implements Serializable {
     private String content;
 
     private LogConfig logConfig = defaultConfig();
-
-    /**
-     * The constant PREFIX_RULE.
-     */
-    public static final String PREFIX = ConfigPropertiesConstant.PREFIX + ".rules";
 
     /**
      * Whether the execution com.gobrs.async.exception interrupts the workflow
