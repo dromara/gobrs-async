@@ -14,7 +14,8 @@ import org.springframework.stereotype.Component;
  * @author: sizegang
  * @create: 2022 -03-20
  */
-@Task
+
+@Task(failSubExec = true)
 public class BService extends AsyncTask {
 
 
@@ -25,7 +26,7 @@ public class BService extends AsyncTask {
 
     @Override
     public void prepare(Object o) {
-
+        System.out.println(this.getName() + " 使用线程---" + Thread.currentThread().getName());
     }
 
     @Override
@@ -34,13 +35,13 @@ public class BService extends AsyncTask {
         for (int i1 = 0; i1 < i; i1++) {
             i1 += i1;
         }
-        System.out.println(1 / 0);
+//        System.out.println(1 / 0);
         System.out.println("BService Finish");
         return null;
     }
 
     @Override
-    public boolean nessary(Object o, TaskSupport support) {
+    public boolean necessary(Object o, TaskSupport support) {
         return true;
     }
 

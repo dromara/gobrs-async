@@ -1,10 +1,10 @@
 package com.gobrs.async.core.config;
 
-import com.gobrs.async.core.common.constant.ConfigPropertiesConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
+
+import static com.gobrs.async.core.common.constant.ConfigPropertiesConstant.RULES;
 
 /**
  * The type Rule.
@@ -18,20 +18,14 @@ import java.io.Serializable;
  * @Version 1.0
  * @date 2022 -01-27
  */
-@ConfigurationProperties(prefix = RuleConfig.PREFIX)
-@Component
+@ConfigurationProperties(prefix = RULES)
 public class RuleConfig implements Serializable {
 
     private String name;
 
     private String content;
 
-    private LogConfig logConfig = defaultConfig();
-
-    /**
-     * The constant PREFIX_RULE.
-     */
-    public static final String PREFIX = ConfigPropertiesConstant.PREFIX + ".rules";
+    private LogConfig logConfig;
 
     /**
      * Whether the execution com.gobrs.async.exception interrupts the workflow
@@ -43,16 +37,6 @@ public class RuleConfig implements Serializable {
      * 流程事务
      */
     boolean transaction = false;
-
-
-    /**
-     * Default config log config.
-     *
-     * @return the log config
-     */
-    LogConfig defaultConfig() {
-        return new LogConfig();
-    }
 
     /**
      * Gets name.
@@ -89,7 +73,6 @@ public class RuleConfig implements Serializable {
     public void setContent(String content) {
         this.content = content;
     }
-
 
     /**
      * Is com.gobrs.async.com.gobrs.async.test.task interrupt boolean.

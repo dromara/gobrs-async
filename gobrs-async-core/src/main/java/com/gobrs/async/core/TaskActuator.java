@@ -21,6 +21,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * The type Task actuator.
+ *
+ * @param <Result> the type parameter
  */
 @Slf4j
 public class TaskActuator<Result> implements Callable<Result>, Cloneable {
@@ -58,9 +60,6 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     private Lock lock;
 
     private Map<AsyncTask, List<AsyncTask>> upwardTasksMap;
-
-
-    private RuleConfig rule;
 
     /**
      * 执行状态
@@ -111,7 +110,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     @Override
     public Result call() {
 
-        Object parameter = getParameter();
+        Object parameter = getParameter(task);
 
 
         preparation();
@@ -128,10 +127,10 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
             /**
              * 判断任务是否有必要执行
-             * 1、nessary 返回true
+             * 1、necessary 返回true
              * 2、如果具备执行结果 则无需执行
              */
-            if (task.nessary(parameter, support) && (Objects.isNull(support.getResultMap().get(task.getClass())))) {
+            if (executeNecessary(parameter, task)) {
 
                 task.prepare(parameter);
 
@@ -173,13 +172,9 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                  */
                 task.onSuccess(support);
             }
-            /**
-             * Determine whether the process is interrupted
-             * 判断当前任务是否已经执行过
-             */
-            if (taskLoader.isRunning().get()) {
-                nextTaskByCase(taskLoader, result);
-            }
+
+            noRepeat(taskLoader, result);
+
         } catch (Exception e) {
             try {
                 exceptionProcess(parameter, taskLoader, e);
@@ -191,6 +186,20 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
             }
         }
         return (Result) result;
+    }
+
+    private boolean executeNecessary(Object parameter, AsyncTask task) {
+        return task.necessary(parameter, support) && (Objects.isNull(support.getResultMap().get(task.getClass())));
+    }
+
+    /**
+     * Determine whether the process is interrupted
+     * 判断当前任务是否已经执行过
+     */
+    private void noRepeat(TaskLoader taskLoader, Object result) {
+        if (taskLoader.isRunning().get()) {
+            nextTaskByCase(taskLoader, result);
+        }
     }
 
     /**
@@ -296,7 +305,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      *
      * @return
      */
-    private Object getParameter() {
+    private Object getParameter(AsyncTask task) {
 
         Object parameter = param.get();
 
@@ -413,13 +422,13 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                             Boolean aBoolean = (Boolean) taskLoader.anyConditionProx.get(process);
                             if (Objects.isNull(aBoolean)) {
                                 taskLoader.anyConditionProx.put(process, true);
-                                doTask(taskLoader, process, optionalTasks);
+                                doTask(taskLoader, process, optionalTasks, i == subTasks.size() - 1);
                             }
                         }
                     }
                 } else {
                     if (process.releasingDependency() == 0) {
-                        doTask(taskLoader, process, optionalTasks);
+                        doTask(taskLoader, process, optionalTasks, i == subTasks.size() - 1);
                     }
                 }
             }
@@ -435,18 +444,38 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param process
      * @param optionalTasks
      */
-    private void doTask(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks) {
-        doProcess(taskLoader, process, optionalTasks);
+    private void doTask(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks, boolean cycleThread) {
+        process(taskLoader, process, optionalTasks, cycleThread);
     }
 
 
-    private void doProcess(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks) {
+    private void process(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks, boolean cycleThread) {
         if (Objects.nonNull(optionalTasks)) {
             if (optionalTasks.contains(process.getTask())) {
-                taskLoader.startProcess(process);
+                doProcess(taskLoader, process, cycleThread);
             }
         } else {
+            doProcess(taskLoader, process, cycleThread);
+        }
+    }
+
+    /**
+     * 向下执行
+     * 线程复用
+     * 线程循环利用
+     *
+     * @param taskLoader
+     * @param process
+     * @param cycleThread
+     */
+    private void doProcess(TaskLoader taskLoader, TaskActuator process, boolean cycleThread) {
+        if (!cycleThread) {
             taskLoader.startProcess(process);
+        } else {
+            /**
+             * Thread reuse saves context switching
+             */
+            process.call();
         }
     }
 

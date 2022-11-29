@@ -43,7 +43,7 @@ public class CServiceCondition extends AsyncTask<String, AnyConditionResult<Stri
     public AnyConditionResult<String> task(String o, TaskSupport support) {
         AnyConditionResult.Builder<String> condition = AnyConditionResult.builder();
 
-//      System.out.println("CServiceCondition Begin");
+        System.out.println("CServiceCondition Begin");
         /**
          * 获取 所依赖的父任务的结果
          */
@@ -72,13 +72,13 @@ public class CServiceCondition extends AsyncTask<String, AnyConditionResult<Stri
         for (int i1 = 0; i1 < i; i1++) {
             i1 += i1;
         }
-//      System.out.println("CServiceCondition Finish");
+        System.out.println("CServiceCondition Finish");
         return condition.build();
 
     }
 
     @Override
-    public boolean nessary(String o, TaskSupport support) {
+    public boolean necessary(String o, TaskSupport support) {
         return true;
     }
 

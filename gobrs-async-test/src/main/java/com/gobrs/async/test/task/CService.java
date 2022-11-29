@@ -26,6 +26,7 @@ public class CService extends AsyncTask<String, Integer> {
 
     @Override
     public void prepare(String o) {
+        System.out.println(this.getName() + "使用线程---" + Thread.currentThread().getName());
     }
 
     @Override
@@ -50,7 +51,7 @@ public class CService extends AsyncTask<String, Integer> {
     }
 
     @Override
-    public boolean nessary(String o, TaskSupport support) {
+    public boolean necessary(String o, TaskSupport support) {
         return true;
     }
 

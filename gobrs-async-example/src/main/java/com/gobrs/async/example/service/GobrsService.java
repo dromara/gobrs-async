@@ -50,7 +50,7 @@ public class GobrsService {
         params.put(CServiceCondition.class, "2");
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        AsyncResult resp = gobrsAsync.go("anyConditionGeneral", () -> params);
+        AsyncResult resp = gobrsAsync.go("general", () -> params);
         stopWatch.stop();
         System.out.println(stopWatch.getTotalTimeMillis());
         return resp;

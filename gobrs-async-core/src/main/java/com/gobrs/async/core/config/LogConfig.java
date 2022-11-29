@@ -8,15 +8,14 @@ package com.gobrs.async.core.config;
  * @create: 2022-10-30
  **/
 
-import com.gobrs.async.core.common.constant.ConfigPropertiesConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+
+import static com.gobrs.async.core.common.constant.ConfigPropertiesConstant.RULES;
 
 /**
  * The type Log config.
  */
-@ConfigurationProperties(prefix = LogConfig.PREFIX)
-@Component
+@ConfigurationProperties(prefix = RULES)
 public class LogConfig {
     /**
      * 执行异常trace log打印
@@ -26,11 +25,6 @@ public class LogConfig {
      * 任务执行过程中耗时打印
      */
     private Boolean costLogabled = true;
-
-    /**
-     * The constant PREFIX.
-     */
-    public static final String PREFIX = ConfigPropertiesConstant.PREFIX + ".rules";
 
     /**
      * Gets err logabled.

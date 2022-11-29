@@ -25,7 +25,9 @@ public class GobrsPrint {
 
     private static final String GOBRS_ASYNC = " :: Gobrs-Async :: ";
 
-    private static final String GOBRS_ASYNC_GITHUB = "GitHub:  https://gitee.com/dromara/gobrs-async";
+    private static final String GOBRS_ASYNC_GITHUB = "GitHub:  https://github.com/dromara/gobrs-async";
+
+    private static final String GOBRS_ASYNC_GITEE = "Gitee:  https://gitee.com/dromara/gobrs-async";
 
     private static final String GOBRS_ASYNC_SITE = "Site:  https://docs.sizegang.cn";
 
@@ -52,7 +54,7 @@ public class GobrsPrint {
         }
 
         System.out.println(AnsiOutput.toString(banner, AnsiColor.GREEN, GOBRS_ASYNC, AnsiColor.DEFAULT,
-                padding.toString(), AnsiStyle.FAINT, version, "\n\n", GOBRS_ASYNC_GITHUB, "\n", GOBRS_ASYNC_SITE, "\n"));
+                padding.toString(), AnsiStyle.FAINT, version, "\n\n", GOBRS_ASYNC_GITHUB, "\n", GOBRS_ASYNC_GITEE, "\n", GOBRS_ASYNC_SITE, "\n"));
         logger.info("Gobrs-Async Load Successful");
     }
 

@@ -46,7 +46,7 @@ public class TaskLoader<P, R> {
     private AtomicInteger expCode = new AtomicInteger(ExpState.DEFAULT.getCode());
 
     /**
-     * com.gobrs.async.com.gobrs.async.test.task Loader is Running
+     * task Loader is Running
      */
     private AtomicBoolean isRunning = new AtomicBoolean(true);
 
@@ -71,7 +71,7 @@ public class TaskLoader<P, R> {
     public final AtomicInteger oplCount = new AtomicInteger(0);
 
     /**
-     * The Assistant com.gobrs.async.com.gobrs.async.test.task.
+     * The Assistant task.
      */
     public TaskTrigger.AssistantTask assistantTask;
 
@@ -237,7 +237,7 @@ public class TaskLoader<P, R> {
     }
 
     /**
-     * The process is interrupted by a com.gobrs.async.com.gobrs.async.test.task com.gobrs.async.exception
+     * The process is interrupted by a task com.gobrs.async.exception
      *
      * @param errorCallback the error com.gobrs.async.callback
      */
@@ -261,7 +261,7 @@ public class TaskLoader<P, R> {
     /**
      * Premission interceptor
      *
-     * @param p        com.gobrs.async.com.gobrs.async.test.task parameter
+     * @param p        task parameter
      * @param taskName taskName
      */
     public void preInterceptor(P p, String taskName) {
@@ -271,7 +271,7 @@ public class TaskLoader<P, R> {
     /**
      * Mission post-intercept
      *
-     * @param param    com.gobrs.async.com.gobrs.async.test.task Result
+     * @param param    task Result
      * @param taskName taskName
      */
     public void postInterceptor(P param, String taskName) {
@@ -295,7 +295,7 @@ public class TaskLoader<P, R> {
     }
 
     /**
-     * The main process interrupts and waits for the com.gobrs.async.com.gobrs.async.test.task to flow
+     * The main process interrupts and waits for the task to flow
      * 主线程等待
      */
     private void waitIfNecessary() {
@@ -320,7 +320,7 @@ public class TaskLoader<P, R> {
     /**
      * Gets process.
      *
-     * @param asyncTask the async com.gobrs.async.com.gobrs.async.test.task
+     * @param asyncTask the async task
      * @return the process
      */
     TaskActuator getProcess(AsyncTask asyncTask) {
@@ -331,12 +331,12 @@ public class TaskLoader<P, R> {
      * Start process.
      * 开启线程执行任务
      *
-     * @param taskActuator the com.gobrs.async.com.gobrs.async.test.task actuator
+     * @param taskActuator the task actuator
      */
     void startProcess(TaskActuator taskActuator) {
         if (timeout > 0 || ConfigManager.getRule(ruleName).isTaskInterrupt()) {
             /**
-             * If you need to interrupt then you need to save all the com.gobrs.async.com.gobrs.async.test.task threads and you need to manipulate shared variables
+             * If you need to interrupt then you need to save all the task threads and you need to manipulate shared variables
              */
             try {
                 lock.lock();
@@ -377,7 +377,7 @@ public class TaskLoader<P, R> {
     /**
      * Rt dept.
      *
-     * @param task            the com.gobrs.async.com.gobrs.async.test.task
+     * @param task            task
      * @param terminationTask the terminationTask
      */
     public void rtDept(AsyncTask task, TaskActuator terminationTask) {
@@ -393,7 +393,7 @@ public class TaskLoader<P, R> {
 
 
     /**
-     * Get the com.gobrs.async.com.gobrs.async.test.task Bus
+     * Get the task Bus
      *
      * @param begins Collection of subtask processes
      * @return
@@ -454,18 +454,18 @@ public class TaskLoader<P, R> {
     }
 
     /**
-     * Gets assistant com.gobrs.async.com.gobrs.async.test.task.
+     * Gets assistant task.
      *
-     * @return the assistant com.gobrs.async.com.gobrs.async.test.task
+     * @return the assistant task
      */
     public TaskTrigger.AssistantTask getAssistantTask() {
         return assistantTask;
     }
 
     /**
-     * Sets assistant com.gobrs.async.com.gobrs.async.test.task.
+     * Sets assistant task.
      *
-     * @param assistantTask the assistant com.gobrs.async.com.gobrs.async.test.task
+     * @param assistantTask the assistant task
      */
     public void setAssistantTask(TaskTrigger.AssistantTask assistantTask) {
         this.assistantTask = assistantTask;

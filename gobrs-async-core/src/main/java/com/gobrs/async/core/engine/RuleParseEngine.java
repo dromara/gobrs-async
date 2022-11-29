@@ -150,12 +150,12 @@ public class RuleParseEngine<T> extends AbstractEngine {
              * Parse annotation configuration
              */
 
-            task.setDesc(getTaskAnnotion(task, (anno) -> task.getDesc(), String.class));
-            task.setDesc(getTaskAnnotion(task, (anno) -> task.getDesc(), String.class));
-            task.setCallback(getTaskAnnotion(task, (anno) -> task.isCallback(), Boolean.class));
-            task.setRetryCount(getTaskAnnotion(task, (anno) -> task.getRetryCount(), Integer.class));
-            task.setFailSubExec(getTaskAnnotion(task, (anno) -> task.isFailSubExec(), Boolean.class));
-            String annotionTaskName = getTaskAnnotion(task, (anno) -> task.getName(), String.class);
+            task.setDesc(getTaskAnnotion(task, (anno) -> anno.desc(), String.class));
+            task.setDesc(getTaskAnnotion(task, (anno) -> anno.desc(), String.class));
+            task.setCallback(getTaskAnnotion(task, (anno) -> anno.callback(), Boolean.class));
+            task.setRetryCount(getTaskAnnotion(task, (anno) -> anno.retryCount(), Integer.class));
+            task.setFailSubExec(getTaskAnnotion(task, (anno) -> anno.failSubExec(), Boolean.class));
+            String annotionTaskName = getTaskAnnotion(task, (anno) -> anno.desc(), String.class);
 
             if (!StringUtils.isEmpty(annotionTaskName)) {
                 task.setName(annotionTaskName);

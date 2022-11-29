@@ -44,7 +44,7 @@ public class InterruptTaskB extends AsyncTask<Object, Object> {
     }
 
     @Override
-    public boolean nessary(Object o, TaskSupport support) {
+    public boolean necessary(Object o, TaskSupport support) {
         return true;
     }
 
