@@ -26,6 +26,7 @@ public class CService extends AsyncTask<String, Integer> {
 
     @Override
     public void prepare(String o) {
+        System.out.println(this.getName() + "使用线程---" + Thread.currentThread().getName());
     }
 
     @Override

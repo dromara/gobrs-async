@@ -22,7 +22,7 @@ public class FService extends AsyncTask<Object, Object> {
     int i = 10000;
     @Override
     public void prepare(Object o) {
-
+        System.out.println(this.getName() + " 使用线程---" + Thread.currentThread().getName());
     }
 
     @Override

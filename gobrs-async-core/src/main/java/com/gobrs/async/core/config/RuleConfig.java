@@ -1,6 +1,5 @@
 package com.gobrs.async.core.config;
 
-import com.gobrs.async.core.holder.BeanHolder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.io.Serializable;
@@ -26,7 +25,7 @@ public class RuleConfig implements Serializable {
 
     private String content;
 
-    private LogConfig logConfig = defaultConfig();
+    private LogConfig logConfig;
 
     /**
      * Whether the execution com.gobrs.async.exception interrupts the workflow
@@ -38,16 +37,6 @@ public class RuleConfig implements Serializable {
      * 流程事务
      */
     boolean transaction = false;
-
-
-    /**
-     * Default config log config.
-     *
-     * @return the log config
-     */
-    LogConfig defaultConfig() {
-        return BeanHolder.getBean(LogConfig.class);
-    }
 
     /**
      * Gets name.
@@ -84,7 +73,6 @@ public class RuleConfig implements Serializable {
     public void setContent(String content) {
         this.content = content;
     }
-
 
     /**
      * Is com.gobrs.async.com.gobrs.async.test.task interrupt boolean.
