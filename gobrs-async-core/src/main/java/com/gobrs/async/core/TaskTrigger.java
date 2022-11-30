@@ -252,7 +252,7 @@ class TaskTrigger<P, R> {
      * 终止任务 在整个任务流程结束后 会调用该任务类执行 completed()
      * Task flow End tasks
      */
-    private class TerminationTask<P, R> extends TaskActuator {
+    private class TerminationTask<P, R> extends TaskActuator<Object> {
 
         /**
          * com.gobrs.async.com.gobrs.async.test.task executor
@@ -261,7 +261,7 @@ class TaskTrigger<P, R> {
          * @param depdending    The number of tasks to depend on
          * @param dependedTasks Array of dependent tasks
          */
-        TerminationTask(AsyncTask handler, int depdending, List<AsyncTask> dependedTasks) {
+        TerminationTask(AsyncTask<P, R> handler, int depdending, List<AsyncTask> dependedTasks) {
             super(handler, depdending, dependedTasks);
         }
 
