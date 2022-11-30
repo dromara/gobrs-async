@@ -20,7 +20,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Data
 public class LogWrapper {
 
-    private Long traceId;
 
     private final LinkedBlockingQueue<LogTracer> tracerQueue = new LinkedBlockingQueue<>();
 
@@ -53,7 +52,6 @@ public class LogWrapper {
     @Override
     public String toString() {
         return "LogWrapper{" +
-                "traceId=" + traceId +
                 ", tracerQueue=" + tracerQueue +
                 ", timeCollector=" + timeCollector +
                 ", processCost=" + processCost +

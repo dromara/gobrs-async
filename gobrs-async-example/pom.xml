@@ -39,7 +39,12 @@
         <dependency>
             <groupId>io.github.memorydoc</groupId>
             <artifactId>gobrs-async-starter</artifactId>
-            <version>1.2.4-RELEASE</version>
+            <version>1.2.5-RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>tlog-all-spring-boot-starter</artifactId>
+            <version>1.5.0</version>
         </dependency>
     </dependencies>
 

@@ -8,9 +8,7 @@ import com.gobrs.async.core.holder.BeanHolder;
 import com.gobrs.async.core.log.LogWrapper;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.threadpool.GobrsAsyncThreadPoolFactory;
-import com.gobrs.async.core.common.util.IdWorker;
 import com.gobrs.async.core.common.util.JsonUtil;
-import com.gobrs.async.core.log.TraceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -325,8 +323,6 @@ class TaskTrigger<P, R> {
      */
     private void logAdvance(TaskSupport support) {
 
-        long traceId = IdWorker.nextId();
-        TraceUtil.set(traceId);
 
         boolean costLogabled = ConfigManager.Action.costLogabled(ruleName);
         if (costLogabled) {
@@ -335,7 +331,6 @@ class TaskTrigger<P, R> {
                             .startTime(SystemClock.now())
                             .build();
             LogWrapper logWrapper = new LogWrapper()
-                    .setTraceId(traceId)
                     .setTimeCollector(timeCollector);
             support.setLogWrapper(logWrapper);
             support.getTaskLoader().setLogWrapper(logWrapper);

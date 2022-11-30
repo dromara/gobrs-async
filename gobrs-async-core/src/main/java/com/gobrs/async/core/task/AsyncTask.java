@@ -9,7 +9,6 @@ import com.gobrs.async.core.common.util.SystemClock;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.log.LogTracer;
 import com.gobrs.async.core.log.LogWrapper;
-import com.gobrs.async.core.log.TraceUtil;
 import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.TaskResult;
@@ -162,7 +161,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
     public void onFailureTrace(TaskSupport support, Exception exception) {
         boolean logable = ConfigManager.Action.errLogabled(support.getRuleName());
         if (logable) {
-            logger.error("[traceId:{}] {} 任务执行失败", TraceUtil.get(), this.getName(), exception);
+            logger.error(" {} 任务执行失败", this.getName(), exception);
         }
         onFail(support, exception);
     }

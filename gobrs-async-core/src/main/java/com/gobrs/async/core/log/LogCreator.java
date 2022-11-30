@@ -42,11 +42,7 @@ public class LogCreator {
                 .append("【ProcessTrace】")
                 .append("Total cost: ")
                 .append(SystemClock.now() - processStartTime)
-                .append("ms")
-                .append(" | ")
-                .append("traceId = ")
-                .append(logWrapper.getTraceId())
-                .append(" | ");
+                .append("ms");
         for (LogTracer tracer : logTracerList) {
             printContent = printContent
                     .append("【task】")
