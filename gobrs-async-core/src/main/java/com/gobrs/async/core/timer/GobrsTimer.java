@@ -1,7 +1,6 @@
 
 package com.gobrs.async.core.timer;
 
-import com.sun.deploy.util.StringUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

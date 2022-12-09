@@ -110,7 +110,6 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
         Object parameter = getParameter(task);
 
-
         preparation();
 
         TaskLoader taskLoader = support.getTaskLoader();
