@@ -4,7 +4,6 @@ import com.gobrs.async.core.callback.ErrorCallback;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.enums.ResultState;
-import com.gobrs.async.core.config.RuleConfig;
 import com.gobrs.async.core.task.TaskUtil;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.TaskResult;
@@ -18,7 +17,6 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 

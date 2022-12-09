@@ -30,11 +30,6 @@ public class DServiceCondition extends AsyncTask<Object, Boolean> {
     int sums = 1;
 
     @Override
-    public void prepare(Object o) {
-
-    }
-
-    @Override
     public Boolean task(Object o, TaskSupport support) {
         System.out.println("DServiceCondition Begin");
         for (int i1 = 0; i1 < sums; i1++) {
@@ -44,15 +39,5 @@ public class DServiceCondition extends AsyncTask<Object, Boolean> {
         return true;
     }
 
-    @Override
-    public boolean necessary(Object o, TaskSupport support) {
-        return true;
-    }
-
-
-    @Override
-    public void onSuccess(TaskSupport support) {
-
-    }
 
 }

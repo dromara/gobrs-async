@@ -2,13 +2,13 @@ package com.gobrs.async.core.task;
 
 
 import com.gobrs.async.core.TaskSupport;
-import com.gobrs.async.core.anno.Task;
 import com.gobrs.async.core.callback.ErrorCallback;
 import com.gobrs.async.core.common.enums.ExpState;
 import com.gobrs.async.core.common.util.SystemClock;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.log.LogTracer;
 import com.gobrs.async.core.log.LogWrapper;
+import com.gobrs.async.core.log.TraceUtil;
 import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.TaskResult;
@@ -18,10 +18,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionInterceptor;
@@ -120,7 +118,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      */
     public Result taskAdapter(Param param, TaskSupport support) {
         Long startTime = SystemClock.now();
-        Result task = null;
+        Result task;
         Exception exeError = null;
         try {
             task = task(param, support);
@@ -170,7 +168,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         }
         boolean logable = ConfigManager.Action.errLogabled(support.getRuleName());
         if (logable) {
-            logger.error(" {} 任务执行失败", this.getName(), exception);
+            logger.error("[traceId:{}] {} 任务执行失败", TraceUtil.get(), this.getName(), exception);
         }
         onFail(support, exception);
     }

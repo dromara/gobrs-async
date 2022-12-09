@@ -33,11 +33,6 @@ public class CServiceCondition extends AsyncTask<String, AnyConditionResult<Stri
      */
     int i = 1;
 
-    @Override
-    public void prepare(String o) {
-
-    }
-
     @SneakyThrows
     @Override
     public AnyConditionResult<String> task(String o, TaskSupport support) {
@@ -76,12 +71,6 @@ public class CServiceCondition extends AsyncTask<String, AnyConditionResult<Stri
         return condition.build();
 
     }
-
-    @Override
-    public boolean necessary(String o, TaskSupport support) {
-        return true;
-    }
-
 
     @Override
     public void onSuccess(TaskSupport support) {

@@ -177,7 +177,7 @@ public class TaskLoader<P, R> {
 
             // wait
             waitIfNecessary();
-            back(begins);
+            result = back(begins);
         } catch (Exception exception) {
             throw exception;
         } finally {

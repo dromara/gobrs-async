@@ -26,12 +26,6 @@ import org.springframework.stereotype.Component;
 public class BServiceCondition extends AsyncTask {
 
     int i = 10000;
-
-    @Override
-    public void prepare(Object o) {
-
-    }
-
     @Override
     public AnyConditionResult<String> task(Object o, TaskSupport support) {
         AnyConditionResult.Builder<String> builder = AnyConditionResult.builder();
@@ -43,15 +37,5 @@ public class BServiceCondition extends AsyncTask {
         System.out.println("BServiceCondition Finish");
         builder.setState(false);
         return builder.build();
-    }
-
-    @Override
-    public boolean necessary(Object o, TaskSupport support) {
-        return true;
-    }
-
-    @Override
-    public void onSuccess(TaskSupport support) {
-
     }
 }

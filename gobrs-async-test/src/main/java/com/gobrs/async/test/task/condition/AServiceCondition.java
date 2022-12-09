@@ -31,11 +31,6 @@ public class AServiceCondition extends AsyncTask {
     int sums = 10000;
 
     @Override
-    public void prepare(Object o) {
-
-    }
-
-    @Override
     public AnyConditionResult<String> task(Object o, TaskSupport support) {
         AnyConditionResult.Builder<String> builder = AnyConditionResult.builder();
         try {
@@ -47,19 +42,9 @@ public class AServiceCondition extends AsyncTask {
             System.out.println("AServiceCondition Finish");
         } catch (InterruptedException e) {
             e.printStackTrace();
-            builder.setState(false);
+           return builder.setState(false).build();
         }
-        return builder.setState(false).build();
+        return builder.setState(true).build();
     }
 
-    @Override
-    public boolean necessary(Object o, TaskSupport support) {
-        return true;
-    }
-
-
-    @Override
-    public void onSuccess(TaskSupport support) {
-
-    }
 }
