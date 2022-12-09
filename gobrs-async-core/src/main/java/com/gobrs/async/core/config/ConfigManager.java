@@ -1,9 +1,12 @@
 package com.gobrs.async.core.config;
 
+import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
 import com.gobrs.async.core.holder.BeanHolder;
 
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 /**
  * The type Config manager.
@@ -89,7 +92,7 @@ public class ConfigManager {
          * @return the boolean
          */
         public static boolean errLogabled(String ruleName) {
-            return getRule(ruleName).getLogConfig().getErrLogabled();
+            return defaultRule(() -> getRule(ruleName).getLogConfig().getErrLogabled(), DefaultConfig.ERR_LOGABLED);
         }
 
         /**
@@ -101,8 +104,26 @@ public class ConfigManager {
          * @return the boolean
          */
         public static boolean costLogabled(String ruleName) {
-            return getRule(ruleName).getLogConfig().getCostLogabled();
+            return defaultRule(() -> getRule(ruleName).getLogConfig().getCostLogabled(), DefaultConfig.COST_LOGABLED);
+
         }
+
+        /**
+         * Default rule boolean.
+         *
+         * @param action       the action
+         * @param defaultValue the default value
+         * @return the boolean
+         */
+        public static Boolean defaultRule(Supplier<Boolean> action, Boolean defaultValue) {
+            try {
+                return action.get();
+            } catch (Exception ex) {
+                return defaultValue;
+            }
+        }
+
+
     }
 
 }

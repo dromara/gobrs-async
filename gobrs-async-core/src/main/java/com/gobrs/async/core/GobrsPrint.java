@@ -1,5 +1,6 @@
 package com.gobrs.async.core;
 
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ansi.AnsiColor;
@@ -65,7 +66,7 @@ public class GobrsPrint {
      */
     public static String getVersion() {
         Package pkg = Package.getPackage("java.com.gobrs.async.util");
-        return pkg != null ? pkg.getImplementationVersion() : "";
+        return pkg != null ? pkg.getImplementationVersion() : Strings.EMPTY;
     }
 
 }

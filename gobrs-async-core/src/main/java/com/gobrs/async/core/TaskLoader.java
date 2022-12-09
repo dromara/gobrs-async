@@ -4,6 +4,7 @@ import com.gobrs.async.core.callback.AsyncTaskPostInterceptor;
 import com.gobrs.async.core.callback.AsyncTaskPreInterceptor;
 import com.gobrs.async.core.callback.ErrorCallback;
 import com.gobrs.async.core.callback.AsyncTaskExceptionInterceptor;
+import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.AsyncResult;
 import com.gobrs.async.core.common.enums.ExpState;
 import com.gobrs.async.core.common.enums.ResultState;
@@ -14,10 +15,11 @@ import com.gobrs.async.core.log.LogWrapper;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
 import com.gobrs.async.core.common.exception.TimeoutException;
-import com.gobrs.async.core.task.TaskUtil;
+import com.gobrs.async.core.timer.GobrsTimer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
+import java.lang.ref.Reference;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -26,6 +28,10 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.gobrs.async.core.common.def.DefaultConfig.TASK_INITIALIZE;
+import static com.gobrs.async.core.common.def.DefaultConfig.TASK_TIMEOUT;
+import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionInterceptor;
 
 /**
  * The type Task loader.
@@ -75,7 +81,7 @@ public class TaskLoader<P, R> {
      */
     public TaskTrigger.AssistantTask assistantTask;
 
-    private final long timeout;
+    private final long processTimeout;
 
     private volatile Throwable error;
 
@@ -92,6 +98,11 @@ public class TaskLoader<P, R> {
      * The Futures async.
      */
     public final Map<Class<?>, Future> futureMaps = new ConcurrentHashMap<>();
+
+    /**
+     * The Timer listeners.
+     */
+    public final Map<Class<?>, Reference<GobrsTimer.TimerListener>> timerListeners = new ConcurrentHashMap<>();
 
     private LogWrapper logWrapper;
 
@@ -128,8 +139,8 @@ public class TaskLoader<P, R> {
         this.executorService = executorService;
         this.processMap = processMap;
         completeLatch = new CountDownLatch(1);
-        this.timeout = timeout;
-        if (this.timeout > 0) {
+        this.processTimeout = timeout;
+        if (this.processTimeout > 0) {
             futureLists = new ArrayList<>(1);
         } else {
             futureLists = EmptyFutures;
@@ -233,6 +244,9 @@ public class TaskLoader<P, R> {
      * @param errorCallback Exception parameter encapsulation
      */
     public void error(ErrorCallback errorCallback) {
+        if (!exceptionInterceptor(errorCallback.getThrowable())) {
+            return;
+        }
         asyncExceptionInterceptor.exception(errorCallback);
     }
 
@@ -254,6 +268,9 @@ public class TaskLoader<P, R> {
             /**
              * Global interception listening
              */
+            if (!exceptionInterceptor(errorCallback.getThrowable())) {
+                return;
+            }
             asyncExceptionInterceptor.exception(errorCallback);
         }
     }
@@ -300,8 +317,8 @@ public class TaskLoader<P, R> {
      */
     private void waitIfNecessary() {
         try {
-            if (timeout > 0) {
-                if (!completeLatch.await(timeout, TimeUnit.MILLISECONDS)) {
+            if (processTimeout > 0) {
+                if (!completeLatch.await(processTimeout, TimeUnit.MILLISECONDS)) {
                     cancel();
                     throw new TimeoutException();
                 }
@@ -334,20 +351,17 @@ public class TaskLoader<P, R> {
      * @param taskActuator the task actuator
      */
     void startProcess(TaskActuator taskActuator) {
-        if (timeout > 0 || ConfigManager.getRule(ruleName).isTaskInterrupt()) {
+        if (processTimeout > 0 || ConfigManager.getRule(ruleName).isTaskInterrupt()) {
             /**
              * If you need to interrupt then you need to save all the task threads and you need to manipulate shared variables
              */
             try {
                 lock.lock();
                 if (!canceled) {
-                    Future<?> submit = executorService.submit(taskActuator);
-                    /**
-                     * 保存返回future 提供中断 能力
-                     */
+                    Future<?> submit = taskListenerConditional(taskActuator);
                     futureLists.add(submit);
-                    futureMaps.put(taskActuator.task.getClass(), submit);
                 }
+
             } finally {
                 lock.unlock();
             }
@@ -355,9 +369,48 @@ public class TaskLoader<P, R> {
             /**
              * Run the command without setting the timeout period
              */
-            Future<?> submit = executorService.submit(taskActuator);
-            futureMaps.put(taskActuator.task.getClass(), submit);
+            taskListenerConditional(taskActuator);
         }
+    }
+
+    private Future<?> taskListenerConditional(TaskActuator taskActuator) {
+        if (taskActuator.task.getTimeoutInMilliseconds() > DefaultConfig.TASK_TIME_OUT) {
+            return timeOperator(taskActuator);
+        }
+        Future<?> future = start(taskActuator);
+        return future;
+    }
+
+    private Future<?> timeOperator(TaskActuator<?> taskActuator) {
+
+        Future<?> future = executorService.submit(taskActuator);
+
+        GobrsTimer.TimerListener listener = new GobrsTimer.TimerListener() {
+            @Override
+            public void tick() {
+                if (!future.isDone()
+                        && taskActuator.getTaskSupport().getStatus(taskActuator.getTask().getClass()).compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT)
+                        && future.cancel(true)) {
+                    throw new TimeoutException(String.format("task %s TimeoutException", taskActuator.getTask().getName()));
+                }
+            }
+
+            @Override
+            public int getIntervalTimeInMilliseconds() {
+                return taskActuator.task.getTimeoutInMilliseconds();
+            }
+        };
+
+        Reference<GobrsTimer.TimerListener> tl = GobrsTimer.getInstance(100).addTimerListener(listener);
+        timerListeners.put(taskActuator.getTask().getClass(), tl);
+        futureMaps.put(taskActuator.task.getClass(), future);
+        return future;
+    }
+
+    private Future<?> start(TaskActuator taskActuator) {
+        Future<?> future = executorService.submit(taskActuator);
+        futureMaps.put(taskActuator.task.getClass(), future);
+        return future;
     }
 
     /**
@@ -523,5 +576,14 @@ public class TaskLoader<P, R> {
      */
     public void setRuleName(String ruleName) {
         this.ruleName = ruleName;
+    }
+
+    /**
+     * Gets timer listeners.
+     *
+     * @return the timer listeners
+     */
+    public Map<Class<?>, Reference<GobrsTimer.TimerListener>> getTimerListeners() {
+        return timerListeners;
     }
 }

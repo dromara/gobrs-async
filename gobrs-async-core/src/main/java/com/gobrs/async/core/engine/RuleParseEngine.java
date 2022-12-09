@@ -155,6 +155,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
             task.setCallback(getTaskAnnotion(task, (anno) -> anno.callback(), Boolean.class));
             task.setRetryCount(getTaskAnnotion(task, (anno) -> anno.retryCount(), Integer.class));
             task.setFailSubExec(getTaskAnnotion(task, (anno) -> anno.failSubExec(), Boolean.class));
+            task.setTimeoutInMilliseconds(getTaskAnnotion(task, (anno) -> anno.timeoutInMilliseconds(), Integer.class));
             String annotionTaskName = getTaskAnnotion(task, (anno) -> anno.desc(), String.class);
 
             if (!StringUtils.isEmpty(annotionTaskName)) {
