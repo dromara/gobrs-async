@@ -3,6 +3,7 @@ package com.gobrs.async.test.task;
 import com.gobrs.async.core.TaskSupport;
 import com.gobrs.async.core.anno.Task;
 import com.gobrs.async.core.task.AsyncTask;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
  * @author: sizegang
  * @create: 2022 -03-20
  */
+@Slf4j
 @Task
 public class HService extends AsyncTask<Object, Object> {
     /**
@@ -23,7 +25,7 @@ public class HService extends AsyncTask<Object, Object> {
 
     @Override
     public void prepare(Object o) {
-        System.out.println(this.getName() + " 使用线程---" + Thread.currentThread().getName());
+        log.info(this.getName() + " 使用线程---" + Thread.currentThread().getName());
     }
 
     @Override

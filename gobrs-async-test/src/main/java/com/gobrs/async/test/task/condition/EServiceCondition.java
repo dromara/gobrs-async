@@ -22,10 +22,6 @@ public class EServiceCondition extends AsyncTask<Object, Boolean> {
      */
     int i = 10000;
 
-    @Override
-    public void prepare(Object o) {
-
-    }
 
     @Override
     public Boolean task(Object o, TaskSupport support) {
@@ -35,16 +31,5 @@ public class EServiceCondition extends AsyncTask<Object, Boolean> {
         }
 //        System.out.println("EServiceCondition Finish");
         return true;
-    }
-
-    @Override
-    public boolean necessary(Object o, TaskSupport support) {
-        return true;
-    }
-
-
-    @Override
-    public void onSuccess(TaskSupport support) {
-
     }
 }

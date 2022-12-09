@@ -4,20 +4,23 @@ import com.gobrs.async.core.callback.ErrorCallback;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.enums.ResultState;
-import com.gobrs.async.core.config.RuleConfig;
 import com.gobrs.async.core.task.TaskUtil;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.core.task.AsyncTask;
+import com.gobrs.async.core.timer.GobrsTimer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
+import java.lang.ref.Reference;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import static com.gobrs.async.core.common.def.DefaultConfig.*;
 
 /**
  * The type Task actuator.
@@ -60,11 +63,6 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     private Lock lock;
 
     private Map<AsyncTask, List<AsyncTask>> upwardTasksMap;
-
-    /**
-     * 执行状态
-     */
-    private AtomicInteger state;
 
 
     /**
@@ -146,6 +144,10 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                  */
                 result = task.taskAdapter(parameter, support);
 
+                /**
+                 * 状态改变
+                 */
+                change();
 
                 /**
                  * 数量统计
@@ -184,8 +186,27 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                 }
                 taskLoader.stopSingleTaskLine(subTasks);
             }
+        } finally {
+            clear();
         }
         return (Result) result;
+    }
+
+    private void change() {
+        support.getStatus(task.getClass()).compareAndSet(TASK_INITIALIZE, TASK_FINISH);
+    }
+
+
+    private void clear() {
+        Reference<GobrsTimer.TimerListener> listenerReference = getListenerReference();
+        if (Objects.nonNull(listenerReference)) {
+            listenerReference.clear();
+        }
+    }
+
+    private Reference<GobrsTimer.TimerListener> getListenerReference() {
+        Map<Class<?>, Reference<GobrsTimer.TimerListener>> timerListeners = support.getTaskLoader().getTimerListeners();
+        return timerListeners.get(task.getClass());
     }
 
     private boolean executeNecessary(Object parameter, AsyncTask task) {
@@ -210,9 +231,10 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param e
      */
     private void exceptionProcess(Object parameter, TaskLoader taskLoader, Exception e) {
+
         Optimal.optimalCount(support.taskLoader);
 
-        state = new AtomicInteger(1);
+        support.setStatus(this.getClass(), new AtomicInteger(TASK_INITIALIZE));
 
         if (!retryTask(parameter, taskLoader)) {
 
@@ -328,9 +350,11 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      */
     private boolean retryTask(Object parameter, TaskLoader taskLoader) {
         try {
-            if (task.getRetryCount() > 1 && task.getRetryCount() >= state.get()) {
+            AtomicInteger status = support.getStatus(this.getClass());
 
-                state.incrementAndGet();
+            if (task.getRetryCount() > 1 && task.getRetryCount() > status.get()) {
+
+                status.incrementAndGet();
 
                 doTaskWithRetryConditional(parameter, taskLoader);
 
@@ -360,6 +384,11 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
          * Perform a com.gobrs.async.com.gobrs.async.test.task
          */
         Object result = task.taskAdapter(parameter, support);
+
+        /**
+         * 状态改变
+         */
+        change();
 
         try {
             /**
@@ -422,13 +451,13 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                             Boolean aBoolean = (Boolean) taskLoader.anyConditionProx.get(process);
                             if (Objects.isNull(aBoolean)) {
                                 taskLoader.anyConditionProx.put(process, true);
-                                doTask(taskLoader, process, optionalTasks, i == subTasks.size() - 1);
+                                doTask(taskLoader, process, optionalTasks, isCycleThread(i));
                             }
                         }
                     }
                 } else {
                     if (process.releasingDependency() == 0) {
-                        doTask(taskLoader, process, optionalTasks, i == subTasks.size() - 1);
+                        doTask(taskLoader, process, optionalTasks, isCycleThread(i));
                     }
                 }
             }
@@ -436,7 +465,19 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     }
 
     /**
-     * hasUsedSynRunTimeOnce 线程复用
+     * 线程复用
+     * 1、最后一个子任务使用父任务的线程
+     * 2、父任务未设置超时时间的任务 具备线程复用的能力
+     *
+     * @param i
+     * @return
+     */
+    private boolean isCycleThread(int i) {
+        return i == subTasks.size() - 1 && Objects.isNull(getListenerReference());
+    }
+
+    /**
+     * cycleThread 线程复用
      * A->C,D
      * 此时 C会使用A的线程继续执行任务 而不会再开启线程 节省了线程开销和线程上下文切换
      *
@@ -461,8 +502,6 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
     /**
      * 向下执行
-     * 线程复用
-     * 线程循环利用
      *
      * @param taskLoader
      * @param process

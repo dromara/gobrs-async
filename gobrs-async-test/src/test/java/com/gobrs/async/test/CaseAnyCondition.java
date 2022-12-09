@@ -37,24 +37,16 @@ public class CaseAnyCondition {
 
     public static ExecutorService executorService = Executors.newCachedThreadPool();
 
-    public Integer count = 100;
+    public Integer count = 1;
 
     /**
      * Test condition.
      */
     @Test
     public void testCondition() {
-        Set<String> cases = new HashSet<>();
-
-        cases.add("BService");
-        cases.add("GService");
 
         Map<Class, Object> params = new HashMap<>();
-        params.put(AServiceCondition.class, "1");
-        params.put(CServiceCondition.class, "2");
-
         CountDownLatch countDownLatch = new CountDownLatch(count);
-
         for (int i = 0; i < count; i++) {
             executorService.submit(() -> {
                 StopWatch stopWatch = new StopWatch();

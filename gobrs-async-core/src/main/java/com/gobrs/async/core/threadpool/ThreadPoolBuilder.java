@@ -7,6 +7,8 @@ import com.gobrs.async.core.common.exception.GobrsAsyncException;
 import java.math.BigDecimal;
 import java.util.concurrent.*;
 
+import static com.gobrs.async.core.common.util.ThreadPoolUtil.calculateCoreNum;
+
 /**
  * The type Thread pool builder.
  *
@@ -383,9 +385,6 @@ public class ThreadPoolBuilder {
     }
 
 
-    private Integer calculateCoreNum() {
-        int cpuCoreNum = Runtime.getRuntime().availableProcessors();
-        return new BigDecimal(cpuCoreNum).divide(new BigDecimal("0.2")).intValue();
-    }
+
 
 }

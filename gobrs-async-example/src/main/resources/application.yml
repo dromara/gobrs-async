@@ -22,6 +22,9 @@ gobrs:
         - name: "anyConditionRuleAppend"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition->EServiceCondition"
 
+        ## 单一任务超时时间
+        - name: "timeoutRule"
+          content: "caseTimeoutTaskA->caseTimeoutTaskB->caseTimeoutTaskC"
         # 官方场景一 https://async.sizegang.cn/pages/2f844b/#%E5%9C%BA%E6%99%AF%E4%B8%80
         - name: "caseOne"
           content: "caseOneTaskA->caseOneTaskB,caseOneTaskC,caseOneTaskD"

@@ -1,5 +1,7 @@
 package com.gobrs.async.core.common.def;
 
+import org.apache.logging.log4j.util.Strings;
+
 /**
  * The interface Default com.gobrs.async.config.
  *
@@ -46,7 +48,7 @@ public interface DefaultConfig {
     /**
      * The constant retryCount.
      */
-    int retryCount = 1;
+    int RETRY_COUNT = 1;
     /**
      * Whether to execute a subtask if it fails
      */
@@ -79,7 +81,18 @@ public interface DefaultConfig {
     /**
      * The constant QUEUE.
      */
-    String QUEUE_SIZE = "";
+    String QUEUE_SIZE = Strings.EMPTY;
+
+    int TASK_TIME_OUT = 0;
+
+    boolean ERR_LOGABLED = true;
+
+    boolean COST_LOGABLED = true;
 
 
+    int TASK_INITIALIZE = 0;
+
+    int TASK_FINISH = Integer.MAX_VALUE;
+
+    int TASK_TIMEOUT = -1;
 }

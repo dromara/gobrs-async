@@ -2,7 +2,6 @@ package com.gobrs.async.core.task;
 
 
 import com.gobrs.async.core.TaskSupport;
-import com.gobrs.async.core.anno.Task;
 import com.gobrs.async.core.callback.ErrorCallback;
 import com.gobrs.async.core.common.enums.ExpState;
 import com.gobrs.async.core.common.util.SystemClock;
@@ -13,16 +12,17 @@ import com.gobrs.async.core.log.TraceUtil;
 import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.TaskResult;
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionInterceptor;
 
 /**
  * The type Async com.gobrs.async.com.gobrs.async.test.task.
@@ -59,12 +59,14 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      */
     private boolean callback = DefaultConfig.transaction;
 
-    private int retryCount = DefaultConfig.retryCount;
+    private int retryCount = DefaultConfig.RETRY_COUNT;
 
     /**
      * Whether to execute a subtask if it fails
      */
     private boolean failSubExec = DefaultConfig.failSubExec;
+
+    private int timeoutInMilliseconds = DefaultConfig.TASK_TIME_OUT;
 
     /**
      * if true => execute when any of parentTasks finished
@@ -123,6 +125,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         } catch (Exception exception) {
             exeError = exception;
             throw exception;
+            //  InterruptedException exceptions do nothing
         } finally {
             boolean costLogabled = ConfigManager.Action.costLogabled(support.getRuleName());
             if (costLogabled &&
@@ -132,7 +135,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
                         .taskName(this.getName())
                         .taskCost(costTime)
                         .executeState(exeError == null ? true : false)
-                        .errorMessage(exeError == null ? "" : exeError.getMessage())
+                        .errorMessage(exeError == null ? Strings.EMPTY : exeError.getMessage())
                         .build();
                 LogWrapper logWrapper = support.getLogWrapper();
                 logWrapper.addTrace(logTracer);
@@ -160,12 +163,16 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * @param exception the com.gobrs.async.exception
      */
     public void onFailureTrace(TaskSupport support, Exception exception) {
+        if (!exceptionInterceptor(exception)) {
+            return;
+        }
         boolean logable = ConfigManager.Action.errLogabled(support.getRuleName());
         if (logable) {
             logger.error("[traceId:{}] {} 任务执行失败", TraceUtil.get(), this.getName(), exception);
         }
         onFail(support, exception);
     }
+
 
     /**
      * get result of depend on class
@@ -475,5 +482,23 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
     @Override
     public boolean equals(Object obj) {
         return super.equals(obj);
+    }
+
+    /**
+     * Gets timeout in milliseconds.
+     *
+     * @return the timeout in milliseconds
+     */
+    public int getTimeoutInMilliseconds() {
+        return timeoutInMilliseconds;
+    }
+
+    /**
+     * Sets timeout in milliseconds.
+     *
+     * @param timeoutInMilliseconds the timeout in milliseconds
+     */
+    public void setTimeoutInMilliseconds(int timeoutInMilliseconds) {
+        this.timeoutInMilliseconds = timeoutInMilliseconds;
     }
 }

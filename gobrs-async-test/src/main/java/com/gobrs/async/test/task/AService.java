@@ -3,7 +3,8 @@ package com.gobrs.async.test.task;
 import com.gobrs.async.core.TaskSupport;
 import com.gobrs.async.core.anno.Task;
 import com.gobrs.async.core.task.AsyncTask;
-import org.springframework.stereotype.Component;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The type A service.
@@ -14,7 +15,8 @@ import org.springframework.stereotype.Component;
  * @author: sizegang
  * @create: 2022 -03-20
  */
-@Task(failSubExec = true)
+@Slf4j
+@Task(failSubExec = true, timeoutInMilliseconds = 300)
 public class AService extends AsyncTask {
 
     /**
@@ -24,22 +26,19 @@ public class AService extends AsyncTask {
 
     @Override
     public void prepare(Object o) {
-        System.out.println(this.getName() + " 使用线程---" + Thread.currentThread().getName());
+        log.info(this.getName() + " 使用线程---" + Thread.currentThread().getName());
     }
 
+    @SneakyThrows
     @Override
     public String task(Object o, TaskSupport support) {
 
-        try {
-            System.out.println("AService Begin");
-            Thread.sleep(300);
-            for (int i1 = 0; i1 < i; i1++) {
-                i1 += i1;
-            }
-            System.out.println("AService Finish");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        System.out.println("AService Begin");
+        Thread.sleep(300);
+        for (int i1 = 0; i1 < i; i1++) {
+            i1 += i1;
         }
+        System.out.println("AService Finish");
         return "result";
     }
 

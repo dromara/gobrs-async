@@ -2,6 +2,7 @@ package com.gobrs.async.core.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import javax.annotation.Resource;
 import java.io.Serializable;
 
 import static com.gobrs.async.core.common.constant.ConfigPropertiesConstant.RULES;
