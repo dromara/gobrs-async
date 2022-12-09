@@ -111,7 +111,7 @@ public class GobrsTimer {
         public void clear() {
             super.clear();
             // stop this ScheduledFuture from any further executions
-            f.cancel(true);
+            f.cancel(false);
         }
 
     }
