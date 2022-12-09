@@ -2,7 +2,7 @@ package com.gobrs.async.test;
 
 import com.gobrs.async.core.engine.RuleThermalLoad;
 import com.gobrs.async.core.config.RuleConfig;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

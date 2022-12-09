@@ -1,6 +1,7 @@
 package com.gobrs.async.core.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
@@ -19,6 +20,7 @@ import static com.gobrs.async.core.common.constant.ConfigPropertiesConstant.RULE
  * @Version 1.0
  * @date 2022 -01-27
  */
+@Configuration
 @ConfigurationProperties(prefix = RULES)
 public class RuleConfig implements Serializable {
 

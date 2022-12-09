@@ -2,7 +2,7 @@ package com.gobrs.async.test.future;
 
 import com.gobrs.async.core.GobrsAsync;
 import com.gobrs.async.test.GobrsAsyncTestApplication;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 

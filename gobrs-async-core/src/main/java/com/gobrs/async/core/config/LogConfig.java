@@ -10,15 +10,14 @@ package com.gobrs.async.core.config;
 
 import com.gobrs.async.core.common.def.DefaultConfig;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
-
+import org.springframework.context.annotation.Configuration;
 import static com.gobrs.async.core.common.constant.ConfigPropertiesConstant.RULES;
 
 /**
  * The type Log config.
  */
 @ConfigurationProperties(prefix = RULES)
-@Component
+@Configuration
 public class LogConfig {
     /**
      * 执行异常trace log打印

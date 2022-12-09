@@ -52,11 +52,9 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <logback.version>1.2.3</logback.version>
-        <revision>1.0.0-beta.3</revision>
         <maven.javadoc.plugin.version>3.0.0</maven.javadoc.plugin.version>
         <maven.compiler.plugin.version>3.6.1</maven.compiler.plugin.version>
         <ttl.version>2.11.2</ttl.version>
-        <gobrs.asnyc.version>1.0.5-SNAPSHOT</gobrs.asnyc.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -90,7 +88,6 @@
         <dependency>
             <groupId>com.jd.gobrs</groupId>
             <artifactId>gobrs-async-core</artifactId>
-            <version>${gobrs.asnyc.version}</version>
         </dependency>
     </dependencies>
     <build>
