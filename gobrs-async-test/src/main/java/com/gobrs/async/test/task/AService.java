@@ -34,7 +34,7 @@ public class AService extends AsyncTask {
     public String task(Object o, TaskSupport support) {
 
         System.out.println("AService Begin");
-        Thread.sleep(290);
+        Thread.sleep(300);
         for (int i1 = 0; i1 < i; i1++) {
             i1 += i1;
         }
