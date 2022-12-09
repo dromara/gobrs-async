@@ -21,6 +21,8 @@ gobrs:
 
         - name: "anyConditionRuleAppend"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition->EServiceCondition"
+        - name: "retryRule"
+          content: "caseRetryTaskA->caseRetryTaskB,caseRetryTaskC"
 
         ## 单一任务超时时间
         - name: "timeoutRule"

@@ -352,7 +352,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
         try {
             AtomicInteger status = support.getStatus(this.getClass());
 
-            if (task.getRetryCount() > 1 && task.getRetryCount() >= status.get()) {
+            if (task.getRetryCount() > 1 && task.getRetryCount() > status.get()) {
 
                 status.incrementAndGet();
 
