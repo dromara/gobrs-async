@@ -24,7 +24,6 @@ public class GobrsInterceptor implements AsyncTaskExceptionInterceptor {
     @SneakyThrows
     @Override
     public void exception(ErrorCallback errorCallback) {
-
-        log.error("Execute global interceptor  error", errorCallback.getThrowable());
+//        log.error("Execute global interceptor  error", errorCallback.getThrowable());
     }
 }

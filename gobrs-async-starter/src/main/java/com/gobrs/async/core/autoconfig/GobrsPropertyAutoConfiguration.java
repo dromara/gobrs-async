@@ -2,10 +2,7 @@ package com.gobrs.async.core.autoconfig;
 
 import com.gobrs.async.core.config.GobrsConfig.ThreadPool;
 
-import java.util.ArrayList;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.BlockingQueue;
 
 import com.gobrs.async.core.config.GobrsAsyncRule;
 import com.gobrs.async.core.property.GobrsAsyncProperties;
@@ -51,19 +48,7 @@ public class GobrsPropertyAutoConfiguration {
         gobrsConfig.setTimeout(properties.getTimeout());
         gobrsConfig.setRelyDepend(properties.isRelyDepend());
 
-        GobrsAsyncProperties.ThreadPool threadPool = properties.getThreadPool();
-        GobrsConfig.ThreadPool tp = new GobrsConfig.ThreadPool();
-        tp.setCorePoolSize(threadPool.getCorePoolSize());
-        tp.setMaxPoolSize(threadPool.getMaxPoolSize());
-        tp.setKeepAliveTime(threadPool.getKeepAliveTime());
-        tp.setTimeUnit(threadPool.getTimeUnit());
-        tp.setExecuteTimeOut(threadPool.getExecuteTimeOut());
-        tp.setCapacity(threadPool.getCapacity());
-        tp.setWorkQueue(threadPool.getWorkQueue());
-        tp.setThreadNamePrefix(threadPool.getThreadNamePrefix());
-        tp.setAllowCoreThreadTimeOut(threadPool.getAllowCoreThreadTimeOut());
-        tp.setRejectedExecutionHandler(threadPool.getRejectedExecutionHandler());
-        gobrsConfig.setThreadPool(tp);
+        threadPool(properties, gobrsConfig);
 
         List<RuleConfig> rules = properties.getRules();
         List<GobrsAsyncRule> rList = rules.stream().map(x -> {
@@ -83,5 +68,27 @@ public class GobrsPropertyAutoConfiguration {
         }).collect(Collectors.toList());
         gobrsConfig.setRules(rList);
         return gobrsConfig;
+    }
+
+    /**
+     * @param properties
+     * @param gobrsConfig
+     */
+    private void threadPool(GobrsAsyncProperties properties, GobrsConfig gobrsConfig) {
+        GobrsAsyncProperties.ThreadPool threadPool = properties.getThreadPool();
+        if(Objects.nonNull(threadPool)){
+            ThreadPool tp = new ThreadPool();
+            tp.setCorePoolSize(threadPool.getCorePoolSize());
+            tp.setMaxPoolSize(threadPool.getMaxPoolSize());
+            tp.setKeepAliveTime(threadPool.getKeepAliveTime());
+            tp.setTimeUnit(threadPool.getTimeUnit());
+            tp.setExecuteTimeOut(threadPool.getExecuteTimeOut());
+            tp.setCapacity(threadPool.getCapacity());
+            tp.setWorkQueue(threadPool.getWorkQueue());
+            tp.setThreadNamePrefix(threadPool.getThreadNamePrefix());
+            tp.setAllowCoreThreadTimeOut(threadPool.getAllowCoreThreadTimeOut());
+            tp.setRejectedExecutionHandler(threadPool.getRejectedExecutionHandler());
+            gobrsConfig.setThreadPool(tp);
+        }
     }
 }

@@ -326,7 +326,6 @@ class TaskTrigger<P, R> {
 
         long traceId = IdWorker.nextId();
         TraceUtil.set(traceId);
-
         boolean costLogabled = ConfigManager.Action.costLogabled(ruleName);
         if (costLogabled) {
             LogWrapper.TimeCollector timeCollector =

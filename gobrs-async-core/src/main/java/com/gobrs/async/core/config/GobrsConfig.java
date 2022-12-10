@@ -46,7 +46,7 @@ public class GobrsConfig {
     private String point = "->";
 
 
-    private ThreadPool threadPool = new ThreadPool();
+    private ThreadPool threadPool;
 
 
     /**

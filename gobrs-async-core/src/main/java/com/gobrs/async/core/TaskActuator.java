@@ -4,6 +4,7 @@ import com.gobrs.async.core.callback.ErrorCallback;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.enums.ResultState;
+import com.gobrs.async.core.log.TraceUtil;
 import com.gobrs.async.core.task.TaskUtil;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.TaskResult;
@@ -182,7 +183,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                 exceptionProcess(parameter, taskLoader, e);
             } catch (Exception exception) {
                 if (log.isErrorEnabled()) {
-                    log.error(" gobrs exceptionProcess error task is ", task.getName(), exception);
+                    log.error("<{}> [{}] exceptionProcess error {} ", TraceUtil.get(), task.getName(), e);
                 }
                 taskLoader.stopSingleTaskLine(subTasks);
             }

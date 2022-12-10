@@ -159,12 +159,10 @@ public class TaskLoader<P, R> {
         AsyncResult result = null;
         try {
             List<TaskActuator> begins = getBeginProcess();
-
             /**
              * 可选任务
              */
             begins = preOptimal(begins);
-
             /**
              * 并发开始执行每条任务链
              */

@@ -12,15 +12,19 @@ import com.gobrs.async.core.log.TraceUtil;
 import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.TaskResult;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionInterceptor;
 
@@ -36,12 +40,9 @@ import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionIntercepto
  * @author: sizegang
  * @create: 2022 -03-16
  */
+@Slf4j
 public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Result> {
 
-    /**
-     * The Logger.
-     */
-    Logger logger = LoggerFactory.getLogger(AsyncTask.class);
 
     /**
      * 任务名称
@@ -140,6 +141,8 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
                 LogWrapper logWrapper = support.getLogWrapper();
                 logWrapper.addTrace(logTracer);
                 logWrapper.setProcessCost(costTime);
+                log.info("<{}> [{}] execution", logWrapper.getTraceId(), this.getName());
+
             }
         }
         return task;
@@ -168,7 +171,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         }
         boolean logable = ConfigManager.Action.errLogabled(support.getRuleName());
         if (logable) {
-            logger.error("[traceId:{}] {} 任务执行失败", TraceUtil.get(), this.getName(), exception);
+            log.error("<{}> {} error", TraceUtil.get(), this.getName(), exception);
         }
         onFail(support, exception);
     }
@@ -267,7 +270,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
             try {
                 return ((Future<Result>) o).get(timeout, unit);
             } catch (Exception e) {
-                logger.error("task {} getTaskFuture error {}", this.getName(), e);
+                log.error("task {} getTaskFuture error {}", this.getName(), e);
             }
         }
         return null;
@@ -299,7 +302,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
             support.taskLoader.setExpCode(new AtomicInteger(ExpState.DEFAULT.getCode()));
             support.taskLoader.errorInterrupted(errorCallback);
         } catch (Exception ex) {
-            logger.error("stopAsync error {}", ex);
+            log.error("stopAsync error {}", ex);
             return false;
         }
         return true;
@@ -321,11 +324,33 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
             support.taskLoader.errorInterrupted(errorCallback);
 
         } catch (Exception ex) {
-            logger.error("stopAsync error {} ", ex);
+            log.error("stopAsync error {} ", ex);
             return false;
         }
         return true;
     }
+
+
+    /**
+     * Gets process trace id.
+     *
+     * @return the trace id
+     */
+    public String getProcessTraceId() {
+        Object tr = TraceUtil.get();
+        return tr != null ? tr.toString() : null;
+    }
+
+    /**
+     * Gets formatted trace id.
+     *
+     * @return the formatted trace id
+     */
+    public String getFormattedTraceId() {
+        String processTraceId = getProcessTraceId();
+        return String.format("<%s> [%s]", processTraceId, this.getName());
+    }
+
 
     /**
      * Gets name.

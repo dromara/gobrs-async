@@ -40,7 +40,12 @@ public class BService extends AsyncTask {
         for (int i1 = 0; i1 < i; i1++) {
             i1 += i1;
         }
-//        System.out.println(1 / 0);
+        try {
+            System.out.println(1 / 0);
+        } catch (Exception exception) {
+            log.error(getFormattedTraceId(), exception);
+        }
+
         System.out.println("BService Finish");
         return null;
     }

@@ -3,7 +3,9 @@ package com.gobrs.async.core.threadpool;
 import com.alibaba.ttl.threadpool.TtlExecutors;
 import com.gobrs.async.core.config.GobrsConfig;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -66,6 +68,9 @@ public class GobrsAsyncThreadPoolFactory {
      */
     ThreadPoolExecutor createDefaultThreadPool() {
         GobrsConfig.ThreadPool threadPool = gobrsConfig.getThreadPool();
+        if (Objects.isNull(threadPool)) {
+            return (ThreadPoolExecutor) Executors.newCachedThreadPool();
+        }
         return new ThreadPoolExecutor(threadPool.getCorePoolSize(),
                 threadPool.getMaxPoolSize(), threadPool.getKeepAliveTime(), threadPool.getTimeUnit(),
                 threadPool.getWorkQueue(), ThreadPoolBuilder.caseReject(threadPool.getRejectedExecutionHandler()));

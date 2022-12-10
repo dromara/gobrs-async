@@ -50,7 +50,7 @@ public class GobrsAsyncProperties {
     private String point = "->";
 
 
-    private ThreadPool threadPool = new ThreadPool();
+    private ThreadPool threadPool;
 
 
     /**
