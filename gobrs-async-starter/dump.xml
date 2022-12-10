@@ -86,7 +86,7 @@
             <version>${ttl.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.jd.gobrs</groupId>
+            <groupId>io.github.memorydoc</groupId>
             <artifactId>gobrs-async-core</artifactId>
         </dependency>
     </dependencies>

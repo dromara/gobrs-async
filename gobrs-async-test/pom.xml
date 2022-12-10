@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>gobrs-async</artifactId>
-        <groupId>com.gobrs</groupId>
+        <groupId>io.github.memorydoc</groupId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>com.gobrs</groupId>
+    <groupId>io.github.memorydoc</groupId>
     <artifactId>gobrs-async-test</artifactId>
 
     <properties>

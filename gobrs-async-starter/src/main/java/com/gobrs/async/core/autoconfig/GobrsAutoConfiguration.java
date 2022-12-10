@@ -10,11 +10,13 @@ import com.gobrs.async.core.engine.RulePostProcessor;
 import com.gobrs.async.core.engine.RuleThermalLoad;
 import com.gobrs.async.core.holder.BeanHolder;
 import com.gobrs.async.core.threadpool.GobrsAsyncThreadPoolFactory;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 
 /**
@@ -28,7 +30,10 @@ import org.springframework.context.annotation.Configuration;
  * @Version 1.0
  */
 @Configuration
+@AutoConfigureAfter({GobrsPropertyAutoConfiguration.class})
+@ConditionalOnBean(GobrsConfig.class)
 @ConditionalOnProperty(prefix = GobrsAsyncProperties.PREFIX, value = "enable", matchIfMissing = true, havingValue = "true")
+@Import(BeanHolder.class)
 public class GobrsAutoConfiguration {
 
 

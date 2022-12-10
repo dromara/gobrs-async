@@ -2,7 +2,7 @@ package com.gobrs.async.test;
 
 import com.gobrs.async.test.task.*;
 import com.gobrs.async.core.task.AsyncTask;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;

@@ -1,7 +1,6 @@
 package com.gobrs.async.core.config;
 
 import com.gobrs.async.core.common.constant.ConfigPropertiesConstant;
-import com.gobrs.async.core.common.def.DefaultConfig;
 import lombok.Data;
 
 import java.math.BigDecimal;

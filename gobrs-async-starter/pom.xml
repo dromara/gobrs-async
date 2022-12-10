@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>gobrs-async</artifactId>
-        <groupId>com.gobrs</groupId>
+        <groupId>io.github.memorydoc</groupId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
@@ -17,40 +17,6 @@
     <url>https://github.com/Memorydoc/gobrs-async-starter</url>
 
 
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    <developers>
-        <developer>
-            <name>Memorydoc</name>
-            <email>17615195790@163.com</email>
-            <organization>Github</organization>
-        </developer>
-    </developers>
-    <scm>
-        <connection>scm:git:git@github.com:Memorydoc/gobrs-async-starter.git</connection>
-        <developerConnection>scm:git:git@github.com:Memorydoc/gobrs-async-starter.git</developerConnection>
-        <tag>master</tag>
-        <url>git@github.com:Memorydoc/gobrs-async-starter.git</url>
-    </scm>
-    <issueManagement>
-        <system>Github Issue</system>
-        <url>https://github.com/Memorydoc/gobrs-async-starter/issues</url>
-    </issueManagement>
-    <distributionManagement>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
     <properties>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
         <java.version>1.8</java.version>
@@ -88,7 +54,7 @@
             <artifactId>transmittable-thread-local</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.gobrs</groupId>
+            <groupId>io.github.memorydoc</groupId>
             <artifactId>gobrs-async-core</artifactId>
         </dependency>
     </dependencies>

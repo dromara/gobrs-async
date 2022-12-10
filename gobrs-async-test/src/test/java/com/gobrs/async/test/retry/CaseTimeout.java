@@ -3,7 +3,7 @@ package com.gobrs.async.test.retry;
 import com.gobrs.async.core.GobrsAsync;
 import com.gobrs.async.core.common.domain.AsyncResult;
 import com.gobrs.async.test.GobrsAsyncTestApplication;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 

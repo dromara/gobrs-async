@@ -6,7 +6,7 @@ import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.test.task.condition.AServiceCondition;
 import com.gobrs.async.test.task.condition.BServiceCondition;
 import com.gobrs.async.test.task.condition.CServiceCondition;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.StopWatch;

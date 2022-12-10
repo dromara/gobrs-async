@@ -4,7 +4,7 @@ import com.gobrs.async.core.GobrsAsync;
 import com.gobrs.async.core.common.domain.AsyncResult;
 import com.gobrs.async.test.task.AService;
 import com.gobrs.async.test.task.CService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 

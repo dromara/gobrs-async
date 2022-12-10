@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>gobrs-async</artifactId>
-    <groupId>com.gobrs</groupId>
+    <groupId>io.github.memorydoc</groupId>
     <version>${revision}</version>
     <packaging>pom</packaging>
 
@@ -21,39 +21,11 @@
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <springboot.version>2.0.5.RELEASE</springboot.version>
+        <springboot.version>2.5.8</springboot.version>
         <jackson.version>2.12.6</jackson.version>
         <lombok.version>1.18.22</lombok.version>
         <ttl.version>2.11.2</ttl.version>
     </properties>
-
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <name>Memorydoc</name>
-            <email>17615195790@163.com</email>
-            <organization>Github</organization>
-        </developer>
-    </developers>
-
-    <scm>
-        <connection>scm:git:git@github.com:Memorydoc/gobrs-async-starter.git</connection>
-        <developerConnection>scm:git:git@github.com:Memorydoc/gobrs-async-starter.git</developerConnection>
-        <tag>master</tag>
-        <url>git@github.com:Memorydoc/gobrs-async-starter.git</url>
-    </scm>
-
-    <issueManagement>
-        <system>Github Issue</system>
-        <url>https://github.com/Memorydoc/gobrs-async-starter/issues</url>
-    </issueManagement>
 
 
     <dependencyManagement>
@@ -71,22 +43,22 @@
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>com.gobrs</groupId>
+                <groupId>io.github.memorydoc</groupId>
                 <artifactId>gobrs-async-core</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>com.gobrs</groupId>
+                <groupId>io.github.memorydoc</groupId>
                 <artifactId>gobrs-async-common</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>com.gobrs</groupId>
+                <groupId>io.github.memorydoc</groupId>
                 <artifactId>gobrs-async-example</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>com.gobrs</groupId>
+                <groupId>io.github.memorydoc</groupId>
                 <artifactId>gobrs-async-test</artifactId>
                 <version>${revision}</version>
             </dependency>
@@ -108,6 +80,18 @@
         </dependencies>
     </dependencyManagement>
 
+    <profiles>
+        <!-- 禁用注释检查 -->
+        <profile>
+            <id>disable-javadoc-doclint</id>
+            <activation>
+                <jdk>[1.8,)</jdk>
+            </activation>
+            <properties>
+                <javadoc.opts>-Xdoclint:none</javadoc.opts>
+            </properties>
+        </profile>
+    </profiles>
     <build>
         <plugins>
             <plugin>
@@ -217,6 +201,33 @@
             </plugin>
         </plugins>
     </build>
+
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Memorydoc</name>
+            <email>17615195790@163.com</email>
+            <organization>Github</organization>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:git@github.com:dromara/gobrs-async.git</connection>
+        <developerConnection>scm:git:git@github.com:dromara/gobrs-async.git</developerConnection>
+        <tag>master</tag>
+        <url>git@github.com:dromara/gobrs-async.git</url>
+    </scm>
+    <issueManagement>
+        <system>Github Issue</system>
+        <url>https://github.com/Memorydoc/gobrs-async-starter/issues</url>
+    </issueManagement>
+
     <distributionManagement>
         <repository>
             <id>sonatype-nexus-staging</id>
@@ -227,6 +238,5 @@
             <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
-
 
 </project>

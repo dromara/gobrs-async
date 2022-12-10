@@ -5,12 +5,12 @@
 
     <parent>
         <artifactId>gobrs-async</artifactId>
-        <groupId>com.gobrs</groupId>
+        <groupId>io.github.memorydoc</groupId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>com.gobrs</groupId>
+    <groupId>io.github.memorydoc</groupId>
     <artifactId>gobrs-async-example</artifactId>
     <name>gobrs-async-example</name>
     <description>gobrs-async-example</description>
@@ -32,7 +32,7 @@
             <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.gobrs</groupId>
+            <groupId>io.github.memorydoc</groupId>
             <artifactId>gobrs-async-test</artifactId>
         </dependency>
         <!-- 公网-->
