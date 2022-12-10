@@ -10,7 +10,6 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>io.github.memorydoc</groupId>
     <artifactId>gobrs-async-test</artifactId>
 
     <properties>

@@ -6,6 +6,10 @@
     <version>${revision}</version>
     <packaging>pom</packaging>
 
+    <name>gobrs-async</name>
+    <description>🔥 强大异步任务编排工具（没有依赖中间件）</description>
+    <url>https://github.com/dromara/gobrs-async</url>
+
     <modules>
         <module>gobrs-async-common</module>
         <module>gobrs-async-core</module>
@@ -15,7 +19,7 @@
     </modules>
 
     <properties>
-        <revision>1.2.6-RELEASE</revision>
+        <revision>1.2.7-RELEASE</revision>
         <jdk.version>1.8</jdk.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
@@ -225,7 +229,7 @@
     </scm>
     <issueManagement>
         <system>Github Issue</system>
-        <url>https://github.com/Memorydoc/gobrs-async-starter/issues</url>
+        <url>https://github.com/dromara/gobrs-async/issues</url>
     </issueManagement>
 
     <distributionManagement>

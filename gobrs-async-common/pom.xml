@@ -9,10 +9,7 @@
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
-    <groupId>io.github.memorydoc</groupId>
     <artifactId>gobrs-async-common</artifactId>
-
 
     <dependencies>
         <dependency>

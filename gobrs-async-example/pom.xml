@@ -10,10 +10,8 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>io.github.memorydoc</groupId>
     <artifactId>gobrs-async-example</artifactId>
-    <name>gobrs-async-example</name>
-    <description>gobrs-async-example</description>
+
     <properties>
         <java.version>1.8</java.version>
     </properties>

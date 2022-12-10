@@ -9,13 +9,7 @@
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <packaging>jar</packaging>
-    <groupId>io.github.memorydoc</groupId>
     <artifactId>gobrs-async-starter</artifactId>
-
-    <description>🔥 强大异步任务编排工具（没有依赖中间件）</description>
-    <url>https://github.com/Memorydoc/gobrs-async-starter</url>
-
 
     <properties>
         <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
