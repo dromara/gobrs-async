@@ -197,12 +197,11 @@ class TaskTrigger<P, R> {
      */
     TaskLoader trigger(AsyncParam<P> param, long timeout, Set<String> optionalTasks) {
 
-
         IdentityHashMap<AsyncTask, TaskActuator> newProcessMap = new IdentityHashMap<>(prepareTaskMap.size());
         /**
          * Create a com.gobrs.async.com.gobrs.async.test.task loader, A com.gobrs.async.com.gobrs.async.test.task flow corresponds to a taskLoader
          */
-        TaskLoader<P, R> loader = new TaskLoader<P, R>(ruleName, threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
+        TaskLoader<P, R> loader = new TaskLoader<>(ruleName, threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
 
         TaskSupport support = related(param, loader);
 
@@ -210,7 +209,7 @@ class TaskTrigger<P, R> {
             /**
              * clone Process for Thread isolation
              */
-            TaskActuator processor = (TaskActuator) prepareTaskMap.get(task).clone();
+            TaskActuator processor = (TaskActuator<?>) prepareTaskMap.get(task).clone();
 
             processor.init(support, param);
 
@@ -218,6 +217,7 @@ class TaskTrigger<P, R> {
         }
 
         Optimal.doOptimal(optionalTasks, loader, upwardTasksMapSpace);
+
         return loader;
     }
 

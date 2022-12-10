@@ -28,6 +28,7 @@ public class GobrsConfig {
      */
     public static final String PREFIX = ConfigPropertiesConstant.PREFIX;
 
+    private boolean enable;
 
     /**
      * Task rules

@@ -34,6 +34,15 @@ public class GobrsService {
     @Autowired(required = false)
     private RuleThermalLoad ruleThermalLoad;
 
+
+    /**
+     * Performance test.
+     */
+    public void performanceTest() {
+        gobrsAsync.go("performanceRule", () -> "");
+    }
+
+
     /**
      * Gobrs async.
      */

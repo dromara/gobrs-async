@@ -33,6 +33,7 @@ public class GobrsAsyncProperties {
     public static final String PREFIX = ConfigPropertiesConstant.PREFIX;
 
 
+    private boolean enable;
     /**
      * Task rules
      */
@@ -197,6 +198,25 @@ public class GobrsAsyncProperties {
      */
     public void setThreadPool(ThreadPool threadPool) {
         this.threadPool = threadPool;
+    }
+
+
+    /**
+     * Is enable boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isEnable() {
+        return enable;
+    }
+
+    /**
+     * Sets enable.
+     *
+     * @param enable the enable
+     */
+    public void setEnable(boolean enable) {
+        this.enable = enable;
     }
 
     /**

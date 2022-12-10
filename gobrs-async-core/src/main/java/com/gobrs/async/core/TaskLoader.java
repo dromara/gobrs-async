@@ -171,10 +171,14 @@ public class TaskLoader<P, R> {
             for (TaskActuator process : begins) {
                 /**
                  * Start the thread to perform tasks without any dependencies
+                 * Thread reuse
                  */
-                startProcess(process);
+                if (begins.size() == 1) {
+                    process.call();
+                } else {
+                    startProcess(process);
+                }
             }
-
             // wait
             waitIfNecessary();
             result = back(begins);

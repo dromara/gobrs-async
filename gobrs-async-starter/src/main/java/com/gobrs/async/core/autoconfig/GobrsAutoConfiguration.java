@@ -31,7 +31,6 @@ import org.springframework.context.annotation.Import;
  */
 @Configuration
 @AutoConfigureAfter({GobrsPropertyAutoConfiguration.class})
-@ConditionalOnBean(GobrsConfig.class)
 @ConditionalOnProperty(prefix = GobrsAsyncProperties.PREFIX, value = "enable", matchIfMissing = true, havingValue = "true")
 @Import(BeanHolder.class)
 public class GobrsAutoConfiguration {

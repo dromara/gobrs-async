@@ -1,6 +1,7 @@
 package com.gobrs.async.example.controller;
 
 import com.gobrs.async.example.service.GobrsService;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +22,18 @@ public class GobrsController {
     @Autowired
     private GobrsService gobrsService;
 
+
+    /**
+     * Performance string.
+     *
+     * @return the string
+     */
+    @RequestMapping("performance")
+    public String performance() {
+        gobrsService.performanceTest();
+        return Strings.EMPTY;
+    }
+
     /**
      * Gobrs test string.
      *
@@ -33,6 +46,11 @@ public class GobrsController {
     }
 
 
+    /**
+     * Update rule string.
+     *
+     * @return the string
+     */
     @RequestMapping("updateRule")
     public String updateRule() {
         gobrsService.updateRule();
