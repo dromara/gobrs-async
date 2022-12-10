@@ -21,7 +21,10 @@
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <springboot.version>2.5.8</springboot.version>
+        <springboot.version>2.0.5.RELEASE</springboot.version>
+        <jackson.version>2.12.6</jackson.version>
+        <lombok.version>1.18.22</lombok.version>
+        <ttl.version>2.11.2</ttl.version>
     </properties>
 
     <licenses>
@@ -39,12 +42,14 @@
             <organization>Github</organization>
         </developer>
     </developers>
+
     <scm>
         <connection>scm:git:git@github.com:Memorydoc/gobrs-async-starter.git</connection>
         <developerConnection>scm:git:git@github.com:Memorydoc/gobrs-async-starter.git</developerConnection>
         <tag>master</tag>
         <url>git@github.com:Memorydoc/gobrs-async-starter.git</url>
     </scm>
+
     <issueManagement>
         <system>Github Issue</system>
         <url>https://github.com/Memorydoc/gobrs-async-starter/issues</url>
@@ -56,7 +61,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.0.5.RELEASE</version>
+                <version>${springboot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -85,10 +90,49 @@
                 <artifactId>gobrs-async-test</artifactId>
                 <version>${revision}</version>
             </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>transmittable-thread-local</artifactId>
+                <version>${ttl.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
+
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.2</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- mvn javadoc:jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -129,20 +173,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
                 <version>3.7.1</version>
-            </plugin>
-            <!-- Javadoc -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.0.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
             <!-- Gpg Signature -->
             <plugin>
@@ -185,16 +215,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <proc>none</proc><!-- 该配置必须存在 -->
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
-                    <encoding>utf-8</encoding>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
     <distributionManagement>
@@ -207,7 +227,6 @@
             <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
-
 
 
 </project>

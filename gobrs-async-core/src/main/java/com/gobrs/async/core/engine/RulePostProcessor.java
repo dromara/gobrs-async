@@ -3,9 +3,9 @@ package com.gobrs.async.core.engine;
 import com.gobrs.async.core.GobrsAsync;
 import com.gobrs.async.core.GobrsPrint;
 import com.gobrs.async.core.config.ConfigManager;
-import com.gobrs.async.core.config.GobrsAsyncProperties;
 import com.gobrs.async.core.common.exception.NotTaskRuleException;
-import com.gobrs.async.core.config.RuleConfig;
+import com.gobrs.async.core.config.GobrsAsyncRule;
+import com.gobrs.async.core.config.GobrsConfig;
 import com.gobrs.async.core.holder.BeanHolder;
 
 import org.slf4j.Logger;
@@ -52,9 +52,9 @@ public class RulePostProcessor implements ApplicationListener<ApplicationReadyEv
     }
 
     private void init() {
-        GobrsAsyncProperties properties = BeanHolder.getBean(GobrsAsyncProperties.class);
+        GobrsConfig properties = BeanHolder.getBean(GobrsConfig.class);
         GobrsAsync gobrsAsync = BeanHolder.getBean(GobrsAsync.class);
-        List<RuleConfig> rules = properties.getRules();
+        List<GobrsAsyncRule> rules = properties.getRules();
         Optional.ofNullable(rules).map((data) -> {
             /**
              * The primary purpose of resolving a com.gobrs.async.rule is to check that the com.gobrs.async.rule is correct
@@ -65,7 +65,7 @@ public class RulePostProcessor implements ApplicationListener<ApplicationReadyEv
 
             try {
                 RuleEngine engine = BeanHolder.getBean(RuleEngine.class);
-                for (RuleConfig rule : rules) {
+                for (GobrsAsyncRule rule : rules) {
                     configManager.addRule(rule.getName(), rule);
                     engine.doParse(rule, false);
                     gobrsAsync.readyTo(rule.getName());

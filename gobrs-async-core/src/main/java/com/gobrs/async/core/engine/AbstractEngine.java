@@ -1,7 +1,7 @@
 package com.gobrs.async.core.engine;
 
 import com.gobrs.async.core.GobrsAsync;
-import com.gobrs.async.core.config.RuleConfig;
+import com.gobrs.async.core.config.GobrsAsyncRule;
 import com.gobrs.async.core.holder.BeanHolder;
 import com.gobrs.async.core.common.util.JsonUtil;
 
@@ -29,8 +29,8 @@ public abstract class AbstractEngine implements RuleEngine {
     @Override
     public void parse(String rule) {
         GobrsAsync gobrsAsync = BeanHolder.getBean(GobrsAsync.class);
-        List<RuleConfig> rules = JsonUtil.string2Obj(rule, List.class);
-        for (RuleConfig r : rules) {
+        List<GobrsAsyncRule> rules = JsonUtil.string2Obj(rule, List.class);
+        for (GobrsAsyncRule r : rules) {
             /**
              * true com.gobrs.async.rule enforcer
              */

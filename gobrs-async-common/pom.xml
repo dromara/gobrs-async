@@ -3,83 +3,16 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>7</source>
-                    <target>7</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
     <parent>
         <artifactId>gobrs-async</artifactId>
         <groupId>com.gobrs</groupId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+
     <groupId>com.gobrs</groupId>
     <artifactId>gobrs-async-common</artifactId>
 
-    <description>🔥 强大异步任务编排工具（没有依赖中间件）</description>
-    <url>https://github.com/Memorydoc/gobrs-async-starter</url>
-
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    <properties>
-        <maven.javadoc.failOnError>false</maven.javadoc.failOnError>
-        <java.version>1.8</java.version>
-        <spring-boot.version>2.3.2.RELEASE</spring-boot.version>
-        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <license-maven-plugin.version>3.0</license-maven-plugin.version>
-        <maven.source.plugin.version>3.0.1</maven.source.plugin.version>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <logback.version>1.2.3</logback.version>
-        <maven.javadoc.plugin.version>3.0.0</maven.javadoc.plugin.version>
-        <maven.compiler.plugin.version>3.6.1</maven.compiler.plugin.version>
-        <ttl.version>2.11.2</ttl.version>
-    </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.5.8</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-    <scm>
-        <connection>scm:git:git@github.com:Memorydoc/gobrs-async-starter.git</connection>
-        <developerConnection>scm:git:git@github.com:Memorydoc/gobrs-async-starter.git</developerConnection>
-        <tag>master</tag>
-        <url>git@github.com:Memorydoc/gobrs-async-starter.git</url>
-    </scm>
-    <issueManagement>
-        <system>Github Issue</system>
-        <url>https://github.com/Memorydoc/gobrs-async-starter/issues</url>
-    </issueManagement>
-    <distributionManagement>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 
     <dependencies>
         <dependency>

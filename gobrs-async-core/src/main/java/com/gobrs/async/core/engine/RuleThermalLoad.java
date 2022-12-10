@@ -1,7 +1,8 @@
 package com.gobrs.async.core.engine;
 
 import com.gobrs.async.core.GobrsAsync;
-import com.gobrs.async.core.config.RuleConfig;
+import com.gobrs.async.core.config.GobrsAsyncRule;
+import com.gobrs.async.core.config.GobrsConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +31,7 @@ public class RuleThermalLoad implements RuleThermal {
     private GobrsAsync gobrsAsync;
 
     @Override
-    public void load(RuleConfig rule) {
+    public void load(GobrsAsyncRule rule) {
         try {
             ruleEngine.doParse(rule, true);
             gobrsAsync.readyTo(rule.getName(), true);
@@ -42,7 +43,7 @@ public class RuleThermalLoad implements RuleThermal {
 
 
     @Override
-    public void load(List<RuleConfig> ruleList) {
+    public void load(List<GobrsAsyncRule> ruleList) {
         ruleList.stream().parallel().forEach(x -> {
             try {
                 ruleEngine.doParse(x, true);

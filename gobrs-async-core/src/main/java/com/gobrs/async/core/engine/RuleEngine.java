@@ -1,7 +1,8 @@
 package com.gobrs.async.core.engine;
 
 
-import com.gobrs.async.core.config.RuleConfig;
+import com.gobrs.async.core.config.GobrsAsyncRule;
+import com.gobrs.async.core.config.GobrsConfig;
 
 /**
  * The interface Rule com.gobrs.async.engine.
@@ -25,6 +26,6 @@ public interface RuleEngine extends Engine {
      * @param r      the r
      * @param reload the reload
      */
-    void doParse(RuleConfig r, boolean reload);
+    void doParse(GobrsAsyncRule r, boolean reload);
 
 }

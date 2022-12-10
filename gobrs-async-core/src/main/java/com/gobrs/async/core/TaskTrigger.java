@@ -3,7 +3,6 @@ package com.gobrs.async.core;
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.util.SystemClock;
 import com.gobrs.async.core.config.ConfigManager;
-import com.gobrs.async.core.config.RuleConfig;
 import com.gobrs.async.core.holder.BeanHolder;
 import com.gobrs.async.core.log.LogWrapper;
 import com.gobrs.async.core.task.AsyncTask;

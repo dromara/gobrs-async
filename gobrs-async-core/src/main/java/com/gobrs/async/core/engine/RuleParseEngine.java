@@ -3,10 +3,10 @@ package com.gobrs.async.core.engine;
 import com.gobrs.async.core.GobrsAsync;
 import com.gobrs.async.core.TaskReceive;
 import com.gobrs.async.core.anno.Task;
-import com.gobrs.async.core.config.GobrsAsyncProperties;
 import com.gobrs.async.core.common.def.Constant;
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
-import com.gobrs.async.core.config.RuleConfig;
+import com.gobrs.async.core.config.GobrsAsyncRule;
+import com.gobrs.async.core.config.GobrsConfig;
 import com.gobrs.async.core.holder.BeanHolder;
 import com.gobrs.async.core.task.AsyncTask;
 import org.springframework.util.StringUtils;
@@ -32,16 +32,16 @@ import static com.gobrs.async.core.common.def.DefaultConfig.*;
 public class RuleParseEngine<T> extends AbstractEngine {
 
     @Resource
-    private GobrsAsyncProperties gobrsAsyncProperties;
+    private GobrsConfig gobrsConfig;
 
 
     @Resource
     private GobrsAsync gobrsAsync;
 
     @Override
-    public void doParse(RuleConfig rule, boolean reload) {
+    public void doParse(GobrsAsyncRule rule, boolean reload) {
 
-        String[] taskFlows = rule.getContent().replaceAll("\\s+", "").split(gobrsAsyncProperties.getSplit());
+        String[] taskFlows = rule.getContent().replaceAll("\\s+", "").split(gobrsConfig.getSplit());
         /**
          * cache rules
          */
@@ -51,7 +51,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
 
         for (String taskFlow : taskFlows) {
 
-            String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
+            String[] taskArr = taskFlow.split(gobrsConfig.getPoint());
             if (taskArr.length == 0) {
                 throw new GobrsAsyncException("com.gobrs.async.rule com.gobrs.async.config error !!!");
             }
@@ -75,7 +75,7 @@ public class RuleParseEngine<T> extends AbstractEngine {
             /**
              * Parse tasks according to parsing rules
              */
-            String[] taskArr = taskFlow.split(gobrsAsyncProperties.getPoint());
+            String[] taskArr = taskFlow.split(gobrsConfig.getPoint());
             List<String> arrayList = Arrays.asList(taskArr);
             String leftTaskName = arrayList.get(0);
             TaskReceive taskReceive;

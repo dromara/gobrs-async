@@ -1,7 +1,8 @@
 package com.gobrs.async.test;
 
+import com.gobrs.async.core.config.GobrsAsyncRule;
 import com.gobrs.async.core.engine.RuleThermalLoad;
-import com.gobrs.async.core.config.RuleConfig;
+import com.gobrs.async.core.property.RuleConfig;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -26,8 +27,8 @@ public class RuleConfigUpdate {
      * @param rule the com.gobrs.async.rule
      */
     @Test
-    public void updateRule(RuleConfig rule) {
-        RuleConfig r = new RuleConfig();
+    public void updateRule(GobrsAsyncRule rule) {
+        GobrsAsyncRule r = new GobrsAsyncRule();
         r.setName("anyConditionGeneral");
         r.setContent("AService->CService->EService->GService; BService->DService->FService->HService;");
         ruleThermalLoad.load(rule);

@@ -1,9 +1,9 @@
 package com.gobrs.async.core.autoconfig;
 
-import com.gobrs.async.core.GobrsAsync;
-import com.gobrs.async.core.TaskFlow;
-import com.gobrs.async.core.config.*;
+import com.gobrs.async.core.*;
+import com.gobrs.async.core.property.GobrsAsyncProperties;
 import com.gobrs.async.core.callback.*;
+import com.gobrs.async.core.config.*;
 import com.gobrs.async.core.engine.RuleEngine;
 import com.gobrs.async.core.engine.RuleParseEngine;
 import com.gobrs.async.core.engine.RulePostProcessor;
@@ -13,7 +13,6 @@ import com.gobrs.async.core.threadpool.GobrsAsyncThreadPoolFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,7 +28,6 @@ import org.springframework.context.annotation.Configuration;
  * @Version 1.0
  */
 @Configuration
-@EnableConfigurationProperties({GobrsAsyncProperties.class, RuleConfig.class, LogConfig.class})
 @ConditionalOnProperty(prefix = GobrsAsyncProperties.PREFIX, value = "enable", matchIfMissing = true, havingValue = "true")
 public class GobrsAutoConfiguration {
 
@@ -40,16 +38,16 @@ public class GobrsAutoConfiguration {
     public GobrsAutoConfiguration() {
     }
 
-    private GobrsAsyncProperties gobrsAsyncProperties;
+    private GobrsConfig gobrsConfig;
 
 
     /**
      * Instantiates a new Gobrs auto configuration.
      *
-     * @param gobrsAsyncProperties the gobrs async properties
+     * @param gobrsConfig the gobrs config
      */
-    public GobrsAutoConfiguration(GobrsAsyncProperties gobrsAsyncProperties) {
-        this.gobrsAsyncProperties = gobrsAsyncProperties;
+    public GobrsAutoConfiguration(GobrsConfig gobrsConfig) {
+        this.gobrsConfig = gobrsConfig;
     }
 
     /**
@@ -65,12 +63,12 @@ public class GobrsAutoConfiguration {
     /**
      * Gobrs async thread pool factory gobrs async thread pool factory.
      *
-     * @param grabrsAsyncProperties the grabrs async properties
+     * @param gobrsConfig the gobrs config
      * @return the gobrs async thread pool factory
      */
     @Bean
-    public GobrsAsyncThreadPoolFactory gobrsAsyncThreadPoolFactory(GobrsAsyncProperties grabrsAsyncProperties) {
-        return new GobrsAsyncThreadPoolFactory(grabrsAsyncProperties);
+    public GobrsAsyncThreadPoolFactory gobrsAsyncThreadPoolFactory(GobrsConfig gobrsConfig) {
+        return new GobrsAsyncThreadPoolFactory(gobrsConfig);
     }
 
 
@@ -88,12 +86,12 @@ public class GobrsAutoConfiguration {
     /**
      * Config factory config factory.
      *
-     * @param gobrsAsyncProperties the gobrs async properties
+     * @param gobrsConfig the gobrs config
      * @return the config factory
      */
     @Bean
-    public ConfigFactory configFactory(GobrsAsyncProperties gobrsAsyncProperties) {
-        return new ConfigFactory(gobrsAsyncProperties);
+    public ConfigFactory configFactory(GobrsConfig gobrsConfig) {
+        return new ConfigFactory(gobrsConfig);
     }
 
     /**

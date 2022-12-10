@@ -1,16 +1,14 @@
-package com.gobrs.async.core.config;
+package com.gobrs.async.core.property;
 
+
+import com.gobrs.async.core.common.constant.ConfigPropertiesConstant;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import com.gobrs.async.core.common.constant.ConfigPropertiesConstant;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Component;
 
 import static com.gobrs.async.core.common.def.DefaultConfig.*;
 

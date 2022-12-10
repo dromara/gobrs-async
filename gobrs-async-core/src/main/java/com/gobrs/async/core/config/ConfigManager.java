@@ -5,7 +5,6 @@ import com.gobrs.async.core.common.exception.GobrsAsyncException;
 import com.gobrs.async.core.holder.BeanHolder;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -39,7 +38,7 @@ public class ConfigManager {
      *
      * @return the global config
      */
-    public static GobrsAsyncProperties getGlobalConfig() {
+    public static GobrsConfig getGlobalConfig() {
         return checkAndGet().getGobrsAsyncProperties();
     }
 
@@ -49,7 +48,7 @@ public class ConfigManager {
      * @param ruleName the rule name
      * @return the rule
      */
-    public static RuleConfig getRule(String ruleName) {
+    public static GobrsAsyncRule getRule(String ruleName) {
         return checkAndGet().getProcessRules().get(ruleName);
     }
 
@@ -74,7 +73,7 @@ public class ConfigManager {
      * @param ruleName the rule name
      * @param rule     the rule
      */
-    public void addRule(String ruleName, RuleConfig rule) {
+    public void addRule(String ruleName, GobrsAsyncRule rule) {
         configFactory.addRule(ruleName, rule);
     }
 
@@ -92,7 +91,7 @@ public class ConfigManager {
          * @return the boolean
          */
         public static boolean errLogabled(String ruleName) {
-            return defaultRule(() -> getRule(ruleName).getLogConfig().getErrLogabled(), DefaultConfig.ERR_LOGABLED);
+            return defaultRule(() -> getRule(ruleName).getErrLogabled(), DefaultConfig.ERR_LOGABLED);
         }
 
         /**
@@ -104,7 +103,7 @@ public class ConfigManager {
          * @return the boolean
          */
         public static boolean costLogabled(String ruleName) {
-            return defaultRule(() -> getRule(ruleName).getLogConfig().getCostLogabled(), DefaultConfig.COST_LOGABLED);
+            return defaultRule(() -> getRule(ruleName).getCostLogabled(), DefaultConfig.COST_LOGABLED);
 
         }
 
