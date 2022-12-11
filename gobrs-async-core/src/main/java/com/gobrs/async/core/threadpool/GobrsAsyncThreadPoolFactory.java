@@ -66,10 +66,10 @@ public class GobrsAsyncThreadPoolFactory {
      *
      * @return the thread pool executor
      */
-    ThreadPoolExecutor createDefaultThreadPool() {
+    ExecutorService createDefaultThreadPool() {
         GobrsConfig.ThreadPool threadPool = gobrsConfig.getThreadPool();
         if (Objects.isNull(threadPool)) {
-            return (ThreadPoolExecutor) Executors.newCachedThreadPool();
+            return Executors.newCachedThreadPool();
         }
         return new ThreadPoolExecutor(threadPool.getCorePoolSize(),
                 threadPool.getMaxPoolSize(), threadPool.getKeepAliveTime(), threadPool.getTimeUnit(),
