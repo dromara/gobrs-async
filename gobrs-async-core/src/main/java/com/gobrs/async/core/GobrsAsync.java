@@ -3,7 +3,7 @@ package com.gobrs.async.core;
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.AsyncResult;
 import com.gobrs.async.core.task.AsyncTask;
-import com.gobrs.async.core.common.exception.NotTaskRuleException;
+import com.gobrs.async.core.common.exception.NotFoundGobrsRuleException;
 
 import java.util.*;
 
@@ -110,7 +110,7 @@ public class GobrsAsync {
         if (check(ruleName).isPresent()) {
             return trigger.get(ruleName).trigger(param, timeout, optionalTasks).load();
         }
-        throw new NotTaskRuleException("Gobrs Rule Name Is Error!!!");
+        throw new NotFoundGobrsRuleException("Gobrs Rule Name Is Error!!!");
     }
 
 

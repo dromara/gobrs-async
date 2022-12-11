@@ -2,27 +2,35 @@ gobrs:
   async:
     config:
       rules:
-        - name: "performanceRule"
-          content: "taskA->taskB->TaskC"
+        - name: "performance"
+          content: "taskA->taskB,TaskC->taskD->taskE,taskF"
+
         # 规则 是数组类型的 多组规则
         - name: "general" # 猜想下面的流程 gobrs 会开启几个线程？ 注意看打印的日志哦～
           content: "AService->BService->FService,CService,EService->GService,HService" # AService: 300ms + FService: 2000ms + GService: 100  = 2400ms
           task-interrupt: false # 局部异常是否打断主流程 默认false
           transaction: false
           logConfig:
-            costLogabled: false # 开启任务耗时打印 log日志级别需要为 error 默认true
+            costLogabled: true # 开启任务耗时打印 log日志级别需要为 error 默认true
             errLogabled: true # 开启任务异常打印 默认true
+
         - name: "anyConditionGeneral"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition"
           logConfig:
             costLogabled: true # 开启任务耗时打印 log日志级别需要为 error 默认true
             errLogabled: true # 开启任务异常打印 默认true
+
         #  AServiceCondition 、BServiceCondition、CServiceCondition任务谁返回true 谁有资格继续往下执行
         - name: "anyConditionRule"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition"
 
         - name: "anyConditionRuleAppend"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition->EServiceCondition"
+        - name: "retryRule"
+          content: "caseRetryTaskA->caseRetryTaskB,caseRetryTaskC"
+
+        - name: "optionalRule"
+          content: "caseOptionalTaskA->caseOptionalTaskB->caseOptionalTaskC,caseOptionalTaskD->caseOptionalTaskE->caseOptionalTaskF"
 
         ## 单一任务超时时间
         - name: "timeoutRule"
@@ -58,3 +66,5 @@ gobrs:
           task-interrupt: true # 局部异常是否打断主流程 默认 false
 server:
   port: 8888 # 端口: 8888
+
+

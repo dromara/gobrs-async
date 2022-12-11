@@ -14,7 +14,7 @@ import com.gobrs.async.core.log.LogCreator;
 import com.gobrs.async.core.log.LogWrapper;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
-import com.gobrs.async.core.common.exception.TimeoutException;
+import com.gobrs.async.core.common.exception.AsyncTaskTimeoutException;
 import com.gobrs.async.core.timer.GobrsTimer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
@@ -322,7 +322,7 @@ public class TaskLoader<P, R> {
             if (processTimeout > 0) {
                 if (!completeLatch.await(processTimeout, TimeUnit.MILLISECONDS)) {
                     cancel();
-                    throw new TimeoutException();
+                    throw new AsyncTaskTimeoutException();
                 }
             } else {
                 completeLatch.await();
@@ -393,7 +393,7 @@ public class TaskLoader<P, R> {
                 if (!future.isDone()
                         && taskActuator.getTaskSupport().getStatus(taskActuator.getTask().getClass()).compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT)
                         && future.cancel(true)) {
-                    throw new TimeoutException(String.format("task %s TimeoutException", taskActuator.getTask().getName()));
+                    throw new AsyncTaskTimeoutException(String.format("task %s TimeoutException", taskActuator.getTask().getName()));
                 }
             }
 

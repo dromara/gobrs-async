@@ -52,7 +52,7 @@ class TaskTrigger<P, R> {
     /**
      * The Upward tasks map space.
      */
-    public static Map<AsyncTask, List<AsyncTask>> upwardTasksMapSpace = new ConcurrentHashMap<>();
+    public static Map<String, Map<AsyncTask, List<AsyncTask>>> upwardTasksMapSpace = new ConcurrentHashMap<>();
 
     /**
      * Instantiates a new Task trigger.
@@ -112,7 +112,7 @@ class TaskTrigger<P, R> {
 
         downTasksMap.put(assistantTask, new ArrayList<>(0));
         upwardTasksMap.put(assistantTask, noSubtasks);
-        upwardTasksMapSpace = upwardTasksMap;
+        upwardTasksMapSpace.put(ruleName,upwardTasksMap);
         clear();
         for (AsyncTask task : downTasksMap.keySet()) {
             TaskActuator process;
@@ -216,7 +216,7 @@ class TaskTrigger<P, R> {
             newProcessMap.put(task, processor);
         }
 
-        Optimal.doOptimal(optionalTasks, loader, upwardTasksMapSpace);
+        Optimal.doOptimal(optionalTasks, loader, upwardTasksMapSpace.get(ruleName));
 
         return loader;
     }

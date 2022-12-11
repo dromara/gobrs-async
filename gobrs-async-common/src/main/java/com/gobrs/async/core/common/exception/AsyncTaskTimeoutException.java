@@ -5,19 +5,18 @@ package com.gobrs.async.core.common.exception;
  * The type Timeout com.gobrs.async.exception.
  *
  * @program: gobrs -async-starter
- * @ClassName TimeoutException
  * @description:
  * @author: sizegang
  * @create: 2022 -03-16
  */
-public class TimeoutException extends GobrsAsyncException {
+public class AsyncTaskTimeoutException extends GobrsAsyncException {
 
     private static final long serialVersionUID = -5423490721470482068L;
 
     /**
      * Instantiates a new Timeout com.gobrs.async.exception.
      */
-    public TimeoutException() {
+    public AsyncTaskTimeoutException() {
         super();
     }
 
@@ -27,7 +26,7 @@ public class TimeoutException extends GobrsAsyncException {
      * @param message the message
      * @param cause   the cause
      */
-    public TimeoutException(String message, Throwable cause) {
+    public AsyncTaskTimeoutException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -36,7 +35,7 @@ public class TimeoutException extends GobrsAsyncException {
      *
      * @param message the message
      */
-    public TimeoutException(String message) {
+    public AsyncTaskTimeoutException(String message) {
         super(message);
     }
 
@@ -45,7 +44,7 @@ public class TimeoutException extends GobrsAsyncException {
      *
      * @param cause the cause
      */
-    public TimeoutException(Throwable cause) {
+    public AsyncTaskTimeoutException(Throwable cause) {
         super(cause);
     }
 

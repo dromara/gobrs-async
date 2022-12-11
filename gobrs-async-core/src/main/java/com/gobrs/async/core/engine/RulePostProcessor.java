@@ -3,7 +3,7 @@ package com.gobrs.async.core.engine;
 import com.gobrs.async.core.GobrsAsync;
 import com.gobrs.async.core.GobrsPrint;
 import com.gobrs.async.core.config.ConfigManager;
-import com.gobrs.async.core.common.exception.NotTaskRuleException;
+import com.gobrs.async.core.common.exception.NotFoundGobrsRuleException;
 import com.gobrs.async.core.config.GobrsAsyncRule;
 import com.gobrs.async.core.config.GobrsConfig;
 import com.gobrs.async.core.holder.BeanHolder;
@@ -77,7 +77,7 @@ public class RulePostProcessor implements ApplicationListener<ApplicationReadyEv
             GobrsPrint.printBanner();
             GobrsPrint.getVersion();
             return 1;
-        }).orElseThrow(() -> new NotTaskRuleException("com.gobrs.async.rule parse error"));
+        }).orElseThrow(() -> new NotFoundGobrsRuleException("com.gobrs.async.rule parse error"));
     }
 
 

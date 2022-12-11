@@ -10,11 +10,11 @@ package com.gobrs.async.core.common.exception;
  * @create: 2022 -01-27
  * @Version 1.0
  */
-public class NotTaskRuleException extends RuntimeException {
+public class NotFoundGobrsRuleException extends RuntimeException {
     /**
      * Instantiates a new Not com.gobrs.async.com.gobrs.async.test.task com.gobrs.async.rule com.gobrs.async.exception.
      */
-    public NotTaskRuleException() {
+    public NotFoundGobrsRuleException() {
         super();
     }
 
@@ -23,7 +23,7 @@ public class NotTaskRuleException extends RuntimeException {
      *
      * @param message the message
      */
-    public NotTaskRuleException(String message) {
+    public NotFoundGobrsRuleException(String message) {
         super(message);
     }
 

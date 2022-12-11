@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The type Gobrs service.
@@ -77,5 +79,12 @@ public class GobrsService {
         r.setContent("AService->CService->EService->GService; BService->DService->FService->HService;");
         ruleThermalLoad.load(r);
 
+    }
+
+    public void optionalProcess() {
+        Map<Class, Object> params = new HashMap<>();
+        Set<String> options = new HashSet<>();
+        options.add("caseOptionalTaskD");
+        AsyncResult asyncResult = gobrsAsync.go("optionalRule", () -> params, options, 300000);
     }
 }

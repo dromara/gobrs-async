@@ -75,7 +75,15 @@ public class GobrsController {
         gobrsService.gobrsAsync();
         //结束时间: 当前时间 - 开始时间
         long coust = System.currentTimeMillis() - start;
-        System.out.println("gobrs-Async " + coust);
+        System.out.println("cost " + coust);
 
+    }
+
+    @RequestMapping("optional")
+    public void optional() {
+        long start = System.currentTimeMillis();
+        gobrsService.optionalProcess();
+        long coust = System.currentTimeMillis() - start;
+        System.out.println("cost " + coust);
     }
 }
