@@ -9,7 +9,6 @@ import com.gobrs.async.core.property.GobrsAsyncProperties;
 import com.gobrs.async.core.property.LogConfig;
 import com.gobrs.async.core.property.RuleConfig;
 import com.gobrs.async.core.config.GobrsConfig;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,7 +25,6 @@ import java.util.stream.Collectors;
  * @create: 2022 -12-10
  */
 @Configuration
-@EnableConfigurationProperties({GobrsAsyncProperties.class, RuleConfig.class, LogConfig.class})
 public class GobrsPropertyAutoConfiguration {
 
 

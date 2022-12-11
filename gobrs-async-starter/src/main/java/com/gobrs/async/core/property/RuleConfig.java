@@ -1,10 +1,8 @@
 package com.gobrs.async.core.property;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.io.Serializable;
 
-import static com.gobrs.async.core.common.constant.ConfigPropertiesConstant.RULES;
 
 /**
  * The type Rule.
@@ -18,8 +16,7 @@ import static com.gobrs.async.core.common.constant.ConfigPropertiesConstant.RULE
  * @Version 1.0
  * @date 2022 -01-27
  */
-@ConfigurationProperties(prefix = RULES)
-public class RuleConfig implements Serializable {
+public class RuleConfig {
 
     private String name;
 

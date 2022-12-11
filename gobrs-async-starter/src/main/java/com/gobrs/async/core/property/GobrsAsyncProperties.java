@@ -3,6 +3,9 @@ package com.gobrs.async.core.property;
 
 import com.gobrs.async.core.common.constant.ConfigPropertiesConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -24,7 +27,10 @@ import static com.gobrs.async.core.common.def.DefaultConfig.*;
  * @Version 1.0
  * @date 2022 -01-27 22:04
  */
-@ConfigurationProperties(prefix = GobrsAsyncProperties.PREFIX)
+
+@ConfigurationProperties(prefix = GobrsAsyncProperties.PREFIX, ignoreInvalidFields = false)
+@PropertySource(value = {"classpath:config/gobrs.yaml", "classpath:config/gobrs.yml", "classpath:config/gobrs.properties"}, ignoreResourceNotFound = false, factory = GobbrsPropertySourceFactory.class)
+@Component
 public class GobrsAsyncProperties {
 
     /**
