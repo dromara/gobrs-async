@@ -403,7 +403,7 @@ public class TaskLoader<P, R> {
             }
         };
 
-        Reference<GobrsTimer.TimerListener> tl = GobrsTimer.getInstance(100).addTimerListener(listener);
+        Reference<GobrsTimer.TimerListener> tl = GobrsTimer.getInstance(ConfigManager.getGlobalConfig().getTimeoutCoreSize()).addTimerListener(listener);
         timerListeners.put(taskActuator.getTask().getClass(), tl);
         futureMaps.put(taskActuator.task.getClass(), future);
         return future;

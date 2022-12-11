@@ -1,12 +1,15 @@
 
 package com.gobrs.async.core.timer;
 
+import com.gobrs.async.core.common.util.ThreadPoolUtil;
+import com.gobrs.async.core.config.ConfigManager;
 import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.util.Objects;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -38,12 +41,18 @@ public class GobrsTimer {
      * @return the instance
      */
     public static GobrsTimer getInstance(Integer timerCorePoolSize) {
+
         if (INSTANCE == null) {
             synchronized (GobrsTimer.class) {
                 if (INSTANCE != null) {
                     return INSTANCE;
                 }
+
+                if (Objects.isNull(timerCorePoolSize)) {
+                    timerCorePoolSize = ThreadPoolUtil.calculateCoreNum();
+                }
                 return INSTANCE = new GobrsTimer(timerCorePoolSize);
+
             }
         }
         return INSTANCE;

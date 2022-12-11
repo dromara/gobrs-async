@@ -48,6 +48,11 @@ public class GobrsConfig {
 
     private ThreadPool threadPool;
 
+    /**
+     * 超时时间监听时间
+     */
+    private Integer timeoutCoreSize;
+
 
     /**
      * Whether global parameter dataContext mode  Parameter context

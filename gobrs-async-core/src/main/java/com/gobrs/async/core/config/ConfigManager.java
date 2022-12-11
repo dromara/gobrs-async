@@ -39,7 +39,7 @@ public class ConfigManager {
      * @return the global config
      */
     public static GobrsConfig getGlobalConfig() {
-        return checkAndGet().getGobrsAsyncProperties();
+        return checkAndGet().getGobrsConfig();
     }
 
     /**
@@ -66,6 +66,14 @@ public class ConfigManager {
         return configFactory;
     }
 
+    /**
+     * Gets config.
+     *
+     * @return the config
+     */
+    public GobrsConfig getConfig() {
+        return checkAndGet().getGobrsConfig();
+    }
 
     /**
      * Add rule.

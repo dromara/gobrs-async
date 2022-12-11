@@ -47,7 +47,7 @@ public class ConfigFactory {
      *
      * @return the gobrs async properties
      */
-    public GobrsConfig getGobrsAsyncProperties() {
+    public GobrsConfig getGobrsConfig() {
         return gobrsConfig;
     }
 
