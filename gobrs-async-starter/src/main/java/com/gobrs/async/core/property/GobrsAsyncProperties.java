@@ -51,6 +51,10 @@ public class GobrsAsyncProperties {
 
 
     private ThreadPool threadPool;
+    /**
+     * 超时时间监听时间
+     */
+    private Integer timeoutCoreSize;
 
 
     /**
@@ -217,6 +221,24 @@ public class GobrsAsyncProperties {
      */
     public void setEnable(boolean enable) {
         this.enable = enable;
+    }
+
+    /**
+     * Gets timeout core size.
+     *
+     * @return the timeout core size
+     */
+    public Integer getTimeoutCoreSize() {
+        return timeoutCoreSize;
+    }
+
+    /**
+     * Sets timeout core size.
+     *
+     * @param timeoutCoreSize the timeout core size
+     */
+    public void setTimeoutCoreSize(Integer timeoutCoreSize) {
+        this.timeoutCoreSize = timeoutCoreSize;
     }
 
     /**

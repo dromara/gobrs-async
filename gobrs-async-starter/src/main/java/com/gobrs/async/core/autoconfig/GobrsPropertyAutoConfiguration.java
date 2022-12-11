@@ -47,6 +47,7 @@ public class GobrsPropertyAutoConfiguration {
         gobrsConfig.setParamContext(gobrsConfig.isParamContext());
         gobrsConfig.setTimeout(properties.getTimeout());
         gobrsConfig.setRelyDepend(properties.isRelyDepend());
+        gobrsConfig.setTimeoutCoreSize(properties.getTimeoutCoreSize());
 
         threadPool(properties, gobrsConfig);
 
@@ -76,7 +77,7 @@ public class GobrsPropertyAutoConfiguration {
      */
     private void threadPool(GobrsAsyncProperties properties, GobrsConfig gobrsConfig) {
         GobrsAsyncProperties.ThreadPool threadPool = properties.getThreadPool();
-        if(Objects.nonNull(threadPool)){
+        if (Objects.nonNull(threadPool)) {
             ThreadPool tp = new ThreadPool();
             tp.setCorePoolSize(threadPool.getCorePoolSize());
             tp.setMaxPoolSize(threadPool.getMaxPoolSize());
