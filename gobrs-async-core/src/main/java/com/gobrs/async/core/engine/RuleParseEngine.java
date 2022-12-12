@@ -150,13 +150,13 @@ public class RuleParseEngine<T> extends AbstractEngine {
              * Parse annotation configuration
              */
 
-            task.setDesc(getTaskAnnotion(task, (anno) -> anno.desc(), String.class));
-            task.setDesc(getTaskAnnotion(task, (anno) -> anno.desc(), String.class));
-            task.setCallback(getTaskAnnotion(task, (anno) -> anno.callback(), Boolean.class));
-            task.setRetryCount(getTaskAnnotion(task, (anno) -> anno.retryCount(), Integer.class));
-            task.setFailSubExec(getTaskAnnotion(task, (anno) -> anno.failSubExec(), Boolean.class));
-            task.setTimeoutInMilliseconds(getTaskAnnotion(task, (anno) -> anno.timeoutInMilliseconds(), Integer.class));
-            String annotionTaskName = getTaskAnnotion(task, (anno) -> anno.desc(), String.class);
+            task.setDesc(getTaskAnnotion(task, taskName, (anno) -> anno.desc(), String.class));
+            task.setDesc(getTaskAnnotion(task, taskName, (anno) -> anno.desc(), String.class));
+            task.setCallback(getTaskAnnotion(task, taskName, (anno) -> anno.callback(), Boolean.class));
+            task.setRetryCount(getTaskAnnotion(task, taskName, (anno) -> anno.retryCount(), Integer.class));
+            task.setFailSubExec(getTaskAnnotion(task, taskName, (anno) -> anno.failSubExec(), Boolean.class));
+            task.setTimeoutInMilliseconds(getTaskAnnotion(task, taskName, (anno) -> anno.timeoutInMilliseconds(), Integer.class));
+            String annotionTaskName = getTaskAnnotion(task, taskName, (anno) -> anno.desc(), String.class);
 
             if (!StringUtils.isEmpty(annotionTaskName)) {
                 task.setName(annotionTaskName);
@@ -229,8 +229,11 @@ public class RuleParseEngine<T> extends AbstractEngine {
          * @param <T>
          * @return
          */
-        private static <T> T getTaskAnnotion(AsyncTask task, Function<Task, T> function, Class<T> tClass) {
+        private static <T> T getTaskAnnotion(AsyncTask task, String taskName, Function<Task, T> function, Class<T> tClass) {
             Task annotation = task.getClass().getAnnotation(Task.class);
+            if (Objects.isNull(annotation)) {
+                throw new GobrsAsyncException(String.format("Tasks %s are not annotated with @Task", taskName));
+            }
             return function.apply(annotation);
         }
 
