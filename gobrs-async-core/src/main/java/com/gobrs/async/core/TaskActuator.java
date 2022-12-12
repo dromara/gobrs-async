@@ -1,28 +1,31 @@
 package com.gobrs.async.core;
 
 import com.gobrs.async.core.callback.ErrorCallback;
-import com.gobrs.async.core.config.ConfigManager;
-import com.gobrs.async.core.common.domain.AsyncParam;
-import com.gobrs.async.core.common.enums.ResultState;
-import com.gobrs.async.core.log.TraceUtil;
-import com.gobrs.async.core.task.TaskUtil;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
+import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.TaskResult;
+import com.gobrs.async.core.common.enums.ResultState;
+import com.gobrs.async.core.config.ConfigManager;
+import com.gobrs.async.core.log.TraceUtil;
 import com.gobrs.async.core.task.AsyncTask;
+import com.gobrs.async.core.task.TaskUtil;
 import com.gobrs.async.core.timer.GobrsTimer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.ref.Reference;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.gobrs.async.core.common.def.DefaultConfig.*;
+import static com.gobrs.async.core.common.def.DefaultConfig.TASK_FINISH;
+import static com.gobrs.async.core.common.def.DefaultConfig.TASK_INITIALIZE;
 
 /**
  * The type Task actuator.
@@ -235,8 +238,6 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
         Optimal.optimalCount(support.taskLoader);
 
-        support.setStatus(this.getClass(), new AtomicInteger(TASK_INITIALIZE));
-
         if (!retryTask(parameter, taskLoader)) {
 
             support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
@@ -351,11 +352,11 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      */
     private boolean retryTask(Object parameter, TaskLoader taskLoader) {
         try {
-            AtomicInteger status = support.getStatus(this.getClass());
+            AtomicInteger retryCounts = support.getStatus(task.getClass()).getRetryCounts();
 
-            if (task.getRetryCount() > 1 && task.getRetryCount() > status.get()) {
+            if (task.getRetryCount() > 1 && task.getRetryCount() > retryCounts.get()) {
 
-                status.incrementAndGet();
+                retryCounts.incrementAndGet();
 
                 doTaskWithRetryConditional(parameter, taskLoader);
 

@@ -1,18 +1,14 @@
 package com.gobrs.async.core;
 
 import com.gobrs.async.core.common.domain.TaskResult;
+import com.gobrs.async.core.common.domain.TaskStatus;
 import com.gobrs.async.core.log.LogWrapper;
-import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static com.gobrs.async.core.common.def.DefaultConfig.TASK_INITIALIZE;
 
 /**
  * The type Task support.
@@ -63,7 +59,7 @@ public class TaskSupport {
      */
     private Map<Class, TaskResult> resultMap = new ConcurrentHashMap<>();
 
-    private Map<Class, AtomicInteger> taskStatus = new ConcurrentHashMap<>();
+    private Map<Class, TaskStatus> taskStatus = new ConcurrentHashMap<>();
 
     /**
      * Gets status.
@@ -71,27 +67,8 @@ public class TaskSupport {
      * @param clazz the clazz
      * @return the status
      */
-    public synchronized AtomicInteger getStatus(Class clazz) {
-        AtomicInteger atomicInteger = taskStatus.get(clazz);
-        if (Objects.isNull(atomicInteger)) {
-            return setStatus(clazz, new AtomicInteger(TASK_INITIALIZE));
-        }
-        return atomicInteger;
-    }
-
-    /**
-     * Sets status.
-     *
-     * @param clazz the clazz
-     * @param state the state
-     * @return the status
-     */
-    public AtomicInteger setStatus(Class clazz, AtomicInteger state) {
-        AtomicInteger put = taskStatus.put(clazz, state);
-        if (put == null) {
-            return state;
-        }
-        return put;
+    public TaskStatus getStatus(Class clazz) {
+        return taskStatus.computeIfAbsent(clazz, TaskStatus::new);
     }
 
 
