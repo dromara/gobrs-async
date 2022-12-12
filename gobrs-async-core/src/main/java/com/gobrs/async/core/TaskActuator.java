@@ -310,14 +310,14 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
             List<AsyncTask> asyncTaskList = upwardTasksMap.get(task);
 
-            Map<AsyncTask, Future> futuresAsync = support.getTaskLoader().futureMaps;
+            Map<AsyncTask<?, Result>, Future<?>> futureMaps = support.getTaskLoader().futureMaps;
 
-            futuresAsync.forEach((x, y) -> {
+            futureMaps.forEach((x, y) -> {
 
                 if (asyncTaskList.contains(x)) {
-
                     y.cancel(true);
                 }
+
             });
 
         }

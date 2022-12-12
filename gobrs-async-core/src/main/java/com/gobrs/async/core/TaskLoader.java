@@ -97,7 +97,7 @@ public class TaskLoader<P, R> {
     /**
      * The Futures async.
      */
-    public final Map<Class<?>, Future> futureMaps = new ConcurrentHashMap<>();
+    public final Map<AsyncTask<P,R>, Future<?>> futureMaps = new ConcurrentHashMap<>();
 
     /**
      * The Timer listeners.
@@ -405,13 +405,13 @@ public class TaskLoader<P, R> {
 
         Reference<GobrsTimer.TimerListener> tl = GobrsTimer.getInstance(ConfigManager.getGlobalConfig().getTimeoutCoreSize()).addTimerListener(listener);
         timerListeners.put(taskActuator.getTask().getClass(), tl);
-        futureMaps.put(taskActuator.task.getClass(), future);
+        futureMaps.put(taskActuator.task, future);
         return future;
     }
 
     private Future<?> start(TaskActuator taskActuator) {
         Future<?> future = executorService.submit(taskActuator);
-        futureMaps.put(taskActuator.task.getClass(), future);
+        futureMaps.put(taskActuator.task, future);
         return future;
     }
 
