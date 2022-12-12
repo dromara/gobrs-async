@@ -9,6 +9,8 @@ import com.gobrs.async.core.property.GobrsAsyncProperties;
 import com.gobrs.async.core.property.LogConfig;
 import com.gobrs.async.core.property.RuleConfig;
 import com.gobrs.async.core.config.GobrsConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

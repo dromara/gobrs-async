@@ -15,6 +15,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -33,6 +34,7 @@ import org.springframework.context.annotation.Import;
 @AutoConfigureAfter({GobrsPropertyAutoConfiguration.class})
 @ConditionalOnProperty(prefix = GobrsAsyncProperties.PREFIX, value = "enable", matchIfMissing = true, havingValue = "true")
 @Import(BeanHolder.class)
+@ComponentScan(value = {"com.gobrs.async"})
 public class GobrsAutoConfiguration {
 
 

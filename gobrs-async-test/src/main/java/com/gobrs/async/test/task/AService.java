@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  * @create: 2022 -03-20
  */
 @Slf4j
-@Component
+@Task
 public class AService extends AsyncTask {
 
     /**
