@@ -1,10 +1,11 @@
 package com.gobrs.async.core.threadpool;
 
 import com.alibaba.ttl.threadpool.TtlExecutors;
-import com.gobrs.async.core.config.GobrsAsyncProperties;
-import org.springframework.context.annotation.Primary;
+import com.gobrs.async.core.config.GobrsConfig;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -19,15 +20,13 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class GobrsAsyncThreadPoolFactory {
 
-    private GobrsAsyncProperties gobrsAsyncProperties;
+    private GobrsConfig gobrsConfig;
 
     /**
      * Instantiates a new Gobrs async thread pool factory.
-     *
-     * @param gobrsAsyncProperties the gobrs async properties
      */
-    public GobrsAsyncThreadPoolFactory(GobrsAsyncProperties gobrsAsyncProperties) {
-        this.gobrsAsyncProperties = gobrsAsyncProperties;
+    public GobrsAsyncThreadPoolFactory(GobrsConfig gobrsConfig) {
+        this.gobrsConfig = gobrsConfig;
         this.COMMON_POOL = TtlExecutors.getTtlExecutorService(createDefaultThreadPool());
         this.threadPoolExecutor = defaultThreadPool();
     }
@@ -67,8 +66,11 @@ public class GobrsAsyncThreadPoolFactory {
      *
      * @return the thread pool executor
      */
-    ThreadPoolExecutor createDefaultThreadPool() {
-        GobrsAsyncProperties.ThreadPool threadPool = gobrsAsyncProperties.getThreadPool();
+    ExecutorService createDefaultThreadPool() {
+        GobrsConfig.ThreadPool threadPool = gobrsConfig.getThreadPool();
+        if (Objects.isNull(threadPool)) {
+            return Executors.newCachedThreadPool();
+        }
         return new ThreadPoolExecutor(threadPool.getCorePoolSize(),
                 threadPool.getMaxPoolSize(), threadPool.getKeepAliveTime(), threadPool.getTimeUnit(),
                 threadPool.getWorkQueue(), ThreadPoolBuilder.caseReject(threadPool.getRejectedExecutionHandler()));

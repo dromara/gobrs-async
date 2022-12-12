@@ -14,7 +14,7 @@ import com.gobrs.async.core.log.LogCreator;
 import com.gobrs.async.core.log.LogWrapper;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
-import com.gobrs.async.core.common.exception.TimeoutException;
+import com.gobrs.async.core.common.exception.AsyncTaskTimeoutException;
 import com.gobrs.async.core.timer.GobrsTimer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
@@ -159,22 +159,24 @@ public class TaskLoader<P, R> {
         AsyncResult result = null;
         try {
             List<TaskActuator> begins = getBeginProcess();
-
             /**
              * 可选任务
              */
             begins = preOptimal(begins);
-
             /**
              * 并发开始执行每条任务链
              */
             for (TaskActuator process : begins) {
                 /**
                  * Start the thread to perform tasks without any dependencies
+                 * Thread reuse
                  */
-                startProcess(process);
+                if (begins.size() == 1) {
+                    process.call();
+                } else {
+                    startProcess(process);
+                }
             }
-
             // wait
             waitIfNecessary();
             result = back(begins);
@@ -320,7 +322,7 @@ public class TaskLoader<P, R> {
             if (processTimeout > 0) {
                 if (!completeLatch.await(processTimeout, TimeUnit.MILLISECONDS)) {
                     cancel();
-                    throw new TimeoutException();
+                    throw new AsyncTaskTimeoutException();
                 }
             } else {
                 completeLatch.await();
@@ -391,7 +393,7 @@ public class TaskLoader<P, R> {
                 if (!future.isDone()
                         && taskActuator.getTaskSupport().getStatus(taskActuator.getTask().getClass()).compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT)
                         && future.cancel(true)) {
-                    throw new TimeoutException(String.format("task %s TimeoutException", taskActuator.getTask().getName()));
+                    throw new AsyncTaskTimeoutException(String.format("task %s TimeoutException", taskActuator.getTask().getName()));
                 }
             }
 
@@ -401,7 +403,7 @@ public class TaskLoader<P, R> {
             }
         };
 
-        Reference<GobrsTimer.TimerListener> tl = GobrsTimer.getInstance(100).addTimerListener(listener);
+        Reference<GobrsTimer.TimerListener> tl = GobrsTimer.getInstance(ConfigManager.getGlobalConfig().getTimeoutCoreSize()).addTimerListener(listener);
         timerListeners.put(taskActuator.getTask().getClass(), tl);
         futureMaps.put(taskActuator.task.getClass(), future);
         return future;

@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.gobrs.async.core.autoconfig.GobrsAutoConfiguration
+  com.gobrs.async.core.autoconfig.GobrsAutoConfiguration,\
+  com.gobrs.async.core.autoconfig.GobrsPropertyAutoConfiguration

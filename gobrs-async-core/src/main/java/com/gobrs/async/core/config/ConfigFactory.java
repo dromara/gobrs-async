@@ -17,19 +17,19 @@ public class ConfigFactory {
     /**
      * 任务流程独特配置
      */
-    private Map<String, RuleConfig> processRules = new ConcurrentHashMap();
+    private Map<String, GobrsAsyncRule> processRules = new ConcurrentHashMap();
 
     /**
      * 全局配置
      */
-    private GobrsAsyncProperties gobrsAsyncProperties;
+    private GobrsConfig gobrsConfig;
 
     /**
      * Gets process rules.
      *
      * @return the process rules
      */
-    public Map<String, RuleConfig> getProcessRules() {
+    public Map<String, GobrsAsyncRule> getProcessRules() {
         return processRules;
     }
 
@@ -38,7 +38,7 @@ public class ConfigFactory {
      *
      * @param processRules the process rules
      */
-    public void setProcessRules(Map<String, RuleConfig> processRules) {
+    public void setProcessRules(Map<String, GobrsAsyncRule> processRules) {
         this.processRules = processRules;
     }
 
@@ -47,26 +47,24 @@ public class ConfigFactory {
      *
      * @return the gobrs async properties
      */
-    public GobrsAsyncProperties getGobrsAsyncProperties() {
-        return gobrsAsyncProperties;
+    public GobrsConfig getGobrsConfig() {
+        return gobrsConfig;
     }
 
     /**
      * Sets gobrs async properties.
-     *
-     * @param gobrsAsyncProperties the gobrs async properties
      */
-    public void setGobrsAsyncProperties(GobrsAsyncProperties gobrsAsyncProperties) {
-        this.gobrsAsyncProperties = gobrsAsyncProperties;
+    public void setGobrsAsyncProperties(GobrsConfig gobrsConfig) {
+        this.gobrsConfig = gobrsConfig;
     }
 
     /**
      * Instantiates a new Config cache manager.
      *
-     * @param gobrsAsyncProperties the gobrs async properties
+     * @param gobrsConfig the gobrs async properties
      */
-    public ConfigFactory(GobrsAsyncProperties gobrsAsyncProperties) {
-        this.gobrsAsyncProperties = gobrsAsyncProperties;
+    public ConfigFactory(GobrsConfig gobrsConfig) {
+        this.gobrsConfig = gobrsConfig;
     }
 
     /**
@@ -76,7 +74,7 @@ public class ConfigFactory {
      * @param rule     the rule
      * @return the rule
      */
-    public RuleConfig addRule(String ruleName, RuleConfig rule) {
+    public GobrsAsyncRule addRule(String ruleName, GobrsAsyncRule rule) {
         return this.processRules.put(ruleName, rule);
     }
 }

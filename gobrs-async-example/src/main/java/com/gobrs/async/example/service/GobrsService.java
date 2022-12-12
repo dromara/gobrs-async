@@ -2,8 +2,10 @@ package com.gobrs.async.example.service;
 
 import com.gobrs.async.core.GobrsAsync;
 import com.gobrs.async.core.common.domain.AsyncResult;
-import com.gobrs.async.core.config.RuleConfig;
+import com.gobrs.async.core.config.GobrsAsyncRule;
+import com.gobrs.async.core.config.GobrsConfig;
 import com.gobrs.async.core.engine.RuleThermalLoad;
+import com.gobrs.async.core.property.RuleConfig;
 import com.gobrs.async.test.task.condition.AServiceCondition;
 import com.gobrs.async.test.task.condition.CServiceCondition;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StopWatch;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The type Gobrs service.
@@ -31,6 +35,15 @@ public class GobrsService {
 
     @Autowired(required = false)
     private RuleThermalLoad ruleThermalLoad;
+
+
+    /**
+     * Performance test.
+     */
+    public void performanceTest() {
+        gobrsAsync.go("performanceRule", () -> "");
+    }
+
 
     /**
      * Gobrs async.
@@ -61,10 +74,17 @@ public class GobrsService {
      * 然后在浏览器调用 http://localhost:9999/gobrs/updateRule  看规则变更效果
      */
     public void updateRule() {
-        RuleConfig r = new RuleConfig();
+        GobrsAsyncRule r = new GobrsAsyncRule();
         r.setName("anyConditionGeneral");
         r.setContent("AService->CService->EService->GService; BService->DService->FService->HService;");
         ruleThermalLoad.load(r);
 
+    }
+
+    public void optionalProcess() {
+        Map<Class, Object> params = new HashMap<>();
+        Set<String> options = new HashSet<>();
+        options.add("caseOptionalTaskD");
+        AsyncResult asyncResult = gobrsAsync.go("optionalRule", () -> params, options, 300000);
     }
 }

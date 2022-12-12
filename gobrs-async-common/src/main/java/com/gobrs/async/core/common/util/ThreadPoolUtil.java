@@ -13,6 +13,11 @@ import java.math.BigDecimal;
  */
 public class ThreadPoolUtil {
 
+    /**
+     * Calculate core num integer.
+     *
+     * @return the integer
+     */
     public static Integer calculateCoreNum() {
         int cpuCoreNum = Runtime.getRuntime().availableProcessors();
         return new BigDecimal(cpuCoreNum).divide(new BigDecimal("0.2")).intValue();

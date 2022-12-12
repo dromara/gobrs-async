@@ -3,7 +3,6 @@ package com.gobrs.async.core;
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.util.SystemClock;
 import com.gobrs.async.core.config.ConfigManager;
-import com.gobrs.async.core.config.RuleConfig;
 import com.gobrs.async.core.holder.BeanHolder;
 import com.gobrs.async.core.log.LogWrapper;
 import com.gobrs.async.core.task.AsyncTask;
@@ -53,7 +52,7 @@ class TaskTrigger<P, R> {
     /**
      * The Upward tasks map space.
      */
-    public static Map<AsyncTask, List<AsyncTask>> upwardTasksMapSpace = new ConcurrentHashMap<>();
+    public static Map<String, Map<AsyncTask, List<AsyncTask>>> upwardTasksMapSpace = new ConcurrentHashMap<>();
 
     /**
      * Instantiates a new Task trigger.
@@ -113,7 +112,7 @@ class TaskTrigger<P, R> {
 
         downTasksMap.put(assistantTask, new ArrayList<>(0));
         upwardTasksMap.put(assistantTask, noSubtasks);
-        upwardTasksMapSpace = upwardTasksMap;
+        upwardTasksMapSpace.put(ruleName,upwardTasksMap);
         clear();
         for (AsyncTask task : downTasksMap.keySet()) {
             TaskActuator process;
@@ -198,12 +197,11 @@ class TaskTrigger<P, R> {
      */
     TaskLoader trigger(AsyncParam<P> param, long timeout, Set<String> optionalTasks) {
 
-
         IdentityHashMap<AsyncTask, TaskActuator> newProcessMap = new IdentityHashMap<>(prepareTaskMap.size());
         /**
          * Create a com.gobrs.async.com.gobrs.async.test.task loader, A com.gobrs.async.com.gobrs.async.test.task flow corresponds to a taskLoader
          */
-        TaskLoader<P, R> loader = new TaskLoader<P, R>(ruleName, threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
+        TaskLoader<P, R> loader = new TaskLoader<>(ruleName, threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
 
         TaskSupport support = related(param, loader);
 
@@ -211,14 +209,15 @@ class TaskTrigger<P, R> {
             /**
              * clone Process for Thread isolation
              */
-            TaskActuator processor = (TaskActuator) prepareTaskMap.get(task).clone();
+            TaskActuator processor = (TaskActuator<?>) prepareTaskMap.get(task).clone();
 
             processor.init(support, param);
 
             newProcessMap.put(task, processor);
         }
 
-        Optimal.doOptimal(optionalTasks, loader, upwardTasksMapSpace);
+        Optimal.doOptimal(optionalTasks, loader, upwardTasksMapSpace.get(ruleName));
+
         return loader;
     }
 
@@ -327,7 +326,6 @@ class TaskTrigger<P, R> {
 
         long traceId = IdWorker.nextId();
         TraceUtil.set(traceId);
-
         boolean costLogabled = ConfigManager.Action.costLogabled(ruleName);
         if (costLogabled) {
             LogWrapper.TimeCollector timeCollector =

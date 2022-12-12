@@ -4,6 +4,7 @@ import com.gobrs.async.core.callback.ErrorCallback;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.enums.ResultState;
+import com.gobrs.async.core.log.TraceUtil;
 import com.gobrs.async.core.task.TaskUtil;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.TaskResult;
@@ -16,6 +17,7 @@ import java.lang.ref.Reference;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -110,7 +112,6 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
         Object parameter = getParameter(task);
 
-
         preparation();
 
         TaskLoader taskLoader = support.getTaskLoader();
@@ -182,7 +183,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                 exceptionProcess(parameter, taskLoader, e);
             } catch (Exception exception) {
                 if (log.isErrorEnabled()) {
-                    log.error(" gobrs exceptionProcess error task is ", task.getName(), exception);
+                    log.error("<{}> [{}] exceptionProcess error {} ", TraceUtil.get(), task.getName(), e);
                 }
                 taskLoader.stopSingleTaskLine(subTasks);
             }

@@ -1,16 +1,17 @@
-package com.gobrs.async.core.config;
+package com.gobrs.async.core.property;
 
+
+import com.gobrs.async.core.common.constant.ConfigPropertiesConstant;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import com.gobrs.async.core.common.constant.ConfigPropertiesConstant;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Component;
 
 import static com.gobrs.async.core.common.def.DefaultConfig.*;
 
@@ -26,7 +27,10 @@ import static com.gobrs.async.core.common.def.DefaultConfig.*;
  * @Version 1.0
  * @date 2022 -01-27 22:04
  */
-@ConfigurationProperties(prefix = GobrsAsyncProperties.PREFIX)
+
+@ConfigurationProperties(prefix = GobrsAsyncProperties.PREFIX, ignoreInvalidFields = false)
+@PropertySource(value = {"classpath:config/gobrs.yaml", "classpath:config/gobrs.yml", "classpath:config/gobrs.properties"}, ignoreResourceNotFound = false, factory = GobbrsPropertySourceFactory.class)
+@Component
 public class GobrsAsyncProperties {
 
     /**
@@ -35,6 +39,7 @@ public class GobrsAsyncProperties {
     public static final String PREFIX = ConfigPropertiesConstant.PREFIX;
 
 
+    private boolean enable;
     /**
      * Task rules
      */
@@ -51,7 +56,11 @@ public class GobrsAsyncProperties {
     private String point = "->";
 
 
-    private ThreadPool threadPool = new ThreadPool();
+    private ThreadPool threadPool;
+    /**
+     * 超时时间监听时间
+     */
+    private Integer timeoutCoreSize;
 
 
     /**
@@ -199,6 +208,43 @@ public class GobrsAsyncProperties {
      */
     public void setThreadPool(ThreadPool threadPool) {
         this.threadPool = threadPool;
+    }
+
+
+    /**
+     * Is enable boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isEnable() {
+        return enable;
+    }
+
+    /**
+     * Sets enable.
+     *
+     * @param enable the enable
+     */
+    public void setEnable(boolean enable) {
+        this.enable = enable;
+    }
+
+    /**
+     * Gets timeout core size.
+     *
+     * @return the timeout core size
+     */
+    public Integer getTimeoutCoreSize() {
+        return timeoutCoreSize;
+    }
+
+    /**
+     * Sets timeout core size.
+     *
+     * @param timeoutCoreSize the timeout core size
+     */
+    public void setTimeoutCoreSize(Integer timeoutCoreSize) {
+        this.timeoutCoreSize = timeoutCoreSize;
     }
 
     /**
