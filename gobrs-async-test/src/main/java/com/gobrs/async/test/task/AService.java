@@ -5,6 +5,7 @@ import com.gobrs.async.core.anno.Task;
 import com.gobrs.async.core.task.AsyncTask;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
  * The type A service.
@@ -16,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
  * @create: 2022 -03-20
  */
 @Slf4j
-@Task(failSubExec = true, timeoutInMilliseconds = 300)
+@Component
 public class AService extends AsyncTask {
 
     /**
