@@ -8,17 +8,12 @@
         <groupId>io.github.memorydoc</groupId>
         <version>${revision}</version>
     </parent>
-    <artifactId>gobrs-async-skywalking-plugin</artifactId>
+    <artifactId>gobrs-async-plugin-base</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>io.github.memorydoc</groupId>
-            <artifactId>gobrs-async-plugin-base</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.skywalking</groupId>
-            <artifactId>apm-toolkit-trace</artifactId>
+            <artifactId>gobrs-async-spi</artifactId>
         </dependency>
     </dependencies>
-
 </project>

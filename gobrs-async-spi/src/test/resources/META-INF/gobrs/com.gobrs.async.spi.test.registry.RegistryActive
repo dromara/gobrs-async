@@ -1,0 +1,3 @@
+zk=com.gobrs.async.spi.test.registry.ZkRegistry
+nacos=com.gobrs.async.spi.test.registry.NacosRegistry
+etcd=com.gobrs.async.spi.test.registry.EtcdRegistry
