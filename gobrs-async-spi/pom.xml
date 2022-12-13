@@ -4,21 +4,21 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>gobrs-async-plugin</artifactId>
+        <artifactId>gobrs-async</artifactId>
         <groupId>io.github.memorydoc</groupId>
         <version>${revision}</version>
     </parent>
-    <artifactId>gobrs-async-skywalking-plugin</artifactId>
+    <artifactId>gobrs-async-spi</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>io.github.memorydoc</groupId>
-            <artifactId>gobrs-async-plugin-base</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.apache.skywalking</groupId>
-            <artifactId>apm-toolkit-trace</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
         </dependency>
     </dependencies>
-
 </project>

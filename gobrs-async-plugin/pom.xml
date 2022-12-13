@@ -5,20 +5,28 @@
         <artifactId>gobrs-async</artifactId>
         <groupId>io.github.memorydoc</groupId>
         <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>gobrs-async-plugin</artifactId>
-    <groupId>io.github.memorydoc</groupId>
-    <version>${revision}</version>
     <packaging>pom</packaging>
-    <name>gobrs-async-plugin</name>
 
     <modules>
         <module>gobrs-async-skywalking-plugin</module>
+        <module>gobrs-async-plugin-base</module>
     </modules>
 
+    <properties>
+        <skywalking.version>8.4.0</skywalking.version>
+    </properties>
     <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.skywalking</groupId>
+                <artifactId>apm-toolkit-trace</artifactId>
+                <version>${skywalking.version}</version>
+            </dependency>
+        </dependencies>
+
     </dependencyManagement>
 
 </project>

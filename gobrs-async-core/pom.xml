@@ -7,7 +7,6 @@
         <artifactId>gobrs-async</artifactId>
         <groupId>io.github.memorydoc</groupId>
         <version>${revision}</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>gobrs-async-core</artifactId>
@@ -24,6 +23,10 @@
         <dependency>
             <groupId>io.github.memorydoc</groupId>
             <artifactId>gobrs-async-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.memorydoc</groupId>
+            <artifactId>gobrs-async-plugin-base</artifactId>
         </dependency>
     </dependencies>
 

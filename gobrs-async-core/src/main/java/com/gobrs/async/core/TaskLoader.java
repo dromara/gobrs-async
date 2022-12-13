@@ -16,6 +16,8 @@ import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
 import com.gobrs.async.core.common.exception.AsyncTaskTimeoutException;
 import com.gobrs.async.core.timer.GobrsTimer;
+import com.gobrs.async.plugin.base.wrapper.ThreadWapper;
+import com.gobrs.async.spi.ExtensionLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
@@ -97,7 +99,7 @@ public class TaskLoader<P, R> {
     /**
      * The Futures async.
      */
-    public final Map<AsyncTask<P,R>, Future<?>> futureMaps = new ConcurrentHashMap<>();
+    public final Map<AsyncTask<P, R>, Future<?>> futureMaps = new ConcurrentHashMap<>();
 
     /**
      * The Timer listeners.
@@ -384,9 +386,8 @@ public class TaskLoader<P, R> {
     }
 
     private Future<?> timeOperator(TaskActuator<?> taskActuator) {
-
-        Future<?> future = executorService.submit(taskActuator);
-
+        List<ThreadWapper> realizes = ExtensionLoader.getExtensionLoader(ThreadWapper.class).getRealizes();
+        Future<?> future = executorService.submit(CollectionUtils.isEmpty(realizes) ? taskActuator : realizes.get(0).wrapper(taskActuator));
         GobrsTimer.TimerListener listener = new GobrsTimer.TimerListener() {
             @Override
             public void tick() {

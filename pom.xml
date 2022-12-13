@@ -17,6 +17,7 @@
         <module>gobrs-async-example</module>
         <module>gobrs-async-test</module>
         <module>gobrs-async-plugin</module>
+        <module>gobrs-async-spi</module>
     </modules>
 
     <properties>
@@ -30,6 +31,7 @@
         <jackson.version>2.12.6</jackson.version>
         <lombok.version>1.18.22</lombok.version>
         <ttl.version>2.11.2</ttl.version>
+        <common3.version>3.12.0</common3.version>
     </properties>
 
 
@@ -42,6 +44,22 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <dependency>
+                <groupId>io.github.memorydoc</groupId>
+                <artifactId>gobrs-async-spi</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.memorydoc</groupId>
+                <artifactId>gobrs-async-plugin-base</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.memorydoc</groupId>
+                <artifactId>gobrs-async-common</artifactId>
+                <version>${revision}</version>
+            </dependency>
             <dependency>
                 <groupId>io.github.memorydoc</groupId>
                 <artifactId>gobrs-async-starter</artifactId>
@@ -52,11 +70,14 @@
                 <artifactId>gobrs-async-core</artifactId>
                 <version>${revision}</version>
             </dependency>
+
+
             <dependency>
                 <groupId>io.github.memorydoc</groupId>
-                <artifactId>gobrs-async-common</artifactId>
+                <artifactId>gobrs-async-plugin</artifactId>
                 <version>${revision}</version>
             </dependency>
+
             <dependency>
                 <groupId>io.github.memorydoc</groupId>
                 <artifactId>gobrs-async-example</artifactId>
@@ -81,6 +102,11 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>transmittable-thread-local</artifactId>
                 <version>${ttl.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${common3.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

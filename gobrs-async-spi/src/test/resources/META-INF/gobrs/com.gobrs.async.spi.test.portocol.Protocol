@@ -1,0 +1,4 @@
+hession=com.gobrs.async.spi.test.portocol.HessionProtocol
+jdk=com.gobrs.async.spi.test.portocol.JdkProtocol
+kryro=com.gobrs.async.spi.test.portocol.KryroProtocol
+thrift=com.gobrs.async.spi.test.portocol.ThriftProtocol
