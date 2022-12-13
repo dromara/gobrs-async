@@ -16,6 +16,7 @@
         <module>gobrs-async-starter</module>
         <module>gobrs-async-example</module>
         <module>gobrs-async-test</module>
+        <module>gobrs-async-plugin</module>
     </modules>
 
     <properties>
