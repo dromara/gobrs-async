@@ -15,6 +15,7 @@ import com.gobrs.async.core.log.LogWrapper;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
 import com.gobrs.async.core.common.exception.AsyncTaskTimeoutException;
+import com.gobrs.async.core.timer.GobrsFutureTask;
 import com.gobrs.async.core.timer.GobrsTimer;
 import com.gobrs.async.plugin.base.wrapper.ThreadWapper;
 import com.gobrs.async.spi.ExtensionLoader;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 import static com.gobrs.async.core.common.def.DefaultConfig.TASK_INITIALIZE;
 import static com.gobrs.async.core.common.def.DefaultConfig.TASK_TIMEOUT;
 import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionInterceptor;
+import static com.gobrs.async.core.timer.RetryUtil.retryConditional;
 
 /**
  * The type Task loader.
@@ -173,7 +175,7 @@ public class TaskLoader<P, R> {
                  * Start the thread to perform tasks without any dependencies
                  * Thread reuse
                  */
-                if (begins.size() == 1) {
+                if (begins.size() == 1 && retryConditional(process)) {
                     process.call();
                 } else {
                     startProcess(process);
@@ -386,16 +388,25 @@ public class TaskLoader<P, R> {
     }
 
     private Future<?> timeOperator(TaskActuator<?> taskActuator) {
-        List<ThreadWapper> realizes = ExtensionLoader.getExtensionLoader(ThreadWapper.class).getRealizes();
-        Future<?> future = executorService.submit(CollectionUtils.isEmpty(realizes) ? taskActuator : realizes.get(0).wrapper(taskActuator));
+        Callable<?> callable = threadAdapter(taskActuator);
+        GobrsFutureTask gobrsFutureTask = new GobrsFutureTask<>(callable);
+        Future<?> future = executorService.submit(gobrsFutureTask);
         GobrsTimer.TimerListener listener = new GobrsTimer.TimerListener() {
             @Override
             public void tick() {
-                if (!future.isDone()
-                        && taskActuator.getTaskSupport().getStatus(taskActuator.getTask().getClass()).compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT)
-                        && future.cancel(true)) {
+                if (stamp()) {
                     throw new AsyncTaskTimeoutException(String.format("task %s TimeoutException", taskActuator.getTask().getName()));
                 }
+            }
+
+            /**
+             * adjust interrupt
+             * @return
+             */
+            private boolean stamp() {
+                return !future.isDone()
+                        && taskActuator.getTaskSupport().getStatus(taskActuator.getTask().getClass()).compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT)
+                        && future.cancel(true) && ((GobrsFutureTask) futureMaps.get(taskActuator.task)).stop(true);
             }
 
             @Override
@@ -406,14 +417,26 @@ public class TaskLoader<P, R> {
 
         Reference<GobrsTimer.TimerListener> tl = GobrsTimer.getInstance(ConfigManager.getGlobalConfig().getTimeoutCoreSize()).addTimerListener(listener);
         timerListeners.put(taskActuator.getTask().getClass(), tl);
-        futureMaps.put(taskActuator.task, future);
+        futureMaps.put(taskActuator.task, gobrsFutureTask);
         return future;
     }
 
     private Future<?> start(TaskActuator taskActuator) {
-        Future<?> future = executorService.submit(taskActuator);
+        Callable<?> callable = threadAdapter(taskActuator);
+        Future<?> future = executorService.submit(callable);
         futureMaps.put(taskActuator.task, future);
         return future;
+    }
+
+    /**
+     * 线程 适配 SPI
+     *
+     * @param taskActuator
+     * @return
+     */
+    private Callable<?> threadAdapter(TaskActuator<?> taskActuator) {
+        List<ThreadWapper> realizes = ExtensionLoader.getExtensionLoader(ThreadWapper.class).getRealizes();
+        return CollectionUtils.isEmpty(realizes) ? taskActuator : realizes.get(0).wrapper(taskActuator);
     }
 
     /**
@@ -588,5 +611,14 @@ public class TaskLoader<P, R> {
      */
     public Map<Class<?>, Reference<GobrsTimer.TimerListener>> getTimerListeners() {
         return timerListeners;
+    }
+
+    /**
+     * Gets future maps.
+     *
+     * @return the future maps
+     */
+    public Map<AsyncTask<P, R>, Future<?>> getFutureMaps() {
+        return futureMaps;
     }
 }

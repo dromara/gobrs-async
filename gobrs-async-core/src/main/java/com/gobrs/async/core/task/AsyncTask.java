@@ -140,7 +140,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
                 LogWrapper logWrapper = support.getLogWrapper();
                 logWrapper.addTrace(logTracer);
                 logWrapper.setProcessCost(costTime);
-                log.info("<{}> [{}] execution", logWrapper.getTraceId(), this.getName());
+                log.info("<{}> [{}]", logWrapper.getTraceId(), this.getName());
 
             }
         }
