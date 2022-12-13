@@ -27,7 +27,6 @@ import static com.gobrs.async.core.common.def.DefaultConfig.*;
  * @Version 1.0
  * @date 2022 -01-27 22:04
  */
-
 @ConfigurationProperties(prefix = GobrsAsyncProperties.PREFIX, ignoreInvalidFields = false)
 @PropertySource(value = {"classpath:config/gobrs.yaml", "classpath:config/gobrs.yml", "classpath:config/gobrs.properties"}, ignoreResourceNotFound = false, factory = GobbrsPropertySourceFactory.class)
 @Component

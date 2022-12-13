@@ -4,6 +4,7 @@ import com.gobrs.async.core.callback.ErrorCallback;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.TaskResult;
+import com.gobrs.async.core.common.domain.TaskStatus;
 import com.gobrs.async.core.common.enums.ResultState;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.log.TraceUtil;
@@ -11,6 +12,7 @@ import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.task.TaskUtil;
 import com.gobrs.async.core.timer.GobrsTimer;
 import lombok.extern.slf4j.Slf4j;
+import org.omg.CORBA.INITIALIZE;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.ref.Reference;
@@ -24,8 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static com.gobrs.async.core.common.def.DefaultConfig.TASK_FINISH;
-import static com.gobrs.async.core.common.def.DefaultConfig.TASK_INITIALIZE;
+import static com.gobrs.async.core.common.def.DefaultConfig.*;
 
 /**
  * The type Task actuator.
@@ -354,7 +355,12 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
         try {
             AtomicInteger retryCounts = support.getStatus(task.getClass()).getRetryCounts();
 
-            if (task.getRetryCount() > 1 && task.getRetryCount() > retryCounts.get()) {
+            /**
+             * 单任务超时判断
+             */
+            TaskStatus status = getTaskSupport().getStatus(task.getClass());
+
+            if ((status.getStatus().get() == TASK_INITIALIZE) && task.getRetryCount() > 1 && task.getRetryCount() > retryCounts.get()) {
 
                 retryCounts.incrementAndGet();
 

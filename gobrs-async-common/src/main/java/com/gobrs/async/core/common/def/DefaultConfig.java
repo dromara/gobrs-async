@@ -83,16 +83,34 @@ public interface DefaultConfig {
      */
     String QUEUE_SIZE = Strings.EMPTY;
 
+    /**
+     * The constant TASK_TIME_OUT.
+     */
     int TASK_TIME_OUT = 0;
 
+    /**
+     * The constant ERR_LOGABLED.
+     */
     boolean ERR_LOGABLED = true;
 
+    /**
+     * The constant COST_LOGABLED.
+     */
     boolean COST_LOGABLED = true;
 
 
+    /**
+     * The constant TASK_INITIALIZE.
+     */
     int TASK_INITIALIZE = 0;
 
+    /**
+     * The constant TASK_FINISH.
+     */
     int TASK_FINISH = Integer.MAX_VALUE;
 
+    /**
+     * The constant TASK_TIMEOUT.
+     */
     int TASK_TIMEOUT = -1;
 }

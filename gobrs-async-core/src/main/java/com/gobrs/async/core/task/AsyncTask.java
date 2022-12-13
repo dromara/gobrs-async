@@ -126,7 +126,6 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         } catch (Exception exception) {
             exeError = exception;
             throw exception;
-            //  InterruptedException exceptions do nothing
         } finally {
             boolean costLogabled = ConfigManager.Action.costLogabled(support.getRuleName());
             if (costLogabled &&
