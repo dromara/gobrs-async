@@ -10,6 +10,7 @@ import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.log.TraceUtil;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.task.TaskUtil;
+import com.gobrs.async.core.timer.GobrsFutureTask;
 import com.gobrs.async.core.timer.GobrsTimer;
 import lombok.extern.slf4j.Slf4j;
 import org.omg.CORBA.INITIALIZE;
@@ -27,6 +28,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.gobrs.async.core.common.def.DefaultConfig.*;
+import static com.gobrs.async.core.timer.GobrsFutureTask.STOP_STAMP;
+import static com.gobrs.async.core.timer.RetryUtil.retryConditional;
 
 /**
  * The type Task actuator.
@@ -193,8 +196,23 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
             }
         } finally {
             clear();
+            futureStopRelease(taskLoader);
         }
         return (Result) result;
+    }
+
+    /**
+     * 根据中断位强制释放资源 针对开发者使用死循环等问题fix
+     * @param taskLoader
+     */
+    private void futureStopRelease(TaskLoader taskLoader) {
+        Future<?> future = (Future<?>) taskLoader.getFutureMaps().get(task);
+        if (future instanceof GobrsFutureTask) {
+            Integer syncState = ((GobrsFutureTask<?>) future).getSyncState();
+            if (syncState == STOP_STAMP) {
+                taskLoader.stopSingleTaskLine(subTasks);
+            }
+        }
     }
 
     private void change() {
@@ -516,7 +534,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param cycleThread
      */
     private void doProcess(TaskLoader taskLoader, TaskActuator process, boolean cycleThread) {
-        if (!cycleThread) {
+        if (!cycleThread || retryConditional(process)) {
             taskLoader.startProcess(process);
         } else {
             /**
