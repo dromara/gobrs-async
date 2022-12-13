@@ -389,7 +389,7 @@ public class TaskLoader<P, R> {
 
     private Future<?> timeOperator(TaskActuator<?> taskActuator) {
         Callable<?> callable = threadAdapter(taskActuator);
-        GobrsFutureTask gobrsFutureTask = new GobrsFutureTask<>(callable);
+        GobrsFutureTask<?> gobrsFutureTask = new GobrsFutureTask<>(callable);
         Future<?> future = executorService.submit(gobrsFutureTask);
         GobrsTimer.TimerListener listener = new GobrsTimer.TimerListener() {
             @Override
@@ -406,7 +406,7 @@ public class TaskLoader<P, R> {
             private boolean stamp() {
                 return !future.isDone()
                         && taskActuator.getTaskSupport().getStatus(taskActuator.getTask().getClass()).compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT)
-                        && future.cancel(true) && ((GobrsFutureTask) futureMaps.get(taskActuator.task)).stop(true);
+                        && future.cancel(true) && ((GobrsFutureTask<?>) futureMaps.get(taskActuator.task)).stop(true);
             }
 
             @Override

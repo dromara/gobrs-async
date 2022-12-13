@@ -1,6 +1,7 @@
 gobrs:
   async:
     config:
+      timeout-core-size: 200
       rules:
         - name: "performance"
           content: "taskA->taskB,TaskC->taskD->taskE,taskF"
@@ -27,7 +28,7 @@ gobrs:
         - name: "anyConditionRuleAppend"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition->EServiceCondition"
         - name: "retryRule"
-          content: "caseRetryTaskA->caseRetryTaskB,caseRetryTaskC"
+          content: "caseRetryTaskA->caseRetryTaskB->caseRetryTaskC->caseRetryTaskD->caseRetryTaskE"
 
         - name: "optionalRule"
           content: "caseOptionalTaskA->caseOptionalTaskB->caseOptionalTaskC,caseOptionalTaskD->caseOptionalTaskE->caseOptionalTaskF"
