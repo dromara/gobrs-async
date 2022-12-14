@@ -6,6 +6,7 @@ import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.core.common.domain.TaskStatus;
 import com.gobrs.async.core.common.enums.ResultState;
+import com.gobrs.async.core.common.exception.AsyncTaskTimeoutException;
 import com.gobrs.async.core.common.exception.GobrsForceStopException;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.log.TraceUtil;
@@ -273,9 +274,9 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
         }
     }
 
+
     private void onDoTask(Object parameter, TaskLoader taskLoader, Exception e) {
         task.onFailureTrace(support, e);
-
         /**
          * A single com.gobrs.async.com.gobrs.async.test.task com.gobrs.async.exception interrupts the entire process
          * 配置 taskInterrupt = true 则某一任务异常后结束整个任务流程 默认 false
@@ -410,7 +411,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param parameter
      * @param taskLoader
      */
-    private void doTaskWithRetryConditional(Object parameter, TaskLoader taskLoader) {
+    private void doTaskWithRetryConditional(Object parameter, TaskLoader taskLoader) throws Exception {
 
         /**
          * Perform a com.gobrs.async.com.gobrs.async.test.task
