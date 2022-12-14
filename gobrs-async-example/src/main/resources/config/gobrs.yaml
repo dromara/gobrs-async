@@ -30,6 +30,7 @@ gobrs:
         - name: "retryRule"
           content: "caseRetryTaskA->caseRetryTaskB->caseRetryTaskC->caseRetryTaskD->caseRetryTaskE"
 
+
         - name: "optionalRule"
           content: "caseOptionalTaskA->caseOptionalTaskB->caseOptionalTaskC,caseOptionalTaskD->caseOptionalTaskE->caseOptionalTaskF"
 

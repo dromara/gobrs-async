@@ -20,7 +20,6 @@ package com.gobrs.async.spi;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -193,6 +192,11 @@ public final class ExtensionLoader<T> {
             realizes.add(realize);
         });
         return realizes;
+    }
+
+    public T getRealLizesFirst() {
+        List<T> realizes = getRealizes();
+        return realizes.size() == 0 ? null : realizes.get(0);
     }
 
     @SuppressWarnings("unchecked")

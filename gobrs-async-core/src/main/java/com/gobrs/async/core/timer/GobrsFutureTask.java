@@ -1,18 +1,31 @@
 package com.gobrs.async.core.timer;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
 
 /**
- * @program: gobrs-async
+ * The type Gobrs future task.
+ *
+ * @param <V> the type parameter
+ * @program: gobrs -async
  * @ClassName GobrsFutureTask
  * @description:
  * @author: sizegang
- * @create: 2022-12-13
- **/
+ * @create: 2022 -12-13
+ */
 public class GobrsFutureTask<V> implements RunnableFuture<V> {
 
+    /**
+     * The constant STOP_STAMP.
+     */
     public static final int STOP_STAMP = 5;
+
     /**
      * Synchronization control for FutureTask
      */
@@ -38,19 +51,11 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
      * the given result on successful completion.
      *
      * @param runnable the runnable task
-     * @param result   the result to return on successful completion. If you
-     *                 don't need a particular result, consider using
-     *                 constructions of the form:
-     *                 <tt>Future&lt;?&gt; f = new FutureTask&lt;Object&gt;(runnable, null)</tt>
+     * @param result   the result to return on successful completion. If you                 don't need a particular result, consider using                 constructions of the form:                 <tt>Future&lt;?&gt; f = new FutureTask&lt;Object&gt;(runnable, null)</tt>
      * @throws NullPointerException if runnable is null
      */
     public GobrsFutureTask(Runnable runnable, V result) {
         sync = new Sync(Executors.callable(runnable, result));
-    }
-
-    @Override
-    public boolean cancel(boolean mayInterruptIfRunning) {
-        return cancel(mayInterruptIfRunning, false);
     }
 
     @Override
@@ -63,21 +68,38 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
         return sync.innerIsDone();
     }
 
+    @Override
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        return sync.innerCancel(mayInterruptIfRunning, false);
+    }
+
+    /**
+     * Cancel boolean.
+     *
+     * @param mayInterruptIfRunning the may interrupt if running
+     * @param stopBehind            the stop behind
+     * @return the boolean
+     */
     public boolean cancel(boolean mayInterruptIfRunning, boolean stopBehind) {
         return sync.innerCancel(mayInterruptIfRunning, stopBehind);
     }
 
-
     /**
-     * @return
+     *
+     * @param mayStopIfRunning the may stop if running
+     * @return boolean
      */
-    public boolean forceStopIfRunning() {
-        return sync.innerStop();
+    public boolean isMayStopIfRunning(boolean mayStopIfRunning) {
+        if (sync.runner.getState() != Thread.State.RUNNABLE) {
+            return cancel(true);
+        }
+        return sync.innerStop(mayStopIfRunning);
     }
 
     /**
      * @throws CancellationException {@inheritDoc}
      */
+    @Override
     public V get() throws InterruptedException, ExecutionException {
         return sync.innerGet();
     }
@@ -152,8 +174,23 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
         return sync.innerRunAndReset();
     }
 
+    /**
+     * Gets sync state.
+     *
+     * @return the sync state
+     */
     public Integer getSyncState() {
         return sync.$$getState();
+    }
+
+    /**
+     * Force stop if running boolean.
+     *
+     * @param mayStopIfRunning the may stop if running
+     * @return the boolean
+     */
+    public boolean forceStopIfRunning(boolean mayStopIfRunning) {
+        return sync.innerStop(mayStopIfRunning);
     }
 
     /**
@@ -184,8 +221,6 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
          */
         private static final int CANCELLED = 4;
 
-        private static final int STOP = STOP_STAMP;
-
         /**
          * The underlying callable
          */
@@ -206,12 +241,23 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
          */
         private volatile Thread runner;
 
-        Sync(Callable<V> callable) {
-            this.callable = callable;
-        }
 
+        /**
+         * $$ get state int.
+         *
+         * @return the int
+         */
         public int $$getState() {
             return getState();
+        }
+
+        /**
+         * Instantiates a new Sync.
+         *
+         * @param callable the callable
+         */
+        Sync(Callable<V> callable) {
+            this.callable = callable;
         }
 
         private boolean ranOrCancelled(int state) {
@@ -236,14 +282,31 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
             return true;
         }
 
+        /**
+         * Inner is cancelled boolean.
+         *
+         * @return the boolean
+         */
         boolean innerIsCancelled() {
             return getState() == CANCELLED;
         }
 
+        /**
+         * Inner is done boolean.
+         *
+         * @return the boolean
+         */
         boolean innerIsDone() {
             return ranOrCancelled(getState()) && runner == null;
         }
 
+        /**
+         * Inner get v.
+         *
+         * @return the v
+         * @throws InterruptedException the interrupted exception
+         * @throws ExecutionException   the execution exception
+         */
         V innerGet() throws InterruptedException, ExecutionException {
             acquireSharedInterruptibly(0);
             if (getState() == CANCELLED)
@@ -253,6 +316,15 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
             return result;
         }
 
+        /**
+         * Inner get v.
+         *
+         * @param nanosTimeout the nanos timeout
+         * @return the v
+         * @throws InterruptedException the interrupted exception
+         * @throws ExecutionException   the execution exception
+         * @throws TimeoutException     the timeout exception
+         */
         V innerGet(long nanosTimeout) throws InterruptedException,
                 ExecutionException, TimeoutException {
             if (!tryAcquireSharedNanos(0, nanosTimeout))
@@ -264,6 +336,11 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
             return result;
         }
 
+        /**
+         * Inner set.
+         *
+         * @param v the v
+         */
         void innerSet(V v) {
             for (; ; ) {
                 int s = getState();
@@ -285,6 +362,11 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
             }
         }
 
+        /**
+         * Inner set exception.
+         *
+         * @param t the t
+         */
         void innerSetException(Throwable t) {
             for (; ; ) {
                 int s = getState();
@@ -307,23 +389,39 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
         }
 
         /**
-         * own write
+         * Inner stop boolean.
          *
-         * @return
+         * @param mayStopIfRunning the may stop if running
+         * @return boolean
          */
-        boolean innerStop() {
-            Thread r = runner;
-            if (r != null && Thread.State.RUNNABLE == r.getState()) {
+        boolean innerStop(boolean mayStopIfRunning) {
+            for (; ; ) {
                 int s = getState();
-                if (compareAndSetState(s, STOP)) {
+                if (ranOrCancelled(s))
+                    return false;
+                if (compareAndSetState(s, CANCELLED))
+                    break;
+            }
+            if (mayStopIfRunning) {
+                Thread r = runner;
+                if (r != null) {
                     r.stop();//这里调用线程stop方法
+                    setState(STOP_STAMP);
                 }
             }
             releaseShared(0);
             done();
+
             return true;
         }
 
+        /**
+         * Inner cancel boolean.
+         *
+         * @param mayInterruptIfRunning the may interrupt if running
+         * @param stopBehind            the stop behind
+         * @return the boolean
+         */
         boolean innerCancel(boolean mayInterruptIfRunning, boolean stopBehind) {
             for (; ; ) {
                 int s = getState();
@@ -338,13 +436,14 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
                     r.interrupt();
                 }
             }
-            if (!stopBehind) {
-                releaseShared(0);
-                done();
-            }
+            releaseShared(0);
+            done();
             return true;
         }
 
+        /**
+         * Inner run.
+         */
         void innerRun() {
             if (!compareAndSetState(READY, RUNNING))
                 return;
@@ -364,6 +463,11 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
             }
         }
 
+        /**
+         * Inner run and reset boolean.
+         *
+         * @return the boolean
+         */
         boolean innerRunAndReset() {
             if (!compareAndSetState(READY, RUNNING))
                 return false;
@@ -379,4 +483,5 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
             }
         }
     }
+
 }
