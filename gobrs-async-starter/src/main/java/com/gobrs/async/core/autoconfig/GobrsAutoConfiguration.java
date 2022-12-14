@@ -19,6 +19,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import static com.gobrs.async.core.autoconfig.GobrsAutoConfiguration.GOBRS_NAMESPACE;
+
 
 /**
  * The type Gobrs auto configuration.
@@ -34,9 +36,10 @@ import org.springframework.context.annotation.Import;
 @AutoConfigureAfter({GobrsPropertyAutoConfiguration.class})
 @ConditionalOnProperty(prefix = GobrsAsyncProperties.PREFIX, value = "enable", matchIfMissing = true, havingValue = "true")
 @Import(BeanHolder.class)
-@ComponentScan(value = {"com.gobrs.async"})
+@ComponentScan(value = GOBRS_NAMESPACE)
 public class GobrsAutoConfiguration {
 
+    protected static final String GOBRS_NAMESPACE = "com.gobrs.async";
 
     /**
      * Instantiates a new Gobrs auto configuration.

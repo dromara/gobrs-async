@@ -70,6 +70,16 @@
                 <artifactId>gobrs-async-core</artifactId>
                 <version>${revision}</version>
             </dependency>
+            <dependency>
+                <groupId>io.github.memorydoc</groupId>
+                <artifactId>gobrs-async-skywalking-plugin</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.memorydoc</groupId>
+                <artifactId>gobrs-async-plugin-base</artifactId>
+                <version>${revision}</version>
+            </dependency>
 
 
             <dependency>

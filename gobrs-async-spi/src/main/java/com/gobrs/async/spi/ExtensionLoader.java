@@ -194,6 +194,11 @@ public final class ExtensionLoader<T> {
         return realizes;
     }
 
+    /**
+     * Gets real lizes first.
+     *
+     * @return the real lizes first
+     */
     public T getRealLizesFirst() {
         List<T> realizes = getRealizes();
         return realizes.size() == 0 ? null : realizes.get(0);

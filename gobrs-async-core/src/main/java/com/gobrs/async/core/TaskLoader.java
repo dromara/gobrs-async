@@ -19,7 +19,6 @@ import com.gobrs.async.core.timer.GobrsFutureTask;
 import com.gobrs.async.core.timer.GobrsTimer;
 import com.gobrs.async.plugin.base.wrapper.ThreadWapper;
 import com.gobrs.async.spi.ExtensionLoader;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
@@ -90,19 +89,19 @@ public class TaskLoader<P, R> {
 
     private volatile Throwable error;
 
-    private final Lock lock = new ReentrantLock();
+    private static final Lock taskLock = new ReentrantLock();
 
     private volatile boolean canceled = false;
 
     /**
      * The Futures.
      */
-    public ArrayList<Future<?>> futureLists;
+    public ArrayList<Future<?>> futureTasksLists;
 
     /**
      * The Futures async.
      */
-    public final Map<AsyncTask<P, R>, Future<?>> futureMaps = new ConcurrentHashMap<>();
+    public final Map<AsyncTask<P, R>, Future<?>> futureTasksMap = new ConcurrentHashMap<>();
 
     /**
      * The Timer listeners.
@@ -146,9 +145,9 @@ public class TaskLoader<P, R> {
         completeLatch = new CountDownLatch(1);
         this.processTimeout = timeout;
         if (this.processTimeout > 0) {
-            futureLists = new ArrayList<>(1);
+            futureTasksLists = new ArrayList<>(1);
         } else {
-            futureLists = EmptyFutures;
+            futureTasksLists = EmptyFutures;
         }
     }
 
@@ -303,17 +302,17 @@ public class TaskLoader<P, R> {
     }
 
     private void cancel() {
-        lock.lock();
+        taskLock.lock();
         try {
             canceled = true;
-            for (Future<?> future : futureLists) {
+            for (Future<?> future : futureTasksLists) {
                 /**
                  * Enforced interruptions
                  */
                 future.cancel(true);
             }
         } finally {
-            lock.unlock();
+            taskLock.unlock();
         }
 
     }
@@ -363,14 +362,14 @@ public class TaskLoader<P, R> {
              * If you need to interrupt then you need to save all the task threads and you need to manipulate shared variables
              */
             try {
-                lock.lock();
+                taskLock.lock();
                 if (!canceled) {
                     Future<?> submit = taskListenerConditional(taskActuator);
-                    futureLists.add(submit);
+                    futureTasksLists.add(submit);
                 }
 
             } finally {
-                lock.unlock();
+                taskLock.unlock();
             }
         } else {
             /**
@@ -389,7 +388,7 @@ public class TaskLoader<P, R> {
     }
 
     private Future<?> timeOperator(TaskActuator<?> taskActuator) {
-        Callable<?> callable = threadAdapter(taskActuator);
+        Callable<?> callable = threadAdapterSPI(taskActuator);
         GobrsFutureTask<?> future = new GobrsFutureTask<>(callable);
         executorService.submit(future);
         GobrsTimer.TimerListener listener = new GobrsTimer.TimerListener() {
@@ -425,14 +424,14 @@ public class TaskLoader<P, R> {
 
         Reference<GobrsTimer.TimerListener> tl = GobrsTimer.getInstance(ConfigManager.getGlobalConfig().getTimeoutCoreSize()).addTimerListener(listener);
         timerListeners.put(taskActuator.getTask().getClass(), tl);
-        futureMaps.put(taskActuator.task, future);
+        futureTasksMap.put(taskActuator.task, future);
         return future;
     }
 
     private Future<?> start(TaskActuator taskActuator) {
-        Callable<?> callable = threadAdapter(taskActuator);
+        Callable<?> callable = threadAdapterSPI(taskActuator);
         Future<?> future = executorService.submit(callable);
-        futureMaps.put(taskActuator.task, future);
+        futureTasksMap.put(taskActuator.task, future);
         return future;
     }
 
@@ -442,7 +441,7 @@ public class TaskLoader<P, R> {
      * @param taskActuator
      * @return
      */
-    private Callable<?> threadAdapter(TaskActuator<?> taskActuator) {
+    private Callable<?> threadAdapterSPI(TaskActuator<?> taskActuator) {
         ThreadWapper threadWapper = ExtensionLoader.getExtensionLoader(ThreadWapper.class).getRealLizesFirst();
         return Objects.isNull(threadWapper) ? taskActuator : threadWapper.wrapper(taskActuator);
     }
@@ -622,11 +621,11 @@ public class TaskLoader<P, R> {
     }
 
     /**
-     * Gets future maps.
+     * Gets future tasks map.
      *
-     * @return the future maps
+     * @return the future tasks map
      */
-    public Map<AsyncTask<P, R>, Future<?>> getFutureMaps() {
-        return futureMaps;
+    public Map<AsyncTask<P, R>, Future<?>> getFutureTasksMap() {
+        return futureTasksMap;
     }
 }

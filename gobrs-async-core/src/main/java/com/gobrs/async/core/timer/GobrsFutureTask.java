@@ -70,28 +70,18 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
 
     @Override
     public boolean cancel(boolean mayInterruptIfRunning) {
-        return sync.innerCancel(mayInterruptIfRunning, false);
+        return sync.innerCancel(mayInterruptIfRunning);
     }
 
     /**
-     * Cancel boolean.
-     *
-     * @param mayInterruptIfRunning the may interrupt if running
-     * @param stopBehind            the stop behind
-     * @return the boolean
-     */
-    public boolean cancel(boolean mayInterruptIfRunning, boolean stopBehind) {
-        return sync.innerCancel(mayInterruptIfRunning, stopBehind);
-    }
-
-    /**
+     * /**
      *
      * @param mayStopIfRunning the may stop if running
-     * @return boolean
+     * @return boolean boolean
      */
     public boolean isMayStopIfRunning(boolean mayStopIfRunning) {
         if (sync.runner.getState() != Thread.State.RUNNABLE) {
-            return cancel(true);
+            return cancel(mayStopIfRunning);
         }
         return sync.innerStop(mayStopIfRunning);
     }
@@ -107,6 +97,7 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
     /**
      * @throws CancellationException {@inheritDoc}
      */
+    @Override
     public V get(long timeout, TimeUnit unit) throws InterruptedException,
             ExecutionException, TimeoutException {
         return sync.innerGet(unit.toNanos(timeout));
@@ -392,7 +383,7 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
          * Inner stop boolean.
          *
          * @param mayStopIfRunning the may stop if running
-         * @return boolean
+         * @return boolean boolean
          */
         boolean innerStop(boolean mayStopIfRunning) {
             for (; ; ) {
@@ -419,10 +410,9 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
          * Inner cancel boolean.
          *
          * @param mayInterruptIfRunning the may interrupt if running
-         * @param stopBehind            the stop behind
          * @return the boolean
          */
-        boolean innerCancel(boolean mayInterruptIfRunning, boolean stopBehind) {
+        boolean innerCancel(boolean mayInterruptIfRunning) {
             for (; ; ) {
                 int s = getState();
                 if (ranOrCancelled(s))

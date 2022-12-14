@@ -25,11 +25,6 @@
                 <artifactId>apm-toolkit-trace</artifactId>
                 <version>${skywalking.version}</version>
             </dependency>
-            <dependency>
-                <groupId>io.github.memorydoc</groupId>
-                <artifactId>gobrs-async-skywalking-plugin</artifactId>
-                <version>${revision}</version>
-            </dependency>
         </dependencies>
 
     </dependencyManagement>

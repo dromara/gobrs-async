@@ -6,7 +6,6 @@ import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.core.common.domain.TaskStatus;
 import com.gobrs.async.core.common.enums.ResultState;
-import com.gobrs.async.core.common.exception.AsyncTaskTimeoutException;
 import com.gobrs.async.core.common.exception.GobrsForceStopException;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.log.TraceUtil;
@@ -15,7 +14,6 @@ import com.gobrs.async.core.task.TaskUtil;
 import com.gobrs.async.core.timer.GobrsFutureTask;
 import com.gobrs.async.core.timer.GobrsTimer;
 import lombok.extern.slf4j.Slf4j;
-import org.omg.CORBA.INITIALIZE;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.ref.Reference;
@@ -209,7 +207,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param taskLoader
      */
     private void futureStopRelease(Object parameter, TaskLoader taskLoader, Exception exception) {
-        Future<?> future = (Future<?>) taskLoader.getFutureMaps().get(task);
+        Future<?> future = (Future<?>) taskLoader.getFutureTasksMap().get(task);
         if (future instanceof GobrsFutureTask) {
             Integer syncState = ((GobrsFutureTask<?>) future).getSyncState();
             if (syncState == STOP_STAMP) {
@@ -337,7 +335,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
             List<AsyncTask> asyncTaskList = upwardTasksMap.get(task);
 
-            Map<AsyncTask<?, Result>, Future<?>> futureMaps = support.getTaskLoader().futureMaps;
+            Map<AsyncTask<?, Result>, Future<?>> futureMaps = support.getTaskLoader().getFutureTasksMap();
 
             futureMaps.forEach((x, y) -> {
 
