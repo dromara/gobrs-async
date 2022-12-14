@@ -4,6 +4,7 @@ package com.gobrs.async.core.task;
 import com.gobrs.async.core.TaskSupport;
 import com.gobrs.async.core.callback.ErrorCallback;
 import com.gobrs.async.core.common.enums.ExpState;
+import com.gobrs.async.core.common.exception.AsyncTaskTimeoutException;
 import com.gobrs.async.core.common.util.SystemClock;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.log.LogTracer;
@@ -26,6 +27,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static com.gobrs.async.core.common.def.DefaultConfig.TASK_TIMEOUT;
 import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionInterceptor;
 
 /**
@@ -117,7 +119,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * @param support the support
      * @return the result
      */
-    public Result taskAdapter(Param param, TaskSupport support) {
+    public Result taskAdapter(Param param, TaskSupport support) throws Exception {
         Long startTime = SystemClock.now();
         Result task;
         Exception exeError = null;
@@ -125,8 +127,10 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
             task = task(param, support);
         } catch (Exception exception) {
             exeError = exception;
-            throw exception;
+            exeError = transferException(exeError, support.getStatus(getClass()).getStatus().get());
+            throw exeError;
         } finally {
+
             boolean costLogabled = ConfigManager.Action.costLogabled(support.getRuleName());
             if (costLogabled &&
                     Objects.nonNull(support.getLogWrapper())) {
@@ -145,6 +149,19 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
             }
         }
         return task;
+    }
+
+    /**
+     * 异常转换
+     *
+     * @param e
+     * @param state
+     */
+    protected Exception transferException(Exception e, Integer state) {
+        if (TASK_TIMEOUT == state) {
+            return new AsyncTaskTimeoutException(String.format("task %s timeout exception", this.getName(), e));
+        }
+        return e;
     }
 
 
