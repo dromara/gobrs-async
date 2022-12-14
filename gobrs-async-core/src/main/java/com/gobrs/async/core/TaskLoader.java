@@ -394,16 +394,14 @@ public class TaskLoader<P, R> {
         GobrsTimer.TimerListener listener = new GobrsTimer.TimerListener() {
             @Override
             public void tick() {
-                if (stamp()) {
-                    throw new AsyncTaskTimeoutException(String.format("task %s TimeoutException", taskActuator.getTask().getName()));
-                }
+                doTick();
             }
 
             /**
              * adjust interrupt
              * @return
              */
-            private boolean stamp() {
+            private void doTick() {
                 boolean b = !future.isDone() && taskActuator.getTaskStatus(taskActuator).compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT);
                 if (b) {
                     try {
@@ -411,9 +409,7 @@ public class TaskLoader<P, R> {
                     } catch (Exception e) {
                         future.isMayStopIfRunning(true);
                     }
-                    return true;
                 }
-                return false;
             }
 
             @Override
