@@ -49,6 +49,11 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
     }
 
     @Override
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        return cancel(mayInterruptIfRunning, false);
+    }
+
+    @Override
     public boolean isCancelled() {
         return sync.innerIsCancelled();
     }
@@ -58,19 +63,16 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
         return sync.innerIsDone();
     }
 
-    @Override
-    public boolean cancel(boolean mayInterruptIfRunning) {
-        return sync.innerCancel(mayInterruptIfRunning);
+    public boolean cancel(boolean mayInterruptIfRunning, boolean stopBehind) {
+        return sync.innerCancel(mayInterruptIfRunning, stopBehind);
     }
 
+
     /**
-     * 自己加的！！！！
-     *
-     * @param mayStopIfRunning
      * @return
      */
-    public boolean stop(boolean mayStopIfRunning) {
-        return sync.innerStop(mayStopIfRunning);
+    public boolean forceStopIfRunning() {
+        return sync.innerStop();
     }
 
     /**
@@ -305,24 +307,15 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
         }
 
         /**
-         * 仿照innerCancel自己加的！！
+         * own write
          *
-         * @param mayStopIfRunning
          * @return
          */
-        boolean innerStop(boolean mayStopIfRunning) {
-            for (; ; ) {
+        boolean innerStop() {
+            Thread r = runner;
+            if (r != null && Thread.State.RUNNABLE == r.getState()) {
                 int s = getState();
-                if (ranOrCancelled(s))
-                    return true;
-                if (compareAndSetState(s, CANCELLED))
-                    break;
-            }
-            if (mayStopIfRunning) {
-                Thread r = runner;
-                if (r != null && Thread.State.RUNNABLE == r.getState()) {
-                    int s = getState();
-                    compareAndSetState(s, STOP);
+                if (compareAndSetState(s, STOP)) {
                     r.stop();//这里调用线程stop方法
                 }
             }
@@ -331,7 +324,7 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
             return true;
         }
 
-        boolean innerCancel(boolean mayInterruptIfRunning) {
+        boolean innerCancel(boolean mayInterruptIfRunning, boolean stopBehind) {
             for (; ; ) {
                 int s = getState();
                 if (ranOrCancelled(s))
@@ -345,8 +338,10 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
                     r.interrupt();
                 }
             }
-            releaseShared(0);
-            done();
+            if (!stopBehind) {
+                releaseShared(0);
+                done();
+            }
             return true;
         }
 
