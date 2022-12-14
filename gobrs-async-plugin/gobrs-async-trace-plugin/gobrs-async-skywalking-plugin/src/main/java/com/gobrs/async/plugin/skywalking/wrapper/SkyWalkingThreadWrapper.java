@@ -17,7 +17,7 @@ import java.util.concurrent.Callable;
  * @create: 2022 -12-13
  */
 @Realize
-public class SkyWalkingThreadWapper<T> implements ThreadWapper<T> {
+public class SkyWalkingThreadWrapper<T> implements ThreadWapper<T> {
 
     @Override
     public Callable<T> wrapper(Callable<T> callable) {

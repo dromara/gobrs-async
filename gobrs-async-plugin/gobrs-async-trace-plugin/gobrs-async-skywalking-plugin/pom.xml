@@ -4,12 +4,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>gobrs-async-plugin</artifactId>
+        <artifactId>gobrs-async-trace-plugin</artifactId>
         <groupId>io.github.memorydoc</groupId>
         <version>${revision}</version>
     </parent>
     <artifactId>gobrs-async-skywalking-plugin</artifactId>
-
     <dependencies>
         <dependency>
             <groupId>io.github.memorydoc</groupId>
