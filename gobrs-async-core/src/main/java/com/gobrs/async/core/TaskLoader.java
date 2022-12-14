@@ -389,8 +389,8 @@ public class TaskLoader<P, R> {
 
     private Future<?> timeOperator(TaskActuator<?> taskActuator) {
         Callable<?> callable = threadAdapter(taskActuator);
-        GobrsFutureTask<?> gobrsFutureTask = new GobrsFutureTask<>(callable);
-        Future<?> future = executorService.submit(gobrsFutureTask);
+        GobrsFutureTask<?> future = new GobrsFutureTask<>(callable);
+        executorService.submit(future);
         GobrsTimer.TimerListener listener = new GobrsTimer.TimerListener() {
             @Override
             public void tick() {
@@ -405,8 +405,8 @@ public class TaskLoader<P, R> {
              */
             private boolean stamp() {
                 return !future.isDone()
-                        && taskActuator.getTaskSupport().getStatus(taskActuator.getTask().getClass()).compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT)
-                        && future.cancel(true) && ((GobrsFutureTask<?>) futureMaps.get(taskActuator.task)).stop(true);
+                        && taskActuator.getTaskStatus(taskActuator).compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT)
+                        && future.cancel(true, true) && ((GobrsFutureTask<?>) futureMaps.get(taskActuator.task)).forceStopIfRunning();
             }
 
             @Override
@@ -417,7 +417,7 @@ public class TaskLoader<P, R> {
 
         Reference<GobrsTimer.TimerListener> tl = GobrsTimer.getInstance(ConfigManager.getGlobalConfig().getTimeoutCoreSize()).addTimerListener(listener);
         timerListeners.put(taskActuator.getTask().getClass(), tl);
-        futureMaps.put(taskActuator.task, gobrsFutureTask);
+        futureMaps.put(taskActuator.task, future);
         return future;
     }
 

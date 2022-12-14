@@ -6,6 +6,7 @@ import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.core.common.domain.TaskStatus;
 import com.gobrs.async.core.common.enums.ResultState;
+import com.gobrs.async.core.common.exception.GobrsForceStopException;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.log.TraceUtil;
 import com.gobrs.async.core.task.AsyncTask;
@@ -196,21 +197,22 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
             }
         } finally {
             clear();
-            futureStopRelease(taskLoader);
+            futureStopRelease(parameter, taskLoader, new GobrsForceStopException(String.format(" task %s force stop error", task.getName())));
         }
         return (Result) result;
     }
 
     /**
      * 根据中断位强制释放资源 针对开发者使用死循环等问题fix
+     *
      * @param taskLoader
      */
-    private void futureStopRelease(TaskLoader taskLoader) {
+    private void futureStopRelease(Object parameter, TaskLoader taskLoader, Exception exception) {
         Future<?> future = (Future<?>) taskLoader.getFutureMaps().get(task);
         if (future instanceof GobrsFutureTask) {
             Integer syncState = ((GobrsFutureTask<?>) future).getSyncState();
             if (syncState == STOP_STAMP) {
-                taskLoader.stopSingleTaskLine(subTasks);
+                onDoTask(parameter, taskLoader, exception);
             }
         }
     }
@@ -261,39 +263,43 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
             support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
 
-            task.onFailureTrace(support, e);
-
             /**
              * transaction com.gobrs.async.com.gobrs.async.test.task
              * 事物任务
              */
             transaction(taskLoader);
 
+            onDoTask(parameter, taskLoader, e);
+        }
+    }
+
+    private void onDoTask(Object parameter, TaskLoader taskLoader, Exception e) {
+        task.onFailureTrace(support, e);
+
+        /**
+         * A single com.gobrs.async.com.gobrs.async.test.task com.gobrs.async.exception interrupts the entire process
+         * 配置 taskInterrupt = true 则某一任务异常后结束整个任务流程 默认 false
+         */
+        if (ConfigManager.getRule(taskLoader.getRuleName()).isTaskInterrupt()) {
+
+            taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
+
+        } else {
+
+            taskLoader.error(errorCallback(parameter, e, support, task));
+
             /**
-             * A single com.gobrs.async.com.gobrs.async.test.task com.gobrs.async.exception interrupts the entire process
-             * 配置 taskInterrupt = true 则某一任务异常后结束整个任务流程 默认 false
+             * 当然任务失败 是否继续执行子任务
              */
-            if (ConfigManager.getRule(taskLoader.getRuleName()).isTaskInterrupt()) {
-
-                taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
-
+            if (task.isFailSubExec()) {
+                nextTask(taskLoader, TaskUtil.defaultAnyCondition(false));
             } else {
-
-                taskLoader.error(errorCallback(parameter, e, support, task));
-
-                /**
-                 * 当然任务失败 是否继续执行子任务
-                 */
-                if (task.isFailSubExec()) {
+                if (!CollectionUtils.isEmpty(taskLoader.getOptionalTasks()) || TaskUtil.multipleDependencies(upwardTasksMap, subTasks)) {
                     nextTask(taskLoader, TaskUtil.defaultAnyCondition(false));
                 } else {
-                    if (!CollectionUtils.isEmpty(taskLoader.getOptionalTasks()) || TaskUtil.multipleDependencies(upwardTasksMap, subTasks)) {
-                        nextTask(taskLoader, TaskUtil.defaultAnyCondition(false));
-                    } else {
-                        taskLoader.stopSingleTaskLine(subTasks);
-                    }
-
+                    taskLoader.stopSingleTaskLine(subTasks);
                 }
+
             }
         }
     }
@@ -654,6 +660,17 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     public TaskSupport getTaskSupport() {
         return support;
     }
+
+    /**
+     * Gets task status.
+     *
+     * @param taskActuator the task actuator
+     * @return the task status
+     */
+    public TaskStatus getTaskStatus(TaskActuator<?> taskActuator) {
+        return support.getStatus(taskActuator.getTask().getClass());
+    }
+
 
     /**
      * Sets com.gobrs.async.com.gobrs.async.test.task support.

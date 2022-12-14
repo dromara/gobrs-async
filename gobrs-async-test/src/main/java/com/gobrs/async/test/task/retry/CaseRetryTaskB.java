@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
  * @create: 2022 -10-31
  */
 @Slf4j
-@Task(retryCount = 2, timeoutInMilliseconds = 100, failSubExec = true)
+@Task(retryCount = 2, timeoutInMilliseconds = 10, failSubExec = true)
 public class CaseRetryTaskB extends AsyncTask {
 
     @Override
@@ -30,6 +30,10 @@ public class CaseRetryTaskB extends AsyncTask {
     @Override
     public Object task(Object o, TaskSupport support) {
         System.out.println("CaseRetryTaskB Begin");
+        for (int i = 0; i < 10000000000000L; i++) {
+            l++;
+        }
+//        Thread.sleep(10000);
         System.out.println("CaseRetryTaskB End");
         return "AResult";
     }
