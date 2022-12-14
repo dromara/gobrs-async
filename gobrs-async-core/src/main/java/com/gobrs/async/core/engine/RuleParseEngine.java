@@ -31,12 +31,21 @@ import static com.gobrs.async.core.common.def.DefaultConfig.*;
  */
 public class RuleParseEngine<T> extends AbstractEngine {
 
-    @Resource
     private GobrsConfig gobrsConfig;
 
-
-    @Resource
     private GobrsAsync gobrsAsync;
+
+
+    /**
+     * Instantiates a new Rule parse engine.
+     *
+     * @param gobrsConfig the gobrs config
+     * @param gobrsAsync  the gobrs async
+     */
+    public RuleParseEngine(GobrsConfig gobrsConfig, GobrsAsync gobrsAsync) {
+        this.gobrsConfig = gobrsConfig;
+        this.gobrsAsync = gobrsAsync;
+    }
 
     @Override
     public void doParse(GobrsAsyncRule rule, boolean reload) {

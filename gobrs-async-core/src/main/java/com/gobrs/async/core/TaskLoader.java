@@ -19,6 +19,7 @@ import com.gobrs.async.core.timer.GobrsFutureTask;
 import com.gobrs.async.core.timer.GobrsTimer;
 import com.gobrs.async.plugin.base.wrapper.ThreadWapper;
 import com.gobrs.async.spi.ExtensionLoader;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
@@ -404,9 +405,16 @@ public class TaskLoader<P, R> {
              * @return
              */
             private boolean stamp() {
-                return !future.isDone()
-                        && taskActuator.getTaskStatus(taskActuator).compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT)
-                        && future.cancel(true, true) && ((GobrsFutureTask<?>) futureMaps.get(taskActuator.task)).forceStopIfRunning();
+                boolean b = !future.isDone() && taskActuator.getTaskStatus(taskActuator).compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT);
+                if (b) {
+                    try {
+                        future.get(0, TimeUnit.MILLISECONDS);
+                    } catch (Exception e) {
+                        future.isMayStopIfRunning(true);
+                    }
+                    return true;
+                }
+                return false;
             }
 
             @Override
@@ -435,8 +443,8 @@ public class TaskLoader<P, R> {
      * @return
      */
     private Callable<?> threadAdapter(TaskActuator<?> taskActuator) {
-        List<ThreadWapper> realizes = ExtensionLoader.getExtensionLoader(ThreadWapper.class).getRealizes();
-        return CollectionUtils.isEmpty(realizes) ? taskActuator : realizes.get(0).wrapper(taskActuator);
+        ThreadWapper threadWapper = ExtensionLoader.getExtensionLoader(ThreadWapper.class).getRealLizesFirst();
+        return Objects.isNull(threadWapper) ? taskActuator : threadWapper.wrapper(taskActuator);
     }
 
     /**

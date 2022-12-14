@@ -81,12 +81,14 @@ public class GobrsAutoConfiguration {
     /**
      * Rule com.gobrs.async.engine com.gobrs.async.rule com.gobrs.async.engine.
      *
+     * @param gobrsConfig the gobrs config
+     * @param gobrsAsync  the gobrs async
      * @return the com.gobrs.async.rule com.gobrs.async.engine
      */
     @Bean
     @ConditionalOnMissingBean(value = RuleEngine.class)
-    public RuleEngine ruleEngine() {
-        return new RuleParseEngine<>();
+    public RuleEngine ruleEngine(GobrsConfig gobrsConfig, GobrsAsync gobrsAsync) {
+        return new RuleParseEngine<>(gobrsConfig, gobrsAsync);
     }
 
     /**
