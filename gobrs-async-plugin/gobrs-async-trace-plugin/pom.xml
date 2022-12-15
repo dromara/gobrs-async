@@ -11,21 +11,27 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>gobrs-async-skywalking-plugin</module>
     </modules>
 
     <properties>
-        <skywalking.version>8.4.0</skywalking.version>
+        <tlog.version>1.5.0</tlog.version>
+        <log4j.versino>1.2.17</log4j.versino>
     </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.apache.skywalking</groupId>
-                <artifactId>apm-toolkit-trace</artifactId>
-                <version>${skywalking.version}</version>
+                <groupId>com.yomahub</groupId>
+                <artifactId>tlog-all-spring-boot-starter</artifactId>
+                <version>${tlog.version}</version>
             </dependency>
-        </dependencies>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>${log4j.versino}</version>
+            </dependency>
 
+        </dependencies>
     </dependencyManagement>
 
 </project>

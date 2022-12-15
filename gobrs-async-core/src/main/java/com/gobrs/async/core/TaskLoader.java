@@ -409,7 +409,7 @@ public class TaskLoader<P, R> {
              * @return
              */
             private void doTick() {
-                boolean b = !future.isDone() && taskActuator.getTaskStatus().compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT);
+                boolean b = !future.isDone() && taskActuator.taskStatus().compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT);
                 if (b) {
                     try {
                         future.get(0, TimeUnit.MILLISECONDS);

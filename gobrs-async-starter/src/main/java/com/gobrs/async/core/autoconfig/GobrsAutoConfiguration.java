@@ -10,6 +10,8 @@ import com.gobrs.async.core.engine.RulePostProcessor;
 import com.gobrs.async.core.engine.RuleThermalLoad;
 import com.gobrs.async.core.holder.BeanHolder;
 import com.gobrs.async.core.threadpool.GobrsAsyncThreadPoolFactory;
+import com.gobrs.async.plugin.base.wrapper.trace.TraceInterceptor;
+import com.gobrs.async.spi.ExtensionLoader;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -18,6 +20,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+
+import java.util.List;
 
 import static com.gobrs.async.core.autoconfig.GobrsAutoConfiguration.GOBRS_NAMESPACE;
 
@@ -40,6 +44,13 @@ import static com.gobrs.async.core.autoconfig.GobrsAutoConfiguration.GOBRS_NAMES
 public class GobrsAutoConfiguration {
 
     protected static final String GOBRS_NAMESPACE = "com.gobrs.async";
+
+    static {
+        List<TraceInterceptor> realizes = ExtensionLoader.getExtensionLoader(TraceInterceptor.class).getRealizes();
+        for (TraceInterceptor realize : realizes) {
+            realize.trace();
+        }
+    }
 
     /**
      * Instantiates a new Gobrs auto configuration.

@@ -666,8 +666,9 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * Gets task status.
      *
      * @return the task status
+     *
      */
-    public TaskStatus getTaskStatus() {
+    public TaskStatus taskStatus() {
         return support.getStatus(task.getClass());
     }
 
