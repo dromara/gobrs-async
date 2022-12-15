@@ -669,8 +669,8 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param taskActuator the task actuator
      * @return the task status
      */
-    public TaskStatus getTaskStatus(TaskActuator<?> taskActuator) {
-        return support.getStatus(taskActuator.getTask().getClass());
+    public TaskStatus getTaskStatus() {
+        return support.getStatus(task.getClass());
     }
 
 
