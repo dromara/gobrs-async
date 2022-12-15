@@ -38,7 +38,6 @@
         <dependency>
             <groupId>io.github.memorydoc</groupId>
             <artifactId>gobrs-async-trace-plugin</artifactId>
-            <version>1.2.8-RELEASE</version>
         </dependency>
 
     </dependencies>
