@@ -176,7 +176,7 @@ public class TaskLoader<P, R> {
                  * Start the thread to perform tasks without any dependencies
                  * Thread reuse
                  */
-                if (reusing(process)) {
+                if (begins.size() == 1 && reusing(process)) {
                     process.call();
                 } else {
                     startProcess(process);
@@ -410,7 +410,7 @@ public class TaskLoader<P, R> {
              * @return
              */
             private void doTick() {
-                boolean b = !future.isDone() && taskActuator.getTaskStatus(taskActuator).compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT);
+                boolean b = !future.isDone() && taskActuator.getTaskStatus().compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT);
                 if (b) {
                     try {
                         future.get(0, TimeUnit.MILLISECONDS);
