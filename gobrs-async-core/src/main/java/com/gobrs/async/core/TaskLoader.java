@@ -36,7 +36,6 @@ import static com.gobrs.async.core.common.def.DefaultConfig.TASK_INITIALIZE;
 import static com.gobrs.async.core.common.def.DefaultConfig.TASK_TIMEOUT;
 import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionInterceptor;
 import static com.gobrs.async.core.task.ReUsing.reusing;
-import static com.gobrs.async.core.timer.RetryUtil.retryConditional;
 
 /**
  * The type Task loader.

@@ -30,7 +30,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import static com.gobrs.async.core.common.def.DefaultConfig.*;
 import static com.gobrs.async.core.task.ReUsing.reusing;
 import static com.gobrs.async.core.timer.GobrsFutureTask.STOP_STAMP;
-import static com.gobrs.async.core.timer.RetryUtil.retryConditional;
 
 /**
  * The type Task actuator.
@@ -289,7 +288,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
             taskLoader.error(errorCallback(parameter, e, support, task));
 
             /**
-             * 当然任务失败 是否继续执行子任务
+             * 当任务失败 是否继续执行子任务
              */
             if (task.isFailSubExec()) {
                 nextTask(taskLoader, TaskUtil.defaultAnyCondition(false));
@@ -666,7 +665,6 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     /**
      * Gets task status.
      *
-     * @param taskActuator the task actuator
      * @return the task status
      */
     public TaskStatus getTaskStatus() {
