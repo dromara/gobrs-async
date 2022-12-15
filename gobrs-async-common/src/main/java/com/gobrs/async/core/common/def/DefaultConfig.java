@@ -48,7 +48,7 @@ public interface DefaultConfig {
     /**
      * The constant retryCount.
      */
-    int RETRY_COUNT = 1;
+    int RETRY_COUNT = 0;
     /**
      * Whether to execute a subtask if it fails
      */

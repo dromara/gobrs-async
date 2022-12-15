@@ -18,7 +18,7 @@ import java.util.Map;
  * @create: 2022-12-09
  **/
 @SpringBootTest(classes = GobrsAsyncTestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CaseTimeout {
+public class CaseRetry {
 
 
     @Autowired(required = false)

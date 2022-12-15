@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import static com.gobrs.async.core.common.def.DefaultConfig.TASK_INITIALIZE;
 import static com.gobrs.async.core.common.def.DefaultConfig.TASK_TIMEOUT;
 import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionInterceptor;
+import static com.gobrs.async.core.task.ReUsing.reusing;
 import static com.gobrs.async.core.timer.RetryUtil.retryConditional;
 
 /**
@@ -175,7 +176,7 @@ public class TaskLoader<P, R> {
                  * Start the thread to perform tasks without any dependencies
                  * Thread reuse
                  */
-                if (begins.size() == 1 && retryConditional(process)) {
+                if (reusing(process)) {
                     process.call();
                 } else {
                     startProcess(process);
@@ -190,6 +191,8 @@ public class TaskLoader<P, R> {
             return postProcess(result);
         }
     }
+
+
 
     /**
      * 后置处理
@@ -387,6 +390,11 @@ public class TaskLoader<P, R> {
         return future;
     }
 
+    /**
+     * https://async.sizegang.cn/pages/2f8gmn/
+     * @param taskActuator
+     * @return
+     */
     private Future<?> timeOperator(TaskActuator<?> taskActuator) {
         Callable<?> callable = threadAdapterSPI(taskActuator);
         GobrsFutureTask<?> future = new GobrsFutureTask<>(callable);
