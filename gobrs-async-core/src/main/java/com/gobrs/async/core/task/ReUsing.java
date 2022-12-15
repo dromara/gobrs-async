@@ -3,8 +3,6 @@ package com.gobrs.async.core.task;
 import com.gobrs.async.core.TaskActuator;
 import com.gobrs.async.core.common.def.DefaultConfig;
 
-import java.util.List;
-
 import static com.gobrs.async.core.timer.RetryUtil.retryConditional;
 
 /**
