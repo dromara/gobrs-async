@@ -18,11 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 @Task(failSubExec = true, timeoutInMilliseconds = 300)
 public class CaseTimeoutTaskA extends AsyncTask {
 
-    /**
-     * The .
-     */
-    int i = 10000;
-
     @Override
     public void prepare(Object o) {
         log.info(this.getName() + " 使用线程---" + Thread.currentThread().getName());
@@ -31,13 +26,13 @@ public class CaseTimeoutTaskA extends AsyncTask {
     @SneakyThrows
     @Override
     public String task(Object o, TaskSupport support) {
-
-        System.out.println("CaseTimeoutTaskA Begin");
-        Thread.sleep(400);
-        for (int i1 = 0; i1 < i; i1++) {
-            i1 += i1;
+        Long j = 0L;
+        for (int i = 0; i < 100000000000000000L; i++) {
+            if(i % 100000L == 0){
+                System.out.println("test");
+            }
+            j++;
         }
-        System.out.println("CaseTimeoutTaskA Finish");
         return "result";
     }
 

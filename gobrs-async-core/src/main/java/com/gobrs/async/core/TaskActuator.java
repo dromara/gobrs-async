@@ -28,6 +28,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.gobrs.async.core.common.def.DefaultConfig.*;
+import static com.gobrs.async.core.task.ReUsing.reusing;
 import static com.gobrs.async.core.timer.GobrsFutureTask.STOP_STAMP;
 import static com.gobrs.async.core.timer.RetryUtil.retryConditional;
 
@@ -211,7 +212,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
         if (future instanceof GobrsFutureTask) {
             Integer syncState = ((GobrsFutureTask<?>) future).getSyncState();
             if (syncState == STOP_STAMP) {
-                onDoTask(parameter, taskLoader,  new GobrsForceStopException(String.format(" task %s force stop error", task.getName())));
+                onDoTask(parameter, taskLoader, new GobrsForceStopException(String.format(" task %s force stop error", task.getName())));
             }
         }
     }
@@ -498,13 +499,12 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     /**
      * 线程复用
      * 1、最后一个子任务使用父任务的线程
-     * 2、父任务未设置超时时间的任务 具备线程复用的能力
      *
      * @param i
      * @return
      */
     private boolean isCycleThread(int i, TaskActuator taskActuator) {
-        return i == subTasks.size() - 1 && Objects.isNull(taskActuator.getTask().getTimeoutInMilliseconds() > TASK_TIME_OUT);
+        return i == subTasks.size() - 1;
     }
 
     /**
@@ -542,13 +542,13 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
         /**
          * retry open thread for task timeout manager
          */
-        if (!cycleThread || retryConditional(process)) {
-            taskLoader.startProcess(process);
-        } else {
+        if (cycleThread && reusing(process)) {
             /**
              * Thread reuse saves context switching
              */
             process.call();
+        } else {
+            taskLoader.startProcess(process);
         }
     }
 

@@ -18,7 +18,7 @@ import java.util.concurrent.*;
  * @create: 2022 -10-31
  */
 @Slf4j
-@Task(timeoutInMilliseconds = 10, failSubExec = true)
+@Task(retryCount = 1, timeoutInMilliseconds = 300, failSubExec = true)
 public class CaseRetryTaskB extends AsyncTask {
 
     private static int l;
