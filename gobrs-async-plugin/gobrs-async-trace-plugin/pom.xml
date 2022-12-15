@@ -20,17 +20,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.yomahub</groupId>
-                <artifactId>tlog-all-spring-boot-starter</artifactId>
-                <version>${tlog.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>${log4j.versino}</version>
-            </dependency>
-
         </dependencies>
     </dependencyManagement>
 
