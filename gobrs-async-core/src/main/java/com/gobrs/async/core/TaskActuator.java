@@ -542,7 +542,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
         /**
          * retry open thread for task timeout manager
          */
-        if (cycleThread && reusing(process)) {
+        if (cycleThread && reusing(this) && reusing(process)) {
             /**
              * Thread reuse saves context switching
              */
