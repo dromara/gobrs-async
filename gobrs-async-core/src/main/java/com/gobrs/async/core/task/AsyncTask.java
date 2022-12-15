@@ -159,7 +159,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      */
     protected Exception transferException(Exception e, Integer state) {
         if (TASK_TIMEOUT == state) {
-            return new AsyncTaskTimeoutException(String.format("task %s timeout exception", this.getName(), e));
+            return new AsyncTaskTimeoutException(String.format("task %s timeout exception", this.getName()), e);
         }
         return e;
     }

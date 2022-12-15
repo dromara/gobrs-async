@@ -197,7 +197,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
             }
         } finally {
             clear();
-            futureStopRelease(parameter, taskLoader, new GobrsForceStopException(String.format(" task %s force stop error", task.getName())));
+            futureStopRelease(parameter, taskLoader);
         }
         return (Result) result;
     }
@@ -207,12 +207,14 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      *
      * @param taskLoader
      */
+    private void futureStopRelease(Object parameter, TaskLoader taskLoader) {
+        Future<?> future = (Future<?>) taskLoader.getFutureMaps().get(task);
     private void futureStopRelease(Object parameter, TaskLoader taskLoader, Exception exception) {
         Future<?> future = (Future<?>) taskLoader.getFutureTasksMap().get(task);
         if (future instanceof GobrsFutureTask) {
             Integer syncState = ((GobrsFutureTask<?>) future).getSyncState();
             if (syncState == STOP_STAMP) {
-                onDoTask(parameter, taskLoader, exception);
+                onDoTask(parameter, taskLoader,  new GobrsForceStopException(String.format(" task %s force stop error", task.getName())));
             }
         }
     }
