@@ -17,6 +17,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static com.gobrs.async.core.common.def.FixSave.LOGGER_PLUGIN;
+
 /**
  * The type Task trigger.
  *
@@ -112,7 +114,7 @@ class TaskTrigger<P, R> {
 
         downTasksMap.put(assistantTask, new ArrayList<>(0));
         upwardTasksMap.put(assistantTask, noSubtasks);
-        upwardTasksMapSpace.put(ruleName,upwardTasksMap);
+        upwardTasksMapSpace.put(ruleName, upwardTasksMap);
         clear();
         for (AsyncTask task : downTasksMap.keySet()) {
             TaskActuator process;
@@ -323,9 +325,11 @@ class TaskTrigger<P, R> {
      * @param support
      */
     private void logAdvance(TaskSupport support) {
-
-        long traceId = IdWorker.nextId();
-        TraceUtil.set(traceId);
+        long traceId = 0;
+        if (!LOGGER_PLUGIN) {
+            traceId = IdWorker.nextId();
+            TraceUtil.set(traceId);
+        }
         boolean costLogabled = ConfigManager.Action.costLogabled(ruleName);
         if (costLogabled) {
             LogWrapper.TimeCollector timeCollector =

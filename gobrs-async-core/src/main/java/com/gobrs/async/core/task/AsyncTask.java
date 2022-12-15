@@ -28,6 +28,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static com.gobrs.async.core.common.def.DefaultConfig.TASK_TIMEOUT;
+import static com.gobrs.async.core.common.def.FixSave.LOGGER_PLUGIN;
 import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionInterceptor;
 
 /**
@@ -144,7 +145,11 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
                 LogWrapper logWrapper = support.getLogWrapper();
                 logWrapper.addTrace(logTracer);
                 logWrapper.setProcessCost(costTime);
-                log.info("<{}> [{}]", logWrapper.getTraceId(), this.getName());
+                if (!LOGGER_PLUGIN) {
+                    log.info("<{}> [{}]", logWrapper.getTraceId(), this.getName());
+                } else {
+                    log.info("[{}]", this.getName());
+                }
 
             }
         }

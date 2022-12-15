@@ -35,12 +35,12 @@
             <groupId>io.github.memorydoc</groupId>
             <artifactId>gobrs-async-starter</artifactId>
         </dependency>
-        <!-- 日志框架 可以生成分布式traceId;  gobrs-async中使用的是字节码方式 生成日志模式-->
         <dependency>
-            <groupId>com.yomahub</groupId>
-            <artifactId>tlog-all-spring-boot-starter</artifactId>
-            <version>1.5.0</version>
+            <groupId>io.github.memorydoc</groupId>
+            <artifactId>gobrs-async-trace-plugin</artifactId>
+            <version>1.2.8-RELEASE</version>
         </dependency>
+
     </dependencies>
 
 </project>

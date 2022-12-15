@@ -4,6 +4,8 @@ import com.gobrs.async.core.common.util.SystemClock;
 
 import java.util.*;
 
+import static com.gobrs.async.core.common.def.FixSave.LOGGER_PLUGIN;
+
 /**
  * The type Log creator.
  *
@@ -38,14 +40,11 @@ public class LogCreator {
         List<LogTracer> logTracerList = new ArrayList<>();
         Long processStartTime = logWrapper.getTimeCollector().getStartTime();
         logWrapper.getTracerQueue().drainTo(logTracerList);
-        printContent
-                .append("【ProcessTrace】")
+        StringBuilder ms = printContent
+                .append(String.format("%s【ProcessTrace】", LOGGER_PLUGIN ? "" : String.format("<%s>", logWrapper.getTraceId())))
                 .append("Total cost: ")
                 .append(SystemClock.now() - processStartTime)
                 .append("ms")
-                .append(" | ")
-                .append("traceId = ")
-                .append(logWrapper.getTraceId())
                 .append(" | ");
         for (LogTracer tracer : logTracerList) {
             printContent = printContent

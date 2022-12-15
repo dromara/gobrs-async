@@ -1,26 +1,24 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>gobrs-async-plugin</artifactId>
         <groupId>io.github.memorydoc</groupId>
         <version>${revision}</version>
     </parent>
-
     <artifactId>gobrs-async-trace-plugin</artifactId>
-    <packaging>pom</packaging>
 
-    <modules>
-    </modules>
-
-    <properties>
-        <tlog.version>1.5.0</tlog.version>
-        <log4j.versino>1.2.17</log4j.versino>
-    </properties>
-
-    <dependencyManagement>
-        <dependencies>
-        </dependencies>
-    </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.yomahub</groupId>
+            <artifactId>tlog-all-spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.memorydoc</groupId>
+            <artifactId>gobrs-async-plugin-base</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>

@@ -75,11 +75,6 @@
                 <artifactId>gobrs-async-skywalking-plugin</artifactId>
                 <version>${revision}</version>
             </dependency>
-            <dependency>
-                <groupId>io.github.memorydoc</groupId>
-                <artifactId>gobrs-async-tlog-plugin</artifactId>
-                <version>${revision}</version>
-            </dependency>
 
             <dependency>
                 <groupId>io.github.memorydoc</groupId>
