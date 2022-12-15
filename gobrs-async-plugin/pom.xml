@@ -18,6 +18,7 @@
     <properties>
         <skywalking.version>8.4.0</skywalking.version>
     </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>

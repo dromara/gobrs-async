@@ -1,6 +1,7 @@
 package com.gobrs.async.core;
 
 import com.gobrs.async.core.callback.ErrorCallback;
+import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.TaskResult;
@@ -482,13 +483,13 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                             Boolean aBoolean = (Boolean) taskLoader.anyConditionProx.get(process);
                             if (Objects.isNull(aBoolean)) {
                                 taskLoader.anyConditionProx.put(process, true);
-                                doTask(taskLoader, process, optionalTasks, isCycleThread(i));
+                                doTask(taskLoader, process, optionalTasks, isCycleThread(i, process));
                             }
                         }
                     }
                 } else {
                     if (process.releasingDependency() == 0) {
-                        doTask(taskLoader, process, optionalTasks, isCycleThread(i));
+                        doTask(taskLoader, process, optionalTasks, isCycleThread(i, process));
                     }
                 }
             }
@@ -503,8 +504,8 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param i
      * @return
      */
-    private boolean isCycleThread(int i) {
-        return i == subTasks.size() - 1 && Objects.isNull(getListenerReference());
+    private boolean isCycleThread(int i, TaskActuator taskActuator) {
+        return i == subTasks.size() - 1 && Objects.isNull(taskActuator.getTask().getTimeoutInMilliseconds() > TASK_TIME_OUT);
     }
 
     /**
@@ -539,6 +540,9 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param cycleThread
      */
     private void doProcess(TaskLoader taskLoader, TaskActuator process, boolean cycleThread) {
+        /**
+         * retry open thread for task timeout manager
+         */
         if (!cycleThread || retryConditional(process)) {
             taskLoader.startProcess(process);
         } else {

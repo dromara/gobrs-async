@@ -1,6 +1,7 @@
 package com.gobrs.async.core.timer;
 
 import com.gobrs.async.core.TaskActuator;
+import com.gobrs.async.core.common.def.DefaultConfig;
 
 /**
  * The type Retry util.
@@ -20,6 +21,6 @@ public class RetryUtil {
      * @return the boolean
      */
     public static boolean retryConditional(TaskActuator taskActuator) {
-        return taskActuator.getTask().getRetryCount() > 1;
+        return taskActuator.getTask().getRetryCount() >= DefaultConfig.RETRY_COUNT;
     }
 }

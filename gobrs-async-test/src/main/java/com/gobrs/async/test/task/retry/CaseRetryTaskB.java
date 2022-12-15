@@ -18,7 +18,7 @@ import java.util.concurrent.*;
  * @create: 2022 -10-31
  */
 @Slf4j
-@Task(retryCount = 2, timeoutInMilliseconds = 10, failSubExec = true)
+@Task(timeoutInMilliseconds = 10, failSubExec = true)
 public class CaseRetryTaskB extends AsyncTask {
 
     private static int l;
@@ -33,10 +33,14 @@ public class CaseRetryTaskB extends AsyncTask {
     @Override
     public Object task(Object o, TaskSupport support) {
         System.out.println("CaseRetryTaskB Begin");
-//        for (int i = 0; i < 10000000000000L; i++) {
-//            l++;
-//        }
-        Thread.sleep(100);
+        Long j = 0L;
+        for (int i = 0; i < 100000000000000000L; i++) {
+            if (i % 100000L == 0) {
+                System.out.println("test");
+            }
+            j++;
+        }
+//        Thread.sleep(100);
         System.out.println("CaseRetryTaskB End");
         return "AResult";
     }
