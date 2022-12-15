@@ -1,7 +1,6 @@
 package com.gobrs.async.core;
 
 import com.gobrs.async.core.callback.ErrorCallback;
-import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.TaskResult;
@@ -208,8 +207,6 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param taskLoader
      */
     private void futureStopRelease(Object parameter, TaskLoader taskLoader) {
-        Future<?> future = (Future<?>) taskLoader.getFutureMaps().get(task);
-    private void futureStopRelease(Object parameter, TaskLoader taskLoader, Exception exception) {
         Future<?> future = (Future<?>) taskLoader.getFutureTasksMap().get(task);
         if (future instanceof GobrsFutureTask) {
             Integer syncState = ((GobrsFutureTask<?>) future).getSyncState();
