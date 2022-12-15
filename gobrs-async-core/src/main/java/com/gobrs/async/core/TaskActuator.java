@@ -586,7 +586,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     @SuppressWarnings("unchecked")
     public Object clone() {
         try {
-            TaskActuator cloned = (TaskActuator) super.clone();
+            TaskActuator<?> cloned = (TaskActuator<?>) super.clone();
             cloned.lock = new ReentrantLock();
             return cloned;
         } catch (Exception e) {
