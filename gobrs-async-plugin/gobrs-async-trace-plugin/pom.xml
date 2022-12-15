@@ -2,23 +2,21 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>gobrs-async</artifactId>
+        <artifactId>gobrs-async-plugin</artifactId>
         <groupId>io.github.memorydoc</groupId>
         <version>${revision}</version>
     </parent>
 
-    <artifactId>gobrs-async-plugin</artifactId>
+    <artifactId>gobrs-async-trace-plugin</artifactId>
     <packaging>pom</packaging>
 
     <modules>
-        <module>gobrs-async-trace-plugin</module>
-        <module>gobrs-async-plugin-base</module>
+        <module>gobrs-async-skywalking-plugin</module>
     </modules>
 
     <properties>
         <skywalking.version>8.4.0</skywalking.version>
     </properties>
-
     <dependencyManagement>
         <dependencies>
             <dependency>

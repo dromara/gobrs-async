@@ -261,7 +261,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * @return the task future
      */
     public <Result> Future<Result> getTaskFuture(TaskSupport support, Class<? extends ITask> clazz, Class<Result> type) {
-        Object o = support.getTaskLoader().futureMaps.get(clazz);
+        Object o = support.getTaskLoader().getFutureTasksMap().get(clazz);
         if (Objects.nonNull(o)) {
             return ((Future<Result>) o);
         }
@@ -281,7 +281,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * @return the task future result
      */
     public <Result> Object getTaskFutureResult(TaskSupport support, Class<? extends ITask> clazz, Class<Result> type, long timeout, TimeUnit unit) {
-        Object o = support.getTaskLoader().futureMaps.get(clazz);
+        Object o = support.getTaskLoader().getFutureTasksMap().get(clazz);
         if (Objects.nonNull(o)) {
             try {
                 return ((Future<Result>) o).get(timeout, unit);

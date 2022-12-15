@@ -6,7 +6,6 @@ import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.core.common.domain.TaskStatus;
 import com.gobrs.async.core.common.enums.ResultState;
-import com.gobrs.async.core.common.exception.AsyncTaskTimeoutException;
 import com.gobrs.async.core.common.exception.GobrsForceStopException;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.log.TraceUtil;
@@ -15,7 +14,6 @@ import com.gobrs.async.core.task.TaskUtil;
 import com.gobrs.async.core.timer.GobrsFutureTask;
 import com.gobrs.async.core.timer.GobrsTimer;
 import lombok.extern.slf4j.Slf4j;
-import org.omg.CORBA.INITIALIZE;
 import org.springframework.util.CollectionUtils;
 
 import java.lang.ref.Reference;
@@ -209,7 +207,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param taskLoader
      */
     private void futureStopRelease(Object parameter, TaskLoader taskLoader) {
-        Future<?> future = (Future<?>) taskLoader.getFutureMaps().get(task);
+        Future<?> future = (Future<?>) taskLoader.getFutureTasksMap().get(task);
         if (future instanceof GobrsFutureTask) {
             Integer syncState = ((GobrsFutureTask<?>) future).getSyncState();
             if (syncState == STOP_STAMP) {
@@ -337,7 +335,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
             List<AsyncTask> asyncTaskList = upwardTasksMap.get(task);
 
-            Map<AsyncTask<?, Result>, Future<?>> futureMaps = support.getTaskLoader().futureMaps;
+            Map<AsyncTask<?, Result>, Future<?>> futureMaps = support.getTaskLoader().getFutureTasksMap();
 
             futureMaps.forEach((x, y) -> {
 
@@ -484,13 +482,13 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                             Boolean aBoolean = (Boolean) taskLoader.anyConditionProx.get(process);
                             if (Objects.isNull(aBoolean)) {
                                 taskLoader.anyConditionProx.put(process, true);
-                                doTask(taskLoader, process, optionalTasks, isCycleThread(i));
+                                doTask(taskLoader, process, optionalTasks, isCycleThread(i, process));
                             }
                         }
                     }
                 } else {
                     if (process.releasingDependency() == 0) {
-                        doTask(taskLoader, process, optionalTasks, isCycleThread(i));
+                        doTask(taskLoader, process, optionalTasks, isCycleThread(i, process));
                     }
                 }
             }
@@ -505,8 +503,8 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param i
      * @return
      */
-    private boolean isCycleThread(int i) {
-        return i == subTasks.size() - 1 && Objects.isNull(getListenerReference());
+    private boolean isCycleThread(int i, TaskActuator taskActuator) {
+        return i == subTasks.size() - 1 && Objects.isNull(taskActuator.getTask().getTimeoutInMilliseconds() > TASK_TIME_OUT);
     }
 
     /**
@@ -541,6 +539,9 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param cycleThread
      */
     private void doProcess(TaskLoader taskLoader, TaskActuator process, boolean cycleThread) {
+        /**
+         * retry open thread for task timeout manager
+         */
         if (!cycleThread || retryConditional(process)) {
             taskLoader.startProcess(process);
         } else {
@@ -665,10 +666,11 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     /**
      * Gets task status.
      *
+     * @param taskActuator the task actuator
      * @return the task status
      */
-    public TaskStatus getTaskStatus() {
-        return support.getStatus(task.getClass());
+    public TaskStatus getTaskStatus(TaskActuator<?> taskActuator) {
+        return support.getStatus(taskActuator.getTask().getClass());
     }
 
 
