@@ -249,48 +249,6 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
 
 
     /**
-     * Gets task future.
-     *
-     * @param <Result> the type parameter
-     * @param support  the support
-     * @param clazz    the clazz
-     * @param type     the type
-     * @return the task future
-     */
-    public <Result> Future<Result> getTaskFuture(TaskSupport support, Class<? extends ITask> clazz, Class<Result> type) {
-        Object o = support.getTaskLoader().getFutureTasksMap().get(clazz);
-        if (Objects.nonNull(o)) {
-            return ((Future<Result>) o);
-        }
-        return null;
-    }
-
-
-    /**
-     * Gets task future result.
-     *
-     * @param <Result> the type parameter
-     * @param support  the support
-     * @param clazz    the clazz
-     * @param type     the type
-     * @param timeout  the timeout
-     * @param unit     the unit
-     * @return the task future result
-     */
-    public <Result> Object getTaskFutureResult(TaskSupport support, Class<? extends ITask> clazz, Class<Result> type, long timeout, TimeUnit unit) {
-        Object o = support.getTaskLoader().getFutureTasksMap().get(clazz);
-        if (Objects.nonNull(o)) {
-            try {
-                return ((Future<Result>) o).get(timeout, unit);
-            } catch (Exception e) {
-                log.error("task {} getTaskFuture error {}", this.getName(), e);
-            }
-        }
-        return null;
-    }
-
-
-    /**
      * Dep key string.
      *
      * @param clazz the clazz

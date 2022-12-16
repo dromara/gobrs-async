@@ -446,7 +446,9 @@ public class TaskLoader<P, R> {
     private Future<?> start(TaskActuator taskActuator) {
         Callable<?> callable = threadAdapterSPI(taskActuator);
         Future<?> future = executorService.submit(callable);
-        futureTasksMap.put(taskActuator.task, future);
+        if (taskActuator.task.isExclusive()) {
+            futureTasksMap.put(taskActuator.task, future);
+        }
         return future;
     }
 
