@@ -1,6 +1,7 @@
 package com.gobrs.async.core;
 
 import com.gobrs.async.core.callback.ErrorCallback;
+import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.TaskResult;
@@ -196,8 +197,11 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
             }
         } finally {
             clear();
-            futureStopRelease(parameter, taskLoader);
-
+            if (task.getTimeoutInMilliseconds() > TASK_TIME_OUT) {
+                futureStopRelease(parameter, taskLoader);
+            } else {
+                releaseFutureTasks();
+            }
         }
         return (Result) result;
     }
@@ -214,6 +218,8 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
             if (syncState == STOP_STAMP) {
                 releaseFutureTasks();
                 onDoTask(parameter, taskLoader, new GobrsForceStopException(String.format(" task %s force stop error", task.getName())));
+            } else {
+                releaseFutureTasks();
             }
         }
     }
@@ -231,7 +237,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     }
 
     private void releaseFutureTasks() {
-        Map<AsyncTask<?,?>, Future<?>> futureTasksMap = support.getTaskLoader().getFutureTasksMap();
+        Map<AsyncTask<?, ?>, Future<?>> futureTasksMap = support.getTaskLoader().getFutureTasksMap();
         futureTasksMap.remove(task);
     }
 
@@ -673,7 +679,6 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * Gets task status.
      *
      * @return the task status
-     *
      */
     public TaskStatus taskStatus() {
         return support.getStatus(task.getClass());
