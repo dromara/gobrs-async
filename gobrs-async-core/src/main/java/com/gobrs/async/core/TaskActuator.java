@@ -239,8 +239,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
     private void releaseFutureTasks() {
         Map<AsyncTask<?, ?>, Future<?>> futureTasksMap = support.getTaskLoader().getFutureTasksMap();
-//        futureTasksMap.remove(task);
-        System.out.println(JsonUtil.obj2String(futureTasksMap.remove(task)));
+        futureTasksMap.remove(task);
     }
 
     private Reference<GobrsTimer.TimerListener> getListenerReference() {
