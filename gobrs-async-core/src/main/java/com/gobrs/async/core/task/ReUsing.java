@@ -3,7 +3,7 @@ package com.gobrs.async.core.task;
 import com.gobrs.async.core.TaskActuator;
 import com.gobrs.async.core.common.def.DefaultConfig;
 
-import static com.gobrs.async.core.timer.RetryUtil.retryConditional;
+import static com.gobrs.async.core.timer.Retry.retryConditional;
 
 /**
  * The type Re using.

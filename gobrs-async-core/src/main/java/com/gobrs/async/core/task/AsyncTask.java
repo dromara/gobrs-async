@@ -15,17 +15,11 @@ import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.TaskResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
-import org.slf4j.Logger;
-
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static com.gobrs.async.core.common.def.DefaultConfig.TASK_TIMEOUT;
 import static com.gobrs.async.core.common.def.FixSave.LOGGER_PLUGIN;
@@ -46,18 +40,14 @@ import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionIntercepto
 @Slf4j
 public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Result> {
 
-
     /**
      * 任务名称
      */
     private String name;
-
     /**
      * 任务描述
      */
     private String desc;
-
-
     /**
      * Transaction com.gobrs.async.com.gobrs.async.test.task
      */

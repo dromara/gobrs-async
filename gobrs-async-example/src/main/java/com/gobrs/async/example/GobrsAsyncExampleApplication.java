@@ -16,7 +16,7 @@ import org.springframework.context.annotation.ComponentScan;
 public class GobrsAsyncExampleApplication {
 
     /**
-     * Tlog 日志打印框架 官网: https://tlog.yomahub.com/
+     * 集成tlog 日志打印框架 官网: https://tlog.yomahub.com/
      */
     static {
         GobrsLogger.logger();

@@ -12,7 +12,7 @@ import com.gobrs.async.core.common.def.DefaultConfig;
  * @author: sizegang
  * @create: 2022 -12-13
  */
-public class RetryUtil {
+public class Retry {
 
     /**
      * Retry conditional boolean.
@@ -20,7 +20,7 @@ public class RetryUtil {
      * @param taskActuator the task actuator
      * @return the boolean
      */
-    public static boolean retryConditional(TaskActuator taskActuator) {
+    public static boolean retryConditional(TaskActuator<?> taskActuator) {
         return taskActuator.getTask().getRetryCount() > DefaultConfig.RETRY_COUNT;
     }
 }
