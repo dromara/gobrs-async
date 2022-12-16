@@ -8,6 +8,7 @@ import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.core.common.domain.TaskStatus;
 import com.gobrs.async.core.common.enums.ResultState;
 import com.gobrs.async.core.common.exception.GobrsForceStopException;
+import com.gobrs.async.core.common.util.JsonUtil;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.log.TraceUtil;
 import com.gobrs.async.core.task.AsyncTask;
@@ -238,7 +239,8 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
     private void releaseFutureTasks() {
         Map<AsyncTask<?, ?>, Future<?>> futureTasksMap = support.getTaskLoader().getFutureTasksMap();
-        futureTasksMap.remove(task);
+//        futureTasksMap.remove(task);
+        System.out.println(JsonUtil.obj2String(futureTasksMap.remove(task)));
     }
 
     private Reference<GobrsTimer.TimerListener> getListenerReference() {

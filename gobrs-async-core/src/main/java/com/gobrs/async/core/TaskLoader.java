@@ -192,7 +192,6 @@ public class TaskLoader<P, R> {
     }
 
 
-
     /**
      * 后置处理
      * 开启日志 error 级别
@@ -338,7 +337,15 @@ public class TaskLoader<P, R> {
             }
         } catch (InterruptedException e) {
             throw new GobrsAsyncException(e);
+        } finally {
+            release();
         }
+    }
+
+    private void release() {
+        futureTasksMap.clear();
+        futureTasksLists.clear();
+        timerListeners.clear();
     }
 
 
@@ -391,6 +398,7 @@ public class TaskLoader<P, R> {
 
     /**
      * https://async.sizegang.cn/pages/2f8gmn/
+     *
      * @param taskActuator
      * @return
      */
