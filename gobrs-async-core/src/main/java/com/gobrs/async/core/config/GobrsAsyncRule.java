@@ -19,7 +19,6 @@ public class GobrsAsyncRule {
     private String content;
 
 
-
     /**
      * 执行异常trace log打印
      */

@@ -44,6 +44,9 @@ public class GobrsAsyncProperties {
      */
     private List<RuleConfig> rules;
 
+
+    private PlatformConfig platform;
+
     /**
      * Task separator
      */
@@ -244,6 +247,25 @@ public class GobrsAsyncProperties {
      */
     public void setTimeoutCoreSize(Integer timeoutCoreSize) {
         this.timeoutCoreSize = timeoutCoreSize;
+    }
+
+
+    /**
+     * Gets platform.
+     *
+     * @return the platform
+     */
+    public PlatformConfig getPlatform() {
+        return platform;
+    }
+
+    /**
+     * Sets platform.
+     *
+     * @param platform the platform
+     */
+    public void setPlatform(PlatformConfig platform) {
+        this.platform = platform;
     }
 
     /**
@@ -488,5 +510,8 @@ public class GobrsAsyncProperties {
         public void setRejectedExecutionHandler(String rejectedExecutionHandler) {
             this.rejectedExecutionHandler = rejectedExecutionHandler;
         }
+
+
+
     }
 }

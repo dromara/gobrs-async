@@ -197,6 +197,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
         } finally {
             clear();
             futureStopRelease(parameter, taskLoader);
+            releaseFutureTasks();
         }
         return (Result) result;
     }
@@ -226,6 +227,11 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
         if (Objects.nonNull(listenerReference)) {
             listenerReference.clear();
         }
+    }
+
+    private void releaseFutureTasks() {
+        Map<AsyncTask<?,?>, Future<?>> futureTasksMap = support.getTaskLoader().getFutureTasksMap();
+        futureTasksMap.remove(task);
     }
 
     private Reference<GobrsTimer.TimerListener> getListenerReference() {

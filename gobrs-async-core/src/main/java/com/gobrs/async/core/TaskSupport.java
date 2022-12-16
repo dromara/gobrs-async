@@ -51,6 +51,7 @@ public class TaskSupport {
     private volatile LogWrapper logWrapper;
 
 
+
     /**
      * 任务参数封装
      * The com.gobrs.async.com.gobrs.async.test.task parameters
