@@ -13,6 +13,7 @@
     <modules>
         <module>gobrs-async-monitor-plugin</module>
         <module>gobrs-async-plugin-base</module>
+        <module>gobrs-async-trace-plugin</module>
     </modules>
 
     <properties>
