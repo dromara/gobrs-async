@@ -24,6 +24,9 @@ public class Environment {
 
     private static void trace() {
         TraceInterceptor realLizesFirst = ExtensionLoader.getExtensionLoader(TraceInterceptor.class).getRealLizesFirst();
+        if (realLizesFirst == null) {
+            return;
+        }
         boolean sign = realLizesFirst.sign();
         if (sign) {
             FixSave.LOGGER_PLUGIN = true;
