@@ -409,7 +409,11 @@ public class TaskLoader<P, R> {
         GobrsTimer.TimerListener listener = new GobrsTimer.TimerListener() {
             @Override
             public void tick() {
-                doTick();
+                try {
+                    doTick();
+                } catch (Exception exception) {
+                    future.cancel(true);
+                }
             }
 
             /**
