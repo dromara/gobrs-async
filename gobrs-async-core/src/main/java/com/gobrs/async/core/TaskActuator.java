@@ -198,13 +198,24 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
             }
         } finally {
             clear();
-            if (task.getTimeoutInMilliseconds() > TASK_TIME_OUT) {
-                futureStopRelease(parameter, taskLoader);
-            } else {
-                releaseFutureTasks();
-            }
+            stopOrRelease(parameter, taskLoader);
         }
         return (Result) result;
+    }
+
+    /**
+     * 停止任务 或 释放资源
+     *
+     * @param parameter
+     * @param taskLoader
+     */
+    private void stopOrRelease(Object parameter, TaskLoader taskLoader) {
+        if (task.getTimeoutInMilliseconds() > TASK_TIME_OUT) {
+            futureStopRelease(parameter, taskLoader);
+        }
+        if (task.isExclusive()) {
+            releaseFutureTasks();
+        }
     }
 
     /**
