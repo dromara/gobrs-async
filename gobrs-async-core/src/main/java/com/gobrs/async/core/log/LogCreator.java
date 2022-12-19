@@ -1,6 +1,7 @@
 package com.gobrs.async.core.log;
 
 import com.gobrs.async.core.common.util.SystemClock;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -45,7 +46,7 @@ public class LogCreator {
                 .append("Total cost: ")
                 .append(SystemClock.now() - processStartTime)
                 .append("ms")
-                .append(" | ");
+                .append(" ");
         for (LogTracer tracer : logTracerList) {
             printContent = printContent
                     .append("【task】")
@@ -65,6 +66,9 @@ public class LogCreator {
                         .append("success");
             }
             printContent.append("; ->");
+        }
+        if (StringUtils.isNotBlank(logWrapper.getStopTaskName())) {
+            printContent.append("exec stopAsync task: ").append(logWrapper.getStopTaskName());
         }
 
         return printContent.substring(0, printContent.length() - 2);

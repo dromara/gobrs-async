@@ -12,6 +12,7 @@ import com.gobrs.async.core.common.enums.ResultState;
 import com.gobrs.async.core.common.exception.GobrsForceStopException;
 import com.gobrs.async.core.common.util.JsonUtil;
 import com.gobrs.async.core.config.ConfigManager;
+import com.gobrs.async.core.log.LogWrapper;
 import com.gobrs.async.core.log.TraceUtil;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.task.TaskUtil;
@@ -166,7 +167,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                     support.getResultMap().put(task.getClass(), buildSuccessResult(result));
                 }
 
-                stopAsync(parameter,support);
+                stopAsync(parameter, support);
 
                 /**
                  * 状态改变
@@ -213,6 +214,10 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
         AtomicInteger diagnose = support.getTaskLoader().getINTERRUPTFLAG();
         if (diagnose.get() == INTERRUPTTING.getState() && diagnose.compareAndSet(INTERRUPTTING.getState(), INTERRUPTED.getState())) {
             ErrorCallback<Object> errorCallback = new ErrorCallback<Object>(() -> parameter, null, support, task);
+            LogWrapper logWrapper = support.getLogWrapper();
+            if (Objects.nonNull(logWrapper)) {
+                logWrapper.setStopTaskName(task.getName());
+            }
             support.taskLoader.setExpCode(new AtomicInteger(ExpState.DEFAULT.getCode()));
             support.getTaskLoader().errorInterrupted(errorCallback);
         }

@@ -28,6 +28,11 @@ public class LogWrapper {
 
     private Long processCost;
 
+    /**
+     * 流程执行中断的任务名称
+     */
+    private String stopTaskName;
+
 
     /**
      * Add trace.
