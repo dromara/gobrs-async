@@ -24,7 +24,7 @@ import static com.gobrs.async.core.common.def.DefaultConfig.TASK_TIMEOUT;
 import static com.gobrs.async.core.common.def.FixSave.LOGGER_PLUGIN;
 import static com.gobrs.async.core.common.enums.InterruptEnum.INIT;
 import static com.gobrs.async.core.common.enums.InterruptEnum.INTERRUPTTING;
-import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionInterceptor;
+import static com.gobrs.async.core.common.util.ExceptionUtil.excludeInterceptException;
 
 /**
  * The type Async com.gobrs.async.com.gobrs.async.test.task.
@@ -178,7 +178,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * @param exception the com.gobrs.async.exception
      */
     public void onFailureTrace(TaskSupport support, Exception exception) {
-        if (!exceptionInterceptor(exception)) {
+        if (!excludeInterceptException(exception)) {
             return;
         }
         boolean logable = ConfigManager.Action.errLogabled(support.getRuleName());

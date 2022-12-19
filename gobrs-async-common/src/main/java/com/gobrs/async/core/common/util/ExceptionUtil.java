@@ -20,7 +20,7 @@ public class ExceptionUtil {
      * @param exception the exception
      * @return the boolean
      */
-    public static boolean exceptionInterceptor(Exception exception) {
+    public static boolean excludeInterceptException(Exception exception) {
         if (exception instanceof InterruptedException) {
             return false;
         }

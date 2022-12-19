@@ -9,6 +9,7 @@ import com.gobrs.async.core.common.domain.AsyncResult;
 import com.gobrs.async.core.common.enums.ExpState;
 import com.gobrs.async.core.common.enums.InterruptEnum;
 import com.gobrs.async.core.common.enums.ResultState;
+import com.gobrs.async.core.common.util.ExceptionUtil;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.holder.BeanHolder;
 import com.gobrs.async.core.log.LogCreator;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 
 import static com.gobrs.async.core.common.def.DefaultConfig.*;
 import static com.gobrs.async.core.common.enums.InterruptEnum.*;
-import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionInterceptor;
+import static com.gobrs.async.core.common.util.ExceptionUtil.excludeInterceptException;
 import static com.gobrs.async.core.task.ReUsing.reusing;
 
 /**
@@ -192,7 +193,9 @@ public class TaskLoader<P, R> {
             waitIfNecessary();
 
         } catch (Exception exception) {
-            throw exception;
+            if (excludeInterceptException(exception)) {
+                throw exception;
+            }
         } finally {
             result = back(begins);
             return postProcess(result);
@@ -259,7 +262,7 @@ public class TaskLoader<P, R> {
      * @param errorCallback Exception parameter encapsulation
      */
     public void error(ErrorCallback errorCallback) {
-        if (!exceptionInterceptor(errorCallback.getThrowable())) {
+        if (!excludeInterceptException(errorCallback.getThrowable())) {
             return;
         }
         asyncExceptionInterceptor.exception(errorCallback);
@@ -283,7 +286,7 @@ public class TaskLoader<P, R> {
             /**
              * Global interception listening
              */
-            if (!exceptionInterceptor(errorCallback.getThrowable())) {
+            if (!excludeInterceptException(errorCallback.getThrowable())) {
                 return;
             }
             asyncExceptionInterceptor.exception(errorCallback);
