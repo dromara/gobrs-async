@@ -21,7 +21,7 @@
     </modules>
 
     <properties>
-        <revision>1.2.8-RELEASE</revision>
+        <revision>1.2.9-RELEASE</revision>
         <jdk.version>1.8</jdk.version>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>

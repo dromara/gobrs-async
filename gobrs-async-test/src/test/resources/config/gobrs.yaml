@@ -13,6 +13,9 @@ gobrs:
           logConfig:
             costLogabled: true # 开启任务耗时打印 log日志级别需要为 error 默认true
             errLogabled: true # 开启任务异常打印 默认true
+        # stop Async
+        - name: "stopAsyncRule"
+          content: "stopAsyncTaskA,stopAsyncTaskB,stopAsyncTaskC;stopAsyncTaskD->stopAsyncTaskE->stopAsyncTaskF"
 
         - name: "anyConditionGeneral"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition"

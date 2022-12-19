@@ -6,6 +6,8 @@ import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.core.common.domain.TaskStatus;
+import com.gobrs.async.core.common.enums.ExpState;
+import com.gobrs.async.core.common.enums.InterruptEnum;
 import com.gobrs.async.core.common.enums.ResultState;
 import com.gobrs.async.core.common.exception.GobrsForceStopException;
 import com.gobrs.async.core.common.util.JsonUtil;
@@ -30,6 +32,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.gobrs.async.core.common.def.DefaultConfig.*;
+import static com.gobrs.async.core.common.enums.InterruptEnum.INTERRUPTED;
+import static com.gobrs.async.core.common.enums.InterruptEnum.INTERRUPTTING;
 import static com.gobrs.async.core.task.ReUsing.reusing;
 import static com.gobrs.async.core.timer.GobrsFutureTask.STOP_STAMP;
 
@@ -155,6 +159,16 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                 result = task.taskAdapter(parameter, support);
 
                 /**
+                 * Setting Task Results
+                 * 设置任务结果
+                 */
+                if (ConfigManager.getGlobalConfig().isParamContext()) {
+                    support.getResultMap().put(task.getClass(), buildSuccessResult(result));
+                }
+
+                stopAsync(parameter,support);
+
+                /**
                  * 状态改变
                  */
                 change();
@@ -169,14 +183,6 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                  * 后置任务
                  */
                 taskLoader.postInterceptor(result, task.getName());
-
-                /**
-                 * Setting Task Results
-                 * 设置任务结果
-                 */
-                if (ConfigManager.getGlobalConfig().isParamContext()) {
-                    support.getResultMap().put(task.getClass(), buildSuccessResult(result));
-                }
 
                 /**
                  * Success com.gobrs.async.callback
@@ -201,6 +207,15 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
             stopOrRelease(parameter, taskLoader);
         }
         return (Result) result;
+    }
+
+    private void stopAsync(Object parameter, TaskSupport support) {
+        AtomicInteger diagnose = support.getTaskLoader().getINTERRUPTFLAG();
+        if (diagnose.get() == INTERRUPTTING.getState() && diagnose.compareAndSet(INTERRUPTTING.getState(), INTERRUPTED.getState())) {
+            ErrorCallback<Object> errorCallback = new ErrorCallback<Object>(() -> parameter, null, support, task);
+            support.taskLoader.setExpCode(new AtomicInteger(ExpState.DEFAULT.getCode()));
+            support.getTaskLoader().errorInterrupted(errorCallback);
+        }
     }
 
     /**

@@ -2,8 +2,6 @@ package com.gobrs.async.core.task;
 
 
 import com.gobrs.async.core.TaskSupport;
-import com.gobrs.async.core.callback.ErrorCallback;
-import com.gobrs.async.core.common.enums.ExpState;
 import com.gobrs.async.core.common.exception.AsyncTaskTimeoutException;
 import com.gobrs.async.core.common.util.SystemClock;
 import com.gobrs.async.core.config.ConfigManager;
@@ -15,7 +13,6 @@ import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.TaskResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
-import org.slf4j.Logger;
 
 import java.util.Map;
 import java.util.Objects;
@@ -25,6 +22,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.gobrs.async.core.common.def.DefaultConfig.TASK_TIMEOUT;
 import static com.gobrs.async.core.common.def.FixSave.LOGGER_PLUGIN;
+import static com.gobrs.async.core.common.enums.InterruptEnum.INIT;
+import static com.gobrs.async.core.common.enums.InterruptEnum.INTERRUPTTING;
 import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionInterceptor;
 
 /**
@@ -269,14 +268,14 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      */
     public boolean stopAsync(TaskSupport support) {
         try {
-            ErrorCallback<Param> errorCallback = new ErrorCallback<Param>(() -> support.getParam(), null, support, this);
-            support.taskLoader.setExpCode(new AtomicInteger(ExpState.DEFAULT.getCode()));
-            support.taskLoader.errorInterrupted(errorCallback);
+            // 设置标识
+            return support.getTaskLoader().getINTERRUPTFLAG().compareAndSet(INIT.getState(), INTERRUPTTING.getState());
+
+//            support.taskLoader.errorInterrupted(errorCallback);
         } catch (Exception ex) {
             log.error("stopAsync error {}", ex);
             return false;
         }
-        return true;
     }
 
     /**
@@ -288,17 +287,11 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      */
     public boolean stopAsync(TaskSupport support, Integer expCode) {
         try {
-            support.taskLoader.setIsRunning(false);
-            support.taskLoader.setExpCode(new AtomicInteger(expCode));
-
-            ErrorCallback<Param> errorCallback = new ErrorCallback<Param>(() -> support.getParam(), null, support, this);
-            support.taskLoader.errorInterrupted(errorCallback);
-
+            return support.getTaskLoader().getINTERRUPTFLAG().compareAndSet(INIT.getState(), INTERRUPTTING.getState());
         } catch (Exception ex) {
             log.error("stopAsync error {} ", ex);
             return false;
         }
-        return true;
     }
 
 

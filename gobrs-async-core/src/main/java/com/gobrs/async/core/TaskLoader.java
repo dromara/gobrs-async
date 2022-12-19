@@ -7,6 +7,7 @@ import com.gobrs.async.core.callback.AsyncTaskExceptionInterceptor;
 import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.AsyncResult;
 import com.gobrs.async.core.common.enums.ExpState;
+import com.gobrs.async.core.common.enums.InterruptEnum;
 import com.gobrs.async.core.common.enums.ResultState;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.holder.BeanHolder;
@@ -32,8 +33,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.gobrs.async.core.common.def.DefaultConfig.TASK_INITIALIZE;
-import static com.gobrs.async.core.common.def.DefaultConfig.TASK_TIMEOUT;
+import static com.gobrs.async.core.common.def.DefaultConfig.*;
+import static com.gobrs.async.core.common.enums.InterruptEnum.*;
 import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionInterceptor;
 import static com.gobrs.async.core.task.ReUsing.reusing;
 
@@ -92,6 +93,11 @@ public class TaskLoader<P, R> {
     private static final Lock taskLock = new ReentrantLock();
 
     private volatile boolean canceled = false;
+
+    /**
+     * The constant INTERRUPTFLAG.
+     */
+    public volatile AtomicInteger INTERRUPTFLAG = new AtomicInteger(INIT.getState());
 
     /**
      * The Futures.
@@ -161,8 +167,9 @@ public class TaskLoader<P, R> {
          * 获取任务链初始任务
          */
         AsyncResult result = null;
+        List<TaskActuator> begins = getBeginProcess();
         try {
-            List<TaskActuator> begins = getBeginProcess();
+
             /**
              * 可选任务
              */
@@ -183,10 +190,11 @@ public class TaskLoader<P, R> {
             }
             // wait
             waitIfNecessary();
-            result = back(begins);
+
         } catch (Exception exception) {
             throw exception;
         } finally {
+            result = back(begins);
             return postProcess(result);
         }
     }
@@ -644,5 +652,14 @@ public class TaskLoader<P, R> {
      */
     public Map<AsyncTask<P, R>, Future<?>> getFutureTasksMap() {
         return futureTasksMap;
+    }
+
+    /**
+     * Gets interruptflag.
+     *
+     * @return the interruptflag
+     */
+    public AtomicInteger getINTERRUPTFLAG() {
+        return INTERRUPTFLAG;
     }
 }
