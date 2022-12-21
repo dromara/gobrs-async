@@ -16,12 +16,9 @@ public enum ExpState {
      */
 
     SUCCESS(100, "成功 默认"),
-    ERROR(200, "流程中存在 业务异常"),
+    ERROR(200, "流程中存在异常任务时"),
     STOP_ASYNC(300, "手动调用 stopAsync"),
     TASK_INTERRUPT(400, "自动中断 配置 taskInterrupt");
-
-
-
 
 
     private Integer code;
