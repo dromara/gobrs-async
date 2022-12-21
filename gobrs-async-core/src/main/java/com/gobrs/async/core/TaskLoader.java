@@ -274,7 +274,13 @@ public class TaskLoader<P, R> {
      * @param errorCallback the error com.gobrs.async.callback
      */
     public void errorInterrupted(ErrorCallback errorCallback) {
-        this.error = errorCallback.getThrowable();
+        errorInterrupted(errorCallback, false);
+    }
+
+    public void errorInterrupted(ErrorCallback errorCallback, boolean isStopAsync) {
+        if (!isStopAsync) {
+            this.error = errorCallback.getThrowable();
+        }
 
         cancel();
 
