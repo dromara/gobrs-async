@@ -249,7 +249,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
             Integer syncState = ((GobrsFutureTask<?>) future).getSyncState();
             if (syncState == STOP_STAMP) {
                 releaseFutureTasks();
-                onDoTask(parameter, taskLoader, new GobrsForceStopException(String.format(" task %s force stop error", task.getName())));
+                preNextTask(parameter, taskLoader, new GobrsForceStopException(String.format(" task %s force stop error", task.getName())));
             } else {
                 releaseFutureTasks();
             }
@@ -313,7 +313,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
              */
             transaction(taskLoader);
 
-            onDoTask(parameter, taskLoader, e);
+            preNextTask(parameter, taskLoader, e);
         }
     }
 
@@ -323,7 +323,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     }
 
 
-    private void onDoTask(Object parameter, TaskLoader taskLoader, Exception e) throws Exception {
+    private void preNextTask(Object parameter, TaskLoader taskLoader, Exception e) throws Exception {
         task.onFailureTrace(support, e);
         /**
          * 配置 taskInterrupt = true 则某一任务异常后结束整个任务流程 默认 false

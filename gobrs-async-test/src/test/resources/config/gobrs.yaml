@@ -16,6 +16,7 @@ gobrs:
         # stop Async
         - name: "stopAsyncRule"
           content: "stopAsyncTaskA,stopAsyncTaskB,stopAsyncTaskC;stopAsyncTaskD->stopAsyncTaskE->stopAsyncTaskF"
+          catchable: true
 
         - name: "anyConditionGeneral"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition"
@@ -55,6 +56,7 @@ gobrs:
                     caseFourTaskA->caseFourTaskH->caseFourTaskI,caseFourTaskJ,caseFourTaskK;"
           logConfig:
             costLogabled: false # 关闭耗时任务打印
+          catchable: true
         # 官方场景五 https://async.sizegang.cn/pages/2f844b/#%E5%9C%BA%E6%99%AF%E4%BA%94
         - name: "caseFive"
           content: "caseFourTaskA,caseFourTaskB,caseFourTaskC->caseFourTaskD:any:exclusive" # any 任意一个任务（A、B、C）执行完成后 则执行D任务

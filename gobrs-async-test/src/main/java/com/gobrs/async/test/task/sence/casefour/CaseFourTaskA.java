@@ -17,6 +17,7 @@ public class CaseFourTaskA extends AsyncTask {
     @Override
     public Object task(Object o, TaskSupport support) {
         System.out.println("A任务执行");
+        System.out.println(1/0);
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
