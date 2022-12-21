@@ -11,6 +11,7 @@ import com.gobrs.async.core.common.enums.InterruptEnum;
 import com.gobrs.async.core.common.enums.ResultState;
 import com.gobrs.async.core.common.util.ExceptionUtil;
 import com.gobrs.async.core.config.ConfigManager;
+import com.gobrs.async.core.config.GobrsAsyncRule;
 import com.gobrs.async.core.holder.BeanHolder;
 import com.gobrs.async.core.log.LogCreator;
 import com.gobrs.async.core.log.LogWrapper;
@@ -163,11 +164,11 @@ public class TaskLoader<P, R> {
      *
      * @return the async result
      */
-    AsyncResult load() {
+    AsyncResult load() throws Exception {
         /**
          * 获取任务链初始任务
          */
-        AsyncResult result = null;
+        AsyncResult result;
         List<TaskActuator> begins = getBeginProcess();
         try {
 
@@ -191,15 +192,14 @@ public class TaskLoader<P, R> {
             }
             // wait
             waitIfNecessary();
-
+            result = back(begins);
+            return postProcess(result);
         } catch (Exception exception) {
             if (excludeInterceptException(exception)) {
                 throw exception;
             }
-        } finally {
-            result = back(begins);
-            return postProcess(result);
         }
+        return null;
     }
 
 
@@ -343,7 +343,8 @@ public class TaskLoader<P, R> {
             } else {
                 completeLatch.await();
             }
-            if (error != null) {
+            GobrsAsyncRule rule = ConfigManager.getRule(ruleName);
+            if (error != null && rule.isCatchable()) {
                 throw new GobrsAsyncException(error);
             }
         } catch (InterruptedException e) {
@@ -480,7 +481,7 @@ public class TaskLoader<P, R> {
      *
      * @param subtasks the subtasks
      */
-    public void stopSingleTaskLine(List<AsyncTask> subtasks) {
+    public void stopSingleTaskLine(List<AsyncTask> subtasks) throws Exception {
         TaskActuator taskActuator = processMap.get(assistantTask);
         for (AsyncTask subtask : subtasks) {
             rtDept(subtask, taskActuator);
@@ -494,7 +495,7 @@ public class TaskLoader<P, R> {
      * @param task            task
      * @param terminationTask the terminationTask
      */
-    public void rtDept(AsyncTask task, TaskActuator terminationTask) {
+    public void rtDept(AsyncTask task, TaskActuator terminationTask) throws Exception {
         if (task instanceof TaskTrigger.AssistantTask) {
             terminationTask.releasingDependency();
             if (!terminationTask.hasUnsatisfiedDependcies()) {

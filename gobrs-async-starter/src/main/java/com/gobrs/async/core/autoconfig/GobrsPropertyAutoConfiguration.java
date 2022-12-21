@@ -48,9 +48,7 @@ public class GobrsPropertyAutoConfiguration {
         gobrsConfig.setTimeout(properties.getTimeout());
         gobrsConfig.setRelyDepend(properties.isRelyDepend());
         gobrsConfig.setTimeoutCoreSize(properties.getTimeoutCoreSize());
-
         threadPool(properties, gobrsConfig);
-
         List<RuleConfig> rules = properties.getRules();
         List<GobrsAsyncRule> rList = rules.stream().map(x -> {
             GobrsAsyncRule r = new GobrsAsyncRule();
@@ -60,7 +58,7 @@ public class GobrsPropertyAutoConfiguration {
                 r.setErrLogabled(logConfig.getErrLogabled());
                 r.setCostLogabled(logConfig.getCostLogabled());
             }
-
+            r.setCatchable(x.isCatchable());
             r.setName(x.getName());
             r.setContent(x.getContent());
             r.setTaskInterrupt(x.isTaskInterrupt());

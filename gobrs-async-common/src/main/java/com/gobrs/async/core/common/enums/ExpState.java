@@ -15,10 +15,10 @@ public enum ExpState {
      * The Default.
      */
 
-    SUCCESS(100, "成功 默认"),
-    ERROR(200, "流程中存在异常任务时"),
-    STOP_ASYNC(300, "手动调用 stopAsync"),
-    TASK_INTERRUPT(400, "自动中断 配置 taskInterrupt");
+    SUCCESS(100, "Success Default"),
+    ERROR(200, "When there are abnormal tasks in the process"),
+    STOP_ASYNC(300, "Call stopAsync manually"),
+    TASK_INTERRUPT(400, "Automatic interrupt configuration taskInterrupt");
 
 
     private Integer code;

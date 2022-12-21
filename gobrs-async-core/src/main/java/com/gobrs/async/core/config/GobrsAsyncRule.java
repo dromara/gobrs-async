@@ -35,6 +35,8 @@ public class GobrsAsyncRule {
      */
     private boolean taskInterrupt = false;
 
+    private boolean catchable = false;
+
     /**
      * 流程事务
      */
@@ -147,5 +149,23 @@ public class GobrsAsyncRule {
      */
     public void setTransaction(boolean transaction) {
         this.transaction = transaction;
+    }
+
+    /**
+     * Is catchable boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isCatchable() {
+        return catchable;
+    }
+
+    /**
+     * Sets catchable.
+     *
+     * @param catchable the catchable
+     */
+    public void setCatchable(boolean catchable) {
+        this.catchable = catchable;
     }
 }

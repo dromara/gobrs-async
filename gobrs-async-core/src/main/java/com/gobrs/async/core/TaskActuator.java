@@ -16,6 +16,7 @@ import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.task.TaskUtil;
 import com.gobrs.async.core.timer.GobrsFutureTask;
 import com.gobrs.async.core.timer.GobrsTimer;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
@@ -120,7 +121,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     }
 
     @Override
-    public Result call() {
+    public Result call() throws Exception {
 
         Object parameter = getParameter(task);
 
@@ -228,7 +229,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param parameter
      * @param taskLoader
      */
-    private void stopOrRelease(Object parameter, TaskLoader taskLoader) {
+    private void stopOrRelease(Object parameter, TaskLoader taskLoader) throws Exception {
         if (task.getTimeoutInMilliseconds() > TASK_TIME_OUT) {
             futureStopRelease(parameter, taskLoader);
         }
@@ -242,7 +243,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      *
      * @param taskLoader
      */
-    private void futureStopRelease(Object parameter, TaskLoader taskLoader) {
+    private void futureStopRelease(Object parameter, TaskLoader taskLoader) throws Exception {
         Future<?> future = (Future<?>) taskLoader.getFutureTasksMap().get(task);
         if (future instanceof GobrsFutureTask) {
             Integer syncState = ((GobrsFutureTask<?>) future).getSyncState();
@@ -285,7 +286,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * Determine whether the process is interrupted
      * 判断当前任务是否已经执行过
      */
-    private void noRepeat(TaskLoader taskLoader, Object result) {
+    private void noRepeat(TaskLoader taskLoader, Object result) throws Exception {
         if (taskLoader.isRunning().get()) {
             nextTaskByCase(taskLoader, result);
         }
@@ -298,7 +299,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param taskLoader
      * @param e
      */
-    private void exceptionProcess(Object parameter, TaskLoader taskLoader, Exception e) {
+    private void exceptionProcess(Object parameter, TaskLoader taskLoader, Exception e) throws Exception {
 
         Optimal.optimalCount(support.taskLoader);
         setExpCode(ExpState.ERROR.getCode());
@@ -322,16 +323,14 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     }
 
 
-    private void onDoTask(Object parameter, TaskLoader taskLoader, Exception e) {
+    private void onDoTask(Object parameter, TaskLoader taskLoader, Exception e) throws Exception {
         task.onFailureTrace(support, e);
         /**
-         * A single com.gobrs.async.com.gobrs.async.test.task com.gobrs.async.exception interrupts the entire process
          * 配置 taskInterrupt = true 则某一任务异常后结束整个任务流程 默认 false
          */
         if (ConfigManager.getRule(taskLoader.getRuleName()).isTaskInterrupt()) {
             setExpCode(ExpState.TASK_INTERRUPT.getCode());
             support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
-
         } else {
 
             taskLoader.error(errorCallback(parameter, e, support, task));
@@ -359,7 +358,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param taskLoader
      * @param result
      */
-    private void nextTaskByCase(TaskLoader taskLoader, Object result) {
+    private void nextTaskByCase(TaskLoader taskLoader, Object result) throws Exception {
         if (result instanceof AnyConditionResult) {
             nextTask(taskLoader, (AnyConditionResult) result);
             return;
@@ -497,7 +496,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      *
      * @param taskLoader the com.gobrs.async.com.gobrs.async.test.task loader
      */
-    public void nextTask(TaskLoader taskLoader) {
+    public void nextTask(TaskLoader taskLoader) throws Exception {
         nextTask(taskLoader, TaskUtil.defaultAnyCondition());
     }
 
@@ -508,7 +507,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param taskLoader      the com.gobrs.async.com.gobrs.async.test.task loader
      * @param conditionResult the com.gobrs.async.com.gobrs.async.test.task conditionResult
      */
-    public void nextTask(TaskLoader taskLoader, AnyConditionResult conditionResult) {
+    public void nextTask(TaskLoader taskLoader, AnyConditionResult conditionResult) throws Exception {
 
         if (!CollectionUtils.isEmpty(subTasks)) {
             for (int i = 0; i < subTasks.size(); i++) {
@@ -564,12 +563,12 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param process
      * @param optionalTasks
      */
-    private void doTask(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks, boolean cycleThread) {
+    private void doTask(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks, boolean cycleThread) throws Exception {
         process(taskLoader, process, optionalTasks, cycleThread);
     }
 
 
-    private void process(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks, boolean cycleThread) {
+    private void process(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks, boolean cycleThread) throws Exception {
         if (Objects.nonNull(optionalTasks)) {
             if (optionalTasks.contains(process.getTask())) {
                 doProcess(taskLoader, process, cycleThread);
@@ -586,7 +585,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param process
      * @param cycleThread
      */
-    private void doProcess(TaskLoader taskLoader, TaskActuator process, boolean cycleThread) {
+    private void doProcess(TaskLoader taskLoader, TaskActuator process, boolean cycleThread) throws Exception {
         /**
          * retry open thread for task timeout manager
          */

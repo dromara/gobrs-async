@@ -3,6 +3,7 @@ package com.gobrs.async.test.task.interrupt;
 import com.gobrs.async.core.TaskSupport;
 import com.gobrs.async.core.anno.Task;
 import com.gobrs.async.core.task.AsyncTask;
+import lombok.SneakyThrows;
 
 /**
  * The type D service.
@@ -26,20 +27,16 @@ public class InterruptTaskB extends AsyncTask<Object, Object> {
 
     }
 
+    @SneakyThrows
     @Override
     public Object task(Object o, TaskSupport support) {
-        try {
-            System.out.println("InterruptTaskB Begin");
-            Thread.sleep(200);
-            for (int i1 = 0; i1 < i; i1++) {
-                i1 += i1;
-            }
-            System.out.println(1 / 0);
-            System.out.println("InterruptTaskB Finish");
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        System.out.println("InterruptTaskB Begin");
+        Thread.sleep(200);
+        for (int i1 = 0; i1 < i; i1++) {
+            i1 += i1;
         }
+        System.out.println(1 / 0);
+        System.out.println("InterruptTaskB Finish");
         return null;
     }
 

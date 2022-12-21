@@ -4,6 +4,7 @@ import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.AsyncResult;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.common.exception.NotFoundGobrsRuleException;
+import lombok.SneakyThrows;
 
 import java.util.*;
 
@@ -108,6 +109,7 @@ public class GobrsAsync {
      * @param timeout       the timeout
      * @return the async result
      */
+    @SneakyThrows
     public AsyncResult go(String ruleName, AsyncParam param, Set<String> optionalTasks, long timeout) {
         if (check(ruleName).isPresent()) {
             return trigger.get(ruleName).trigger(param, timeout, optionalTasks).load();
