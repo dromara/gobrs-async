@@ -26,6 +26,7 @@ public class InterruptRule {
         Map<Class, Object> params = new HashMap<>();
 
         AsyncResult result = gobrsAsync.go("taskInterrupt", () -> params, 300000);
+        System.out.println(result);
 
     }
 }

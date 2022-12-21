@@ -1,16 +1,14 @@
 package com.gobrs.async.core;
 
 import com.gobrs.async.core.callback.ErrorCallback;
-import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.core.common.domain.TaskStatus;
 import com.gobrs.async.core.common.enums.ExpState;
-import com.gobrs.async.core.common.enums.InterruptEnum;
 import com.gobrs.async.core.common.enums.ResultState;
 import com.gobrs.async.core.common.exception.GobrsForceStopException;
-import com.gobrs.async.core.common.util.JsonUtil;
+import com.gobrs.async.core.common.exception.ManualStopException;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.log.LogWrapper;
 import com.gobrs.async.core.log.TraceUtil;
@@ -218,7 +216,8 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
             if (Objects.nonNull(logWrapper)) {
                 logWrapper.setStopTaskName(task.getName());
             }
-            support.taskLoader.setExpCode(new AtomicInteger(ExpState.DEFAULT.getCode()));
+            support.taskLoader.setExpCode(new AtomicInteger(ExpState.STOP_ASYNC.getCode()));
+            support.getResultMap().put(task.getClass(), buildErrorResult(null, new ManualStopException("Manually executing stopAsync Exception")));
             support.getTaskLoader().errorInterrupted(errorCallback);
         }
     }
@@ -302,10 +301,10 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     private void exceptionProcess(Object parameter, TaskLoader taskLoader, Exception e) {
 
         Optimal.optimalCount(support.taskLoader);
-
+        setExpCode(ExpState.ERROR.getCode());
         if (!retryTask(parameter, taskLoader)) {
 
-            support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
+            taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
 
             /**
              * transaction com.gobrs.async.com.gobrs.async.test.task
@@ -318,6 +317,11 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     }
 
 
+    public void setExpCode(Integer code) {
+        support.taskLoader.setExpCode(new AtomicInteger(code));
+    }
+
+
     private void onDoTask(Object parameter, TaskLoader taskLoader, Exception e) {
         task.onFailureTrace(support, e);
         /**
@@ -325,8 +329,8 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
          * 配置 taskInterrupt = true 则某一任务异常后结束整个任务流程 默认 false
          */
         if (ConfigManager.getRule(taskLoader.getRuleName()).isTaskInterrupt()) {
-
-            taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
+            setExpCode(ExpState.TASK_INTERRUPT.getCode());
+            support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
 
         } else {
 
@@ -759,7 +763,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @return the com.gobrs.async.com.gobrs.async.test.task result
      */
     public TaskResult buildErrorResult(Object result, Exception ex) {
-        return new TaskResult(result, ResultState.SUCCESS, ex);
+        return new TaskResult(result, ResultState.EXCEPTION, ex);
     }
 
     /**

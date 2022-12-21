@@ -55,7 +55,7 @@ public class TaskLoader<P, R> {
     /**
      * Interruption code
      */
-    private AtomicInteger expCode = new AtomicInteger(ExpState.DEFAULT.getCode());
+    private AtomicInteger expCode = new AtomicInteger(ExpState.SUCCESS.getCode());
 
     /**
      * task Loader is Running
