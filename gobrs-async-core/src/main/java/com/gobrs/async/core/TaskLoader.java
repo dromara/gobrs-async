@@ -101,11 +101,6 @@ public class TaskLoader<P, R> {
     public volatile AtomicInteger INTERRUPTFLAG = new AtomicInteger(INIT.getState());
 
     /**
-     * The Futures.
-     */
-    public ArrayList<Future<?>> futureTasksLists;
-
-    /**
      * The Futures async.
      */
     public final Map<AsyncTask<P, R>, Future<?>> futureTasksMap = new ConcurrentHashMap<>();
@@ -151,11 +146,6 @@ public class TaskLoader<P, R> {
         this.processMap = processMap;
         completeLatch = new CountDownLatch(1);
         this.processTimeout = timeout;
-        if (this.processTimeout > 0) {
-            futureTasksLists = new ArrayList<>(1);
-        } else {
-            futureTasksLists = EmptyFutures;
-        }
     }
 
     /**
@@ -317,11 +307,10 @@ public class TaskLoader<P, R> {
         taskLock.lock();
         try {
             canceled = true;
-            for (Future<?> future : futureTasksLists) {
-                /**
-                 * Enforced interruptions
-                 */
-                future.cancel(true);
+            Set<Map.Entry<AsyncTask<P, R>, Future<?>>> entries =
+                    futureTasksMap.entrySet();
+            for (Map.Entry<AsyncTask<P, R>, Future<?>> entry : entries) {
+                entry.getValue().cancel(true);
             }
         } finally {
             taskLock.unlock();
@@ -356,7 +345,6 @@ public class TaskLoader<P, R> {
 
     private void release() {
         futureTasksMap.clear();
-        futureTasksLists.clear();
         timerListeners.clear();
     }
 
@@ -385,8 +373,7 @@ public class TaskLoader<P, R> {
             try {
                 taskLock.lock();
                 if (!canceled) {
-                    Future<?> submit = taskListenerConditional(taskActuator);
-                    futureTasksLists.add(submit);
+                    taskListenerConditional(taskActuator);
                 }
 
             } finally {
@@ -458,9 +445,7 @@ public class TaskLoader<P, R> {
     private Future<?> start(TaskActuator taskActuator) {
         Callable<?> callable = threadAdapterSPI(taskActuator);
         Future<?> future = executorService.submit(callable);
-        if (taskActuator.task.isExclusive()) {
-            futureTasksMap.put(taskActuator.task, future);
-        }
+        futureTasksMap.put(taskActuator.task, future);
         return future;
     }
 
