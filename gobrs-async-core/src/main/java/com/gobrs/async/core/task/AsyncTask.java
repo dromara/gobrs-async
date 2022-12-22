@@ -270,8 +270,6 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         try {
             // 设置标识
             return support.getTaskLoader().getINTERRUPTFLAG().compareAndSet(INIT.getState(), INTERRUPTTING.getState());
-
-//            support.taskLoader.errorInterrupted(errorCallback);
         } catch (Exception ex) {
             log.error("stopAsync error {}", ex);
             return false;
@@ -282,12 +280,16 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * Stop async boolean.
      *
      * @param support the support
-     * @param expCode the exp code
+     * @param cusCode 开发者自定义状态码
      * @return the boolean
      */
-    public boolean stopAsync(TaskSupport support, Integer expCode) {
+    public boolean stopAsync(TaskSupport support, Integer cusCode) {
         try {
-            return support.getTaskLoader().getINTERRUPTFLAG().compareAndSet(INIT.getState(), INTERRUPTTING.getState());
+            boolean b = support.getTaskLoader().getINTERRUPTFLAG().compareAndSet(INIT.getState(), INTERRUPTTING.getState());
+            if (b) {
+                support.getTaskLoader().setCusCode(cusCode);
+            }
+            return b;
         } catch (Exception ex) {
             log.error("stopAsync error {} ", ex);
             return false;

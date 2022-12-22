@@ -19,7 +19,7 @@ public class StopAsyncTaskA extends AsyncTask {
     @Override
     public Object task(Object o, TaskSupport support) {
         System.out.println("使用" + Thread.currentThread().getName());
-        stopAsync(support);
+        stopAsync(support, 11);
         Thread.sleep(100);
         System.out.println("StopAsyncTaskA");
         return "StopAsyncTaskA";

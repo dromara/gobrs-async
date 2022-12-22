@@ -20,7 +20,7 @@ public class StopAsyncTaskC extends AsyncTask {
     public Object task(Object o, TaskSupport support) {
         System.out.println("使用" + Thread.currentThread().getName());
         System.out.println("StopAsyncTaskC");
-        stopAsync(support);
+        stopAsync(support, 11);
         Thread.sleep(100);
         return "StopAsyncTaskC";
     }

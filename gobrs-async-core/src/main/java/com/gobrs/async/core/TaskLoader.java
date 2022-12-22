@@ -7,9 +7,7 @@ import com.gobrs.async.core.callback.AsyncTaskExceptionInterceptor;
 import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.AsyncResult;
 import com.gobrs.async.core.common.enums.ExpState;
-import com.gobrs.async.core.common.enums.InterruptEnum;
 import com.gobrs.async.core.common.enums.ResultState;
-import com.gobrs.async.core.common.util.ExceptionUtil;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.config.GobrsAsyncRule;
 import com.gobrs.async.core.holder.BeanHolder;
@@ -57,6 +55,7 @@ public class TaskLoader<P, R> {
      * Interruption code
      */
     private AtomicInteger expCode = new AtomicInteger(ExpState.SUCCESS.getCode());
+    private Integer cusCode;
 
     /**
      * task Loader is Running
@@ -163,6 +162,7 @@ public class TaskLoader<P, R> {
      * Load async result.
      *
      * @return the async result
+     * @throws Exception the exception
      */
     AsyncResult load() throws Exception {
         /**
@@ -480,6 +480,7 @@ public class TaskLoader<P, R> {
      * 结束单条任务链
      *
      * @param subtasks the subtasks
+     * @throws Exception the exception
      */
     public void stopSingleTaskLine(List<AsyncTask> subtasks) throws Exception {
         TaskActuator taskActuator = processMap.get(assistantTask);
@@ -494,6 +495,7 @@ public class TaskLoader<P, R> {
      *
      * @param task            task
      * @param terminationTask the terminationTask
+     * @throws Exception the exception
      */
     public void rtDept(AsyncTask task, TaskActuator terminationTask) throws Exception {
         if (task instanceof TaskTrigger.AssistantTask) {
@@ -528,6 +530,7 @@ public class TaskLoader<P, R> {
         AsyncResult asyncResult = new AsyncResult();
         asyncResult.setResultMap(support.getResultMap());
         asyncResult.setExecuteCode(expCode.get());
+        asyncResult.setCusCode(cusCode);
         asyncResult.setSuccess(support.getResultMap().values().stream().allMatch(r -> r.getResultState().equals(ResultState.SUCCESS)));
         return asyncResult;
     }
@@ -665,5 +668,23 @@ public class TaskLoader<P, R> {
      */
     public AtomicInteger getINTERRUPTFLAG() {
         return INTERRUPTFLAG;
+    }
+
+    /**
+     * Gets cus code.
+     *
+     * @return the cus code
+     */
+    public Integer getCusCode() {
+        return cusCode;
+    }
+
+    /**
+     * Sets cus code.
+     *
+     * @param cusCode the cus code
+     */
+    public void setCusCode(Integer cusCode) {
+        this.cusCode = cusCode;
     }
 }

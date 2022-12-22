@@ -21,6 +21,8 @@ public class AsyncResult implements Serializable {
      */
     private Integer executeCode;
 
+    private Integer cusCode;
+
     /**
      * 整流程 执行是否成功
      */
@@ -86,5 +88,23 @@ public class AsyncResult implements Serializable {
      */
     public void setResultMap(Map<Class, TaskResult> resultMap) {
         this.resultMap = resultMap;
+    }
+
+    /**
+     * Gets cus code.
+     *
+     * @return the cus code
+     */
+    public Integer getCusCode() {
+        return cusCode;
+    }
+
+    /**
+     * Sets cus code.
+     *
+     * @param cusCode the cus code
+     */
+    public void setCusCode(Integer cusCode) {
+        this.cusCode = cusCode;
     }
 }

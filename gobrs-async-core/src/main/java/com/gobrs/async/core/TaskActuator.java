@@ -16,7 +16,6 @@ import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.task.TaskUtil;
 import com.gobrs.async.core.timer.GobrsFutureTask;
 import com.gobrs.async.core.timer.GobrsTimer;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 
@@ -305,8 +304,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
         setExpCode(ExpState.ERROR.getCode());
         if (!retryTask(parameter, taskLoader)) {
 
-            taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
-
+            support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
             /**
              * transaction com.gobrs.async.com.gobrs.async.test.task
              * 事物任务
@@ -330,7 +328,8 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
          */
         if (ConfigManager.getRule(taskLoader.getRuleName()).isTaskInterrupt()) {
             setExpCode(ExpState.TASK_INTERRUPT.getCode());
-            support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
+
+            taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
         } else {
 
             taskLoader.error(errorCallback(parameter, e, support, task));
