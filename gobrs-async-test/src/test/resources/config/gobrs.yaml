@@ -36,6 +36,11 @@ gobrs:
         - name: "optionalRule"
           content: "caseOptionalTaskA->caseOptionalTaskB->caseOptionalTaskC,caseOptionalTaskD->caseOptionalTaskE->caseOptionalTaskF"
 
+        - name: "transactionRule"
+          content: "transactionTaskA->transactionTaskB->transactionTaskC->transactionTaskD"
+          transaction: true
+
+
         ## 单一任务超时时间
         - name: "timeoutRule"
           content: "caseTimeoutTaskA->caseTimeoutTaskB->caseTimeoutTaskC"

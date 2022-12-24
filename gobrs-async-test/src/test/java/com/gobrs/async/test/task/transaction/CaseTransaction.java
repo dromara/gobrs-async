@@ -1,14 +1,13 @@
-package com.gobrs.async.test;
+package com.gobrs.async.test.task.transaction;
 
 import com.gobrs.async.core.GobrsAsync;
 import com.gobrs.async.core.common.domain.AsyncResult;
-import com.gobrs.async.test.task.AService;
-import com.gobrs.async.test.task.CService;
+import com.gobrs.async.test.GobrsAsyncTestApplication;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.*;
+import java.util.HashMap;
 
 /**
  * The type Case general.
@@ -20,7 +19,7 @@ import java.util.*;
  * @create: 2022 -06-13
  */
 @SpringBootTest(classes = GobrsAsyncTestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class CaseGeneral {
+public class CaseTransaction {
 
 
     @Autowired(required = false)
@@ -31,15 +30,8 @@ public class CaseGeneral {
      */
     @Test
     public void tcase() {
-        Set<String> cases = new HashSet<>();
-        cases.add("BService");
-        cases.add("GService");
 
-        Map<Class, Object> params = new HashMap<>();
-        params.put(AService.class, "1");
-        params.put(CService.class, "2");
-
-        AsyncResult asyncResult = gobrsAsync.go("general", () -> params, 300000);
+        AsyncResult asyncResult = gobrsAsync.go("transactionRule", () -> new HashMap<>(), 300000);
         System.out.println(asyncResult);
     }
 
