@@ -63,6 +63,7 @@ public class GobrsPropertyAutoConfiguration {
             r.setContent(x.getContent());
             r.setTaskInterrupt(x.isTaskInterrupt());
             r.setTransaction(x.isTransaction());
+            r.setInterruptionImmediate(x.isInterruptionImmediate());
             return r;
         }).collect(Collectors.toList());
         gobrsConfig.setRules(rList);

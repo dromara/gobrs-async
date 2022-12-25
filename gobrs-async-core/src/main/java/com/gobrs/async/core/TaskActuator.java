@@ -165,7 +165,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                     support.getResultMap().put(task.getClass(), buildSuccessResult(result));
                 }
 
-                stopAsync(parameter, support);
+                stopAsync0(parameter, support);
 
                 /**
                  * 状态改变
@@ -208,7 +208,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
         return (Result) result;
     }
 
-    private void stopAsync(Object parameter, TaskSupport support) {
+    private void stopAsync0(Object parameter, TaskSupport support) {
         AtomicInteger diagnose = support.getTaskLoader().getINTERRUPTFLAG();
         if (diagnose.get() == INTERRUPTTING.getState() && diagnose.compareAndSet(INTERRUPTTING.getState(), INTERRUPTED.getState())) {
             ErrorCallback<Object> errorCallback = new ErrorCallback<Object>(() -> parameter, null, support, task);
@@ -218,6 +218,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
             }
             support.taskLoader.setExpCode(new AtomicInteger(ExpState.STOP_ASYNC.getCode()));
             support.getResultMap().put(task.getClass(), buildErrorResult(null, new ManualStopException("Manually executing stopAsync Exception")));
+            support.getTaskLoader().isRunning().set(false);
             support.getTaskLoader().errorInterrupted(errorCallback);
         }
     }
@@ -283,7 +284,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
     /**
      * Determine whether the process is interrupted
-     * 判断当前任务是否已经执行过
+     * 判断当前流程是否执行完成
      */
     private void noRepeat(TaskLoader taskLoader, Object result) throws Exception {
         if (taskLoader.isRunning().get()) {
@@ -328,7 +329,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
          */
         if (ConfigManager.getRule(taskLoader.getRuleName()).isTaskInterrupt()) {
             setExpCode(ExpState.TASK_INTERRUPT.getCode());
-
+            support.getTaskLoader().isRunning().set(false);
             taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
         } else {
 
@@ -652,7 +653,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                 return;
             }
             /**
-             * Get the parent com.gobrs.async.com.gobrs.async.test.task that the com.gobrs.async.com.gobrs.async.test.task depends on
+             * Get the parent .com.gobrs.async.test.task that the com.gobrs.async.test.task depends on
              */
             List<AsyncTask> asyncTaskList = upwardTasksMap.get(this.task);
             if (asyncTaskList == null || asyncTaskList.isEmpty()) {

@@ -309,8 +309,9 @@ public class TaskLoader<P, R> {
             canceled = true;
             Set<Map.Entry<AsyncTask<P, R>, Future<?>>> entries =
                     futureTasksMap.entrySet();
+            boolean interruptionImmediate = ConfigManager.getRule(ruleName).isInterruptionImmediate();
             for (Map.Entry<AsyncTask<P, R>, Future<?>> entry : entries) {
-                entry.getValue().cancel(true);
+                entry.getValue().cancel(interruptionImmediate);
             }
         } finally {
             taskLock.unlock();

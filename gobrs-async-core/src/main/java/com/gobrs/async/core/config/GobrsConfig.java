@@ -60,6 +60,7 @@ public class GobrsConfig {
     private boolean paramContext = true;
 
 
+
     /**
      * Default timeout
      *
@@ -69,7 +70,6 @@ public class GobrsConfig {
 
 
     private boolean relyDepend = false;
-
 
 
     /**

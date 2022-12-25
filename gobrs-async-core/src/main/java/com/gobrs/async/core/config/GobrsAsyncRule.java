@@ -35,6 +35,8 @@ public class GobrsAsyncRule {
      */
     private boolean taskInterrupt = false;
 
+    private boolean interruptionImmediate = true;
+
     private boolean catchable = false;
 
     /**
@@ -167,5 +169,23 @@ public class GobrsAsyncRule {
      */
     public void setCatchable(boolean catchable) {
         this.catchable = catchable;
+    }
+
+    /**
+     * Is interruption immediate boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isInterruptionImmediate() {
+        return interruptionImmediate;
+    }
+
+    /**
+     * Sets interruption immediate.
+     *
+     * @param interruptionImmediate the interruption immediate
+     */
+    public void setInterruptionImmediate(boolean interruptionImmediate) {
+        this.interruptionImmediate = interruptionImmediate;
     }
 }
