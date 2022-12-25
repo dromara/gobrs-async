@@ -1,4 +1,4 @@
-package com.gobrs.async.test.task.transaction;
+package com.gobrs.async.test.transaction;
 
 import com.gobrs.async.core.TaskSupport;
 import com.gobrs.async.core.anno.Task;

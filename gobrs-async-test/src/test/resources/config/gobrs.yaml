@@ -70,6 +70,7 @@ gobrs:
         - name: "taskInterrupt"
           content: "interruptTaskA->interruptTaskB;interruptTaskC->interruptTaskD"
           task-interrupt: true # 局部异常是否打断主流程 默认 false
+          interruptionImmediate: false # 异常中断后 是否立即中断 默认true
           catchable: false # 异常抛出到main线程 适合开发者手动捕获流程内部的异常
         # 获取非强依赖任务的返回结果  如下： C任务获取A任务的返回结果， 从任务配置上看 C并不需要A 执行完成后再执行C 所有 通过Future方式 C有能力获取到A的返回结果
         - name: "futureTaskRule"
