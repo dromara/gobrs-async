@@ -507,7 +507,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param taskLoader      the com.gobrs.async.com.gobrs.async.test.task loader
      * @param conditionResult the com.gobrs.async.com.gobrs.async.test.task conditionResult
      */
-    public void nextTask(TaskLoader taskLoader, AnyConditionResult conditionResult) throws Exception {
+    public void nextTask(TaskLoader taskLoader, AnyConditionResult<Result> conditionResult) throws Exception {
 
         if (!CollectionUtils.isEmpty(subTasks)) {
             for (int i = 0; i < subTasks.size(); i++) {

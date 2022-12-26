@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
  * The type Gobrs property auto configuration.
  *
  * @program: gobrs -async
- * @ClassName GobrsPropertyAutoConfiguration
  * @description:
  * @author: sizegang
  * @create: 2022 -12-10
