@@ -29,7 +29,7 @@ public class TaskReceive {
      * @param taskFlow the com.gobrs.async.com.gobrs.async.test.task flow
      * @param taskList the com.gobrs.async.com.gobrs.async.test.task list
      */
-    TaskReceive(TaskFlow taskFlow, List<AsyncTask> taskList) {
+    TaskReceive(TaskFlow taskFlow, List<AsyncTask<?, ?>> taskList) {
         synchronized (taskFlow) {
             this.taskFlow = taskFlow;
             this.cacheTaskList = new ArrayList<>(taskList.size());
@@ -78,13 +78,13 @@ public class TaskReceive {
      *
      * @param cacheTaskList the cache com.gobrs.async.com.gobrs.async.test.task list
      */
-    public void refresh(List<AsyncTask> cacheTaskList) {
+    public void refresh(List<AsyncTask<?, ?>> cacheTaskList) {
         this.cacheTaskList.clear();
         this.cacheTaskList.addAll(cacheTaskList);
     }
 
 
-    private void copyList(List<AsyncTask> src,
+    private void copyList(List<AsyncTask<?, ?>> src,
                           List<AsyncTask> dest) {
         dest.addAll(src);
     }

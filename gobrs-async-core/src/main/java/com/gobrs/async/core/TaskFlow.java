@@ -61,7 +61,7 @@ public class TaskFlow {
      * @param asyncTasks the async tasks
      * @return the com.gobrs.async.com.gobrs.async.test.task receive
      */
-    synchronized TaskReceive start(List<AsyncTask> asyncTasks) {
+    synchronized TaskReceive start(List<AsyncTask<?, ?>> asyncTasks) {
         /**
          * Building com.gobrs.async.com.gobrs.async.test.task groups
          */

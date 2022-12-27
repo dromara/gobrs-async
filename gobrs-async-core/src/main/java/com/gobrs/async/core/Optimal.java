@@ -31,7 +31,7 @@ public class Optimal {
      */
     public static boolean ifContinue(Set<AsyncTask> optionalTasks, TaskLoader taskLoader, TaskActuator process) throws Exception {
         if (optionalTasks != null && taskLoader.oplCount.get() == taskLoader.getOptionalTasks().size()) {
-            ((TaskActuator) taskLoader.processMap.get(taskLoader.assistantTask)).call();
+            (taskLoader.processMap.get(taskLoader.assistantTask)).call();
             return false;
         }
         return true;

@@ -57,12 +57,13 @@ gobrs:
                     caseThreeTaskA->caseThreeTaskE,caseThreeTaskF->caseThreeTaskG;"
         # 官方场景四 https://async.sizegang.cn/pages/2f844b/#%E5%9C%BA%E6%99%AF%E5%9B%9B
         - name: "caseFour"
-          content: "caseFourTaskA->caseFourTaskB->caseFourTaskC,caseFourTaskD,caseFourTaskE;
-                    caseFourTaskA->caseFourTaskH->caseFourTaskI,caseFourTaskJ,caseFourTaskK;"
+          content: "caseFourTaskA->caseFourTaskB->caseFourTaskC,caseFourTaskD,caseFourTaskE->caseFourTaskK;
+                    caseFourTaskA->caseFourTaskH->caseFourTaskI,caseFourTaskJ;"
           logConfig:
             costLogabled: false # 关闭耗时任务打印
-          catchable: true
+          catchable: false
         # 官方场景五 https://async.sizegang.cn/pages/2f844b/#%E5%9C%BA%E6%99%AF%E4%BA%94
+
         - name: "caseFive"
           content: "caseFourTaskA,caseFourTaskB,caseFourTaskC->caseFourTaskD:any:exclusive" # any 任意一个任务（A、B、C）执行完成后 则执行D任务
           # exclusive 避免任务执行浪费 所以 D执行完成之后 会主动 中断 未完成的任务

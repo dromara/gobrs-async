@@ -23,13 +23,12 @@ import static com.gobrs.async.core.common.def.FixSave.LOGGER_PLUGIN;
  * The type Task trigger.
  *
  * @param <P> the type parameter
- * @param <R> the type parameter
  * @program: gobrs -async-starter
  * @description: Task preloader
  * @author: sizegang
  * @create: 2022 -03-16
  */
-class TaskTrigger<P, R> {
+class TaskTrigger<P> {
 
     /**
      * The Logger.
@@ -291,18 +290,6 @@ class TaskTrigger<P, R> {
     }
 
 
-    private void doProcess(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> affirTasks) {
-        if (affirTasks != null) {
-            if (affirTasks.contains(process.getTask())) {
-                taskLoader.oplCount.incrementAndGet();
-                taskLoader.startProcess(process);
-            }
-        } else {
-            taskLoader.startProcess(process);
-        }
-    }
-
-
     /**
      * Get the com.gobrs.async.com.gobrs.async.test.task support , Similar com.gobrs.async.com.gobrs.async.test.task bus
      * 获取任务流程 总线
@@ -343,12 +330,5 @@ class TaskTrigger<P, R> {
             support.getTaskLoader().setLogWrapper(logWrapper);
         }
 
-    }
-
-    /**
-     * @param rulename
-     */
-    private void rule(String rulename) {
-        this.ruleName = rulename;
     }
 }

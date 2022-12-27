@@ -242,7 +242,7 @@ public class TaskActuator implements Callable, Cloneable {
      * @param taskLoader
      */
     private void futureStopRelease(Object parameter, TaskLoader taskLoader) throws Exception {
-        Future<?> future = (Future<?>) taskLoader.getFutureTasksMap().get(task);
+        Future<?> future = taskLoader.getFutureTasksMap().get(task);
         if (future instanceof GobrsFutureTask) {
             Integer syncState = ((GobrsFutureTask<?>) future).getSyncState();
             if (syncState == STOP_STAMP) {
@@ -525,7 +525,7 @@ public class TaskActuator implements Callable, Cloneable {
                 if (process.task.isAnyCondition()) {
                     if (process.releasingDependency() == 0 || conditionResult.getState()) {
                         synchronized (process.task) {
-                            Boolean aBoolean = (Boolean) taskLoader.anyConditionProx.get(process);
+                            Boolean aBoolean = taskLoader.anyConditionProx.get(process);
                             if (Objects.isNull(aBoolean)) {
                                 taskLoader.anyConditionProx.put(process, true);
                                 doTask(taskLoader, process, optionalTasks, isCycleThread(i, process));

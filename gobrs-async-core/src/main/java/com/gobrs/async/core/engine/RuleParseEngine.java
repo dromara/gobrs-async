@@ -119,7 +119,7 @@ public class RuleParseEngine extends AbstractEngine {
                 /**
                  * Load tasks from the rules com.gobrs.async.engine
                  */
-                List<AsyncTask> asyncTasks = new ArrayList<>();
+                List<AsyncTask<?, ?>> asyncTasks = new ArrayList<>();
                 for (String tbean : beanList) {
                     asyncTasks.add(EngineExecutor.getWrapperDepend(cacheTaskWrappers, tbean, taskReceive, false));
                 }

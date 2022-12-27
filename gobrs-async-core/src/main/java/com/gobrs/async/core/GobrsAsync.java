@@ -52,7 +52,7 @@ public class GobrsAsync {
      * @param reload     the reload
      * @return com.gobrs.async.com.gobrs.async.test.task receive
      */
-    public TaskReceive begin(String ruleName, List<AsyncTask> asyncTasks, boolean reload) {
+    public TaskReceive begin(String ruleName, List<AsyncTask<?, ?>> asyncTasks, boolean reload) {
         if (Objects.isNull(taskFlow)) {
             loadTaskFlow(ruleName);
         }
@@ -73,7 +73,7 @@ public class GobrsAsync {
      * @param asyncTasks the async tasks
      * @return the com.gobrs.async.com.gobrs.async.test.task receive
      */
-    public TaskReceive begin(String ruleName, List<AsyncTask> asyncTasks) {
+    public TaskReceive begin(String ruleName, List<AsyncTask<?, ?>> asyncTasks) {
         return begin(ruleName, asyncTasks, false);
     }
 
