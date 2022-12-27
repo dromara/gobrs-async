@@ -1307,6 +1307,58 @@ cost 311
 
 
 
+## 插件
+## 监控系列
+
+
+### skywalking 适配器
+skywalking 是全链路监控平台，因为skywalking 不兼容多线程traceId，所以`gobrs-async` 提供**skywalking插件**
+
+#### 使用方式
+#### pom.xml 依赖引入
+
+```xml  
+<dependency>
+    <groupId>io.github.memorydoc</groupId>
+    <artifactId>gobrs-async-skywalking-plugin</artifactId>
+    <version>1.2.9-RELEASE</version>
+</dependency>
+```
+
+只需引入依赖即可完成与skywalking完美适配。是不是感觉很神奇！
+
+
+## 日志系列
+
+### 全链路traceId
+各位开发同学已经都知道，全链路traceId是打印在日志里的方便链路追踪的`序列号`。 有了它你可以轻松追踪线上问题，简单好用。
+
+
+### 使用方式
+
+### pom.xml 依赖引入
+
+```xml  
+<dependency>
+    <groupId>io.github.memorydoc</groupId>
+    <artifactId>gobrs-async-trace-plugin</artifactId>
+    <version>1.2.9-RELEASE</version>
+</dependency>
+```
+
+只需引入依赖即可完成与skywalking完美适配。是不是感觉很神奇！
+
+### 静态注入
+需要在`SpringBoot`启动类中编写
+```java 
+static {
+    GobrsLogger.logger();
+}
+```
+### 说明
+**Gobrs-Async日志插件**封装了 [Tlog](https://tlog.yomahub.com/) 如有使用问题请访问Tlog官网。
+
+
 
 ## 加群沟通
 对于这个项目，是否有什么不一样看法，欢迎在 Issue 一起沟通交流；
