@@ -375,7 +375,7 @@ async:
 ### 注意
 示例三 需要和 示例二配合生效， 因为这两种示例是结合的一种场景。
 
-## 规则总结
+### 规则总结
 
 规则配置跟流程图几乎非常相近。
 * 在任务分叉时 使用 <code>,</code> 区分不同任务。
@@ -543,10 +543,10 @@ public class BService extends AsyncTask<Object, Object>  {
 // ...
 }
 ```
-## 单测用例
+### 单测用例
 [单测地址](https://gitee.com/dromara/gobrs-async/blob/master/gobrs-async-test/src/test/java/com/gobrs/async/test/retry/CaseTimeout.java)
 
-## 运行结果
+### 运行结果
 ```sh 
 2022-12-09 19:36:35.444  INFO 99720 --- [pool-2-thread-1] c.g.a.test.task.retry.CaseRetryTaskA     : caseRetryTaskA 使用线程---pool-2-thread-1
 CaseRetryTaskA Begin
@@ -678,7 +678,7 @@ public class CaseTimeoutTaskA extends AsyncTask {
 
 ```
 
-## 超时监听线程池配置
+### 超时监听线程池配置
 **所谓的监听线程池配置即：监听任务超时的线程池的核心线程数，关于为什么要配置该参数。请查看下方的[原理分析](#特别说明)。**
 ```yaml
 gobrs:
@@ -698,10 +698,10 @@ gobrs:
     }
 ```
 
-## 单例测试
+### 单例测试
 [运行代码](https://gitee.com/dromara/gobrs-async/blob/master/gobrs-async-test/src/test/java/com/gobrs/async/test/timeout/CaseTimeout.java)
 
-## 运行结果
+### 运行结果
 ```sh  
 2022-12-09 16:51:41.031  INFO 37083 --- [pool-2-thread-1] c.g.a.t.task.timeout.CaseTimeoutTaskA    : caseTimeoutTaskA 使用线程---pool-2-thread-1
 CaseTimeoutTaskA Begin
@@ -728,7 +728,7 @@ CaseTimeoutTaskC Finish
 
 ```
 
-## 特别说明
+### 特别说明
 * 超时任务不支持线程复用，因为需要通过控制线程超时来进行逻辑判断，如果支持线程复用，可能会出现中断正在复用线程的任务执行。
 * 熔断降级原理借鉴`Hystrix` 方式处理，如果对`Hystrix`不熟悉可以借鉴 [Hystrix 熔断降级原理解析](https://my.oschina.net/13426421702/blog/3071368)
 * 因线程调度的原因，超时时间可能存在10ms内的误差，可忽略！
@@ -742,10 +742,10 @@ CaseTimeoutTaskC Finish
 TaskE、TaskF 都只有两个并发的任务同时存在，所以决定使用线程数量个数的根本条件是有多少个**并发任务同时执行** 那么看下gobrs-async 此时有多少个线程在执行
 
 ![ccc](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/4091670739478_.pic.jpg)
-## 测试用例
+### 测试用例
 [地址](https://gitee.com/dromara/gobrs-async/blob/master/gobrs-async-test/src/test/java/com/gobrs/async/test/performance/CasePerformance.java)
 
-## 运行结果
+### 运行结果
 ```sh   
 主线程使用main
 使用main
@@ -770,7 +770,7 @@ TaskF
 耗时462
 ```
 
-## 说明
+### 说明
 通过日志可以看到 TaskC使用了 TaskA的线程执行任务， 因TaskB 和 TaskC是并行的， 所以此时需要开辟新线程执行TaskB，等到TaskB执行完成后， TaskD继续使用
 TaskB的 线程 pool-2-thread-1 执行任务， 此时TaskC执行完成后 发现其子任务已经被 TaskB释放后的线程拿到执行权，则不需要使用自身线程执行任务。 同理任务流程
 继续往下执行。 整个流程中一共使用 3个线程（包含main线程）。
@@ -780,9 +780,530 @@ TaskB的 线程 pool-2-thread-1 执行任务， 此时TaskC执行完成后 发�
 
 
 
+## 日志体系
+使用 `log.error(getFormattedTraceId(), exception);` 打印的日志会自动带上 traceId， `getFormattedTraceId` 是 `AsyncTask` 提供的通用方法。
+
+```java 
+@Slf4j
+@Task(failSubExec = true)
+public class BService extends AsyncTask {
+
+    int i = 10000;
+    @Override
+    public void prepare(Object o) {
+        log.info(this.getName() + " 使用线程---" + Thread.currentThread().getName());
+    }
+
+    @Override
+    public Object task(Object o, TaskSupport support) {
+        System.out.println("BService Begin");
+        for (int i1 = 0; i1 < i; i1++) {
+            i1 += i1;
+        }
+        try {
+            System.out.println(1 / 0);
+        } catch (Exception exception) {
+            log.error(getFormattedTraceId(), exception);
+        }
+
+        System.out.println("BService Finish");
+        return null;
+    }
+}
+
+```
+
+## 开启全局日志打印
+* `costLogabled`：打印任务流程的全链路执行过程
+* `errLogabled`：开启任务异常打印 默认true
+```yaml
+gobrs:
+  async:
+    config:
+      rules:
+        - name: "optionalRule"
+          content: "caseOptionalTaskA->caseOptionalTaskB->caseOptionalTaskC,caseOptionalTaskD->caseOptionalTaskE->caseOptionalTaskF"
+          task-interrupt: false # 局部异常是否打断主流程 默认false
+          transaction: false
+          logConfig:
+            costLogabled: true # 开启任务耗时打印 log日志级别需要为 error 默认true
+            errLogabled: true # 开启任务异常打印 默认true
+
+```
+## 打印效果
+```sh 
+CaseOptionalTaskA 任务执行
+CaseOptionalTaskA 任务执行完成
+2022-12-11 15:47:32.511  INFO 13458 --- [o-8888-exec-152] com.gobrs.async.core.task.AsyncTask      :  <11781331511388032> [caseOptionalTaskA] execution
+CaseOptionalTaskB 任务执行
+CaseOptionalTaskB 任务执行完成
+2022-12-11 15:47:32.613  INFO 13458 --- [o-8888-exec-152] com.gobrs.async.core.task.AsyncTask      :  <11781331511388032> [caseOptionalTaskB] execution
+CaseOptionalTaskD 任务执行
+CaseOptionalTaskD任务执行完成
+2022-12-11 15:47:32.718  INFO 13458 --- [o-8888-exec-152] com.gobrs.async.core.task.AsyncTask      :  <11781331511388032> [caseOptionalTaskD] execution
+2022-12-11 15:47:32.718  INFO 13458 --- [o-8888-exec-152] com.gobrs.async.core.TaskLoader          : 【ProcessTrace】Total cost: 311ms | traceId = 11781331511388032 | 【task】caseOptionalTaskA cost :102ms【state】：success; ->【task】caseOptionalTaskB cost :102ms【state】：success; ->【task】caseOptionalTaskD cost :105ms【state】：success; 
+cost 311
+
+```
+
+## 第三方日志框架集成
+这里选择[Tlog](https://tlog.yomahub.com/) 日志框架， 使用方法这里就不做赘述了。感兴趣的小伙伴可以到官网查看
+
+### 集成使用
+```java 
+
+/**
+ * 启动类
+ */
+@SpringBootApplication
+/**
+ * 使用gobrs-async-test 模块创建的任务 为了方便不重复创建任务了
+ */
+@ComponentScan(value = {"com.gobrs.async"})
+public class GobrsAsyncExampleApplication {
+
+    /**
+     * Tlog 日志打印框架 官网: https://tlog.yomahub.com/
+     */
+    static {
+        AspectLogEnhance.enhance();
+    }
+
+    /**
+     * The entry point of application.
+     *
+     * @param args the input arguments
+     */
+    public static void main(String[] args) {
+        SpringApplication.run(GobrsAsyncExampleApplication.class, args);
+    }
+}
+```
+
+### 更多细节
+
+集成方式请参考源码示例项目 [gobrs-async-example](https://gitee.com/dromara/gobrs-async/tree/master/gobrs-async-example) 或者直接下载源码查看。
+[源码地址](https://gitee.com/dromara/gobrs-async)
 
 
 
+
+## 规则热更新
+
+**在Gobrs-Async**中默认规则只会加载一次，可能有朋友可能会有规则动态变化的需求，使用程序动态修改规则配置。而不需要重新启动程序。那么对于这种需求
+**Gobrs-Async** 同样支持。
+
+> Gobrs-Async 默认使用CopyOnWrite 机制更新的规则配置，并发度更高。同时维护了线程安全机制。
+
+```java 
+
+// 规则热加载器
+@Resource
+private RuleThermalLoad ruleThermalLoad;
+
+// 热更新规则任务 无需启动程序， 只需要将规则交给 规则热加载器 即可完成接入
+public void updateRule(Rule rule) {
+    // 单任务修改
+    Rule r = new Rule();
+    r.setName("ruleName");
+    r.setContent("AService->CService->EService->GService; BService->DService->FService->HService;");
+    ruleThermalLoad.load(rule);
+    
+    // 批量修改 
+    List<Rule> updateRules = new ArrayList<Rule>();
+    updateRules.add(r);
+    // updateRules.add(...);
+    ruleThermalLoad.load(updateRules);
+}
+```
+
+### 验证
+如果日志打印如下提示，说明配置热更新成功
+```sh
+com.gobrs.async.engine.RuleThermalLoad   : rule test update success
+```
+
+
+
+
+
+
+
+## 中断状态码
+
+在流程中如果你想在某种业务场景下手动关闭任务流程执行。 并在任务触发器执行完成之后，根据<code>AsyncResult</code> 的结果，判断不同的业务逻辑
+**Gobrs-Async** 也为你提供了途径。 用户只需要在 异步任务的 <code> task</code>方法中 手动跳用 <code>stopAsync</code> 透传<code>TaskSupport</code>
+无需关注内部实现，即可轻松完成关闭主流程。
+
+<code>stopAsync</code> 方法有两个参数说明如下：
+
+* <code>TaskSupport</code>: **Gobrs-Async** 使用参数， 透传即可。
+* <code>expCode</code> : 中断状态码，可自定义枚举
+
+```java 
+
+    @Override
+    public Map task(DataContext dataContext, TaskSupport support) {
+        try {
+            // todo 执行任务
+        } catch (Exception e) {
+             // todo  根据不同的异常 处理返回不同的 中断码
+            if (e instanceof RedirectSimpleException) {
+                // 中断任务流程
+                stopAsync(support, PRODUCT_NOT_FOUND);
+                return null;
+            }
+            stopAsync(support, SYSTEM_DEMOTION);
+        }
+        return null;
+    }
+
+```
+
+
+[任务触发器执行完成](/pages/2f674a/#启动任务流程) 执行完成之后，会获取 <code>AsyncResult</code> 任务流程执行结果。
+根据不同的中断码，执行不同的业务逻辑。
+```java 
+Map<String, Object> params  = new HashMap();
+// 任务流程名称 , 任务流程传入参数, 任务流程超时时间 
+AsyncResult asyncResult = gobrsAsync.go("ruleName", () -> params, timeOut);
+
+if(asyncResult.getExpCode().equals(100)){
+    // 业务一
+}else if(asyncResult.getExpCode().equals(200)){
+    // 业务二
+}
+```
+
+
+
+
+## 任务异常是否中断子任务流程
+在执行 A->B->C 过程中，如果A 执行异常，**Gobrs-Async** 默认不会继续执行 B、C任务了，但是如果使用者有特殊需求， 想要继续执行 B、C任务，
+这种情况**Gobrs-Async** 也提供支持, 只需要在 <code>Task</code>注解中声明 <code>failSubExec</code> 即可继续执行任务流程。
+默认 <code>failSubExec=false</code>
+```java  
+@Service
+@Task(failSubExec = true) 
+public class BService extends AsyncTask<Object, Object>  {
+// ...
+}
+```
+
+
+## 状态任务流程
+**何为状态任务流程？** 其实很好理解，比如说有 A、B、C、D 四个任务。D任务的执行依赖A、B、C三个任务， 但是A B C 的执行状态有不好确定（运行时状态）
+如果想根据任务返回值的状态决定流程如何执行怎么办呢？ 比如说A B C三个任务中根据不通的业务逻辑会返回不通的任务状态。遇到这种情况可以使用`Gobrs-Async`
+为你提供的动态状态能力选择任务执行。
+比如： A 业务返回true 则就执行D任务，无需关心B、C任务的执行过程。
+
+与开发一个普通任务不通的是，返回结果需要是 `AnyConditionResult` 类型。
+
+```java  
+package com.gobrs.async.test.task.condition;
+
+import com.gobrs.async.core.TaskSupport;
+import com.gobrs.async.core.anno.Task;
+import com.gobrs.async.core.common.domain.AnyConditionResult;
+import com.gobrs.async.core.task.AsyncTask;
+import org.springframework.stereotype.Component;
+
+/**
+ * The type A service.
+ *
+ * @program: gobrs -async-starter
+ * @ClassName AService
+ * @description: 任务依赖类型
+ * AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition:anyCondition
+ * <p>
+ * 简化配置
+ * <p>
+ * A,B,C->D:anyCondition
+ * <p>
+ * D根据 A,B,C 返回的任务结果中的 AnyCondition 的state状态 进行判断是否继续执行 子任务。
+ * @author: sizegang
+ * @create: 2022 -03-20
+ */
+@Task(failSubExec = true)
+public class AServiceCondition extends AsyncTask {
+    /**
+     * The .
+     */
+    int sums = 10000;
+    @Override
+    public AnyConditionResult<String> task(Object o, TaskSupport support) {
+        AnyConditionResult.Builder<String> builder = AnyConditionResult.builder();
+        try {
+            System.out.println("AServiceCondition Begin");
+            Thread.sleep(300);
+            for (int i1 = 0; i1 < sums; i1++) {
+                i1 += i1;
+            }
+            System.out.println("AServiceCondition Finish");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            //  异常返回false
+           return builder.setState(false).build();
+        }
+        return builder.setState(true).build();
+    }
+}
+
+```
+
+`AnyConditionResult.Builder<String> builder = AnyConditionResult.builder();`  构造函数默认创建一个 `true`的状态。
+
+## 单测用例
+[单测地址](https://gitee.com/dromara/gobrs-async/blob/master/gobrs-async-test/src/test/java/com/gobrs/async/test/CaseAnyCondition.java)
+
+## 运行结果
+```sh  
+2022-12-09 17:48:44.676  INFO 58639 --- [           main] com.gobrs.async.core.GobrsPrint          : Gobrs-Async Load Successful
+CServiceCondition Begin
+BServiceCondition Begin
+AServiceCondition Begin
+BServiceCondition Finish
+AServiceCondition Finish
+DServiceCondition Begin
+DServiceCondition Finish
+2022-12-09 17:48:45.435  INFO 58639 --- [pool-1-thread-1] com.gobrs.async.core.TaskLoader          : 【ProcessTrace】Total cost: 334ms | traceId = 11770483512420224 | 【task】BServiceCondition cost :3ms【state】：success; ->【task】AServiceCondition cost :305ms【state】：success; ->【task】DServiceCondition:anyCondition cost :0ms【state】：success; 
+377
+【gobrs-async】 testCondition 执行完成
+```
+
+
+## 可配置的全局异常拦截器
+
+如果你想在任务流程执行过程中，某一任务执行异常，想让整个任务流程停止下来。并且可自定拦截这个异常，可在发生异常时 执行报警或者打印异常等业务。
+
+
+## 开启全局异常拦截
+
+配置<code>application.yml</code>
+```yaml
+
+gobrs:
+  async:
+    config:
+      rules:
+        # 规则 是数组类型的 多组规则
+        - name: "general"
+          content: "AService->BService->FService->GService->HService;EService->CService;AService"
+          task-interrupt: true # 局部异常是否打断主流程 默认 false
+```
+
+## 异常拦截器
+实现 <code>AsyncExceptionInterceptor</code> 接口，开发一个自定义的异常处理拦截器
+```java 
+/**
+ * @program: gobrs-async
+ * @ClassName GobrsExceptionInter
+ * @description: 主流程中断异常自定义处理
+ * @author: sizegang
+ * @create: 2022-02-19 22:55
+     * @Version 1.0
+ **/
+@Component
+public class GobrsExceptionInter implements AsyncTaskExceptionInterceptor {
+
+    @Override
+    public CompletionException exception(Throwable throwable, Boolean state) {
+        System.out.println("自定义全局异常 exceptor Interceptor 触发");
+        return new CompletionException(throwable);
+    }
+}
+
+```
+
+## 默认情况
+默认 **Gobrs-Async** 对全局拦截器开关是关闭的，如果流程中某一任务异常，只会停止所依赖该异常任务的任务停止，并调用callback 通知 下游任务
+
+## 可配置的全局任务拦截器
+
+有些小伙伴可能不满足与单任务的拦截，希望有一个统一拦截的入口，而不是对每一个任务做单独的处理。那么 **Gobrs-Async** 也为您提供了支持。
+
+## 前置全局任务流程拦截器
+实现 <code>AsyncTaskPreInterceptor</code> 接口，开发一个自定义的任务流程前置 全局拦截器。
+```java 
+/**
+ * @program: m-detail
+ * @ClassName AsyncTaskPreInterceptor
+ * @description:
+ * @author: sizegang
+ * @create: 2022-03-24
+ **/
+@Component
+public class TaskPreInterceptor implements AsyncTaskPreInterceptor<DataContext> {
+    
+     /**
+     * 
+     * @param params 参数
+     * @param taskName 任务名称
+     */
+    @Override
+    public void preProcess(DataContext params, String taskName) {
+
+    }
+}
+
+
+```
+
+## 后置全局任务流程拦截器
+实现 <code>TaskPostInterceptor</code> 接口，开发一个自定义的任务流程前置 全局拦截器
+```java 
+/**
+ * @program: m-detail
+ * @ClassName AsyncTaskPreInterceptor
+ * @description:
+ * @author: sizegang
+ * @create: 2022-03-24
+ **/
+@Component
+public class TaskPostInterceptor implements AsyncTaskPostInterceptor {
+    /**
+     *
+     * @param result 任务结果
+     * @param taskName 任务名称
+     */
+    @Override
+    public void postProcess(Object result, String taskName) {
+
+    }
+}
+
+```
+
+
+
+## 自定义固定线程池
+
+**Gobrs-Async** 默认使用的是 <code>Executors.newCachedThreadPool()</code> 的线程池， 如果你想自定义线程池。满足自己的线程池需求。
+只需要 <code>GobrsAsyncThreadPoolFactory</code> 对象，如下：
+
+```java 
+@Configuration
+public class ThreadPoolConfig {
+
+    @Autowired
+    private GobrsAsyncThreadPoolFactory factory;
+    
+    @PostConstruct
+    public void gobrsThreadPoolExecutor(){
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(300, 500, 30, TimeUnit.SECONDS,
+                new LinkedBlockingQueue());
+        factory.setThreadPoolExecutor(threadPoolExecutor);
+    }
+
+```
+
+## 实时更新线程池
+
+开发者可能有这种苦恼，线程池在运行时是在项目初始化的时候从<code>application.yml</code>中 加载的， 一旦程序运行起来之后，就无法修改使用的线程池了。
+如果自己公司有分布式配置中心，可以实时更新程序内存的应用的话，那么**gobrs**也为你提供了入口。
+
+在我们公司是有自己的热更新组件的，所有可以如下使用：
+
+### 配置中心的线程池配置
+
+```json 
+{
+corePoolSize: 210,
+maxPoolSize: 600,
+keepAliveTime: 30,
+capacity: 10000,
+threadNamePrefix: "m-detail"
+rejectedExecutionHandler： "CallerRunsPolicy"
+}
+```
+
+
+```java 
+@Slf4j
+@Configuration
+public class ThreadPoolConfig {
+
+    @Autowired
+    private GobrsAsyncThreadPoolFactory factory;
+
+    @Resource
+    private DUCCConfigService duccConfigService;
+
+    @PostConstruct
+    public void gobrsThreadPoolExecutor() {
+        // 从配置中心拿到 线程池配置规则 DuccConstant.GOBRS_ASYNC_THREAD_POOL 为线程池配置在配置中心的key
+        String config = duccConfigService.getString(DuccConstant.GOBRS_ASYNC_THREAD_POOL);
+        ThreadPool threadPool = JSONObject.parseObject(config, ThreadPool.class);
+         
+        // 通过gobrs-async 提供的构造器进行构造线程池
+        ThreadPoolExecutor executor = ThreadPoolBuilder.buildByThreadPool(threadPool);
+        factory.setThreadPoolExecutor(executor);
+        listenerDucc();
+    }
+    
+    // 监听配置中心 线程池改动
+    private void listenerDucc() {
+        duccConfigService.addListener(new DuccListener(DuccConstant.GOBRS_ASYNC_THREAD_POOL, property -> {
+            log.warn("监听到DUCC配置GobrsAsync 线程池配置变更，property：{}", JSON.toJSONString(property.getValue()));
+            ThreadPool threadPool = JSONObject.parseObject(property.getValue().toString(), ThreadPool.class);
+            ThreadPoolExecutor executor = ThreadPoolBuilder.buildByThreadPool(threadPool);
+            factory.setThreadPoolExecutor(executor);
+            // 线程池更新成功
+            log.warn("GobrsAsync thread pool update success");
+        }));
+    }
+
+}
+
+```
+
+
+## 可选的执行流程
+### 任务配置
+```yaml
+- name: "optionalRule"
+  content: "caseOptionalTaskA->caseOptionalTaskB->caseOptionalTaskC,caseOptionalTaskD->caseOptionalTaskE->caseOptionalTaskF"
+```
+如果开发者在调用时只希望执行 `caseOptionalTaskD` , 则在任务链中 只需要执行`caseOptionalTaskA、caseOptionalTaskB、caseOptionalTaskD` 三个任务即可即可。 其他任务不需要执行
+，提供了随机选择流程中任务执行的能力。
+
+
+### 调用方式
+
+`gobrsAsync.go`方法的第三个参数 `Set<String>` 需要传递 要执行的任务 `bean` 名称。
+
+```java 
+    @Test
+    public void testOptional() {
+        Map<Class, Object> params = new HashMap<>();
+        Set<String> options = new HashSet<>();
+        options.add("caseOptionalTaskD"); # options中添加要执行的任务 bean 名称
+        AsyncResult asyncResult = gobrsAsync.go("optionalRule", () -> params, options, 300000);
+    }
+```
+
+### 测试用例
+[源码地址](https://gitee.com/dromara/gobrs-async/blob/master/gobrs-async-test/src/test/java/com/gobrs/async/test/optional/CaseOptional.java)
+### 运行结果
+```sh 
+CaseOptionalTaskA 任务执行
+CaseOptionalTaskA 任务执行完成
+2022-12-11 15:47:32.511  INFO 13458 --- [o-8888-exec-152] com.gobrs.async.core.task.AsyncTask      : <0><11781331511388032> <11781331511388032> [caseOptionalTaskA] execution
+CaseOptionalTaskB 任务执行
+CaseOptionalTaskB 任务执行完成
+2022-12-11 15:47:32.613  INFO 13458 --- [o-8888-exec-152] com.gobrs.async.core.task.AsyncTask      : <0><11781331511388032> <11781331511388032> [caseOptionalTaskB] execution
+CaseOptionalTaskD 任务执行
+CaseOptionalTaskD任务执行完成
+2022-12-11 15:47:32.718  INFO 13458 --- [o-8888-exec-152] com.gobrs.async.core.task.AsyncTask      : <0><11781331511388032> <11781331511388032> [caseOptionalTaskD] execution
+2022-12-11 15:47:32.718  INFO 13458 --- [o-8888-exec-152] com.gobrs.async.core.TaskLoader          : <0><11781331511388032> 【ProcessTrace】Total cost: 311ms | traceId = 11781331511388032 | 【task】caseOptionalTaskA cost :102ms【state】：success; ->【task】caseOptionalTaskB cost :102ms【state】：success; ->【task】caseOptionalTaskD cost :105ms【state】：success; 
+cost 311
+```
+
+
+### 适应场景
+在做 **ISV**  ([京东商城ISV组件化建设](https://developer.51cto.com/article/712050.html))  建设时， 楼层中的多个组件可能存在着任务流程的编排， 所需要的上游数据数量多少不一，所以此时就需要进行编排流程中的任务选择执行处理了。
+如下对每个组件进行编排数据编排处理。
+![image-20220809222627074](https://kevin-cloud-dubbo.oss-cn-beijing.aliyuncs.com/gobrs-async/image-20220809222627074.png)
 
 
 
