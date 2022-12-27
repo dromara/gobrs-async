@@ -38,11 +38,9 @@ import static com.gobrs.async.core.timer.GobrsFutureTask.STOP_STAMP;
 
 /**
  * The type Task actuator.
- *
- * @param <Result> the type parameter
  */
 @Slf4j
-public class TaskActuator<Result> implements Callable<Result>, Cloneable {
+public class TaskActuator implements Callable, Cloneable {
 
     /**
      * The Logger.
@@ -120,7 +118,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     }
 
     @Override
-    public Result call() throws Exception {
+    public Object call() throws Exception {
 
         Object parameter = getParameter(task);
 
@@ -205,7 +203,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
             clear();
             stopOrRelease(parameter, taskLoader);
         }
-        return (Result) result;
+        return result;
     }
 
     private void stopAsync0(Object parameter, TaskSupport support) {
@@ -383,7 +381,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
             List<AsyncTask> asyncTaskList = upwardTasksMap.get(task);
 
-            Map<AsyncTask<?, Result>, Future<?>> futureMaps = support.getTaskLoader().getFutureTasksMap();
+            Map<AsyncTask<?, ?>, Future<?>> futureMaps = support.getTaskLoader().getFutureTasksMap();
 
             futureMaps.forEach((x, y) -> {
 
@@ -507,7 +505,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param taskLoader      the com.gobrs.async.com.gobrs.async.test.task loader
      * @param conditionResult the com.gobrs.async.com.gobrs.async.test.task conditionResult
      */
-    public void nextTask(TaskLoader taskLoader, AnyConditionResult<Result> conditionResult) throws Exception {
+    public void nextTask(TaskLoader taskLoader, AnyConditionResult<Object> conditionResult) throws Exception {
 
         if (!CollectionUtils.isEmpty(subTasks)) {
             for (int i = 0; i < subTasks.size(); i++) {
@@ -633,7 +631,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     @SuppressWarnings("unchecked")
     public Object clone() {
         try {
-            TaskActuator<?> cloned = (TaskActuator<?>) super.clone();
+            TaskActuator cloned = (TaskActuator) super.clone();
             cloned.lock = new ReentrantLock();
             return cloned;
         } catch (Exception e) {

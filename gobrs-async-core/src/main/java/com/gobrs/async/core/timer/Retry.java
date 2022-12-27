@@ -20,7 +20,7 @@ public class Retry {
      * @param taskActuator the task actuator
      * @return the boolean
      */
-    public static boolean retryConditional(TaskActuator<?> taskActuator) {
+    public static boolean retryConditional(TaskActuator taskActuator) {
         return taskActuator.getTask().getRetryCount() > DefaultConfig.RETRY_COUNT;
     }
 }

@@ -34,14 +34,14 @@ public class GobrsAsync {
     /**
      * Begin com.gobrs.async.com.gobrs.async.test.task receive.
      *
-     * @param taskName the com.gobrs.async.com.gobrs.async.test.task name
+     * @param ruleName the com.gobrs.async.com.gobrs.async.test.task name
      * @param pioneer
      * @param reload
      * @param tasks    the tasks
      * @return the com.gobrs.async.com.gobrs.async.test.task receive
      */
-    public TaskReceive begin(String taskName, List<AsyncTask<?, ?>> pioneer, boolean reload, AsyncTask<?, ?>... tasks) {
-        return taskFlow.get(taskName).start(tasks);
+    public TaskReceive begin(String ruleName, List<AsyncTask<?, ?>> pioneer, boolean reload, AsyncTask<?, ?>... tasks) {
+        return taskFlow.get(ruleName).start(tasks);
     }
 
     /**

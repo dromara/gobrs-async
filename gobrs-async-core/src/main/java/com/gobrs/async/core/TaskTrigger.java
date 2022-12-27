@@ -203,7 +203,7 @@ class TaskTrigger<P, R> {
         /**
          * Create a com.gobrs.async.com.gobrs.async.test.task loader, A com.gobrs.async.com.gobrs.async.test.task flow corresponds to a taskLoader
          */
-        TaskLoader<P, R> loader = new TaskLoader<>(ruleName, threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
+        TaskLoader loader = new TaskLoader(ruleName, threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
 
         TaskSupport support = related(param, loader);
 
@@ -211,7 +211,7 @@ class TaskTrigger<P, R> {
             /**
              * clone Process for Thread isolation
              */
-            TaskActuator processor = (TaskActuator<?>) prepareTaskMap.get(task).clone();
+            TaskActuator processor = (TaskActuator) prepareTaskMap.get(task).clone();
 
             processor.init(support, param);
 
@@ -231,7 +231,7 @@ class TaskTrigger<P, R> {
      * @param loader
      * @return
      */
-    private TaskSupport related(AsyncParam<P> param, TaskLoader<P, R> loader) {
+    private TaskSupport related(AsyncParam<P> param, TaskLoader loader) {
 
         TaskSupport support = getSupport(param);
 
@@ -253,7 +253,7 @@ class TaskTrigger<P, R> {
      * 终止任务 在整个任务流程结束后 会调用该任务类执行 completed()
      * Task flow End tasks
      */
-    private class TerminationTask<P, R> extends TaskActuator<Object> {
+    private class TerminationTask<P, R> extends TaskActuator {
 
         /**
          * com.gobrs.async.com.gobrs.async.test.task executor

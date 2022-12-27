@@ -50,7 +50,7 @@ import static com.gobrs.async.core.task.ReUsing.reusing;
  * @create: 2022 -03-16
  */
 @Slf4j
-public class TaskLoader<P, R> {
+public class TaskLoader {
     /**
      * Interruption code
      */
@@ -65,11 +65,11 @@ public class TaskLoader<P, R> {
 
     private final ExecutorService executorService;
 
-    private final AsyncTaskExceptionInterceptor<P> asyncExceptionInterceptor = BeanHolder.getBean(AsyncTaskExceptionInterceptor.class);
+    private final AsyncTaskExceptionInterceptor asyncExceptionInterceptor = BeanHolder.getBean(AsyncTaskExceptionInterceptor.class);
 
-    private final AsyncTaskPreInterceptor<P> asyncTaskPreInterceptor = BeanHolder.getBean(AsyncTaskPreInterceptor.class);
+    private final AsyncTaskPreInterceptor asyncTaskPreInterceptor = BeanHolder.getBean(AsyncTaskPreInterceptor.class);
 
-    private final AsyncTaskPostInterceptor<P> asyncTaskPostInterceptor = BeanHolder.getBean(AsyncTaskPostInterceptor.class);
+    private final AsyncTaskPostInterceptor asyncTaskPostInterceptor = BeanHolder.getBean(AsyncTaskPostInterceptor.class);
 
     private final CountDownLatch completeLatch;
 
@@ -104,7 +104,7 @@ public class TaskLoader<P, R> {
     /**
      * The Futures async.
      */
-    public final Map<AsyncTask<P, R>, Future<?>> futureTasksMap = new ConcurrentHashMap<>();
+    public final Map<AsyncTask<?, ?>, Future<?>> futureTasksMap = new ConcurrentHashMap<>();
 
     /**
      * The Timer listeners.
@@ -290,7 +290,7 @@ public class TaskLoader<P, R> {
      * @param p        task parameter
      * @param taskName taskName
      */
-    public void preInterceptor(P p, String taskName) {
+    public void preInterceptor(Object p, String taskName) {
         asyncTaskPreInterceptor.preProcess(p, taskName);
     }
 
@@ -300,7 +300,7 @@ public class TaskLoader<P, R> {
      * @param param    task Result
      * @param taskName taskName
      */
-    public void postInterceptor(P param, String taskName) {
+    public void postInterceptor(Object param, String taskName) {
         asyncTaskPostInterceptor.postProcess(param, taskName);
     }
 
@@ -308,10 +308,10 @@ public class TaskLoader<P, R> {
         taskLock.lock();
         try {
             canceled = true;
-            Set<Map.Entry<AsyncTask<P, R>, Future<?>>> entries =
+            Set<Map.Entry<AsyncTask<?, ?>, Future<?>>> entries =
                     futureTasksMap.entrySet();
             boolean interruptionImmediate = ConfigManager.getRule(ruleName).isInterruptionImmediate();
-            for (Map.Entry<AsyncTask<P, R>, Future<?>> entry : entries) {
+            for (Map.Entry<AsyncTask<?, ?>, Future<?>> entry : entries) {
                 entry.getValue().cancel(interruptionImmediate);
             }
         } finally {
@@ -403,7 +403,7 @@ public class TaskLoader<P, R> {
      * @param taskActuator
      * @return
      */
-    private Future<?> timeOperator(TaskActuator<?> taskActuator) {
+    private Future<?> timeOperator(TaskActuator taskActuator) {
         Callable<?> callable = threadAdapterSPI(taskActuator);
         GobrsFutureTask<?> future = new GobrsFutureTask<>(callable);
         executorService.submit(future);
@@ -457,7 +457,7 @@ public class TaskLoader<P, R> {
      * @param taskActuator
      * @return
      */
-    private Callable<?> threadAdapterSPI(TaskActuator<?> taskActuator) {
+    private Callable<?> threadAdapterSPI(TaskActuator taskActuator) {
         ThreadWapper threadWapper = ExtensionLoader.getExtensionLoader(ThreadWapper.class).getRealLizesFirst();
         return Objects.isNull(threadWapper) ? taskActuator : threadWapper.wrapper(taskActuator);
     }
@@ -644,7 +644,7 @@ public class TaskLoader<P, R> {
      *
      * @return the future tasks map
      */
-    public Map<AsyncTask<P, R>, Future<?>> getFutureTasksMap() {
+    public Map<AsyncTask<?, ?>, Future<?>> getFutureTasksMap() {
         return futureTasksMap;
     }
 
