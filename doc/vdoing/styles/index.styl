@@ -1,0 +1,295 @@
+// 引入字体图标
+@import '//at.alicdn.com/t/font_1678482_4tbhmh589x.css'
+
+@require './config'
+@require './code'
+@require './custom-blocks'
+@require './arrow'
+@require './wrapper'
+@require './toc'
+@require './markdown-container'
+
+
+html, body
+  padding 0
+  margin 0
+
+body
+  font-family -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif
+  -webkit-font-smoothing antialiased
+  -moz-osx-font-smoothing grayscale
+  -webkit-tap-highlight-color transparent
+  font-size 16px
+  color $textColor
+  background var(--bodyBg)
+
+// 去掉黄色边框
+a,input,button
+  outline: none; -webkit-tap-highlight-color: rgba(255, 255, 255, 0); -webkit-focus-ring-color: rgba(0, 0, 0, 0);
+// 滚动条样式
+@media (min-width: $MQMobile)
+  ::-webkit-scrollbar
+    width:6px;
+    height:5px;
+  ::-webkit-scrollbar-track-piece
+    background-color:rgba(0,0,0,.15)
+    -webkit-border-radius:3px
+  ::-webkit-scrollbar-thumb:vertical
+    height:5px;
+    background-color:rgba(0,0,0,.28)
+    -webkit-border-radius:3px
+  ::-webkit-scrollbar-thumb:horizontal
+    width:5px;
+    background-color:rgba(0,0,0,.28)
+    -webkit-border-radius:3px
+
+
+.card-box // 卡片
+  border-radius 5px
+  background var(--mainBg)
+  box-shadow 0 1px 2px 0 rgba(0,0,0,.1)
+  transition box-shadow .5s
+  &:hover
+    box-shadow 0 1px 15px 0 rgba(0,0,0,.1)
+
+.blur // 模糊滤镜
+  backdrop-filter saturate(200%) blur(20px)
+
+.custom-page // 自定义页面
+  min-height calc(100vh - 3.6rem)
+  padding-top $navbarHeight
+  padding-bottom .9rem
+  .theme-vdoing-wrapper
+    margin 0 auto
+
+// 默认的搜索框样式重置
+body .search-box
+  input
+    background-color transparent
+    color var(--textColor)
+    border 1px solid var(--borderColor, #ccc)
+    @media (max-width: $MQNarrow)
+       border-color transparent
+
+
+
+.page
+  transition padding .2s ease
+  padding-left .8rem
+
+.navbar
+  position fixed
+  z-index 20
+  top 0
+  left 0
+  right 0
+  height $navbarHeight
+  background-color var(--blurBg)
+  box-sizing border-box
+  box-shadow 0 2px 5px rgba(0,0,0,.06)
+
+.sidebar-mask
+  position fixed
+  z-index 12
+  top 0
+  left 0
+  width 100vw
+  height 100vh
+  display none
+
+.sidebar-hover-trigger
+  display none
+  position: fixed
+  z-index 12
+  top ($navbarHeight + 4.5rem)
+  left 0
+  bottom 0
+  width 24px
+
+.sidebar
+  font-size 16px
+  background-color var(--sidebarBg)
+  width $sidebarWidth
+  position fixed
+  z-index 13
+  margin 0
+  top $navbarHeight
+  left 0
+  bottom 0
+  box-sizing border-box
+  border-right 1px solid var(--borderColor)
+  overflow-y auto
+  transform translateX(-100%)
+  transition transform .2s
+  @media (max-width: $MQMobile)
+    background-color var(--mainBg)
+
+
+{$contentClass}:not(.custom)
+  word-wrap break-word
+  @extend $wrapper
+  > *:first-child
+    // margin-top $navbarHeight // 内容第一个元素的top距离
+
+  a:hover
+    text-decoration underline
+
+  p.demo
+    padding 1rem 1.5rem
+    border 1px solid #ddd
+    border-radius 4px
+
+  img
+    max-width 100%
+
+{$contentClass}.custom
+  padding 0
+  margin 0
+
+  img
+    max-width 100%
+
+a
+  font-weight 500
+  color $accentColor
+  text-decoration none
+
+p a code
+  font-weight 400
+  color $accentColor
+
+kbd
+  background #eee
+  border solid 0.15rem #ddd
+  border-bottom solid 0.25rem #ddd
+  border-radius 0.15rem
+  padding 0 0.15em
+
+blockquote
+  font-size 1rem
+  opacity .75
+  border-left .2rem solid rgba(100,100,100,.3)
+  margin 1rem 0
+  padding .25rem 0 .25rem 1rem
+
+  & > p
+    margin 0
+
+ul, ol
+  padding-left 1.2em
+
+strong
+  font-weight 600
+
+h1, h2, h3, h4, h5, h6
+  font-weight 600
+  line-height 1.25
+
+  {$contentClass}:not(.custom) > &
+    margin-top (0.5rem - $navbarHeight)
+    padding-top ($navbarHeight + 1rem)
+    margin-bottom 0
+
+    &:first-child
+      // margin-top -1.5rem
+      margin-bottom 1rem
+
+      + p, + pre, + .custom-block
+        margin-top 2rem
+
+  &:focus .header-anchor,
+  &:hover .header-anchor
+    opacity: 1
+
+
+// 没有h1标签时
+p,pre,.custom-block
+  {$contentClass}:not(.custom) > &
+      &:first-child
+        margin-top 2rem
+
+
+h1
+  font-size 1.8rem
+  {$contentClass}:not(.custom) > & // 页面内容的首个h1标签隐藏
+    &:first-child
+      display none
+
+h2
+  font-size 1.5rem
+  padding-bottom .3rem
+  border-bottom 1px solid var(--borderColor)
+
+h3
+  font-size 1.35rem
+
+a.header-anchor
+  font-size 0.85em
+  float left
+  margin-left -0.87em
+  padding-right 0.23em
+  margin-top 0.125em
+  opacity 0
+
+  &:focus,
+  &:hover
+    text-decoration none
+
+code, kbd, .line-number
+  font-family source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace
+
+p, ul, ol
+  line-height 1.7
+
+hr
+  border 0
+  border-top 1px solid var(--borderColor)
+
+table
+  border-collapse collapse
+  margin 1rem 0
+  overflow-x: auto
+  width 100%
+  display inline-table
+  @media (max-width: $MQMobile)
+    display block
+tr
+  border-top 1px solid var(--borderColor)
+
+  &:nth-child(2n)
+    background-color rgba(150,150,150,0.1)
+
+th, td
+  border 1px solid var(--borderColor)
+  padding .6em 1em
+  @media (max-width: $MQMobile)
+    padding .3em .5em
+  a
+    word-break break-all
+
+.theme-container
+  // background var(--mainBg)
+  color var(--textColor)
+  min-height 100vh
+  &.sidebar-open
+    .sidebar-mask
+      display: block
+
+  &.no-navbar
+    {$contentClass}:not(.custom) > h1, h2, h3, h4, h5, h6
+      margin-top 1.5rem
+      padding-top 0
+
+    .sidebar
+      top 0
+
+
+@media (min-width: ($MQMobile + 1px))
+  .theme-container.no-sidebar
+    .sidebar
+      display none
+
+    .page
+      padding-left 0
+
+@require 'mobile.styl'

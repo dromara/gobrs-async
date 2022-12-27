@@ -1,0 +1,101 @@
+@require './config'
+
+$mobileSidebarWidth = $sidebarWidth * 0.9
+
+// narrow desktop / iPad
+@media (max-width: $MQNarrow)
+  .sidebar
+    font-size 15px
+
+@media (max-width: $MQMobile)
+  .sidebar
+    width $sidebarWidth * 0.95
+
+@media (min-width: ($MQMobile + 1px)) and (max-width: $MQNarrow)
+  .sidebar
+    width $mobileSidebarWidth
+  .theme-container
+    &.sidebar-open
+      .page
+        padding-left ($mobileSidebarWidth + .8rem)!important
+
+// wide mobile
+@media (max-width: $MQMobile)
+  .sidebar
+    top 0
+    height 100vh
+    padding-top $navbarHeight
+    transform translateX(-100%)
+    transition transform .2s ease
+  .page
+    padding-left 0
+  .theme-container
+    &.sidebar-open
+      .sidebar
+        transform translateX(0)
+      .sidebar-mask // 蒙版在小屏中才能显示
+        display block
+    &.no-navbar
+      .sidebar
+        padding-top: 0
+
+// narrow mobile
+@media (max-width: $MQMobileNarrow)
+  h1
+    font-size 1.9rem
+  {$contentClass}
+    div[class*="language-"]
+      margin 0.85rem -1.5rem
+      border-radius 0
+
+// 侧边栏显示隐藏的适配
+@media (min-width: ($MQMobile + 1px)) // 720px
+  .theme-container
+    .sidebar-hover-trigger
+      display: block
+    .sidebar-hover-trigger:hover ~ .sidebar
+      transform translateX(0)
+      z-index: 100
+
+    &:not(.sidebar-open)
+      .sidebar-hover-trigger ~ .sidebar:hover
+        transform translateX(0)
+        z-index: 100
+
+    &.sidebar-open
+      .sidebar-mask
+        display: none
+      .sidebar
+        transform translateX(0)
+      .sidebar-button
+        left $sidebarWidth
+      .page
+        padding-left ($sidebarWidth + .8rem)
+        padding-right .8rem
+      .sidebar-hover-trigger
+        display: none
+
+    &.have-rightmenu
+      .page
+        padding-right ($rightMenuWidth + 20rem)
+    &.no-sidebar
+      .page
+        padding-left 0!important
+      .sidebar-hover-trigger
+        display: none
+
+    &.hide-navbar
+      .sidebar-hover-trigger
+        top 4.5rem
+      .sidebar
+        top 0
+
+  @media (max-width: $MQNarrow)
+    .theme-container
+      &.sidebar-open:not(.on-sidebar)
+        .sidebar-button
+          $mobileSidebarWidth = $sidebarWidth * 0.7
+          left $mobileSidebarWidth
+  .theme-container.no-sidebar
+    .sidebar-button
+      display none
