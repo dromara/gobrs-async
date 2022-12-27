@@ -159,7 +159,6 @@ public class RuleParseEngine extends AbstractEngine {
              */
 
             task.setDesc(getTaskAnnotion(task, taskName, (anno) -> anno.desc(), String.class));
-            task.setDesc(getTaskAnnotion(task, taskName, (anno) -> anno.desc(), String.class));
             task.setCallback(getTaskAnnotion(task, taskName, (anno) -> anno.callback(), Boolean.class));
             task.setRetryCount(getTaskAnnotion(task, taskName, (anno) -> anno.retryCount(), Integer.class));
             task.setFailSubExec(getTaskAnnotion(task, taskName, (anno) -> anno.failSubExec(), Boolean.class));
@@ -169,7 +168,7 @@ public class RuleParseEngine extends AbstractEngine {
             if (!StringUtils.isEmpty(annotionTaskName)) {
                 task.setName(annotionTaskName);
             } else {
-                task.setName(taskName);
+                task.setName(name);
             }
 
             if (taskName.contains(Constant.tied) && RULE_ANY.equals(preNamed[1])) {

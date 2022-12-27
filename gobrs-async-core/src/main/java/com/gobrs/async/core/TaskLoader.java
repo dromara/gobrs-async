@@ -41,8 +41,6 @@ import static com.gobrs.async.core.task.ReUsing.reusing;
 /**
  * The type Task loader.
  *
- * @param <P> the type parameter
- * @param <R> the type parameter
  * @program: gobrs -async-starter
  * @ClassName
  * @description:

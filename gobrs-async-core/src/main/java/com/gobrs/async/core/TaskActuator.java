@@ -386,7 +386,7 @@ public class TaskActuator implements Callable, Cloneable {
             futureMaps.forEach((x, y) -> {
 
                 if (asyncTaskList.contains(x)) {
-                    y.cancel(true);
+                    y.cancel(false);
                 }
 
             });

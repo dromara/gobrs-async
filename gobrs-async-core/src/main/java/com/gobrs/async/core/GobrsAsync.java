@@ -80,12 +80,12 @@ public class GobrsAsync {
     /**
      * Add subtask process
      *
-     * @param taskName the com.gobrs.async.com.gobrs.async.test.task name
+     * @param ruleName the com.gobrs.async.com.gobrs.async.test.task name
      * @param tasks    the tasks
      * @return com.gobrs.async.com.gobrs.async.test.task receive
      */
-    public TaskReceive after(String taskName, AsyncTask... tasks) {
-        return taskFlow.get(taskName).after(tasks);
+    public TaskReceive after(String ruleName, AsyncTask... tasks) {
+        return taskFlow.get(ruleName).after(tasks);
     }
 
     /**
