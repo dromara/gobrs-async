@@ -1,6 +1,6 @@
 package com.gobrs.async.example;
 
-import com.yomahub.tlog.core.enhance.bytes.AspectLogEnhance;
+import com.gobrs.async.plugin.trace.GobrsLogger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -16,10 +16,10 @@ import org.springframework.context.annotation.ComponentScan;
 public class GobrsAsyncExampleApplication {
 
     /**
-     * Tlog 日志打印框架 官网: https://tlog.yomahub.com/
+     * 集成tlog 日志打印框架 官网: https://tlog.yomahub.com/
      */
     static {
-        AspectLogEnhance.enhance();
+        GobrsLogger.logger();
     }
 
     /**

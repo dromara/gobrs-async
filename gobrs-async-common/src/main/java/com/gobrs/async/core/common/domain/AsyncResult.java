@@ -21,10 +21,12 @@ public class AsyncResult implements Serializable {
      */
     private Integer executeCode;
 
+    private Integer cusCode;
+
     /**
      * 整流程 执行是否成功
      */
-    private boolean success;
+    private boolean status;
 
     /**
      * 执行结果封装
@@ -52,23 +54,6 @@ public class AsyncResult implements Serializable {
         this.executeCode = executeCode;
     }
 
-    /**
-     * Is success boolean.
-     *
-     * @return the boolean
-     */
-    public boolean isSuccess() {
-        return success;
-    }
-
-    /**
-     * Sets success.
-     *
-     * @param success the success
-     */
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
 
     /**
      * Gets result map.
@@ -86,5 +71,42 @@ public class AsyncResult implements Serializable {
      */
     public void setResultMap(Map<Class, TaskResult> resultMap) {
         this.resultMap = resultMap;
+    }
+
+    /**
+     * Gets cus code.
+     *
+     * @return the cus code
+     */
+    public Integer getCusCode() {
+        return cusCode;
+    }
+
+    /**
+     * Sets cus code.
+     *
+     * @param cusCode the cus code
+     */
+    public void setCusCode(Integer cusCode) {
+        this.cusCode = cusCode;
+    }
+
+
+    /**
+     * Is status boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isStatus() {
+        return status;
+    }
+
+    /**
+     * Sets status.
+     *
+     * @param status the status
+     */
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 }

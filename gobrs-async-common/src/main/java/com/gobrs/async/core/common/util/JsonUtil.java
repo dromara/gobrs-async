@@ -43,7 +43,7 @@ public class JsonUtil {
         try {
             s = obj instanceof String ? (String)obj :  objectMapper.writeValueAsString(obj);
         } catch (JsonProcessingException e) {
-            log.error("JsonUtil obj2String error{}", e);
+            log.error("JsonUtil obj2String error", e);
         }
         return s;
     }

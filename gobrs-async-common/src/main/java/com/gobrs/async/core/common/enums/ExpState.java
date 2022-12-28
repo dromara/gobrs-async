@@ -14,7 +14,12 @@ public enum ExpState {
     /**
      * The Default.
      */
-    DEFAULT(100, " default interrupt");
+
+    SUCCESS(100, "Success Default"),
+    ERROR(200, "When there are abnormal tasks in the process"),
+    STOP_ASYNC(300, "Call stopAsync manually"),
+    TASK_INTERRUPT(400, "Automatic interrupt configuration taskInterrupt");
+
 
     private Integer code;
 

@@ -1,8 +1,11 @@
 package com.gobrs.async.core.log;
 
 import com.gobrs.async.core.common.util.SystemClock;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
+
+import static com.gobrs.async.core.common.def.FixSave.LOGGER_PLUGIN;
 
 /**
  * The type Log creator.
@@ -38,15 +41,12 @@ public class LogCreator {
         List<LogTracer> logTracerList = new ArrayList<>();
         Long processStartTime = logWrapper.getTimeCollector().getStartTime();
         logWrapper.getTracerQueue().drainTo(logTracerList);
-        printContent
-                .append("【ProcessTrace】")
+        StringBuilder ms = printContent
+                .append(String.format("%s【ProcessTrace】", LOGGER_PLUGIN ? "" : String.format("<%s>", logWrapper.getTraceId())))
                 .append("Total cost: ")
                 .append(SystemClock.now() - processStartTime)
                 .append("ms")
-                .append(" | ")
-                .append("traceId = ")
-                .append(logWrapper.getTraceId())
-                .append(" | ");
+                .append(" ");
         for (LogTracer tracer : logTracerList) {
             printContent = printContent
                     .append("【task】")
@@ -66,6 +66,9 @@ public class LogCreator {
                         .append("success");
             }
             printContent.append("; ->");
+        }
+        if (StringUtils.isNotBlank(logWrapper.getStopTaskName())) {
+            printContent.append("exec stopAsync task: ").append(logWrapper.getStopTaskName());
         }
 
         return printContent.substring(0, printContent.length() - 2);

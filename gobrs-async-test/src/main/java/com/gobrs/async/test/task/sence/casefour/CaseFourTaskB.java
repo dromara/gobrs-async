@@ -16,7 +16,17 @@ public class CaseFourTaskB extends AsyncTask {
 
     @Override
     public Object task(Object o, TaskSupport support) {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         System.out.println("B任务执行");
         return "BResult";
+    }
+
+    @Override
+    public void prepare(Object o) {
+        System.out.println("CaseFourTaskB " + Thread.currentThread().getName());
     }
 }

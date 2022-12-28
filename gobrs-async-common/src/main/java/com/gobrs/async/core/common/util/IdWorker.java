@@ -133,7 +133,7 @@ public class IdWorker {
      * @Description: 下一个ID生成算法
      **/
     public static long nextId() {
-        long time = System.currentTimeMillis();
+        long time = SystemClock.now();
         if (lastTime > time) {
             throw new RuntimeException("Clock is moving backwards, last time is %d milliseconds, current time is %d milliseconds" + lastTime);
         }

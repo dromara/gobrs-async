@@ -16,7 +16,19 @@ public class CaseFourTaskK extends AsyncTask {
 
     @Override
     public Object task(Object o, TaskSupport support) {
+        System.out.println("K开始任务执行");
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         System.out.println("K任务执行");
         return "KResult";
+    }
+
+
+    @Override
+    public void prepare(Object o) {
+        System.out.println("CaseFourTaskK " + Thread.currentThread().getName());
     }
 }

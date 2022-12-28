@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
  * The type Gobrs property auto configuration.
  *
  * @program: gobrs -async
- * @ClassName GobrsPropertyAutoConfiguration
  * @description:
  * @author: sizegang
  * @create: 2022 -12-10
@@ -48,9 +47,7 @@ public class GobrsPropertyAutoConfiguration {
         gobrsConfig.setTimeout(properties.getTimeout());
         gobrsConfig.setRelyDepend(properties.isRelyDepend());
         gobrsConfig.setTimeoutCoreSize(properties.getTimeoutCoreSize());
-
         threadPool(properties, gobrsConfig);
-
         List<RuleConfig> rules = properties.getRules();
         List<GobrsAsyncRule> rList = rules.stream().map(x -> {
             GobrsAsyncRule r = new GobrsAsyncRule();
@@ -60,11 +57,12 @@ public class GobrsPropertyAutoConfiguration {
                 r.setErrLogabled(logConfig.getErrLogabled());
                 r.setCostLogabled(logConfig.getCostLogabled());
             }
-
+            r.setCatchable(x.isCatchable());
             r.setName(x.getName());
             r.setContent(x.getContent());
             r.setTaskInterrupt(x.isTaskInterrupt());
             r.setTransaction(x.isTransaction());
+            r.setInterruptionImmediate(x.isInterruptionImmediate());
             return r;
         }).collect(Collectors.toList());
         gobrsConfig.setRules(rList);

@@ -1,5 +1,6 @@
 package com.gobrs.async.core;
 
+import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.core.common.domain.TaskStatus;
 import com.gobrs.async.core.log.LogWrapper;
@@ -7,6 +8,7 @@ import com.gobrs.async.core.task.AsyncTask;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.xml.bind.annotation.XmlType;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -47,6 +49,7 @@ public class TaskSupport {
      * 日志封装
      */
     private volatile LogWrapper logWrapper;
+
 
 
     /**

@@ -19,6 +19,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
+import java.util.List;
+
 import static com.gobrs.async.core.autoconfig.GobrsAutoConfiguration.GOBRS_NAMESPACE;
 
 
@@ -39,6 +41,13 @@ import static com.gobrs.async.core.autoconfig.GobrsAutoConfiguration.GOBRS_NAMES
 @ComponentScan(value = GOBRS_NAMESPACE)
 public class GobrsAutoConfiguration {
 
+    static {
+        Environment.env();
+    }
+
+    /**
+     * The constant GOBRS_NAMESPACE.
+     */
     protected static final String GOBRS_NAMESPACE = "com.gobrs.async";
 
     /**
@@ -48,7 +57,6 @@ public class GobrsAutoConfiguration {
     }
 
     private GobrsConfig gobrsConfig;
-
 
     /**
      * Instantiates a new Gobrs auto configuration.
@@ -60,9 +68,9 @@ public class GobrsAutoConfiguration {
     }
 
     /**
-     * Task flow com.gobrs.async.com.gobrs.async.test.task flow.
+     * Task flow task flow.
      *
-     * @return the com.gobrs.async.com.gobrs.async.test.task flow
+     * @return the task flow
      */
     @Bean
     public TaskFlow taskFlow() {
@@ -82,16 +90,16 @@ public class GobrsAutoConfiguration {
 
 
     /**
-     * Rule com.gobrs.async.engine com.gobrs.async.rule com.gobrs.async.engine.
+     * Rule engine rule engine.
      *
      * @param gobrsConfig the gobrs config
      * @param gobrsAsync  the gobrs async
-     * @return the com.gobrs.async.rule com.gobrs.async.engine
+     * @return the rule engine
      */
     @Bean
     @ConditionalOnMissingBean(value = RuleEngine.class)
     public RuleEngine ruleEngine(GobrsConfig gobrsConfig, GobrsAsync gobrsAsync) {
-        return new RuleParseEngine<>(gobrsConfig, gobrsAsync);
+        return new RuleParseEngine(gobrsConfig, gobrsAsync);
     }
 
     /**
@@ -106,9 +114,9 @@ public class GobrsAutoConfiguration {
     }
 
     /**
-     * Config cache manager config cache manager.
+     * Config manager config manager.
      *
-     * @return the config cache manager
+     * @return the config manager
      */
     @ConditionalOnBean(ConfigFactory.class)
     @Bean
@@ -116,18 +124,16 @@ public class GobrsAutoConfiguration {
         return new ConfigManager();
     }
 
-
     /**
-     * Rule com.gobrs.async.engine post processor com.gobrs.async.rule post processor.
+     * Rule engine post processor rule post processor.
      *
      * @param configManager the config manager
-     * @return the com.gobrs.async.rule post processor
+     * @return the rule post processor
      */
     @Bean
     public RulePostProcessor ruleEnginePostProcessor(ConfigManager configManager) {
         return new RulePostProcessor(configManager);
     }
-
 
     /**
      * Gobrs async gobrs async.
@@ -142,7 +148,7 @@ public class GobrsAutoConfiguration {
     /**
      * Gobrs spring bean holder.
      *
-     * @return the gobrs com.gobrs.async.spring
+     * @return the bean holder
      */
     @Bean
     public BeanHolder gobrsSpring() {
@@ -150,9 +156,9 @@ public class GobrsAutoConfiguration {
     }
 
     /**
-     * Async com.gobrs.async.exception interceptor async com.gobrs.async.com.gobrs.async.test.task com.gobrs.async.exception interceptor.
+     * Async exception interceptor async task exception interceptor.
      *
-     * @return the async com.gobrs.async.com.gobrs.async.test.task com.gobrs.async.exception interceptor
+     * @return the async task exception interceptor
      */
     @Bean
     @ConditionalOnMissingBean(value = AsyncTaskExceptionInterceptor.class)
@@ -161,9 +167,9 @@ public class GobrsAutoConfiguration {
     }
 
     /**
-     * Async com.gobrs.async.com.gobrs.async.test.task pre interceptor async com.gobrs.async.com.gobrs.async.test.task pre interceptor.
+     * Async task pre interceptor async task pre interceptor.
      *
-     * @return the async com.gobrs.async.com.gobrs.async.test.task pre interceptor
+     * @return the async task pre interceptor
      */
     @Bean
     @ConditionalOnMissingBean(value = AsyncTaskPreInterceptor.class)
@@ -172,9 +178,9 @@ public class GobrsAutoConfiguration {
     }
 
     /**
-     * Async com.gobrs.async.com.gobrs.async.test.task post interceptor async com.gobrs.async.com.gobrs.async.test.task post interceptor.
+     * Async task post interceptor async task post interceptor.
      *
-     * @return the async com.gobrs.async.com.gobrs.async.test.task post interceptor
+     * @return the async task post interceptor
      */
     @Bean
     @ConditionalOnMissingBean(value = AsyncTaskPostInterceptor.class)
@@ -183,9 +189,9 @@ public class GobrsAutoConfiguration {
     }
 
     /**
-     * Rule thermal loading com.gobrs.async.rule thermal load.
+     * Rule thermal loading rule thermal load.
      *
-     * @return the com.gobrs.async.rule thermal load
+     * @return the rule thermal load
      */
     @Bean
     public RuleThermalLoad ruleThermalLoading() {

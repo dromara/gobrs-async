@@ -19,4 +19,9 @@ public class CaseFourTaskC extends AsyncTask {
         System.out.println("C任务执行");
         return "CResult";
     }
+
+    @Override
+    public void prepare(Object o) {
+        System.out.println("CaseFourTaskC " + Thread.currentThread().getName());
+    }
 }

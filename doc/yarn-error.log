@@ -1,0 +1,58 @@
+Arguments: 
+  /opt/homebrew/Cellar/node@16/16.13.1/libexec/node /opt/homebrew/bin/yarn install
+
+PATH: 
+  /opt/homebrew/opt/python@3.10/bin:/opt/homebrew/Cellar/node@16/16.13.1/bin:/opt/homebrew/opt/node@16/bin:/opt/homebrew/opt/node@14/bin:/opt/homebrew/opt/node@12/bin:/opt/homebrew/opt/node@16/bin:/opt/homebrew/Cellar/node@16/16.13.1/bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_251.jdk/Contents/Home/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/sizegang1/sizegang_workspace/gitclone-gobrs/gobrs-async-doc/node_modules/.bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/sizegang1/sizegang_workspace/gitclone-gobrs/gobrs-async-doc/node_modules/.bin:/Users/sizegang1/sizegang_workspace/apache-maven-3.6.0/bin:.:/Users/sizegang1/sizegang_workspace/apache-jmeter-5.4.3/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/sizegang1/sizegang_workspace/gitclone-gobrs/gobrs-async-doc/node_modules/.bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/sizegang1/sizegang_workspace/gitclone-gobrs/gobrs-async-doc/node_modules/.bin:/Users/sizegang1/sizegang_workspace/apache-maven-3.6.0/bin
+
+Yarn version: 
+  1.22.17
+
+Node version: 
+  16.13.1
+
+Platform: 
+  darwin arm64
+
+Trace: 
+  Error: http://registry.m.jd.com/dayjs: ETIMEDOUT
+      at Timeout._onTimeout (/opt/homebrew/lib/node_modules/yarn/lib/cli.js:141543:19)
+      at listOnTimeout (node:internal/timers:557:17)
+      at processTimers (node:internal/timers:500:7)
+
+npm manifest: 
+  {
+    "name": "theme-vdoing-blog",
+    "version": "1.0.0",
+    "scripts": {
+      "dev": "vuepress dev docs",
+      "build": "vuepress build docs",
+      "deploy": "bash deploy.sh",
+      "editFm": "node utils/editFrontmatter.js",
+      "baiduPush": "node utils/baiduPush.js https://xugaoyi.com && bash baiduPush.sh",
+      "publish": "cd ./vdoing && npm publish && cd .. && yarn updateTheme",
+      "updateTheme": "yarn remove vuepress-theme-vdoing && rm -rf node_modules && yarn && yarn add vuepress-theme-vdoing -D"
+    },
+    "license": "MIT",
+    "devDependencies": {
+      "dayjs": "^1.9.7",
+      "inquirer": "^7.1.0",
+      "json2yaml": "^1.1.0",
+      "vuepress": "1.9.5",
+      "vuepress-plugin-baidu-autopush": "^1.0.1",
+      "vuepress-plugin-baidu-tongji": "^1.0.1",
+      "vuepress-plugin-comment": "^0.7.3",
+      "vuepress-plugin-demo-block": "^0.7.2",
+      "vuepress-plugin-fulltext-search": "^2.2.1",
+      "vuepress-plugin-one-click-copy": "^1.0.2",
+      "vuepress-plugin-thirdparty-search": "^1.0.2",
+      "vuepress-plugin-zooming": "^1.1.7",
+      "vuepress-theme-vdoing": "^1.9.5",
+      "yamljs": "^0.3.0"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

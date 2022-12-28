@@ -5,9 +5,12 @@ import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.core.common.domain.TaskStatus;
+import com.gobrs.async.core.common.enums.ExpState;
 import com.gobrs.async.core.common.enums.ResultState;
 import com.gobrs.async.core.common.exception.GobrsForceStopException;
+import com.gobrs.async.core.common.exception.ManualStopException;
 import com.gobrs.async.core.config.ConfigManager;
+import com.gobrs.async.core.log.LogWrapper;
 import com.gobrs.async.core.log.TraceUtil;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.task.TaskUtil;
@@ -28,17 +31,16 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.gobrs.async.core.common.def.DefaultConfig.*;
+import static com.gobrs.async.core.common.enums.InterruptEnum.INTERRUPTED;
+import static com.gobrs.async.core.common.enums.InterruptEnum.INTERRUPTTING;
 import static com.gobrs.async.core.task.ReUsing.reusing;
 import static com.gobrs.async.core.timer.GobrsFutureTask.STOP_STAMP;
-import static com.gobrs.async.core.timer.RetryUtil.retryConditional;
 
 /**
  * The type Task actuator.
- *
- * @param <Result> the type parameter
  */
 @Slf4j
-public class TaskActuator<Result> implements Callable<Result>, Cloneable {
+public class TaskActuator implements Callable, Cloneable {
 
     /**
      * The Logger.
@@ -116,7 +118,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     }
 
     @Override
-    public Result call() {
+    public Object call() throws Exception {
 
         Object parameter = getParameter(task);
 
@@ -154,6 +156,16 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                 result = task.taskAdapter(parameter, support);
 
                 /**
+                 * Setting Task Results
+                 * 设置任务结果
+                 */
+                if (ConfigManager.getGlobalConfig().isParamContext()) {
+                    support.getResultMap().put(task.getClass(), buildSuccessResult(result));
+                }
+
+                stopAsync0(parameter, support);
+
+                /**
                  * 状态改变
                  */
                 change();
@@ -168,14 +180,6 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                  * 后置任务
                  */
                 taskLoader.postInterceptor(result, task.getName());
-
-                /**
-                 * Setting Task Results
-                 * 设置任务结果
-                 */
-                if (ConfigManager.getGlobalConfig().isParamContext()) {
-                    support.getResultMap().put(task.getClass(), buildSuccessResult(result));
-                }
 
                 /**
                  * Success com.gobrs.async.callback
@@ -197,9 +201,39 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
             }
         } finally {
             clear();
+            stopOrRelease(parameter, taskLoader);
+        }
+        return result;
+    }
+
+    private void stopAsync0(Object parameter, TaskSupport support) {
+        AtomicInteger diagnose = support.getTaskLoader().getINTERRUPTFLAG();
+        if (diagnose.get() == INTERRUPTTING.getState() && diagnose.compareAndSet(INTERRUPTTING.getState(), INTERRUPTED.getState())) {
+            ErrorCallback<Object> errorCallback = new ErrorCallback<Object>(() -> parameter, null, support, task);
+            LogWrapper logWrapper = support.getLogWrapper();
+            if (Objects.nonNull(logWrapper)) {
+                logWrapper.setStopTaskName(task.getName());
+            }
+            support.taskLoader.setExpCode(new AtomicInteger(ExpState.STOP_ASYNC.getCode()));
+            support.getResultMap().put(task.getClass(), buildErrorResult(null, new ManualStopException("Manually executing stopAsync Exception")));
+            support.getTaskLoader().isRunning().set(false);
+            support.getTaskLoader().errorInterrupted(errorCallback);
+        }
+    }
+
+    /**
+     * 停止任务 或 释放资源
+     *
+     * @param parameter
+     * @param taskLoader
+     */
+    private void stopOrRelease(Object parameter, TaskLoader taskLoader) throws Exception {
+        if (task.getTimeoutInMilliseconds() > TASK_TIME_OUT) {
             futureStopRelease(parameter, taskLoader);
         }
-        return (Result) result;
+        if (task.isExclusive()) {
+            releaseFutureTasks();
+        }
     }
 
     /**
@@ -207,12 +241,15 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      *
      * @param taskLoader
      */
-    private void futureStopRelease(Object parameter, TaskLoader taskLoader) {
-        Future<?> future = (Future<?>) taskLoader.getFutureTasksMap().get(task);
+    private void futureStopRelease(Object parameter, TaskLoader taskLoader) throws Exception {
+        Future<?> future = taskLoader.getFutureTasksMap().get(task);
         if (future instanceof GobrsFutureTask) {
             Integer syncState = ((GobrsFutureTask<?>) future).getSyncState();
             if (syncState == STOP_STAMP) {
-                onDoTask(parameter, taskLoader, new GobrsForceStopException(String.format(" task %s force stop error", task.getName())));
+                releaseFutureTasks();
+                preNextTask(parameter, taskLoader, new GobrsForceStopException(String.format(" task %s force stop error", task.getName())));
+            } else {
+                releaseFutureTasks();
             }
         }
     }
@@ -229,6 +266,11 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
         }
     }
 
+    private void releaseFutureTasks() {
+        Map<AsyncTask<?, ?>, Future<?>> futureTasksMap = support.getTaskLoader().getFutureTasksMap();
+        futureTasksMap.remove(task);
+    }
+
     private Reference<GobrsTimer.TimerListener> getListenerReference() {
         Map<Class<?>, Reference<GobrsTimer.TimerListener>> timerListeners = support.getTaskLoader().getTimerListeners();
         return timerListeners.get(task.getClass());
@@ -240,9 +282,9 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
     /**
      * Determine whether the process is interrupted
-     * 判断当前任务是否已经执行过
+     * 判断当前流程是否执行完成
      */
-    private void noRepeat(TaskLoader taskLoader, Object result) {
+    private void noRepeat(TaskLoader taskLoader, Object result) throws Exception {
         if (taskLoader.isRunning().get()) {
             nextTaskByCase(taskLoader, result);
         }
@@ -255,41 +297,44 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param taskLoader
      * @param e
      */
-    private void exceptionProcess(Object parameter, TaskLoader taskLoader, Exception e) {
+    private void exceptionProcess(Object parameter, TaskLoader taskLoader, Exception e) throws Exception {
 
         Optimal.optimalCount(support.taskLoader);
-
+        setExpCode(ExpState.ERROR.getCode());
         if (!retryTask(parameter, taskLoader)) {
 
             support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
-
             /**
              * transaction com.gobrs.async.com.gobrs.async.test.task
              * 事物任务
              */
             transaction(taskLoader);
 
-            onDoTask(parameter, taskLoader, e);
+            preNextTask(parameter, taskLoader, e);
         }
     }
 
 
-    private void onDoTask(Object parameter, TaskLoader taskLoader, Exception e) {
+    public void setExpCode(Integer code) {
+        support.taskLoader.setExpCode(new AtomicInteger(code));
+    }
+
+
+    private void preNextTask(Object parameter, TaskLoader taskLoader, Exception e) throws Exception {
         task.onFailureTrace(support, e);
         /**
-         * A single com.gobrs.async.com.gobrs.async.test.task com.gobrs.async.exception interrupts the entire process
          * 配置 taskInterrupt = true 则某一任务异常后结束整个任务流程 默认 false
          */
         if (ConfigManager.getRule(taskLoader.getRuleName()).isTaskInterrupt()) {
-
+            setExpCode(ExpState.TASK_INTERRUPT.getCode());
+            support.getTaskLoader().isRunning().set(false);
             taskLoader.errorInterrupted(errorCallback(parameter, e, support, task));
-
         } else {
 
             taskLoader.error(errorCallback(parameter, e, support, task));
 
             /**
-             * 当然任务失败 是否继续执行子任务
+             * 当任务失败 是否继续执行子任务
              */
             if (task.isFailSubExec()) {
                 nextTask(taskLoader, TaskUtil.defaultAnyCondition(false));
@@ -311,7 +356,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param taskLoader
      * @param result
      */
-    private void nextTaskByCase(TaskLoader taskLoader, Object result) {
+    private void nextTaskByCase(TaskLoader taskLoader, Object result) throws Exception {
         if (result instanceof AnyConditionResult) {
             nextTask(taskLoader, (AnyConditionResult) result);
             return;
@@ -336,12 +381,12 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
 
             List<AsyncTask> asyncTaskList = upwardTasksMap.get(task);
 
-            Map<AsyncTask<?, Result>, Future<?>> futureMaps = support.getTaskLoader().getFutureTasksMap();
+            Map<AsyncTask<?, ?>, Future<?>> futureMaps = support.getTaskLoader().getFutureTasksMap();
 
             futureMaps.forEach((x, y) -> {
 
                 if (asyncTaskList.contains(x)) {
-                    y.cancel(true);
+                    y.cancel(false);
                 }
 
             });
@@ -449,7 +494,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      *
      * @param taskLoader the com.gobrs.async.com.gobrs.async.test.task loader
      */
-    public void nextTask(TaskLoader taskLoader) {
+    public void nextTask(TaskLoader taskLoader) throws Exception {
         nextTask(taskLoader, TaskUtil.defaultAnyCondition());
     }
 
@@ -460,7 +505,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param taskLoader      the com.gobrs.async.com.gobrs.async.test.task loader
      * @param conditionResult the com.gobrs.async.com.gobrs.async.test.task conditionResult
      */
-    public void nextTask(TaskLoader taskLoader, AnyConditionResult conditionResult) {
+    public void nextTask(TaskLoader taskLoader, AnyConditionResult<Object> conditionResult) throws Exception {
 
         if (!CollectionUtils.isEmpty(subTasks)) {
             for (int i = 0; i < subTasks.size(); i++) {
@@ -480,7 +525,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                 if (process.task.isAnyCondition()) {
                     if (process.releasingDependency() == 0 || conditionResult.getState()) {
                         synchronized (process.task) {
-                            Boolean aBoolean = (Boolean) taskLoader.anyConditionProx.get(process);
+                            Boolean aBoolean = taskLoader.anyConditionProx.get(process);
                             if (Objects.isNull(aBoolean)) {
                                 taskLoader.anyConditionProx.put(process, true);
                                 doTask(taskLoader, process, optionalTasks, isCycleThread(i, process));
@@ -516,12 +561,12 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param process
      * @param optionalTasks
      */
-    private void doTask(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks, boolean cycleThread) {
+    private void doTask(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks, boolean cycleThread) throws Exception {
         process(taskLoader, process, optionalTasks, cycleThread);
     }
 
 
-    private void process(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks, boolean cycleThread) {
+    private void process(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks, boolean cycleThread) throws Exception {
         if (Objects.nonNull(optionalTasks)) {
             if (optionalTasks.contains(process.getTask())) {
                 doProcess(taskLoader, process, cycleThread);
@@ -538,7 +583,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @param process
      * @param cycleThread
      */
-    private void doProcess(TaskLoader taskLoader, TaskActuator process, boolean cycleThread) {
+    private void doProcess(TaskLoader taskLoader, TaskActuator process, boolean cycleThread) throws Exception {
         /**
          * retry open thread for task timeout manager
          */
@@ -586,7 +631,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     @SuppressWarnings("unchecked")
     public Object clone() {
         try {
-            TaskActuator<?> cloned = (TaskActuator<?>) super.clone();
+            TaskActuator cloned = (TaskActuator) super.clone();
             cloned.lock = new ReentrantLock();
             return cloned;
         } catch (Exception e) {
@@ -606,7 +651,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
                 return;
             }
             /**
-             * Get the parent com.gobrs.async.com.gobrs.async.test.task that the com.gobrs.async.com.gobrs.async.test.task depends on
+             * Get the parent .com.gobrs.async.test.task that the com.gobrs.async.test.task depends on
              */
             List<AsyncTask> asyncTaskList = upwardTasksMap.get(this.task);
             if (asyncTaskList == null || asyncTaskList.isEmpty()) {
@@ -666,10 +711,9 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
     /**
      * Gets task status.
      *
-     * @param taskActuator the task actuator
      * @return the task status
      */
-    public TaskStatus getTaskStatus() {
+    public TaskStatus taskStatus() {
         return support.getStatus(task.getClass());
     }
 
@@ -716,7 +760,7 @@ public class TaskActuator<Result> implements Callable<Result>, Cloneable {
      * @return the com.gobrs.async.com.gobrs.async.test.task result
      */
     public TaskResult buildErrorResult(Object result, Exception ex) {
-        return new TaskResult(result, ResultState.SUCCESS, ex);
+        return new TaskResult(result, ResultState.EXCEPTION, ex);
     }
 
     /**

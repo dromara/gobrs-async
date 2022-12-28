@@ -40,6 +40,7 @@ public class CaseGeneral {
         params.put(CService.class, "2");
 
         AsyncResult asyncResult = gobrsAsync.go("general", () -> params, 300000);
+        System.out.println(asyncResult);
     }
 
 }

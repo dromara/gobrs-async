@@ -11,12 +11,14 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>gobrs-async-trace-plugin</module>
+        <module>gobrs-async-monitor-plugin</module>
         <module>gobrs-async-plugin-base</module>
+        <module>gobrs-async-trace-plugin</module>
     </modules>
 
     <properties>
         <skywalking.version>8.4.0</skywalking.version>
+        <tlog.version>1.5.0</tlog.version>
     </properties>
 
     <dependencyManagement>
@@ -26,7 +28,13 @@
                 <artifactId>apm-toolkit-trace</artifactId>
                 <version>${skywalking.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.yomahub</groupId>
+                <artifactId>tlog-all-spring-boot-starter</artifactId>
+                <version>${tlog.version}</version>
+            </dependency>
         </dependencies>
+
 
     </dependencyManagement>
 

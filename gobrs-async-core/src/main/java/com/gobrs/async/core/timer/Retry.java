@@ -12,7 +12,7 @@ import com.gobrs.async.core.common.def.DefaultConfig;
  * @author: sizegang
  * @create: 2022 -12-13
  */
-public class RetryUtil {
+public class Retry {
 
     /**
      * Retry conditional boolean.

@@ -2,8 +2,6 @@ package com.gobrs.async.core.task;
 
 
 import com.gobrs.async.core.TaskSupport;
-import com.gobrs.async.core.callback.ErrorCallback;
-import com.gobrs.async.core.common.enums.ExpState;
 import com.gobrs.async.core.common.exception.AsyncTaskTimeoutException;
 import com.gobrs.async.core.common.util.SystemClock;
 import com.gobrs.async.core.config.ConfigManager;
@@ -15,20 +13,18 @@ import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.TaskResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
-import org.slf4j.Logger;
 
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static com.gobrs.async.core.common.def.DefaultConfig.TASK_TIMEOUT;
-import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionInterceptor;
+import static com.gobrs.async.core.common.def.FixSave.LOGGER_PLUGIN;
+import static com.gobrs.async.core.common.enums.InterruptEnum.INIT;
+import static com.gobrs.async.core.common.enums.InterruptEnum.INTERRUPTTING;
+import static com.gobrs.async.core.common.util.ExceptionUtil.excludeInterceptException;
 
 /**
  * The type Async com.gobrs.async.com.gobrs.async.test.task.
@@ -45,18 +41,14 @@ import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionIntercepto
 @Slf4j
 public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Result> {
 
-
     /**
      * 任务名称
      */
     private String name;
-
     /**
      * 任务描述
      */
     private String desc;
-
-
     /**
      * Transaction com.gobrs.async.com.gobrs.async.test.task
      */
@@ -144,7 +136,11 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
                 LogWrapper logWrapper = support.getLogWrapper();
                 logWrapper.addTrace(logTracer);
                 logWrapper.setProcessCost(costTime);
-                log.info("<{}> [{}]", logWrapper.getTraceId(), this.getName());
+                if (!LOGGER_PLUGIN) {
+                    log.info("<{}> [{}]", logWrapper.getTraceId(), this.getName());
+                } else {
+                    log.info("[{}]", this.getName());
+                }
 
             }
         }
@@ -182,7 +178,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * @param exception the com.gobrs.async.exception
      */
     public void onFailureTrace(TaskSupport support, Exception exception) {
-        if (!exceptionInterceptor(exception)) {
+        if (!excludeInterceptException(exception)) {
             return;
         }
         boolean logable = ConfigManager.Action.errLogabled(support.getRuleName());
@@ -252,48 +248,6 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
 
 
     /**
-     * Gets task future.
-     *
-     * @param <Result> the type parameter
-     * @param support  the support
-     * @param clazz    the clazz
-     * @param type     the type
-     * @return the task future
-     */
-    public <Result> Future<Result> getTaskFuture(TaskSupport support, Class<? extends ITask> clazz, Class<Result> type) {
-        Object o = support.getTaskLoader().getFutureTasksMap().get(clazz);
-        if (Objects.nonNull(o)) {
-            return ((Future<Result>) o);
-        }
-        return null;
-    }
-
-
-    /**
-     * Gets task future result.
-     *
-     * @param <Result> the type parameter
-     * @param support  the support
-     * @param clazz    the clazz
-     * @param type     the type
-     * @param timeout  the timeout
-     * @param unit     the unit
-     * @return the task future result
-     */
-    public <Result> Object getTaskFutureResult(TaskSupport support, Class<? extends ITask> clazz, Class<Result> type, long timeout, TimeUnit unit) {
-        Object o = support.getTaskLoader().getFutureTasksMap().get(clazz);
-        if (Objects.nonNull(o)) {
-            try {
-                return ((Future<Result>) o).get(timeout, unit);
-            } catch (Exception e) {
-                log.error("task {} getTaskFuture error {}", this.getName(), e);
-            }
-        }
-        return null;
-    }
-
-
-    /**
      * Dep key string.
      *
      * @param clazz the clazz
@@ -314,36 +268,32 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      */
     public boolean stopAsync(TaskSupport support) {
         try {
-            ErrorCallback<Param> errorCallback = new ErrorCallback<Param>(() -> support.getParam(), null, support, this);
-            support.taskLoader.setExpCode(new AtomicInteger(ExpState.DEFAULT.getCode()));
-            support.taskLoader.errorInterrupted(errorCallback);
+            // 设置标识
+            return support.getTaskLoader().getINTERRUPTFLAG().compareAndSet(INIT.getState(), INTERRUPTTING.getState());
         } catch (Exception ex) {
             log.error("stopAsync error {}", ex);
             return false;
         }
-        return true;
     }
 
     /**
      * Stop async boolean.
      *
      * @param support the support
-     * @param expCode the exp code
+     * @param cusCode 开发者自定义状态码
      * @return the boolean
      */
-    public boolean stopAsync(TaskSupport support, Integer expCode) {
+    public boolean stopAsync(TaskSupport support, Integer cusCode) {
         try {
-            support.taskLoader.setIsRunning(false);
-            support.taskLoader.setExpCode(new AtomicInteger(expCode));
-
-            ErrorCallback<Param> errorCallback = new ErrorCallback<Param>(() -> support.getParam(), null, support, this);
-            support.taskLoader.errorInterrupted(errorCallback);
-
+            boolean b = support.getTaskLoader().getINTERRUPTFLAG().compareAndSet(INIT.getState(), INTERRUPTTING.getState());
+            if (b) {
+                support.getTaskLoader().setCusCode(cusCode);
+            }
+            return b;
         } catch (Exception ex) {
             log.error("stopAsync error {} ", ex);
             return false;
         }
-        return true;
     }
 
 

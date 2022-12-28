@@ -48,22 +48,6 @@ public class FutureTaskC extends AsyncTask<String, Integer> {
             for (int i1 = 0; i1 < i; i1++) {
                 i1 += i1;
             }
-            /**
-             * 获取 非父任务的返回结果 应该使用future 方式等待返回结果
-             *
-             */
-            Future<String> aFutureTask = getTaskFuture(support, FutureTaskA.class, String.class);
-
-            try {
-                result = aFutureTask.get();
-                System.out.println(result);
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-            /**
-             *  也可以直接使用该该方法获取值
-             */
-            Object taskFutureResult = getTaskFutureResult(support, FutureTaskA.class, String.class, 1000, TimeUnit.MILLISECONDS);
 
 
             System.out.println("FutureTaskC Finish");

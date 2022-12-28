@@ -9,6 +9,7 @@ import com.gobrs.async.core.common.domain.AsyncResult;
 import com.gobrs.async.core.common.enums.ExpState;
 import com.gobrs.async.core.common.enums.ResultState;
 import com.gobrs.async.core.config.ConfigManager;
+import com.gobrs.async.core.config.GobrsAsyncRule;
 import com.gobrs.async.core.holder.BeanHolder;
 import com.gobrs.async.core.log.LogCreator;
 import com.gobrs.async.core.log.LogWrapper;
@@ -32,17 +33,14 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.gobrs.async.core.common.def.DefaultConfig.TASK_INITIALIZE;
-import static com.gobrs.async.core.common.def.DefaultConfig.TASK_TIMEOUT;
-import static com.gobrs.async.core.common.util.ExceptionUtil.exceptionInterceptor;
+import static com.gobrs.async.core.common.def.DefaultConfig.*;
+import static com.gobrs.async.core.common.enums.InterruptEnum.*;
+import static com.gobrs.async.core.common.util.ExceptionUtil.excludeInterceptException;
 import static com.gobrs.async.core.task.ReUsing.reusing;
-import static com.gobrs.async.core.timer.RetryUtil.retryConditional;
 
 /**
  * The type Task loader.
  *
- * @param <P> the type parameter
- * @param <R> the type parameter
  * @program: gobrs -async-starter
  * @ClassName
  * @description:
@@ -50,11 +48,13 @@ import static com.gobrs.async.core.timer.RetryUtil.retryConditional;
  * @create: 2022 -03-16
  */
 @Slf4j
-public class TaskLoader<P, R> {
+public class TaskLoader {
     /**
      * Interruption code
      */
-    private AtomicInteger expCode = new AtomicInteger(ExpState.DEFAULT.getCode());
+    private AtomicInteger expCode = new AtomicInteger(ExpState.SUCCESS.getCode());
+
+    private Integer cusCode;
 
     /**
      * task Loader is Running
@@ -63,11 +63,11 @@ public class TaskLoader<P, R> {
 
     private final ExecutorService executorService;
 
-    private final AsyncTaskExceptionInterceptor<P> asyncExceptionInterceptor = BeanHolder.getBean(AsyncTaskExceptionInterceptor.class);
+    private final AsyncTaskExceptionInterceptor asyncExceptionInterceptor = BeanHolder.getBean(AsyncTaskExceptionInterceptor.class);
 
-    private final AsyncTaskPreInterceptor<P> asyncTaskPreInterceptor = BeanHolder.getBean(AsyncTaskPreInterceptor.class);
+    private final AsyncTaskPreInterceptor asyncTaskPreInterceptor = BeanHolder.getBean(AsyncTaskPreInterceptor.class);
 
-    private final AsyncTaskPostInterceptor<P> asyncTaskPostInterceptor = BeanHolder.getBean(AsyncTaskPostInterceptor.class);
+    private final AsyncTaskPostInterceptor asyncTaskPostInterceptor = BeanHolder.getBean(AsyncTaskPostInterceptor.class);
 
     private final CountDownLatch completeLatch;
 
@@ -95,14 +95,14 @@ public class TaskLoader<P, R> {
     private volatile boolean canceled = false;
 
     /**
-     * The Futures.
+     * The constant INTERRUPTFLAG.
      */
-    public ArrayList<Future<?>> futureTasksLists;
+    public volatile AtomicInteger INTERRUPTFLAG = new AtomicInteger(INIT.getState());
 
     /**
      * The Futures async.
      */
-    public final Map<AsyncTask<P, R>, Future<?>> futureTasksMap = new ConcurrentHashMap<>();
+    public final Map<AsyncTask<?, ?>, Future<?>> futureTasksMap = new ConcurrentHashMap<>();
 
     /**
      * The Timer listeners.
@@ -145,25 +145,22 @@ public class TaskLoader<P, R> {
         this.processMap = processMap;
         completeLatch = new CountDownLatch(1);
         this.processTimeout = timeout;
-        if (this.processTimeout > 0) {
-            futureTasksLists = new ArrayList<>(1);
-        } else {
-            futureTasksLists = EmptyFutures;
-        }
     }
 
     /**
      * Load async result.
      *
      * @return the async result
+     * @throws Exception the exception
      */
-    AsyncResult load() {
+    AsyncResult load() throws Exception {
         /**
          * 获取任务链初始任务
          */
-        AsyncResult result = null;
+        AsyncResult result;
+        List<TaskActuator> begins = getBeginProcess();
         try {
-            List<TaskActuator> begins = getBeginProcess();
+
             /**
              * 可选任务
              */
@@ -185,13 +182,14 @@ public class TaskLoader<P, R> {
             // wait
             waitIfNecessary();
             result = back(begins);
-        } catch (Exception exception) {
-            throw exception;
-        } finally {
             return postProcess(result);
+        } catch (Exception exception) {
+            if (excludeInterceptException(exception)) {
+                throw exception;
+            }
         }
+        return null;
     }
-
 
 
     /**
@@ -253,7 +251,7 @@ public class TaskLoader<P, R> {
      * @param errorCallback Exception parameter encapsulation
      */
     public void error(ErrorCallback errorCallback) {
-        if (!exceptionInterceptor(errorCallback.getThrowable())) {
+        if (!excludeInterceptException(errorCallback.getThrowable())) {
             return;
         }
         asyncExceptionInterceptor.exception(errorCallback);
@@ -277,7 +275,7 @@ public class TaskLoader<P, R> {
             /**
              * Global interception listening
              */
-            if (!exceptionInterceptor(errorCallback.getThrowable())) {
+            if (!excludeInterceptException(errorCallback.getThrowable())) {
                 return;
             }
             asyncExceptionInterceptor.exception(errorCallback);
@@ -290,7 +288,7 @@ public class TaskLoader<P, R> {
      * @param p        task parameter
      * @param taskName taskName
      */
-    public void preInterceptor(P p, String taskName) {
+    public void preInterceptor(Object p, String taskName) {
         asyncTaskPreInterceptor.preProcess(p, taskName);
     }
 
@@ -300,7 +298,7 @@ public class TaskLoader<P, R> {
      * @param param    task Result
      * @param taskName taskName
      */
-    public void postInterceptor(P param, String taskName) {
+    public void postInterceptor(Object param, String taskName) {
         asyncTaskPostInterceptor.postProcess(param, taskName);
     }
 
@@ -308,11 +306,11 @@ public class TaskLoader<P, R> {
         taskLock.lock();
         try {
             canceled = true;
-            for (Future<?> future : futureTasksLists) {
-                /**
-                 * Enforced interruptions
-                 */
-                future.cancel(true);
+            Set<Map.Entry<AsyncTask<?, ?>, Future<?>>> entries =
+                    futureTasksMap.entrySet();
+            boolean interruptionImmediate = ConfigManager.getRule(ruleName).isInterruptionImmediate();
+            for (Map.Entry<AsyncTask<?, ?>, Future<?>> entry : entries) {
+                entry.getValue().cancel(interruptionImmediate);
             }
         } finally {
             taskLock.unlock();
@@ -334,12 +332,20 @@ public class TaskLoader<P, R> {
             } else {
                 completeLatch.await();
             }
-            if (error != null) {
+            GobrsAsyncRule rule = ConfigManager.getRule(ruleName);
+            if (error != null && rule.isCatchable()) {
                 throw new GobrsAsyncException(error);
             }
         } catch (InterruptedException e) {
             throw new GobrsAsyncException(e);
+        } finally {
+            release();
         }
+    }
+
+    private void release() {
+        futureTasksMap.clear();
+        timerListeners.clear();
     }
 
 
@@ -367,8 +373,7 @@ public class TaskLoader<P, R> {
             try {
                 taskLock.lock();
                 if (!canceled) {
-                    Future<?> submit = taskListenerConditional(taskActuator);
-                    futureTasksLists.add(submit);
+                    taskListenerConditional(taskActuator);
                 }
 
             } finally {
@@ -392,17 +397,22 @@ public class TaskLoader<P, R> {
 
     /**
      * https://async.sizegang.cn/pages/2f8gmn/
+     *
      * @param taskActuator
      * @return
      */
-    private Future<?> timeOperator(TaskActuator<?> taskActuator) {
+    private Future<?> timeOperator(TaskActuator taskActuator) {
         Callable<?> callable = threadAdapterSPI(taskActuator);
         GobrsFutureTask<?> future = new GobrsFutureTask<>(callable);
         executorService.submit(future);
         GobrsTimer.TimerListener listener = new GobrsTimer.TimerListener() {
             @Override
             public void tick() {
-                doTick();
+                try {
+                    doTick();
+                } catch (Exception exception) {
+                    future.cancel(true);
+                }
             }
 
             /**
@@ -410,7 +420,7 @@ public class TaskLoader<P, R> {
              * @return
              */
             private void doTick() {
-                boolean b = !future.isDone() && taskActuator.getTaskStatus().compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT);
+                boolean b = !future.isDone() && taskActuator.taskStatus().compareAndSet(TASK_INITIALIZE, TASK_TIMEOUT);
                 if (b) {
                     try {
                         future.get(0, TimeUnit.MILLISECONDS);
@@ -445,7 +455,7 @@ public class TaskLoader<P, R> {
      * @param taskActuator
      * @return
      */
-    private Callable<?> threadAdapterSPI(TaskActuator<?> taskActuator) {
+    private Callable<?> threadAdapterSPI(TaskActuator taskActuator) {
         ThreadWapper threadWapper = ExtensionLoader.getExtensionLoader(ThreadWapper.class).getRealLizesFirst();
         return Objects.isNull(threadWapper) ? taskActuator : threadWapper.wrapper(taskActuator);
     }
@@ -455,8 +465,9 @@ public class TaskLoader<P, R> {
      * 结束单条任务链
      *
      * @param subtasks the subtasks
+     * @throws Exception the exception
      */
-    public void stopSingleTaskLine(List<AsyncTask> subtasks) {
+    public void stopSingleTaskLine(List<AsyncTask> subtasks) throws Exception {
         TaskActuator taskActuator = processMap.get(assistantTask);
         for (AsyncTask subtask : subtasks) {
             rtDept(subtask, taskActuator);
@@ -469,8 +480,9 @@ public class TaskLoader<P, R> {
      *
      * @param task            task
      * @param terminationTask the terminationTask
+     * @throws Exception the exception
      */
-    public void rtDept(AsyncTask task, TaskActuator terminationTask) {
+    public void rtDept(AsyncTask task, TaskActuator terminationTask) throws Exception {
         if (task instanceof TaskTrigger.AssistantTask) {
             terminationTask.releasingDependency();
             if (!terminationTask.hasUnsatisfiedDependcies()) {
@@ -503,7 +515,8 @@ public class TaskLoader<P, R> {
         AsyncResult asyncResult = new AsyncResult();
         asyncResult.setResultMap(support.getResultMap());
         asyncResult.setExecuteCode(expCode.get());
-        asyncResult.setSuccess(support.getResultMap().values().stream().allMatch(r -> r.getResultState().equals(ResultState.SUCCESS)));
+        asyncResult.setCusCode(cusCode);
+        asyncResult.setStatus(support.getResultMap().values().stream().allMatch(r -> r.getResultState().equals(ResultState.SUCCESS)));
         return asyncResult;
     }
 
@@ -629,7 +642,34 @@ public class TaskLoader<P, R> {
      *
      * @return the future tasks map
      */
-    public Map<AsyncTask<P, R>, Future<?>> getFutureTasksMap() {
+    public Map<AsyncTask<?, ?>, Future<?>> getFutureTasksMap() {
         return futureTasksMap;
+    }
+
+    /**
+     * Gets interruptflag.
+     *
+     * @return the interruptflag
+     */
+    public AtomicInteger getINTERRUPTFLAG() {
+        return INTERRUPTFLAG;
+    }
+
+    /**
+     * Gets cus code.
+     *
+     * @return the cus code
+     */
+    public Integer getCusCode() {
+        return cusCode;
+    }
+
+    /**
+     * Sets cus code.
+     *
+     * @param cusCode the cus code
+     */
+    public void setCusCode(Integer cusCode) {
+        this.cusCode = cusCode;
     }
 }

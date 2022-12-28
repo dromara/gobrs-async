@@ -13,6 +13,10 @@ gobrs:
           logConfig:
             costLogabled: true # 开启任务耗时打印 log日志级别需要为 error 默认true
             errLogabled: true # 开启任务异常打印 默认true
+        # stop Async
+        - name: "stopAsyncRule"
+          content: "stopAsyncTaskA,stopAsyncTaskB,stopAsyncTaskC;stopAsyncTaskD->stopAsyncTaskE->stopAsyncTaskF"
+          catchable: true
 
         - name: "anyConditionGeneral"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition"
@@ -32,6 +36,11 @@ gobrs:
         - name: "optionalRule"
           content: "caseOptionalTaskA->caseOptionalTaskB->caseOptionalTaskC,caseOptionalTaskD->caseOptionalTaskE->caseOptionalTaskF"
 
+        - name: "transactionRule"
+          content: "transactionTaskA->transactionTaskB->transactionTaskC->transactionTaskD"
+          transaction: true
+
+
         ## 单一任务超时时间
         - name: "timeoutRule"
           content: "caseTimeoutTaskA->caseTimeoutTaskB->caseTimeoutTaskC"
@@ -48,11 +57,13 @@ gobrs:
                     caseThreeTaskA->caseThreeTaskE,caseThreeTaskF->caseThreeTaskG;"
         # 官方场景四 https://async.sizegang.cn/pages/2f844b/#%E5%9C%BA%E6%99%AF%E5%9B%9B
         - name: "caseFour"
-          content: "caseFourTaskA->caseFourTaskB->caseFourTaskC,caseFourTaskD,caseFourTaskE;
-                    caseFourTaskA->caseFourTaskH->caseFourTaskI,caseFourTaskJ,caseFourTaskK;"
+          content: "caseFourTaskA->caseFourTaskB->caseFourTaskC,caseFourTaskD,caseFourTaskE->caseFourTaskK;
+                    caseFourTaskA->caseFourTaskH->caseFourTaskI,caseFourTaskJ;"
           logConfig:
             costLogabled: false # 关闭耗时任务打印
+          catchable: false
         # 官方场景五 https://async.sizegang.cn/pages/2f844b/#%E5%9C%BA%E6%99%AF%E4%BA%94
+
         - name: "caseFive"
           content: "caseFourTaskA,caseFourTaskB,caseFourTaskC->caseFourTaskD:any:exclusive" # any 任意一个任务（A、B、C）执行完成后 则执行D任务
           # exclusive 避免任务执行浪费 所以 D执行完成之后 会主动 中断 未完成的任务
@@ -60,6 +71,8 @@ gobrs:
         - name: "taskInterrupt"
           content: "interruptTaskA->interruptTaskB;interruptTaskC->interruptTaskD"
           task-interrupt: true # 局部异常是否打断主流程 默认 false
+          interruptionImmediate: false # 异常中断后 是否立即中断 默认true
+          catchable: false # 异常抛出到main线程 适合开发者手动捕获流程内部的异常
         # 获取非强依赖任务的返回结果  如下： C任务获取A任务的返回结果， 从任务配置上看 C并不需要A 执行完成后再执行C 所有 通过Future方式 C有能力获取到A的返回结果
         - name: "futureTaskRule"
           content: "futureTaskA->futureTaskB;futureTaskC->futureTaskD"

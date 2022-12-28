@@ -80,7 +80,7 @@ public class GobrsFutureTask<V> implements RunnableFuture<V> {
      * @return boolean boolean
      */
     public boolean isMayStopIfRunning(boolean mayStopIfRunning) {
-        if (sync.runner.getState() != Thread.State.RUNNABLE) {
+        if (Thread.State.RUNNABLE != sync.runner.getState()) {
             return cancel(mayStopIfRunning);
         }
         return sync.innerStop(mayStopIfRunning);

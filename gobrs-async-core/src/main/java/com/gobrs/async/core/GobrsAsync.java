@@ -4,6 +4,7 @@ import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.AsyncResult;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.common.exception.NotFoundGobrsRuleException;
+import lombok.SneakyThrows;
 
 import java.util.*;
 
@@ -33,14 +34,14 @@ public class GobrsAsync {
     /**
      * Begin com.gobrs.async.com.gobrs.async.test.task receive.
      *
-     * @param taskName the com.gobrs.async.com.gobrs.async.test.task name
+     * @param ruleName the com.gobrs.async.com.gobrs.async.test.task name
      * @param pioneer
      * @param reload
      * @param tasks    the tasks
      * @return the com.gobrs.async.com.gobrs.async.test.task receive
      */
-    public TaskReceive begin(String taskName, List<AsyncTask<?, ?>> pioneer, boolean reload, AsyncTask<?, ?>... tasks) {
-        return taskFlow.get(taskName).start(tasks);
+    public TaskReceive begin(String ruleName, List<AsyncTask<?, ?>> pioneer, boolean reload, AsyncTask<?, ?>... tasks) {
+        return taskFlow.get(ruleName).start(tasks);
     }
 
     /**
@@ -51,7 +52,7 @@ public class GobrsAsync {
      * @param reload     the reload
      * @return com.gobrs.async.com.gobrs.async.test.task receive
      */
-    public TaskReceive begin(String ruleName, List<AsyncTask> asyncTasks, boolean reload) {
+    public TaskReceive begin(String ruleName, List<AsyncTask<?, ?>> asyncTasks, boolean reload) {
         if (Objects.isNull(taskFlow)) {
             loadTaskFlow(ruleName);
         }
@@ -72,19 +73,19 @@ public class GobrsAsync {
      * @param asyncTasks the async tasks
      * @return the com.gobrs.async.com.gobrs.async.test.task receive
      */
-    public TaskReceive begin(String ruleName, List<AsyncTask> asyncTasks) {
+    public TaskReceive begin(String ruleName, List<AsyncTask<?, ?>> asyncTasks) {
         return begin(ruleName, asyncTasks, false);
     }
 
     /**
      * Add subtask process
      *
-     * @param taskName the com.gobrs.async.com.gobrs.async.test.task name
+     * @param ruleName the com.gobrs.async.com.gobrs.async.test.task name
      * @param tasks    the tasks
      * @return com.gobrs.async.com.gobrs.async.test.task receive
      */
-    public TaskReceive after(String taskName, AsyncTask... tasks) {
-        return taskFlow.get(taskName).after(tasks);
+    public TaskReceive after(String ruleName, AsyncTask... tasks) {
+        return taskFlow.get(ruleName).after(tasks);
     }
 
     /**
@@ -108,6 +109,7 @@ public class GobrsAsync {
      * @param timeout       the timeout
      * @return the async result
      */
+    @SneakyThrows
     public AsyncResult go(String ruleName, AsyncParam param, Set<String> optionalTasks, long timeout) {
         if (check(ruleName).isPresent()) {
             return trigger.get(ruleName).trigger(param, timeout, optionalTasks).load();

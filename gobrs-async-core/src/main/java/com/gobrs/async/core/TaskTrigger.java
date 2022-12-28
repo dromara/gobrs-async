@@ -17,17 +17,18 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static com.gobrs.async.core.common.def.FixSave.LOGGER_PLUGIN;
+
 /**
  * The type Task trigger.
  *
  * @param <P> the type parameter
- * @param <R> the type parameter
  * @program: gobrs -async-starter
  * @description: Task preloader
  * @author: sizegang
  * @create: 2022 -03-16
  */
-class TaskTrigger<P, R> {
+class TaskTrigger<P> {
 
     /**
      * The Logger.
@@ -112,7 +113,7 @@ class TaskTrigger<P, R> {
 
         downTasksMap.put(assistantTask, new ArrayList<>(0));
         upwardTasksMap.put(assistantTask, noSubtasks);
-        upwardTasksMapSpace.put(ruleName,upwardTasksMap);
+        upwardTasksMapSpace.put(ruleName, upwardTasksMap);
         clear();
         for (AsyncTask task : downTasksMap.keySet()) {
             TaskActuator process;
@@ -201,7 +202,7 @@ class TaskTrigger<P, R> {
         /**
          * Create a com.gobrs.async.com.gobrs.async.test.task loader, A com.gobrs.async.com.gobrs.async.test.task flow corresponds to a taskLoader
          */
-        TaskLoader<P, R> loader = new TaskLoader<>(ruleName, threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
+        TaskLoader loader = new TaskLoader(ruleName, threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
 
         TaskSupport support = related(param, loader);
 
@@ -209,7 +210,7 @@ class TaskTrigger<P, R> {
             /**
              * clone Process for Thread isolation
              */
-            TaskActuator processor = (TaskActuator<?>) prepareTaskMap.get(task).clone();
+            TaskActuator processor = (TaskActuator) prepareTaskMap.get(task).clone();
 
             processor.init(support, param);
 
@@ -229,7 +230,7 @@ class TaskTrigger<P, R> {
      * @param loader
      * @return
      */
-    private TaskSupport related(AsyncParam<P> param, TaskLoader<P, R> loader) {
+    private TaskSupport related(AsyncParam<P> param, TaskLoader loader) {
 
         TaskSupport support = getSupport(param);
 
@@ -251,7 +252,7 @@ class TaskTrigger<P, R> {
      * 终止任务 在整个任务流程结束后 会调用该任务类执行 completed()
      * Task flow End tasks
      */
-    private class TerminationTask<P, R> extends TaskActuator<Object> {
+    private class TerminationTask<P, R> extends TaskActuator {
 
         /**
          * com.gobrs.async.com.gobrs.async.test.task executor
@@ -289,18 +290,6 @@ class TaskTrigger<P, R> {
     }
 
 
-    private void doProcess(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> affirTasks) {
-        if (affirTasks != null) {
-            if (affirTasks.contains(process.getTask())) {
-                taskLoader.oplCount.incrementAndGet();
-                taskLoader.startProcess(process);
-            }
-        } else {
-            taskLoader.startProcess(process);
-        }
-    }
-
-
     /**
      * Get the com.gobrs.async.com.gobrs.async.test.task support , Similar com.gobrs.async.com.gobrs.async.test.task bus
      * 获取任务流程 总线
@@ -323,9 +312,11 @@ class TaskTrigger<P, R> {
      * @param support
      */
     private void logAdvance(TaskSupport support) {
-
-        long traceId = IdWorker.nextId();
-        TraceUtil.set(traceId);
+        long traceId = 0;
+        if (!LOGGER_PLUGIN) {
+            traceId = IdWorker.nextId();
+            TraceUtil.set(traceId);
+        }
         boolean costLogabled = ConfigManager.Action.costLogabled(ruleName);
         if (costLogabled) {
             LogWrapper.TimeCollector timeCollector =
@@ -339,12 +330,5 @@ class TaskTrigger<P, R> {
             support.getTaskLoader().setLogWrapper(logWrapper);
         }
 
-    }
-
-    /**
-     * @param rulename
-     */
-    private void rule(String rulename) {
-        this.ruleName = rulename;
     }
 }

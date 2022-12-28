@@ -19,7 +19,6 @@ public class GobrsAsyncRule {
     private String content;
 
 
-
     /**
      * 执行异常trace log打印
      */
@@ -35,6 +34,10 @@ public class GobrsAsyncRule {
      * 任务流程 某任务中断是否终止整个任务流程
      */
     private boolean taskInterrupt = false;
+
+    private boolean interruptionImmediate = true;
+
+    private boolean catchable = false;
 
     /**
      * 流程事务
@@ -148,5 +151,41 @@ public class GobrsAsyncRule {
      */
     public void setTransaction(boolean transaction) {
         this.transaction = transaction;
+    }
+
+    /**
+     * Is catchable boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isCatchable() {
+        return catchable;
+    }
+
+    /**
+     * Sets catchable.
+     *
+     * @param catchable the catchable
+     */
+    public void setCatchable(boolean catchable) {
+        this.catchable = catchable;
+    }
+
+    /**
+     * Is interruption immediate boolean.
+     *
+     * @return the boolean
+     */
+    public boolean isInterruptionImmediate() {
+        return interruptionImmediate;
+    }
+
+    /**
+     * Sets interruption immediate.
+     *
+     * @param interruptionImmediate the interruption immediate
+     */
+    public void setInterruptionImmediate(boolean interruptionImmediate) {
+        this.interruptionImmediate = interruptionImmediate;
     }
 }

@@ -30,7 +30,7 @@ public class CaseFour {
     @Test
     public void caseFour() {
         Map<String, Object> params = new HashMap<>();
-        gobrsAsync.go("caseFour", () -> params);
+        gobrsAsync.go("caseFour", () -> params, 200000);
     }
 
 }

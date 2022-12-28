@@ -28,6 +28,8 @@
             <groupId>io.github.memorydoc</groupId>
             <artifactId>gobrs-async-plugin-base</artifactId>
         </dependency>
+
+
     </dependencies>
 
 </project>
