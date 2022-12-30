@@ -39,7 +39,6 @@ public class GobrsPropertyAutoConfiguration {
     public GobrsConfig gobrsConfig(GobrsAsyncProperties properties) {
 
         GobrsConfig gobrsConfig = new GobrsConfig();
-
         gobrsConfig.setEnable(properties.isEnable());
         gobrsConfig.setSplit(properties.getSplit());
         gobrsConfig.setPoint(properties.getPoint());
@@ -47,15 +46,25 @@ public class GobrsPropertyAutoConfiguration {
         gobrsConfig.setTimeout(properties.getTimeout());
         gobrsConfig.setRelyDepend(properties.isRelyDepend());
         gobrsConfig.setTimeoutCoreSize(properties.getTimeoutCoreSize());
-        threadPool(properties, gobrsConfig);
+        ThreadPool assignThreadPool = threadPool(properties.getThreadPool());
+        if (Objects.nonNull(assignThreadPool)) {
+            gobrsConfig.setThreadPool(assignThreadPool);
+        }
         List<RuleConfig> rules = properties.getRules();
         List<GobrsAsyncRule> rList = rules.stream().map(x -> {
             GobrsAsyncRule r = new GobrsAsyncRule();
             LogConfig logConfig = x.getLogConfig();
-
             if (Objects.nonNull(logConfig)) {
                 r.setErrLogabled(logConfig.getErrLogabled());
                 r.setCostLogabled(logConfig.getCostLogabled());
+            }
+
+            GobrsAsyncProperties.ThreadPool threadPool = x.getThreadPool();
+            if (Objects.nonNull(threadPool)) {
+                ThreadPool asThreadPool = threadPool(threadPool);
+                if (Objects.nonNull(asThreadPool)) {
+                    r.setThreadPool(asThreadPool);
+                }
             }
             r.setCatchable(x.isCatchable());
             r.setName(x.getName());
@@ -70,11 +79,9 @@ public class GobrsPropertyAutoConfiguration {
     }
 
     /**
-     * @param properties
-     * @param gobrsConfig
+     *
      */
-    private void threadPool(GobrsAsyncProperties properties, GobrsConfig gobrsConfig) {
-        GobrsAsyncProperties.ThreadPool threadPool = properties.getThreadPool();
+    private ThreadPool threadPool(GobrsAsyncProperties.ThreadPool threadPool) {
         if (Objects.nonNull(threadPool)) {
             ThreadPool tp = new ThreadPool();
             tp.setCorePoolSize(threadPool.getCorePoolSize());
@@ -87,7 +94,8 @@ public class GobrsPropertyAutoConfiguration {
             tp.setThreadNamePrefix(threadPool.getThreadNamePrefix());
             tp.setAllowCoreThreadTimeOut(threadPool.getAllowCoreThreadTimeOut());
             tp.setRejectedExecutionHandler(threadPool.getRejectedExecutionHandler());
-            gobrsConfig.setThreadPool(tp);
+            return tp;
         }
+        return null;
     }
 }

@@ -26,13 +26,15 @@ public class RuleConfig {
 
     private boolean catchable;
 
+    private GobrsAsyncProperties.ThreadPool threadPool;
+
     /**
      * Whether the execution com.gobrs.async.exception interrupts the workflow
      * 任务流程 某任务中断是否终止整个任务流程
      */
     private boolean taskInterrupt = false;
 
-    private  boolean interruptionImmediate = true;
+    private boolean interruptionImmediate = true;
 
     /**
      * 流程事务
@@ -164,5 +166,23 @@ public class RuleConfig {
      */
     public void setInterruptionImmediate(boolean interruptionImmediate) {
         this.interruptionImmediate = interruptionImmediate;
+    }
+
+    /**
+     * Gets thread pool.
+     *
+     * @return the thread pool
+     */
+    public GobrsAsyncProperties.ThreadPool getThreadPool() {
+        return threadPool;
+    }
+
+    /**
+     * Sets thread pool.
+     *
+     * @param threadPool the thread pool
+     */
+    public void setThreadPool(GobrsAsyncProperties.ThreadPool threadPool) {
+        this.threadPool = threadPool;
     }
 }

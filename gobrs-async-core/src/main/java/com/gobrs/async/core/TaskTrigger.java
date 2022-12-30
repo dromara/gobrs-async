@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 import static com.gobrs.async.core.common.def.FixSave.LOGGER_PLUGIN;
@@ -202,9 +203,12 @@ class TaskTrigger<P> {
         /**
          * Create a com.gobrs.async.com.gobrs.async.test.task loader, A com.gobrs.async.com.gobrs.async.test.task flow corresponds to a taskLoader
          */
-        TaskLoader loader = new TaskLoader(ruleName, threadPoolFactory.getThreadPoolExecutor(), newProcessMap, timeout);
 
-        TaskSupport support = related(param, loader);
+        ExecutorService threadPoolExecutor = getThreadPoolExecutor(ruleName);
+
+        TaskLoader loader = new TaskLoader(ruleName, threadPoolExecutor, newProcessMap, timeout);
+
+        TaskSupport support = related(param, loader, threadPoolExecutor);
 
         for (AsyncTask task : prepareTaskMap.keySet()) {
             /**
@@ -222,6 +226,7 @@ class TaskTrigger<P> {
         return loader;
     }
 
+
     /**
      * 设置 任务总线和任务加载器关联关系
      * 配置设置 环境加载
@@ -230,7 +235,7 @@ class TaskTrigger<P> {
      * @param loader
      * @return
      */
-    private TaskSupport related(AsyncParam<P> param, TaskLoader loader) {
+    private TaskSupport related(AsyncParam<P> param, TaskLoader loader, ExecutorService executorService) {
 
         TaskSupport support = getSupport(param);
 
@@ -240,13 +245,24 @@ class TaskTrigger<P> {
 
         loader.setAssistantTask(assistantTask);
 
-        /**
-         * The thread pool is obtained from the factory, and the thread pool parameters can be dynamically adjusted
-         */
-        support.setExecutorService(threadPoolFactory.getThreadPoolExecutor());
+        support.setExecutorService(executorService);
+
         return support;
     }
 
+
+    /**
+     * 获取线程池
+     * @param ruleName
+     * @return
+     */
+    private ExecutorService getThreadPoolExecutor(String ruleName) {
+        ExecutorService threadPool = threadPoolFactory.getThreadPool(ruleName);
+        if (Objects.isNull(threadPool)) {
+            threadPool = threadPoolFactory.getDefaultThreadPool();
+        }
+        return threadPool;
+    }
 
     /**
      * 终止任务 在整个任务流程结束后 会调用该任务类执行 completed()
