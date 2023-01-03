@@ -2,6 +2,7 @@ package com.gobrs.async.core.task;
 
 
 import com.gobrs.async.core.TaskSupport;
+import com.gobrs.async.core.common.enums.TaskEnum;
 import com.gobrs.async.core.common.exception.AsyncTaskTimeoutException;
 import com.gobrs.async.core.common.util.SystemClock;
 import com.gobrs.async.core.config.ConfigManager;
@@ -74,6 +75,11 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * Whether any interruption ends other dependent tasks
      */
     private boolean exclusive = false;
+
+    /**
+     * 任务类型 class method 默认 class
+     */
+    private Integer type = TaskEnum.CLASS.getType();
 
     /**
      * get result of current com.gobrs.async.com.gobrs.async.test.task
