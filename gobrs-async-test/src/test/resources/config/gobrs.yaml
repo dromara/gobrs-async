@@ -1,6 +1,10 @@
 gobrs:
   async:
     config:
+      ## 如果规则没有制定 线程池 则使用 统一的线程池配置 如果通过 API 的方式动态更新了线程池 则使用动态更新 替换配置文件线程池配置 参见： ThreadPoolConfig
+      thread-pool:
+        core-pool-size: 1000
+        max-pool-size: 2000
       rules:
         - name: "performance"
           content: "taskA->taskB,TaskC->taskD->taskE,taskF"
@@ -47,10 +51,16 @@ gobrs:
         # 官方场景一 https://async.sizegang.cn/pages/2f844b/#%E5%9C%BA%E6%99%AF%E4%B8%80
         - name: "caseOne"
           content: "caseOneTaskA->caseOneTaskB,caseOneTaskC,caseOneTaskD"
+          threadPool:
+            corePoolSize: 10
+            maxPoolSize: 20
 
         # 官方场景二 https://async.sizegang.cn/pages/2f844b/#%E5%9C%BA%E6%99%AF%E4%BA%8C
         - name: "caseTwo"
           content: "caseTwoTaskA->caseTwoTaskB->caseTwoTaskC,caseTwoTaskD"
+          threadPool:
+            corePoolSize: 30
+            maxPoolSize: 40
         # 官方场景三 https://async.sizegang.cn/pages/2f844b/#%E5%9C%BA%E6%99%AF%E4%B8%89
         - name: "caseThree"
           content: "caseThreeTaskA->caseThreeTaskB,caseThreeTaskC,caseFourTaskD->caseThreeTaskG;

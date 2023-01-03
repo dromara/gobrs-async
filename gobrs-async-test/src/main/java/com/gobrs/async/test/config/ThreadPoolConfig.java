@@ -27,7 +27,7 @@ public class ThreadPoolConfig extends GobrsThreadPoolConfiguration {
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(300, 500, 30, TimeUnit.SECONDS,
                 new LinkedBlockingQueue());
 
-        ExecutorService executorService = Executors.newCachedThreadPool();
-        factory.setThreadPoolExecutor((ThreadPoolExecutor) executorService);
+        // ExecutorService executorService = Executors.newCachedThreadPool();
+        factory.setThreadPoolExecutor("ruleName",threadPoolExecutor);
     }
 }

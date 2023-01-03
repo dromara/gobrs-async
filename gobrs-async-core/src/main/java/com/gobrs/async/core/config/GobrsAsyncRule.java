@@ -28,6 +28,8 @@ public class GobrsAsyncRule {
      */
     private Boolean costLogabled = DefaultConfig.COST_LOGABLED;
 
+    private GobrsConfig.ThreadPool threadPool;
+
 
     /**
      * Whether the execution com.gobrs.async.exception interrupts the workflow
@@ -187,5 +189,23 @@ public class GobrsAsyncRule {
      */
     public void setInterruptionImmediate(boolean interruptionImmediate) {
         this.interruptionImmediate = interruptionImmediate;
+    }
+
+    /**
+     * Gets thread pool.
+     *
+     * @return the thread pool
+     */
+    public GobrsConfig.ThreadPool getThreadPool() {
+        return threadPool;
+    }
+
+    /**
+     * Sets thread pool.
+     *
+     * @param threadPool the thread pool
+     */
+    public void setThreadPool(GobrsConfig.ThreadPool threadPool) {
+        this.threadPool = threadPool;
     }
 }
