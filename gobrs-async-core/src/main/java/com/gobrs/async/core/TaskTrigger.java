@@ -2,6 +2,7 @@ package com.gobrs.async.core;
 
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.util.SystemClock;
+import com.gobrs.async.core.common.util.UUIDGenerator;
 import com.gobrs.async.core.config.ConfigManager;
 import com.gobrs.async.core.holder.BeanHolder;
 import com.gobrs.async.core.log.LogWrapper;
@@ -330,7 +331,7 @@ class TaskTrigger<P> {
     private void logAdvance(TaskSupport support) {
         long traceId = 0;
         if (!LOGGER_PLUGIN) {
-            traceId = IdWorker.nextId();
+            traceId = UUIDGenerator.generateUUID();
             TraceUtil.set(traceId);
         }
         boolean costLogabled = ConfigManager.Action.costLogabled(ruleName);
