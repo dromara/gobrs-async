@@ -1,7 +1,5 @@
 package com.gobrs.async.core.common.def;
 
-import org.apache.logging.log4j.util.Strings;
-
 /**
  * The interface Default com.gobrs.async.config.
  *
@@ -10,11 +8,6 @@ import org.apache.logging.log4j.util.Strings;
  * @description:
  */
 public interface DefaultConfig {
-
-    /**
-     * The constant TASKNAME.
-     */
-    String TASKNAME = "asyncTaskName";
     /**
      * The constant THREADPOOLQUEUESIZE.
      */
@@ -58,30 +51,6 @@ public interface DefaultConfig {
      */
     boolean transaction = false;
 
-    /**
-     * The constant anyConditionState.
-     */
-    boolean anyConditionState = true;
-
-
-    /**
-     * The constant CORE_SIZE.
-     */
-    Integer CORE_SIZE = 100;
-
-    /**
-     * The constant MAX_SIZE.
-     */
-    Integer MAX_SIZE = 200;
-
-    /**
-     * The constant REJECT.
-     */
-    String REJECT = "AbortPolicy";
-    /**
-     * The constant QUEUE.
-     */
-    String QUEUE_SIZE = Strings.EMPTY;
 
     /**
      * The constant TASK_TIME_OUT.

@@ -42,7 +42,7 @@ public class TaskUtil {
      * @return the any condition
      */
     public static AnyConditionResult defaultAnyCondition() {
-        return AnyConditionResult.builder().setState(false).build();
+        return AnyConditionResult.builder().state(false).build();
     }
 
     /**
@@ -52,7 +52,7 @@ public class TaskUtil {
      * @return the any condition
      */
     public static AnyConditionResult defaultAnyCondition(boolean state) {
-        return AnyConditionResult.builder().setState(state).build();
+        return AnyConditionResult.builder().state(state).build();
     }
 
     public static TaskResult buildFutureTaskResult(Future result) {

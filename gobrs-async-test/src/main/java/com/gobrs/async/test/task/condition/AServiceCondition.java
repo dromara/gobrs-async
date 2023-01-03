@@ -32,7 +32,8 @@ public class AServiceCondition extends AsyncTask {
 
     @Override
     public AnyConditionResult<String> task(Object o, TaskSupport support) {
-        AnyConditionResult.Builder<String> builder = AnyConditionResult.builder();
+        AnyConditionResult.AnyConditionResultBuilder<String> builder = AnyConditionResult.builder();
+
         try {
             System.out.println("AServiceCondition Begin");
             Thread.sleep(300);
@@ -42,9 +43,9 @@ public class AServiceCondition extends AsyncTask {
             System.out.println("AServiceCondition Finish");
         } catch (InterruptedException e) {
             e.printStackTrace();
-           return builder.setState(false).build();
+           return builder.state(false).build();
         }
-        return builder.setState(true).build();
+        return builder.state(true).build();
     }
 
 }

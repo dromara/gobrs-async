@@ -1,5 +1,7 @@
 package com.gobrs.async.core.property;
 
+import lombok.Data;
+
 /**
  * The type Platform config.
  *
@@ -9,6 +11,7 @@ package com.gobrs.async.core.property;
  * @author: sizegang
  * @create: 2022 -12-16
  */
+@Data
 public class PlatformConfig {
 
     private String appName;
@@ -27,39 +30,4 @@ public class PlatformConfig {
         this.accessToken = accessToken;
     }
 
-    /**
-     * Gets app name.
-     *
-     * @return the app name
-     */
-    public String getAppName() {
-        return appName;
-    }
-
-    /**
-     * Sets app name.
-     *
-     * @param appName the app name
-     */
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
-
-    /**
-     * Gets access token.
-     *
-     * @return the access token
-     */
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    /**
-     * Sets access token.
-     *
-     * @param accessToken the access token
-     */
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
 }
