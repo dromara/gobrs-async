@@ -28,6 +28,8 @@ public interface DefaultConfig {
      */
     String RULE_ANY = "any";
 
+    Boolean TASK_NECESSARY = true;
+
     /**
      * The constant RULE_ANY_CONDITION.
      */

@@ -5,10 +5,11 @@ import com.gobrs.async.core.TaskReceive;
 import com.gobrs.async.core.anno.Task;
 import com.gobrs.async.core.cache.GCacheManager;
 import com.gobrs.async.core.common.def.Constant;
+import com.gobrs.async.core.common.enums.TaskEnum;
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
 import com.gobrs.async.core.config.GobrsAsyncRule;
 import com.gobrs.async.core.config.GobrsConfig;
-import com.gobrs.async.core.holder.BeanHolder;
+import com.gobrs.async.core.holder.BeanProxy;
 import com.gobrs.async.core.task.AsyncTask;
 import org.springframework.util.StringUtils;
 
@@ -34,7 +35,7 @@ public class RuleParseEngine extends AbstractEngine {
 
     private GobrsAsync gobrsAsync;
 
-    private GCacheManager gCacheManager;
+    private static GCacheManager gCacheManager;
 
 
     /**
@@ -47,7 +48,7 @@ public class RuleParseEngine extends AbstractEngine {
     public RuleParseEngine(GobrsConfig gobrsConfig, GobrsAsync gobrsAsync, GCacheManager gCacheManager) {
         this.gobrsConfig = gobrsConfig;
         this.gobrsAsync = gobrsAsync;
-        this.gCacheManager = gCacheManager;
+        RuleParseEngine.gCacheManager = gCacheManager;
     }
 
     @Override
@@ -124,6 +125,7 @@ public class RuleParseEngine extends AbstractEngine {
                  * Load tasks from the rules com.gobrs.async.engine
                  */
                 List<AsyncTask<?, ?>> asyncTasks = new ArrayList<>();
+
                 for (String tbean : beanList) {
                     asyncTasks.add(EngineExecutor.getWrapperDepend(cacheTaskWrappers, tbean, taskReceive, false));
                 }
@@ -160,6 +162,21 @@ public class RuleParseEngine extends AbstractEngine {
             /**
              * Parse annotation configuration
              */
+            if (taskName.contains(Constant.tied) && RULE_ANY.equals(preNamed[1])) {
+                task.setAny(true);
+            }
+
+            if (taskName.contains(Constant.tied) && RULE_ANY_CONDITION.equals(preNamed[1])) {
+                task.setAnyCondition(true);
+            }
+
+            if (cursor == 3 && RULE_EXCLUSIVE.equals(preNamed[2])) {
+                task.setExclusive(true);
+            }
+
+            if (!TaskEnum.CLASS.getType().equals(task.getType())) {
+                return task;
+            }
 
             task.setDesc(getTaskAnnotion(task, taskName, (anno) -> anno.desc(), String.class));
             task.setCallback(getTaskAnnotion(task, taskName, (anno) -> anno.callback(), Boolean.class));
@@ -174,17 +191,6 @@ public class RuleParseEngine extends AbstractEngine {
                 task.setName(name);
             }
 
-            if (taskName.contains(Constant.tied) && RULE_ANY.equals(preNamed[1])) {
-                task.setAny(true);
-            }
-
-            if (taskName.contains(Constant.tied) && RULE_ANY_CONDITION.equals(preNamed[1])) {
-                task.setAnyCondition(true);
-            }
-
-            if (cursor == 3 && RULE_EXCLUSIVE.equals(preNamed[2])) {
-                task.setExclusive(true);
-            }
             return task;
         }
 
@@ -234,18 +240,7 @@ public class RuleParseEngine extends AbstractEngine {
          * @return the bean
          */
         public static Object getBean(String bean) {
-            Object b = null;
-
-            try {
-                b = BeanHolder.getBean(bean);
-            } catch (Exception exception) {
-
-
-
-            } finally {
-                return Optional.ofNullable(b).orElseThrow(() -> new RuntimeException("bean not found, name is " + bean));
-
-            }
+            return Optional.ofNullable(BeanProxy.getBean(bean)).orElseThrow(() -> new RuntimeException("bean not found, name is " + bean));
         }
 
         /**

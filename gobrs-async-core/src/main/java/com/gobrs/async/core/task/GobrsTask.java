@@ -2,10 +2,12 @@ package com.gobrs.async.core.task;
 
 import com.gobrs.async.core.TaskSupport;
 
+import static com.gobrs.async.core.common.def.DefaultConfig.TASK_NECESSARY;
+
 /**
  * The interface Gobrs com.gobrs.async.com.gobrs.async.test.task.
  *
- * @param <Param>  the type parameter
+ * @param <Param> the type parameter
  * @program: gobrs -async-core
  * @description:
  * @author: sizegang
@@ -21,7 +23,6 @@ public interface GobrsTask<Param> extends ITask {
     }
 
 
-
     /**
      * Whether a com.gobrs.async.com.gobrs.async.test.task needs to be executed
      * <p>
@@ -33,7 +34,7 @@ public interface GobrsTask<Param> extends ITask {
      * @return boolean boolean
      */
     default boolean necessary(Param param, TaskSupport support) {
-        return true;
+        return TASK_NECESSARY;
     }
 
     /**

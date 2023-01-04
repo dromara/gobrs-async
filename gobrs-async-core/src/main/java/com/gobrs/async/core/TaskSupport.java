@@ -60,6 +60,8 @@ public class TaskSupport {
      */
     private Map<Class, TaskResult> resultMap = new ConcurrentHashMap<>();
 
+    private Map<String, TaskResult> resultMethodMap = new ConcurrentHashMap<>();
+
     private Map<Class, TaskStatus> taskStatus = new ConcurrentHashMap<>();
 
     /**

@@ -1,5 +1,6 @@
 package com.gobrs.async.core;
 
+import com.gobrs.async.core.anno.Task;
 import com.gobrs.async.core.callback.ErrorCallback;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.AsyncParam;
@@ -7,6 +8,7 @@ import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.core.common.domain.TaskStatus;
 import com.gobrs.async.core.common.enums.ExpState;
 import com.gobrs.async.core.common.enums.ResultState;
+import com.gobrs.async.core.common.enums.TaskEnum;
 import com.gobrs.async.core.common.exception.GobrsForceStopException;
 import com.gobrs.async.core.common.exception.ManualStopException;
 import com.gobrs.async.core.config.ConfigManager;
@@ -38,6 +40,9 @@ import static com.gobrs.async.core.timer.GobrsFutureTask.STOP_STAMP;
 
 /**
  * The type Task actuator.
+ *
+ * @param <Param>  the type parameter
+ * @param <Result> the type parameter
  */
 @Slf4j
 public class TaskActuator<Param, Result> implements Callable, Cloneable {
@@ -160,7 +165,7 @@ public class TaskActuator<Param, Result> implements Callable, Cloneable {
                  * 设置任务结果
                  */
                 if (ConfigManager.getGlobalConfig().isParamContext()) {
-                    support.getResultMap().put(task.getClass(), buildSuccessResult(result));
+                    result(result);
                 }
 
                 stopAsync0(parameter, support);
@@ -204,6 +209,14 @@ public class TaskActuator<Param, Result> implements Callable, Cloneable {
             stopOrRelease(parameter, taskLoader);
         }
         return result;
+    }
+
+    private void result(Result result) {
+        if (TaskEnum.CLASS.getType().equals(task.getType())) {
+            support.getResultMap().put(task.getClass(), buildSuccessResult(result));
+        } else if (TaskEnum.METHOD.getType().equals(task.getType())) {
+            support.getResultMethodMap().put(task.getName(), buildSuccessResult(result));
+        }
     }
 
     private void stopAsync0(Object parameter, TaskSupport support) {
@@ -277,7 +290,8 @@ public class TaskActuator<Param, Result> implements Callable, Cloneable {
     }
 
     private boolean executeNecessary(Param parameter, AsyncTask<Param, ?> task) {
-        return task.necessary(parameter, support) && (Objects.isNull(support.getResultMap().get(task.getClass())));
+        return (TaskEnum.CLASS.getType().equals(task.getType()) && task.necessary(parameter, support) && (Objects.isNull(support.getResultMap().get(task.getClass())))
+                || (TaskEnum.METHOD.getType().equals(task.getType()) && Objects.isNull(support.getResultMethodMap().get(task.getName()))));
     }
 
     /**
@@ -315,6 +329,11 @@ public class TaskActuator<Param, Result> implements Callable, Cloneable {
     }
 
 
+    /**
+     * Sets exp code.
+     *
+     * @param code the code
+     */
     public void setExpCode(Integer code) {
         support.taskLoader.setExpCode(new AtomicInteger(code));
     }
@@ -477,7 +496,7 @@ public class TaskActuator<Param, Result> implements Callable, Cloneable {
              * Setting Task Results
              */
             if (ConfigManager.getGlobalConfig().isParamContext()) {
-                support.getResultMap().put(task.getClass(), buildSuccessResult(result));
+                result(result);
             }
             /**
              * Success com.gobrs.async.callback
@@ -493,6 +512,7 @@ public class TaskActuator<Param, Result> implements Callable, Cloneable {
      * Move on to the next com.gobrs.async.com.gobrs.async.test.task
      *
      * @param taskLoader the com.gobrs.async.com.gobrs.async.test.task loader
+     * @throws Exception the exception
      */
     public void nextTask(TaskLoader<Param, Result> taskLoader) throws Exception {
         nextTask(taskLoader, TaskUtil.defaultAnyCondition());
@@ -504,6 +524,7 @@ public class TaskActuator<Param, Result> implements Callable, Cloneable {
      *
      * @param taskLoader      the com.gobrs.async.com.gobrs.async.test.task loader
      * @param conditionResult the com.gobrs.async.com.gobrs.async.test.task conditionResult
+     * @throws Exception the exception
      */
     public void nextTask(TaskLoader<Param, Result> taskLoader, AnyConditionResult<Object> conditionResult) throws Exception {
 

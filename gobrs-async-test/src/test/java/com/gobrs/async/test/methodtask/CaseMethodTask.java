@@ -32,9 +32,7 @@ public class CaseMethodTask {
     @Test
     public void testOptional() {
         Map<Class, Object> params = new HashMap<>();
-        Set<String> options = new HashSet<>();
-        options.add("case1");
-        AsyncResult asyncResult = gobrsAsync.go("methodTask", () -> params, options, 300000);
+        AsyncResult asyncResult = gobrsAsync.go("methodTask", () -> params, 300000);
     }
 
 }

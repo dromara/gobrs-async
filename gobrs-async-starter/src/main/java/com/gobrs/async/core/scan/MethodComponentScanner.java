@@ -5,23 +5,28 @@ import com.gobrs.async.core.anno.MethodComponent;
 import com.gobrs.async.core.anno.MethodTask;
 import com.gobrs.async.core.cache.GCache;
 import com.gobrs.async.core.cache.GCacheManager;
+import com.gobrs.async.core.common.domain.GobrsTaskMethodEnum;
 import com.gobrs.async.core.common.domain.MethodTaskMatch;
 import com.gobrs.async.core.common.enums.GCacheEnum;
+import com.gobrs.async.core.common.enums.TaskEnum;
 import com.gobrs.async.core.common.exception.DuplicateMethodTaskException;
 import com.gobrs.async.core.property.GobrsAsyncProperties;
 import com.gobrs.async.core.task.MethodTaskAdapter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 /**
  * The type Method component scanner.
@@ -43,6 +48,8 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
 
     private ApplicationContext applicationContext;
 
+    private static List<String> filterMethods = Arrays.asList("equals", "hashCode", "toString", "annotationType");
+
     /**
      * Instantiates a new Method component scanner.
      *
@@ -56,39 +63,80 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
 
     @Override
     public void doScan() {
+
         Map<String, Object> values = applicationContext.getBeansWithAnnotation(MethodComponent.class);
-        GCache<String, MethodTaskAdapter, Map<String, MethodTaskAdapter>> methodTaskCache = gCacheManager.getGCache(GCacheEnum.METHOD_TASK.getType());
+        GCache<String, MethodTaskAdapter, Map<String, MethodTaskAdapter>> methodTaskCache = gCacheManager.getGCache(TaskEnum.METHOD.getType());
         Map<String, MethodTaskAdapter> instance = methodTaskCache.instance();
+
         values.forEach((k, v) -> {
             Method[] methods = v.getClass().getMethods();
-            for (Method method : methods) {
-                MethodTask methodTask = AnnotationUtils.getAnnotation(method, MethodTask.class);
+            Map<String, List<Method>> methodsWith =
+                    Arrays.stream(methods).collect(Collectors.groupingBy(Method::getName));
+            for (Method targetMethod : methods) {
+                MethodTask methodTask = AnnotationUtils.getAnnotation(targetMethod, MethodTask.class);
                 if (Objects.nonNull(methodTask)) {
-                    analysis(k, v, method, methodTask, instance);
+                    analysis(k, v, targetMethod, methodTask, instance, methodsWith);
                 }
             }
         });
     }
 
-    private void analysis(String k, Object v, Method method, MethodTask methodTask, Map<String, MethodTaskAdapter> instance) {
+    private void analysis(String k, Object v, Method targetMethod, MethodTask methodTask, Map<String, MethodTaskAdapter> instance, Map<String, List<Method>> methodsWith) {
+
         MethodTaskAdapter methodTaskAdaptation = applicationContext.getBean(MethodTaskAdapter.class);
+
         methodTaskAdaptation.setName(methodTask.name());
+
         methodTaskAdaptation.setMethodTask(methodTask);
+
         methodTaskAdaptation.setProxy(v);
 
         Invoke invoke = methodTask.invoke();
 
-        Map<String, MethodTaskMatch> PARAMETERS_CACHE = new ConcurrentHashMap<>();
+        Map<String, MethodTaskMatch> PARAMETERS_CACHE = new HashMap<>();
 
-        MethodTaskMatch match = MethodTaskMatch.builder().method(method).parameters(method.getParameters()).build();
-        PARAMETERS_CACHE.put(invoke.task(), match);
+        extracted(methodsWith, invoke, PARAMETERS_CACHE, targetMethod);
+
         methodTaskAdaptation.setPARAMETERS_CACHE(PARAMETERS_CACHE);
 
-        MethodTaskAdapter existed = instance.get(method.getName());
+        methodTaskAdaptation.setType(TaskEnum.METHOD.getType());
+
+        MethodTaskAdapter existed = instance.get(targetMethod.getName());
+
         if (Objects.nonNull(existed)) {
-            throw new DuplicateMethodTaskException(method.getName());
+            throw new DuplicateMethodTaskException(targetMethod.getName());
         }
-        instance.put(method.getName(), methodTaskAdaptation);
+
+        instance.put(targetMethod.getName(), methodTaskAdaptation);
+    }
+
+
+    private void extracted(Map<String, List<Method>> methodsWith, Invoke invoke, Map<String, MethodTaskMatch> PARAMETERS_CACHE, Method targetMethod) {
+
+        Method[] annoMethods = invoke.getClass().getDeclaredMethods();
+
+        List<Method> collectMethods = Arrays.stream(annoMethods).filter(x -> !filterMethods.contains(x.getName())).collect(Collectors.toList());
+
+        for (Method annoMethod : collectMethods) {
+
+            Object value = ReflectionUtils.invokeMethod(annoMethod, invoke);
+
+            if (GobrsTaskMethodEnum.TASK.getMethod().equals(annoMethod.getName())) {
+                MethodTaskMatch match = MethodTaskMatch.builder().method(targetMethod).parameters(targetMethod.getParameters()).build();
+                PARAMETERS_CACHE.put(annoMethod.getName(), match);
+                continue;
+            }
+
+            if (value != null && StringUtils.isNotBlank(value.toString()) && !filterMethods.equals(annoMethod.getName()) && value instanceof String) {
+                List<Method> methods = methodsWith.get(value);
+                if (CollectionUtils.isEmpty(methods)) {
+                    continue;
+                }
+                Method m = methods.get(0);
+                MethodTaskMatch match = MethodTaskMatch.builder().method(m).parameters(m.getParameters()).build();
+                PARAMETERS_CACHE.put(annoMethod.getName(), match);
+            }
+        }
     }
 
     @Override

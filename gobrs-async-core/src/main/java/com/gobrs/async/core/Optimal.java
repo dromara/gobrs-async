@@ -6,7 +6,7 @@ package com.gobrs.async.core; /**
  * @create: 2022-07-23
  **/
 
-import com.gobrs.async.core.holder.BeanHolder;
+import com.gobrs.async.core.holder.BeanProxy;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class Optimal {
      */
     public static boolean ifContinue(Set<AsyncTask<?, ?>> optionalTasks, TaskLoader<?,?> taskLoader, TaskActuator<?,?> process) throws Exception {
         if (optionalTasks != null && taskLoader.oplCount.get() == taskLoader.getOptionalTasks().size()) {
-            ((TaskActuator<?,?>) (taskLoader.processMap.get(taskLoader.assistantTask))).call();
+            ((taskLoader.processMap.get(taskLoader.assistantTask))).call();
             return false;
         }
         return true;
@@ -76,7 +76,7 @@ public class Optimal {
         }
 
         for (String x : optionalTasks) {
-            Object bean = BeanHolder.getBean(x);
+            Object bean = BeanProxy.getBean(x);
             if (bean == null) {
                 log.error("【Gobrs-Async print】affir Task name empty {}", x);
                 continue;

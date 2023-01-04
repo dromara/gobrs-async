@@ -1,6 +1,7 @@
 package com.gobrs.async.core.cache;
 
 import com.gobrs.async.core.common.enums.GCacheEnum;
+import com.gobrs.async.core.common.enums.TaskEnum;
 import com.gobrs.async.core.task.MethodTaskAdapter;
 
 import java.util.Map;
@@ -32,7 +33,7 @@ public class MethodTaskCache extends BaseCache<String, MethodTaskAdapter, Map<St
 
     @Override
     public Integer getType() {
-        return GCacheEnum.METHOD_TASK.getType();
+        return TaskEnum.METHOD.getType();
     }
 
     @Override

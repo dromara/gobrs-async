@@ -9,7 +9,7 @@ gobrs:
         - name: "performance"
           content: "taskA->taskB,TaskC->taskD->taskE,taskF"
         - name: "methodTask"
-          content: "case1->case2"
+          content: "task1->task2,task3->task4:any"
         # 规则 是数组类型的 多组规则
         - name: "general" # 猜想下面的流程 gobrs 会开启几个线程？ 注意看打印的日志哦～
           content: "AService->BService->FService,CService,EService->GService,HService" # AService: 300ms + FService: 2000ms + GService: 100  = 2400ms
