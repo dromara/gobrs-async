@@ -1,6 +1,7 @@
 package com.gobrs.async.core.common.util;
 
 import com.gobrs.async.core.common.exception.InvokeMethodTaskException;
+import com.gobrs.async.core.common.exception.MethodTaskArgumentException;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
@@ -28,9 +29,10 @@ public class ProxyUtil {
     public static Object invokeMethod(Method method, Object target, Object parameters) {
         try {
             return ReflectionUtils.invokeMethod(method, target, parameters);
+        } catch (IllegalArgumentException exception) {
+            throw new MethodTaskArgumentException(String.format("task: %s parameter exception", method.getName()), exception);
         } catch (Exception exception) {
-            new InvokeMethodTaskException(String.format("task %s invoke exception", method.getName()), exception);
+            throw new InvokeMethodTaskException(String.format("task: %s invoke exception", method.getName()), exception);
         }
-        return null;
     }
 }
