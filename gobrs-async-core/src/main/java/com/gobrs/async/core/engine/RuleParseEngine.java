@@ -53,7 +53,7 @@ public class RuleParseEngine extends AbstractEngine {
         /**
          * cache rules
          */
-        Map<String, AsyncTask> cacheTaskWrappers = new HashMap<>();
+        Map<String, AsyncTask<?, ?>> cacheTaskWrappers = new HashMap<>();
 
         List<AsyncTask<?, ?>> pioneer = new ArrayList<>();
 
@@ -103,7 +103,7 @@ public class RuleParseEngine extends AbstractEngine {
         }
     }
 
-    private void doChildFlow(TaskReceive taskReceive, Map<String, AsyncTask> cacheTaskWrappers, List<String> arrayList) {
+    private void doChildFlow(TaskReceive taskReceive, Map<String, AsyncTask<?, ?>> cacheTaskWrappers, List<String> arrayList) {
         for (int i = 1; i < arrayList.size(); i++) {
 
             String taskBean = arrayList.get(i);
@@ -195,12 +195,12 @@ public class RuleParseEngine extends AbstractEngine {
          * @param clear             the clear
          * @return wrapper depend
          */
-        public static AsyncTask getWrapperDepend(Map<String, AsyncTask> cacheTaskWrappers, String taskBean, TaskReceive taskReceive,
+        public static AsyncTask<?, ?> getWrapperDepend(Map<String, AsyncTask<?, ?>> cacheTaskWrappers, String taskBean, TaskReceive taskReceive,
                                                        boolean clear) {
             /**
              *  parsing com.gobrs.async.com.gobrs.async.test.task com.gobrs.async.rule configuration
              */
-            return Optional.ofNullable(getAsyncTask(taskBean))
+            Optional<AsyncTask<?, ?>> o = Optional.ofNullable(getAsyncTask(taskBean))
                     .map((bean) -> Optional.ofNullable(cacheTaskWrappers.get(taskBean))
                             .map((tk) -> {
                                 taskReceive.then(clear, tk);
@@ -209,14 +209,19 @@ public class RuleParseEngine extends AbstractEngine {
                                 /**
                                  * load com.gobrs.async.com.gobrs.async.test.task
                                  */
-                                AsyncTask asyncTask = getAsyncTask(taskBean);
+                                AsyncTask<?, ?> asyncTask = getAsyncTask(taskBean);
                                 cacheTaskWrappers.put(taskBean, asyncTask);
                                 /**
                                  * Set up subtasks
                                  */
                                 taskReceive.then(clear, asyncTask);
-                                return  asyncTask;
-                            })).orElse(null);
+                                return (AsyncTask) asyncTask;
+                            }));
+
+            if (o.isPresent()) {
+                return o.get();
+            }
+            return null;
         }
 
         /**

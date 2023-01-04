@@ -8,7 +8,6 @@ import com.gobrs.async.core.holder.BeanHolder;
 import com.gobrs.async.core.log.LogWrapper;
 import com.gobrs.async.core.task.AsyncTask;
 import com.gobrs.async.core.threadpool.GobrsAsyncThreadPoolFactory;
-import com.gobrs.async.core.common.util.IdWorker;
 import com.gobrs.async.core.common.util.JsonUtil;
 import com.gobrs.async.core.log.TraceUtil;
 import org.slf4j.Logger;
@@ -41,9 +40,9 @@ class TaskTrigger<P> {
 
     private GobrsAsyncThreadPoolFactory threadPoolFactory = BeanHolder.getBean(GobrsAsyncThreadPoolFactory.class);
 
-    private Map<AsyncTask, TaskActuator> prepareTaskMap = Collections.synchronizedMap(new IdentityHashMap<>());
+    private Map<AsyncTask<?,?>, TaskActuator> prepareTaskMap = Collections.synchronizedMap(new IdentityHashMap<>());
 
-    private Map<AsyncTask, TaskActuator> prepareTaskMapWrite = new IdentityHashMap<>();
+    private Map<AsyncTask<?,?>, TaskActuator> prepareTaskMapWrite = new IdentityHashMap<>();
 
     private String ruleName;
 
@@ -55,7 +54,7 @@ class TaskTrigger<P> {
     /**
      * The Upward tasks map space.
      */
-    public static Map<String, Map<AsyncTask, List<AsyncTask>>> upwardTasksMapSpace = new ConcurrentHashMap<>();
+    public static Map<String, Map<AsyncTask<?,?>, List<AsyncTask<?,?>>>> upwardTasksMapSpace = new ConcurrentHashMap<>();
 
     /**
      * Instantiates a new Task trigger.
@@ -81,19 +80,19 @@ class TaskTrigger<P> {
         /**
          * Subtasks under a com.gobrs.async.com.gobrs.async.test.task
          */
-        Map<AsyncTask, List<AsyncTask>> downTasksMap = copyDependTasks(taskFlow.getDependsTasks());
+        Map<AsyncTask<?,?>, List<AsyncTask<?,?>>> downTasksMap = copyDependTasks(taskFlow.getDependsTasks());
 
         /**
          * The com.gobrs.async.com.gobrs.async.test.task on which a com.gobrs.async.com.gobrs.async.test.task depends
          */
-        Map<AsyncTask, List<AsyncTask>> upwardTasksMap = new HashMap<>();
+        Map<AsyncTask<?,?>, List<AsyncTask<?,?>>> upwardTasksMap = new HashMap<>();
 
-        for (AsyncTask task : downTasksMap.keySet()) {
+        for (AsyncTask<?,?> task : downTasksMap.keySet()) {
             upwardTasksMap.put(task, new ArrayList<>(1));
         }
 
-        for (AsyncTask task : downTasksMap.keySet()) {
-            for (AsyncTask depended : downTasksMap.get(task)) {
+        for (AsyncTask<?,?> task : downTasksMap.keySet()) {
+            for (AsyncTask<?,?> depended : downTasksMap.get(task)) {
                 upwardTasksMap.get(depended).add(task);
             }
         }
@@ -103,10 +102,10 @@ class TaskTrigger<P> {
         /**
          * com.gobrs.async.com.gobrs.async.test.task without any subtasks
          */
-        List<AsyncTask> noSubtasks = new ArrayList<>(1);
+        List<AsyncTask<?,?>> noSubtasks = new ArrayList<>(1);
 
-        for (AsyncTask task : downTasksMap.keySet()) {
-            List<AsyncTask> dTasks = downTasksMap.get(task);
+        for (AsyncTask<?,?> task : downTasksMap.keySet()) {
+            List<AsyncTask<?,?>> dTasks = downTasksMap.get(task);
             if (dTasks.isEmpty()) {
                 noSubtasks.add(task);
                 downTasksMap.get(task).add(assistantTask);
@@ -117,10 +116,10 @@ class TaskTrigger<P> {
         upwardTasksMap.put(assistantTask, noSubtasks);
         upwardTasksMapSpace.put(ruleName, upwardTasksMap);
         clear();
-        for (AsyncTask task : downTasksMap.keySet()) {
+        for (AsyncTask<?,?> task : downTasksMap.keySet()) {
             TaskActuator process;
             if (task != assistantTask) {
-                List<AsyncTask> circularDependency = upwardTasksMap.get(task).stream()
+                List<AsyncTask<?,?>> circularDependency = upwardTasksMap.get(task).stream()
                         .filter(x -> x.getName().equals(task.getName())).collect(Collectors.toList());
                 int upDepend = 0;
                 if (circularDependency.size() == 0) {
@@ -154,9 +153,9 @@ class TaskTrigger<P> {
         prepareTaskMapWrite.clear();
     }
 
-    private Map<AsyncTask, List<AsyncTask>> copyDependTasks(Map<AsyncTask, List<AsyncTask>> handlerMap) {
-        IdentityHashMap<AsyncTask, List<AsyncTask>> rt = new IdentityHashMap<>();
-        for (AsyncTask asyncTask : handlerMap.keySet()) {
+    private Map<AsyncTask<?,?>, List<AsyncTask<?,?>>> copyDependTasks(Map<AsyncTask<?,?>, List<AsyncTask<?,?>>> handlerMap) {
+        IdentityHashMap<AsyncTask<?,?>, List<AsyncTask<?,?>>> rt = new IdentityHashMap<>();
+        for (AsyncTask<?,?> asyncTask : handlerMap.keySet()) {
             rt.put(asyncTask, new ArrayList<>(handlerMap.get(asyncTask)));
         }
         return rt;
@@ -200,7 +199,7 @@ class TaskTrigger<P> {
      */
     TaskLoader trigger(AsyncParam<P> param, long timeout, Set<String> optionalTasks) {
 
-        IdentityHashMap<AsyncTask, TaskActuator> newProcessMap = new IdentityHashMap<>(prepareTaskMap.size());
+        IdentityHashMap<AsyncTask<?,?>, TaskActuator> newProcessMap = new IdentityHashMap<>(prepareTaskMap.size());
         /**
          * Create a com.gobrs.async.com.gobrs.async.test.task loader, A com.gobrs.async.com.gobrs.async.test.task flow corresponds to a taskLoader
          */
@@ -211,7 +210,7 @@ class TaskTrigger<P> {
 
         TaskSupport support = related(param, loader, threadPoolExecutor);
 
-        for (AsyncTask task : prepareTaskMap.keySet()) {
+        for (AsyncTask<?,?> task : prepareTaskMap.keySet()) {
             /**
              * clone Process for Thread isolation
              */
@@ -278,7 +277,7 @@ class TaskTrigger<P> {
          * @param depdending    The number of tasks to depend on
          * @param dependedTasks Array of dependent tasks
          */
-        TerminationTask(AsyncTask<P, R> handler, int depdending, List<AsyncTask> dependedTasks) {
+        TerminationTask(AsyncTask<P, R> handler, int depdending, List<AsyncTask<?,?>> dependedTasks) {
             super(handler, depdending, dependedTasks);
         }
 

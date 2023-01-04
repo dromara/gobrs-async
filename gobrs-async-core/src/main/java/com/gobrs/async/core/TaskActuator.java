@@ -40,7 +40,7 @@ import static com.gobrs.async.core.timer.GobrsFutureTask.STOP_STAMP;
  * The type Task actuator.
  */
 @Slf4j
-public class TaskActuator implements Callable, Cloneable {
+public class TaskActuator<Param, Result> implements Callable, Cloneable {
 
     /**
      * The Logger.
@@ -65,7 +65,7 @@ public class TaskActuator implements Callable, Cloneable {
     /**
      * depend com.gobrs.async.com.gobrs.async.test.task
      */
-    public final List<AsyncTask> subTasks;
+    public final List<AsyncTask<?, ?>> subTasks;
 
     /**
      * The Param.
@@ -74,7 +74,7 @@ public class TaskActuator implements Callable, Cloneable {
 
     private Lock lock;
 
-    private Map<AsyncTask, List<AsyncTask>> upwardTasksMap;
+    private Map<AsyncTask<?, ?>, List<AsyncTask<?, ?>>> upwardTasksMap;
 
 
     /**
@@ -84,7 +84,7 @@ public class TaskActuator implements Callable, Cloneable {
      * @param depends   the depends
      * @param subTasks  the sub tasks
      */
-    TaskActuator(AsyncTask asyncTask, int depends, List<AsyncTask> subTasks) {
+    TaskActuator(AsyncTask<Param, Result> asyncTask, int depends, List<AsyncTask<?, ?>> subTasks) {
         this.task = asyncTask;
         this.upstreamDepdends = depends > 1 & task.isAny() ? 1 : depends;
         this.subTasks = subTasks;
@@ -98,7 +98,7 @@ public class TaskActuator implements Callable, Cloneable {
      * @param subTasks       the sub tasks
      * @param upwardTasksMap the upward tasks map
      */
-    TaskActuator(AsyncTask asyncTask, int depends, List<AsyncTask> subTasks, Map<AsyncTask, List<AsyncTask>> upwardTasksMap) {
+    TaskActuator(AsyncTask<Param, Result> asyncTask, int depends, List<AsyncTask<?, ?>> subTasks, Map<AsyncTask<?, ?>, List<AsyncTask<?, ?>>> upwardTasksMap) {
         this.task = asyncTask;
         this.upstreamDepdends = depends > 1 & task.isAny() ? 1 : depends;
         this.subTasks = subTasks;
@@ -241,7 +241,7 @@ public class TaskActuator implements Callable, Cloneable {
      *
      * @param taskLoader
      */
-    private void futureStopRelease(Object parameter, TaskLoader taskLoader) throws Exception {
+    private void futureStopRelease(Object parameter, TaskLoader<Param, Result> taskLoader) throws Exception {
         Future<?> future = taskLoader.getFutureTasksMap().get(task);
         if (future instanceof GobrsFutureTask) {
             Integer syncState = ((GobrsFutureTask<?>) future).getSyncState();
@@ -267,7 +267,7 @@ public class TaskActuator implements Callable, Cloneable {
     }
 
     private void releaseFutureTasks() {
-        Map<AsyncTask<?, ?>, Future<?>> futureTasksMap = support.getTaskLoader().getFutureTasksMap();
+        Map<AsyncTask<Param, Result>, Future<?>> futureTasksMap = support.getTaskLoader().getFutureTasksMap();
         futureTasksMap.remove(task);
     }
 
@@ -276,7 +276,7 @@ public class TaskActuator implements Callable, Cloneable {
         return timerListeners.get(task.getClass());
     }
 
-    private boolean executeNecessary(Object parameter, AsyncTask task) {
+    private boolean executeNecessary(Object parameter, AsyncTask<Object, ?> task) {
         return task.necessary(parameter, support) && (Objects.isNull(support.getResultMap().get(task.getClass())));
     }
 
@@ -379,9 +379,9 @@ public class TaskActuator implements Callable, Cloneable {
 
         if (task.isExclusive()) {
 
-            List<AsyncTask> asyncTaskList = upwardTasksMap.get(task);
+            List<AsyncTask<?, ?>> asyncTaskList = upwardTasksMap.get(task);
 
-            Map<AsyncTask<?, ?>, Future<?>> futureMaps = support.getTaskLoader().getFutureTasksMap();
+            Map<AsyncTask<Param, Result>, Future<?>> futureMaps = support.getTaskLoader().getFutureTasksMap();
 
             futureMaps.forEach((x, y) -> {
 
@@ -399,15 +399,15 @@ public class TaskActuator implements Callable, Cloneable {
      *
      * @return
      */
-    private Object getParameter(AsyncTask task) {
+    private Object getParameter(AsyncTask<Param, Result> task) {
 
         Object parameter = param.get();
 
         if (parameter instanceof Map) {
 
-            Object param = ((Map<?, ?>) parameter).get(task.getClass());
+            Object param = ((Map<Param, Result>) parameter).get(task.getClass());
 
-            return param == null ? ((Map<?, ?>) parameter).get(task.getClass().getName()) : param;
+            return param == null ? ((Map<Param, Result>) parameter).get(task.getClass().getName()) : param;
         }
         return parameter;
     }
@@ -511,7 +511,7 @@ public class TaskActuator implements Callable, Cloneable {
             for (int i = 0; i < subTasks.size(); i++) {
                 TaskActuator process = taskLoader
                         .getProcess(subTasks.get(i));
-                Set<AsyncTask> optionalTasks = taskLoader.getOptionalTasks();
+                Set<AsyncTask<?, ?>> optionalTasks = taskLoader.getOptionalTasks();
 
                 boolean continueExec = Optimal.ifContinue(optionalTasks, taskLoader, process);
 
@@ -525,7 +525,7 @@ public class TaskActuator implements Callable, Cloneable {
                 if (process.task.isAnyCondition()) {
                     if (process.releasingDependency() == 0 || conditionResult.getState()) {
                         synchronized (process.task) {
-                            Boolean aBoolean = taskLoader.anyConditionProx.get(process);
+                            Boolean aBoolean = (Boolean) taskLoader.anyConditionProx.get(process);
                             if (Objects.isNull(aBoolean)) {
                                 taskLoader.anyConditionProx.put(process, true);
                                 doTask(taskLoader, process, optionalTasks, isCycleThread(i, process));
@@ -561,12 +561,12 @@ public class TaskActuator implements Callable, Cloneable {
      * @param process
      * @param optionalTasks
      */
-    private void doTask(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks, boolean cycleThread) throws Exception {
+    private void doTask(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask<?, ?>> optionalTasks, boolean cycleThread) throws Exception {
         process(taskLoader, process, optionalTasks, cycleThread);
     }
 
 
-    private void process(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask> optionalTasks, boolean cycleThread) throws Exception {
+    private void process(TaskLoader taskLoader, TaskActuator process, Set<AsyncTask<?, ?>> optionalTasks, boolean cycleThread) throws Exception {
         if (Objects.nonNull(optionalTasks)) {
             if (optionalTasks.contains(process.getTask())) {
                 doProcess(taskLoader, process, cycleThread);
@@ -653,7 +653,7 @@ public class TaskActuator implements Callable, Cloneable {
             /**
              * Get the parent .com.gobrs.async.test.task that the com.gobrs.async.test.task depends on
              */
-            List<AsyncTask> asyncTaskList = upwardTasksMap.get(this.task);
+            List<AsyncTask<?, ?>> asyncTaskList = upwardTasksMap.get(this.task);
             if (asyncTaskList == null || asyncTaskList.isEmpty()) {
                 return;
             }
@@ -669,7 +669,7 @@ public class TaskActuator implements Callable, Cloneable {
      * @param asyncTasks
      * @param support
      */
-    private void rollback(List<AsyncTask> asyncTasks, TaskSupport support) {
+    private void rollback(List<AsyncTask<?, ?>> asyncTasks, TaskSupport support) {
         for (AsyncTask asyncTask : asyncTasks) {
             try {
                 if (support.getParam() instanceof Map) {
@@ -684,7 +684,7 @@ public class TaskActuator implements Callable, Cloneable {
              * Tasks that the parent com.gobrs.async.com.gobrs.async.test.task depends on recursively roll back
              *
              */
-            List<AsyncTask> asyncTaskList = upwardTasksMap.get(asyncTask);
+            List<AsyncTask<?, ?>> asyncTaskList = upwardTasksMap.get(asyncTask);
             rollback(asyncTaskList, support);
         }
     }
@@ -695,7 +695,7 @@ public class TaskActuator implements Callable, Cloneable {
      *
      * @return the com.gobrs.async.com.gobrs.async.test.task
      */
-    public AsyncTask getTask() {
+    public AsyncTask<Param, Result> getTask() {
         return task;
     }
 
@@ -772,7 +772,7 @@ public class TaskActuator implements Callable, Cloneable {
      * @param asyncTask the async com.gobrs.async.com.gobrs.async.test.task
      * @return the error com.gobrs.async.callback
      */
-    public ErrorCallback errorCallback(Object result, Exception e, TaskSupport support, AsyncTask asyncTask) {
+    public ErrorCallback errorCallback(Object result, Exception e, TaskSupport support, AsyncTask<Param, Result> asyncTask) {
         return new ErrorCallback(param, e, support, asyncTask);
     }
 

@@ -1,6 +1,8 @@
 package com.gobrs.async.core.autoconfig;
 
 import com.gobrs.async.core.*;
+import com.gobrs.async.core.cache.GCache;
+import com.gobrs.async.core.cache.GCacheManager;
 import com.gobrs.async.core.property.GobrsAsyncProperties;
 import com.gobrs.async.core.callback.*;
 import com.gobrs.async.core.config.*;
@@ -18,8 +20,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
+import java.util.Map;
 
 import static com.gobrs.async.core.autoconfig.GobrsAutoConfiguration.GOBRS_NAMESPACE;
 
@@ -100,6 +104,11 @@ public class GobrsAutoConfiguration {
     @ConditionalOnMissingBean(value = RuleEngine.class)
     public RuleEngine ruleEngine(GobrsConfig gobrsConfig, GobrsAsync gobrsAsync) {
         return new RuleParseEngine(gobrsConfig, gobrsAsync);
+    }
+
+    @Bean
+    public GCacheManager cacheManager(@Nullable Map<String, GCache<?, ?>> caches) {
+        return new GCacheManager(caches);
     }
 
     /**

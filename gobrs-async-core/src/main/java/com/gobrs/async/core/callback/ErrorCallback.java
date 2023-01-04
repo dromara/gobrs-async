@@ -31,7 +31,7 @@ public class ErrorCallback<Param> {
     /**
      * The Task.
      */
-    AsyncTask task;
+    AsyncTask<?,?> task;
 
 
     /**
@@ -42,7 +42,7 @@ public class ErrorCallback<Param> {
      * @param support   the support
      * @param task      the com.gobrs.async.com.gobrs.async.test.task
      */
-    public ErrorCallback(AsyncParam param, Exception exception, TaskSupport support, AsyncTask task) {
+    public ErrorCallback(AsyncParam param, Exception exception, TaskSupport support, AsyncTask<?,?> task) {
         this.param = param;
         this.exception = exception;
         this.support = support;
@@ -108,7 +108,7 @@ public class ErrorCallback<Param> {
      *
      * @return the com.gobrs.async.com.gobrs.async.test.task
      */
-    public AsyncTask getTask() {
+    public AsyncTask<?,?> getTask() {
         return task;
     }
 
@@ -117,7 +117,7 @@ public class ErrorCallback<Param> {
      *
      * @param task the com.gobrs.async.com.gobrs.async.test.task
      */
-    public void setTask(AsyncTask task) {
+    public void setTask(AsyncTask<?,?> task) {
         this.task = task;
     }
 

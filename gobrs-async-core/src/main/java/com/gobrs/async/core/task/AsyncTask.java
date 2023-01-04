@@ -32,14 +32,14 @@ import static com.gobrs.async.core.common.util.ExceptionUtil.excludeInterceptExc
  * @param <Param>  the type parameter
  * @param <Result> the type parameter
  * @program: gobrs -async-starter
- * @ClassName AsyncTask
+ * @ClassName AsyncTask<?, ?>
  * @description:
  * @author: sizegang
  * @create: 2022 -03-16
  */
 @Data
 @Slf4j
-public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Result> {
+public abstract class AsyncTask<Param, Result> implements GobrsTask<Param> {
 
     /**
      * 任务名称
@@ -166,6 +166,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         }
         return e;
     }
+
 
 
     /**

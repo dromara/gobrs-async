@@ -48,7 +48,7 @@ import static com.gobrs.async.core.task.ReUsing.reusing;
  * @create: 2022 -03-16
  */
 @Slf4j
-public class TaskLoader {
+public class TaskLoader<Param,Result> {
     /**
      * Interruption code
      */
@@ -74,7 +74,7 @@ public class TaskLoader {
     /**
      * The Process map.
      */
-    public final Map<AsyncTask, TaskActuator> processMap;
+    public final Map<AsyncTask<?,?>, TaskActuator> processMap;
 
     /**
      * The Affir count.
@@ -102,7 +102,7 @@ public class TaskLoader {
     /**
      * The Futures async.
      */
-    public final Map<AsyncTask<?, ?>, Future<?>> futureTasksMap = new ConcurrentHashMap<>();
+    public final Map<AsyncTask<?,?>, Future<?>> futureTasksMap = new ConcurrentHashMap<>();
 
     /**
      * The Timer listeners.
@@ -121,14 +121,14 @@ public class TaskLoader {
      * <p>
      * 那么 可以通过设置 选择B要执行，框架会自动选择B所依赖的所有任务执行完成之后 执行B 然后结束 返回结果
      */
-    private Set<AsyncTask> optionalTasks;
+    private Set<AsyncTask<?,?>> optionalTasks;
 
     private String ruleName;
 
     /**
      * The Any condition prox.
      */
-    public Map<TaskActuator, Boolean> anyConditionProx = new ConcurrentHashMap();
+    public Map<TaskActuator<Param,Result>, Boolean> anyConditionProx = new ConcurrentHashMap();
 
     /**
      * Instantiates a new Task loader.
@@ -138,7 +138,7 @@ public class TaskLoader {
      * @param processMap      the process map
      * @param timeout         the timeout
      */
-    TaskLoader(String ruleName, ExecutorService executorService, Map<AsyncTask, TaskActuator> processMap,
+    TaskLoader(String ruleName, ExecutorService executorService, Map<AsyncTask<?,?>, TaskActuator> processMap,
                long timeout) {
         this.ruleName = ruleName;
         this.executorService = executorService;
@@ -217,7 +217,7 @@ public class TaskLoader {
     private List<TaskActuator> preOptimal(List<TaskActuator> begins) {
         if (!CollectionUtils.isEmpty(optionalTasks)) {
             Optimal.ifOptimal(optionalTasks, processMap, assistantTask);
-            Map<String, AsyncTask> optMap = optionalTasks.stream().collect(Collectors.toMap(AsyncTask::getName, Function.identity()));
+            Map<String, AsyncTask<?,?>> optMap = optionalTasks.stream().collect(Collectors.toMap(AsyncTask::getName, Function.identity()));
             begins = begins.stream().filter(x -> optMap.get(x.getTask().getName()) != null).collect(Collectors.toList());
         }
         return begins;
@@ -306,10 +306,10 @@ public class TaskLoader {
         taskLock.lock();
         try {
             canceled = true;
-            Set<Map.Entry<AsyncTask<?, ?>, Future<?>>> entries =
+            Set<Map.Entry<AsyncTask<?,?>, Future<?>>> entries =
                     futureTasksMap.entrySet();
             boolean interruptionImmediate = ConfigManager.getRule(ruleName).isInterruptionImmediate();
-            for (Map.Entry<AsyncTask<?, ?>, Future<?>> entry : entries) {
+            for (Map.Entry<AsyncTask<?,?>, Future<?>> entry : entries) {
                 entry.getValue().cancel(interruptionImmediate);
             }
         } finally {
@@ -355,7 +355,7 @@ public class TaskLoader {
      * @param asyncTask the async task
      * @return the process
      */
-    TaskActuator getProcess(AsyncTask asyncTask) {
+    TaskActuator getProcess(AsyncTask<?,?> asyncTask) {
         return processMap.get(asyncTask);
     }
 
@@ -467,9 +467,9 @@ public class TaskLoader {
      * @param subtasks the subtasks
      * @throws Exception the exception
      */
-    public void stopSingleTaskLine(List<AsyncTask> subtasks) throws Exception {
-        TaskActuator taskActuator = processMap.get(assistantTask);
-        for (AsyncTask subtask : subtasks) {
+    public void stopSingleTaskLine(List<AsyncTask<?,?>> subtasks) throws Exception {
+        TaskActuator<Param,Result> taskActuator = processMap.get(assistantTask);
+        for (AsyncTask<?,?> subtask : subtasks) {
             rtDept(subtask, taskActuator);
         }
     }
@@ -482,7 +482,7 @@ public class TaskLoader {
      * @param terminationTask the terminationTask
      * @throws Exception the exception
      */
-    public void rtDept(AsyncTask task, TaskActuator terminationTask) throws Exception {
+    public void rtDept(AsyncTask<?,?> task, TaskActuator terminationTask) throws Exception {
         if (task instanceof TaskTrigger.AssistantTask) {
             terminationTask.releasingDependency();
             if (!terminationTask.hasUnsatisfiedDependcies()) {
@@ -579,7 +579,7 @@ public class TaskLoader {
      *
      * @return the optional tasks
      */
-    public Set<AsyncTask> getOptionalTasks() {
+    public Set<AsyncTask<?,?>> getOptionalTasks() {
         return optionalTasks;
     }
 
@@ -588,7 +588,7 @@ public class TaskLoader {
      *
      * @param optionalTasks the optional tasks
      */
-    public void setOptionalTasks(Set<AsyncTask> optionalTasks) {
+    public void setOptionalTasks(Set<AsyncTask<?,?>> optionalTasks) {
         this.optionalTasks = optionalTasks;
     }
 
@@ -642,7 +642,7 @@ public class TaskLoader {
      *
      * @return the future tasks map
      */
-    public Map<AsyncTask<?, ?>, Future<?>> getFutureTasksMap() {
+    public Map<AsyncTask<?,?>, Future<?>> getFutureTasksMap() {
         return futureTasksMap;
     }
 

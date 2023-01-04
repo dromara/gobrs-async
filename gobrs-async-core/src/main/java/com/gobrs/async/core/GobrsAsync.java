@@ -40,7 +40,7 @@ public class GobrsAsync {
      * @param tasks    the tasks
      * @return the com.gobrs.async.com.gobrs.async.test.task receive
      */
-    public TaskReceive begin(String ruleName, List<AsyncTask<?, ?>> pioneer, boolean reload, AsyncTask<?, ?>... tasks) {
+    public TaskReceive begin(String ruleName, List<AsyncTask<?,?>> pioneer, boolean reload, AsyncTask<?,?>... tasks) {
         return taskFlow.get(ruleName).start(tasks);
     }
 
@@ -52,7 +52,7 @@ public class GobrsAsync {
      * @param reload     the reload
      * @return com.gobrs.async.com.gobrs.async.test.task receive
      */
-    public TaskReceive begin(String ruleName, List<AsyncTask<?, ?>> asyncTasks, boolean reload) {
+    public TaskReceive begin(String ruleName, List<AsyncTask<?,?>> asyncTasks, boolean reload) {
         if (Objects.isNull(taskFlow)) {
             loadTaskFlow(ruleName);
         }
@@ -73,7 +73,7 @@ public class GobrsAsync {
      * @param asyncTasks the async tasks
      * @return the com.gobrs.async.com.gobrs.async.test.task receive
      */
-    public TaskReceive begin(String ruleName, List<AsyncTask<?, ?>> asyncTasks) {
+    public TaskReceive begin(String ruleName, List<AsyncTask<?,?>> asyncTasks) {
         return begin(ruleName, asyncTasks, false);
     }
 
@@ -84,7 +84,7 @@ public class GobrsAsync {
      * @param tasks    the tasks
      * @return com.gobrs.async.com.gobrs.async.test.task receive
      */
-    public TaskReceive after(String ruleName, AsyncTask... tasks) {
+    public TaskReceive after(String ruleName, AsyncTask<?,?>... tasks) {
         return taskFlow.get(ruleName).after(tasks);
     }
 
