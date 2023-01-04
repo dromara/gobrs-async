@@ -41,12 +41,4 @@ public @interface MethodTask {
      * @return the invoke
      */
     MethodConfig config() default @MethodConfig();
-
-
-    /**
-     * Transaction com.gobrs.async.com.gobrs.async.test.task
-     *
-     * @return boolean boolean
-     */
-    boolean callback() default false;
 }

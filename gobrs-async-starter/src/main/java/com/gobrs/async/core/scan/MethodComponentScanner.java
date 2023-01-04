@@ -130,6 +130,8 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
         methodTaskAdaptation.setFailSubExec(config.failSubExec());
 
         methodTaskAdaptation.setExclusive(config.failSubExec());
+
+        methodTaskAdaptation.setDesc(config.desc());
     }
 
 

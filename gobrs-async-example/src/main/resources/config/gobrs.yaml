@@ -1,11 +1,15 @@
 gobrs:
   async:
     config:
-      timeout-core-size: 200
+      ## 如果规则没有制定 线程池 则使用 统一的线程池配置 如果通过 API 的方式动态更新了线程池 则使用动态更新 替换配置文件线程池配置 参见： ThreadPoolConfig
+      thread-pool:
+        core-pool-size: 1000
+        max-pool-size: 2000
       rules:
         - name: "performance"
           content: "taskA->taskB,TaskC->taskD->taskE,taskF"
-
+        - name: "methodTask"
+          content: "task1->task2,task3->task4:any"
         # 规则 是数组类型的 多组规则
         - name: "general" # 猜想下面的流程 gobrs 会开启几个线程？ 注意看打印的日志哦～
           content: "AService->BService->FService,CService,EService->GService,HService" # AService: 300ms + FService: 2000ms + GService: 100  = 2400ms
@@ -14,6 +18,10 @@ gobrs:
           logConfig:
             costLogabled: true # 开启任务耗时打印 log日志级别需要为 error 默认true
             errLogabled: true # 开启任务异常打印 默认true
+        # stop Async
+        - name: "stopAsyncRule"
+          content: "stopAsyncTaskA,stopAsyncTaskB,stopAsyncTaskC;stopAsyncTaskD->stopAsyncTaskE->stopAsyncTaskF"
+          catchable: true
 
         - name: "anyConditionGeneral"
           content: "AServiceCondition,BServiceCondition,CServiceCondition->DServiceCondition"
@@ -30,9 +38,12 @@ gobrs:
         - name: "retryRule"
           content: "caseRetryTaskA->caseRetryTaskB->caseRetryTaskC->caseRetryTaskD->caseRetryTaskE"
 
-
         - name: "optionalRule"
           content: "caseOptionalTaskA->caseOptionalTaskB->caseOptionalTaskC,caseOptionalTaskD->caseOptionalTaskE->caseOptionalTaskF"
+
+        - name: "transactionRule"
+          content: "transactionTaskA->transactionTaskB->transactionTaskC->transactionTaskD"
+          transaction: true
 
         ## 单一任务超时时间
         - name: "timeoutRule"
@@ -40,21 +51,29 @@ gobrs:
         # 官方场景一 https://async.sizegang.cn/pages/2f844b/#%E5%9C%BA%E6%99%AF%E4%B8%80
         - name: "caseOne"
           content: "caseOneTaskA->caseOneTaskB,caseOneTaskC,caseOneTaskD"
+          threadPool:
+            corePoolSize: 10
+            maxPoolSize: 20
 
         # 官方场景二 https://async.sizegang.cn/pages/2f844b/#%E5%9C%BA%E6%99%AF%E4%BA%8C
         - name: "caseTwo"
           content: "caseTwoTaskA->caseTwoTaskB->caseTwoTaskC,caseTwoTaskD"
+          threadPool:
+            corePoolSize: 30
+            maxPoolSize: 40
         # 官方场景三 https://async.sizegang.cn/pages/2f844b/#%E5%9C%BA%E6%99%AF%E4%B8%89
         - name: "caseThree"
           content: "caseThreeTaskA->caseThreeTaskB,caseThreeTaskC,caseFourTaskD->caseThreeTaskG;
                     caseThreeTaskA->caseThreeTaskE,caseThreeTaskF->caseThreeTaskG;"
         # 官方场景四 https://async.sizegang.cn/pages/2f844b/#%E5%9C%BA%E6%99%AF%E5%9B%9B
         - name: "caseFour"
-          content: "caseFourTaskA->caseFourTaskB->caseFourTaskC,caseFourTaskD,caseFourTaskE;
-                    caseFourTaskA->caseFourTaskH->caseFourTaskI,caseFourTaskJ,caseFourTaskK;"
+          content: "caseFourTaskA->caseFourTaskB->caseFourTaskC,caseFourTaskD,caseFourTaskE->caseFourTaskK;
+                    caseFourTaskA->caseFourTaskH->caseFourTaskI,caseFourTaskJ;"
           logConfig:
             costLogabled: false # 关闭耗时任务打印
+          catchable: false
         # 官方场景五 https://async.sizegang.cn/pages/2f844b/#%E5%9C%BA%E6%99%AF%E4%BA%94
+
         - name: "caseFive"
           content: "caseFourTaskA,caseFourTaskB,caseFourTaskC->caseFourTaskD:any:exclusive" # any 任意一个任务（A、B、C）执行完成后 则执行D任务
           # exclusive 避免任务执行浪费 所以 D执行完成之后 会主动 中断 未完成的任务
@@ -62,6 +81,8 @@ gobrs:
         - name: "taskInterrupt"
           content: "interruptTaskA->interruptTaskB;interruptTaskC->interruptTaskD"
           task-interrupt: true # 局部异常是否打断主流程 默认 false
+          interruptionImmediate: false # 异常中断后 是否立即中断 默认true
+          catchable: false # 异常抛出到main线程 适合开发者手动捕获流程内部的异常
         # 获取非强依赖任务的返回结果  如下： C任务获取A任务的返回结果， 从任务配置上看 C并不需要A 执行完成后再执行C 所有 通过Future方式 C有能力获取到A的返回结果
         - name: "futureTaskRule"
           content: "futureTaskA->futureTaskB;futureTaskC->futureTaskD"

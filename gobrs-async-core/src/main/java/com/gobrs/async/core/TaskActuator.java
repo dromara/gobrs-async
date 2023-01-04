@@ -427,7 +427,7 @@ public class TaskActuator<Param, Result> implements Callable, Cloneable {
 
             Object param = ((Map<Param, Result>) parameter).get(task.getClass());
 
-            return param == null ? (Param) ((Map<Param, Result>) parameter).get(task.getClass().getName()) : (Param) param;
+            return param == null ? (Param) ((Map<Param, Result>) parameter).get(task.getName()) : (Param) param;
         }
         return parameter;
     }
