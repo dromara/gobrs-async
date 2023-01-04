@@ -17,14 +17,14 @@ public class GCacheManager {
     /**
      * The Caches.
      */
-    Map<Integer, GCache<?, ?>> CACHES = new ConcurrentHashMap<>();
+    Map<Integer, GCache<?, ?, ?>> CACHES = new ConcurrentHashMap<>();
 
     /**
      * Instantiates a new G cache manager.
      *
      * @param caches the caches
      */
-    public GCacheManager(Map<String, GCache<?, ?>> caches) {
+    public GCacheManager(Map<String, GCache<?, ?, ?>> caches) {
         if (caches == null) {
             return;
         }

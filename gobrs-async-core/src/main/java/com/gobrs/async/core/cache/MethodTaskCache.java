@@ -1,6 +1,10 @@
 package com.gobrs.async.core.cache;
 
 import com.gobrs.async.core.common.enums.GCacheEnum;
+import com.gobrs.async.core.task.MethodTaskAdapter;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The type Method task cache.
@@ -11,21 +15,28 @@ import com.gobrs.async.core.common.enums.GCacheEnum;
  * @author: sizegang
  * @create: 2023 -01-04
  */
-public class MethodTaskCache extends BaseCache<String, Object> {
+public class MethodTaskCache extends BaseCache<String, MethodTaskAdapter, Map<String, MethodTaskAdapter>> {
+
+    private Map<String, MethodTaskAdapter> METHOD_TASK_CACHE = new ConcurrentHashMap<>();
 
 
     @Override
-    public Object getCache(String v) {
-        return null;
+    public MethodTaskAdapter getCache(String k) {
+        return METHOD_TASK_CACHE.get(k);
     }
 
     @Override
-    public void setCache(String s, Object o) {
-
+    public void setCache(String s, MethodTaskAdapter o) {
+        METHOD_TASK_CACHE.put(s, o);
     }
 
     @Override
     public Integer getType() {
         return GCacheEnum.METHOD_TASK.getType();
+    }
+
+    @Override
+    public Map<String, MethodTaskAdapter> instance() {
+        return METHOD_TASK_CACHE;
     }
 }

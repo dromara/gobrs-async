@@ -58,6 +58,12 @@ public @interface Invoke {
     String necessary() default StringUtils.EMPTY;
 
     /**
+     * Task string.
+     *
+     * @return the string
+     */
+    String task() default StringUtils.EMPTY;
+    /**
      * Rollback string.
      *
      * @return the string

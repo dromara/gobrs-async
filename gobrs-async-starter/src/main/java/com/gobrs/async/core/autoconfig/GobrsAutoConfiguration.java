@@ -102,12 +102,12 @@ public class GobrsAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean(value = RuleEngine.class)
-    public RuleEngine ruleEngine(GobrsConfig gobrsConfig, GobrsAsync gobrsAsync) {
-        return new RuleParseEngine(gobrsConfig, gobrsAsync);
+    public RuleEngine ruleEngine(GobrsConfig gobrsConfig, GobrsAsync gobrsAsync, GCacheManager cacheManager) {
+        return new RuleParseEngine(gobrsConfig, gobrsAsync, cacheManager);
     }
 
     @Bean
-    public GCacheManager cacheManager(@Nullable Map<String, GCache<?, ?>> caches) {
+    public GCacheManager cacheManager(@Nullable Map<String, GCache<?, ?, ?>> caches) {
         return new GCacheManager(caches);
     }
 

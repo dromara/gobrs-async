@@ -11,6 +11,6 @@ package com.gobrs.async.core.cache;
  * @author: sizegang
  * @create: 2023 -01-04
  */
-public abstract class BaseCache<K, V> implements GCache<K, V> {
+public abstract class BaseCache<K, V, I> implements GCache<K, V, I> {
 
 }

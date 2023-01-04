@@ -11,15 +11,15 @@ package com.gobrs.async.core.cache;
  * @author: sizegang
  * @create: 2023 -01-04
  */
-public interface GCache<K, V> {
+public interface GCache<K, V, I> {
 
     /**
      * Gets cache.
      *
-     * @param v the v
+     * @param k the k
      * @return the cache
      */
-    V getCache(K v);
+    V getCache(K k);
 
     /**
      * Sets cache.
@@ -29,7 +29,13 @@ public interface GCache<K, V> {
      */
     void setCache(K k, V v);
 
+    /**
+     * Gets type.
+     *
+     * @return the type
+     */
     Integer getType();
 
+    I instance();
 
 }

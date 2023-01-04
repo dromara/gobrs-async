@@ -3,6 +3,7 @@ package com.gobrs.async.core.engine;
 import com.gobrs.async.core.GobrsAsync;
 import com.gobrs.async.core.TaskReceive;
 import com.gobrs.async.core.anno.Task;
+import com.gobrs.async.core.cache.GCacheManager;
 import com.gobrs.async.core.common.def.Constant;
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
 import com.gobrs.async.core.config.GobrsAsyncRule;
@@ -11,7 +12,6 @@ import com.gobrs.async.core.holder.BeanHolder;
 import com.gobrs.async.core.task.AsyncTask;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Resource;
 import java.util.*;
 import java.util.function.Function;
 
@@ -34,16 +34,20 @@ public class RuleParseEngine extends AbstractEngine {
 
     private GobrsAsync gobrsAsync;
 
+    private GCacheManager gCacheManager;
+
 
     /**
      * Instantiates a new Rule parse engine.
      *
-     * @param gobrsConfig the gobrs config
-     * @param gobrsAsync  the gobrs async
+     * @param gobrsConfig   the gobrs config
+     * @param gobrsAsync    the gobrs async
+     * @param gCacheManager the g cache manager
      */
-    public RuleParseEngine(GobrsConfig gobrsConfig, GobrsAsync gobrsAsync) {
+    public RuleParseEngine(GobrsConfig gobrsConfig, GobrsAsync gobrsAsync, GCacheManager gCacheManager) {
         this.gobrsConfig = gobrsConfig;
         this.gobrsAsync = gobrsAsync;
+        this.gCacheManager = gCacheManager;
     }
 
     @Override
@@ -126,7 +130,6 @@ public class RuleParseEngine extends AbstractEngine {
                 taskReceive.refresh(asyncTasks);
 
             } else {
-
                 EngineExecutor.getWrapperDepend(cacheTaskWrappers, taskBean, taskReceive, true);
             }
         }
@@ -231,7 +234,18 @@ public class RuleParseEngine extends AbstractEngine {
          * @return the bean
          */
         public static Object getBean(String bean) {
-            return Optional.ofNullable(BeanHolder.getBean(bean)).orElseThrow(() -> new RuntimeException("bean not found, name is " + bean));
+            Object b = null;
+
+            try {
+                b = BeanHolder.getBean(bean);
+            } catch (Exception exception) {
+
+
+
+            } finally {
+                return Optional.ofNullable(b).orElseThrow(() -> new RuntimeException("bean not found, name is " + bean));
+
+            }
         }
 
         /**

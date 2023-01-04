@@ -71,7 +71,7 @@ public class RulePostProcessor implements ApplicationListener<ApplicationReadyEv
                     gobrsAsync.readyTo(rule.getName());
                 }
             } catch (Exception exception) {
-                logger.error("RulePostProcessor parse error{}", exception);
+                logger.error("RulePostProcessor parse error ", exception);
                 throw exception;
             }
             GobrsPrint.printBanner();
