@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static com.gobrs.async.core.common.domain.GobrsTaskMethodEnum.*;
 
@@ -37,21 +38,26 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
     MethodTask methodTask;
 
     @Override
-    public Object task(Object o, TaskSupport support) {
+    public Object task(Object parameter, TaskSupport support) {
         MethodTaskMatch match = PARAMETERS_CACHE.get(TASK.getMethod());
         if (Objects.isNull(match)) {
             throw new AsyncTaskNotFoundException(String.format(" MethodTask not found %s", getName()));
         }
-        return ProxyUtil.invokeMethod(match.getMethod(), proxy, match.getParameters());
+        return ProxyUtil.invokeMethod(match.getMethod(), proxy, MTaskContext.builder().param(parameter).support(support).build());
     }
 
     @Override
-    public boolean necessary(Object o, TaskSupport support) {
+    public boolean necessary(Object parameter, TaskSupport support) {
         MethodTaskMatch match = PARAMETERS_CACHE.get(NECESSARY.getMethod());
         if (Objects.isNull(match)) {
             return DefaultConfig.TASK_NECESSARY;
         }
-        return (Boolean) doProxy(match);
+        Optional<Object> o = Optional.ofNullable(doProxy(match, parameter));
+        if (o.isPresent()) {
+            return (Boolean) o.get();
+        }
+        return true;
+
     }
 
     @Override
@@ -61,11 +67,11 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
             super.onFail(support, exception);
             return;
         }
-        doProxy(match);
+        doProxy(match, support.getParam());
     }
 
-    private Object doProxy(MethodTaskMatch match) {
-        return ProxyUtil.invokeMethod(match.getMethod(), proxy, match.getParameters());
+    private Object doProxy(MethodTaskMatch match, Object parameter) {
+        return ProxyUtil.invokeMethod(match.getMethod(), proxy, parameter);
     }
 
     @Override
@@ -75,26 +81,26 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
             super.onSuccess(support);
             return;
         }
-        doProxy(match);
+        doProxy(match, support.getParam());
     }
 
     @Override
-    public void prepare(Object o) {
+    public void prepare(Object parameter) {
         MethodTaskMatch match = PARAMETERS_CACHE.get(PREPARE.getMethod());
         if (Objects.isNull(match)) {
-            super.prepare(o);
+            super.prepare(parameter);
             return;
         }
-        doProxy(match);
+        doProxy(match, parameter);
     }
 
     @Override
-    public void rollback(Object o) {
+    public void rollback(Object parameter) {
         MethodTaskMatch match = PARAMETERS_CACHE.get(ROLLBACK.getMethod());
         if (Objects.isNull(match)) {
-            super.rollback(o);
+            super.rollback(parameter);
             return;
         }
-        doProxy(match);
+        doProxy(match, parameter);
     }
 }

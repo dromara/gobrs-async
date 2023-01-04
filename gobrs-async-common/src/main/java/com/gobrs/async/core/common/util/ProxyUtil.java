@@ -1,9 +1,9 @@
 package com.gobrs.async.core.common.util;
 
+import com.gobrs.async.core.common.exception.InvokeMethodTaskException;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 
 /**
  * The type Proxy util.
@@ -25,7 +25,12 @@ public class ProxyUtil {
      * @param parameters the parameters
      * @return the object
      */
-    public static Object invokeMethod(Method method, Object target, Parameter[] parameters) {
-        return ReflectionUtils.invokeMethod(method, target, parameters);
+    public static Object invokeMethod(Method method, Object target, Object parameters) {
+        try {
+            return ReflectionUtils.invokeMethod(method, target, parameters);
+        } catch (Exception exception) {
+            new InvokeMethodTaskException(String.format("task %s invoke exception", method.getName()), exception);
+        }
+        return null;
     }
 }

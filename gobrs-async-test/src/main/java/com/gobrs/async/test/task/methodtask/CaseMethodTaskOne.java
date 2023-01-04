@@ -4,6 +4,7 @@ import com.gobrs.async.core.anno.Invoke;
 import com.gobrs.async.core.anno.MethodComponent;
 import com.gobrs.async.core.anno.MethodConfig;
 import com.gobrs.async.core.anno.MethodTask;
+import com.gobrs.async.core.task.MTaskContext;
 import lombok.SneakyThrows;
 
 /**
@@ -22,28 +23,37 @@ public class CaseMethodTaskOne {
      * Case 1.
      */
     @MethodTask(name = "task1")
-    public void task1() throws InterruptedException {
+    public String task1(MTaskContext<String> context) throws InterruptedException {
         Thread.sleep(1000);
         System.out.println("task1");
+        String result = "task1";
+        return result;
     }
 
     /**
      * Case 2.
-     *  MethodConfig 中包含当前方法任务所有的可配置项
-     *  Invoke 中包含 方法任务中的 方法回调用（成功、失败、前置 ）
-     *
-     *
+     * MethodConfig 中包含当前方法任务所有的可配置项
+     * Invoke 中包含 方法任务中的 方法回调用（成功、失败、前置 ）
      */
     @SneakyThrows
-    @MethodTask(name = "task3", invoke = @Invoke(onFail = "task2Fail", rollback = ""), config = @MethodConfig(retryCount = 1))
-    public void task2() {
+    @MethodTask(invoke = @Invoke(onFail = "task2Fail", rollback = ""), config = @MethodConfig(retryCount = 1))
+    public String task2(MTaskContext<String> context) {
+        String param = context.getParam();
+
+        System.out.println("task2 的参数是 " + param);
+
+        /**
+         * 获取 task1 的返回结果
+         */
+        String task1Result = context.getTaskResult("task1", String.class);
+        System.out.println("task1 的结果是 " + task1Result);
         System.out.println("task2");
-        System.out.println(1/0);
         Thread.sleep(1000);
+        return "task2";
     }
 
 
-    public void task2Fail(){
+    public void task2Fail() {
         System.out.println("task2 execute fail");
     }
 
@@ -53,7 +63,7 @@ public class CaseMethodTaskOne {
      */
     @SneakyThrows
     @MethodTask(name = "task3")
-    public void task3() {
+    public void task3(MTaskContext<String> context) {
         System.out.println("task3");
         Thread.sleep(2000);
 
@@ -64,7 +74,7 @@ public class CaseMethodTaskOne {
      */
     @SneakyThrows
     @MethodTask(name = "task4")
-    public void task4() {
+    public void task4(MTaskContext<String> context) {
         Thread.sleep(3000);
         System.out.println("task4");
     }

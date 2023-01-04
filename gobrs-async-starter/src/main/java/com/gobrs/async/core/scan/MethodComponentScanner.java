@@ -104,7 +104,7 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
 
         extracted(methodsWith, invoke, PARAMETERS_CACHE, targetMethod);
 
-        setter(methodTaskAdaptation, config, PARAMETERS_CACHE);
+        setter(methodTaskAdaptation, config, PARAMETERS_CACHE, customizeName);
 
         MethodTaskAdapter existed = instance.get(customizeName);
 
@@ -116,7 +116,7 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
     }
 
 
-    private void setter(MethodTaskAdapter methodTaskAdaptation, MethodConfig config, Map<String, MethodTaskMatch> PARAMETERS_CACHE) {
+    private void setter(MethodTaskAdapter methodTaskAdaptation, MethodConfig config, Map<String, MethodTaskMatch> PARAMETERS_CACHE, String customizeName) {
         methodTaskAdaptation.setPARAMETERS_CACHE(PARAMETERS_CACHE);
 
         methodTaskAdaptation.setType(TaskEnum.METHOD.getType());
@@ -132,6 +132,8 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
         methodTaskAdaptation.setExclusive(config.failSubExec());
 
         methodTaskAdaptation.setDesc(config.desc());
+
+        methodTaskAdaptation.setName(customizeName);
     }
 
 
@@ -146,7 +148,7 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
             Object value = ReflectionUtils.invokeMethod(annoMethod, invoke);
 
             if (GobrsTaskMethodEnum.TASK.getMethod().equals(annoMethod.getName())) {
-                MethodTaskMatch match = MethodTaskMatch.builder().method(targetMethod).parameters(targetMethod.getParameters()).build();
+                MethodTaskMatch match = MethodTaskMatch.builder().method(targetMethod).build();
                 PARAMETERS_CACHE.put(annoMethod.getName(), match);
                 continue;
             }
@@ -157,7 +159,7 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
                     continue;
                 }
                 Method m = methods.get(0);
-                MethodTaskMatch match = MethodTaskMatch.builder().method(m).parameters(m.getParameters()).build();
+                MethodTaskMatch match = MethodTaskMatch.builder().method(m).build();
                 PARAMETERS_CACHE.put(annoMethod.getName(), match);
             }
         }

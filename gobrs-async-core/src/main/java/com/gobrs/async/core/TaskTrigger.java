@@ -141,9 +141,9 @@ class TaskTrigger<P> {
          * 读写分离
          */
         prepareTaskMap = prepareTaskMapWrite;
-        if (logger.isInfoEnabled()) {
-            logger.info("prepareTaskMap build success {}", JsonUtil.obj2String(prepareTaskMap));
-        }
+//        if (logger.isInfoEnabled()) {
+//            logger.info("prepareTaskMap build success {}", JsonUtil.obj2String(prepareTaskMap));
+//        }
     }
 
     /**
