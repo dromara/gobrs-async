@@ -74,7 +74,7 @@ public class TaskLoader<Param,Result> {
     /**
      * The Process map.
      */
-    public final Map<AsyncTask<?,?>, TaskActuator> processMap;
+    public final Map<AsyncTask<?,?>, TaskActuator<?,?>> processMap;
 
     /**
      * The Affir count.
@@ -138,7 +138,7 @@ public class TaskLoader<Param,Result> {
      * @param processMap      the process map
      * @param timeout         the timeout
      */
-    TaskLoader(String ruleName, ExecutorService executorService, Map<AsyncTask<?,?>, TaskActuator> processMap,
+    TaskLoader(String ruleName, ExecutorService executorService, Map<AsyncTask<?,?>, TaskActuator<?,?>> processMap,
                long timeout) {
         this.ruleName = ruleName;
         this.executorService = executorService;
@@ -158,7 +158,7 @@ public class TaskLoader<Param,Result> {
          * 获取任务链初始任务
          */
         AsyncResult result;
-        List<TaskActuator> begins = getBeginProcess();
+        List<TaskActuator<?,?>> begins = getBeginProcess();
         try {
 
             /**
@@ -168,7 +168,7 @@ public class TaskLoader<Param,Result> {
             /**
              * 并发开始执行每条任务链
              */
-            for (TaskActuator process : begins) {
+            for (TaskActuator<?,?> process : begins) {
                 /**
                  * Start the thread to perform tasks without any dependencies
                  * Thread reuse
@@ -214,7 +214,7 @@ public class TaskLoader<Param,Result> {
      * @param begins
      * @return
      */
-    private List<TaskActuator> preOptimal(List<TaskActuator> begins) {
+    private List<TaskActuator<?,?>> preOptimal(List<TaskActuator<?,?>> begins) {
         if (!CollectionUtils.isEmpty(optionalTasks)) {
             Optimal.ifOptimal(optionalTasks, processMap, assistantTask);
             Map<String, AsyncTask<?,?>> optMap = optionalTasks.stream().collect(Collectors.toMap(AsyncTask::getName, Function.identity()));
@@ -228,9 +228,9 @@ public class TaskLoader<Param,Result> {
      *
      * @return
      */
-    private ArrayList<TaskActuator> getBeginProcess() {
-        ArrayList<TaskActuator> beginsWith = new ArrayList<>(1);
-        for (TaskActuator process : processMap.values()) {
+    private ArrayList<TaskActuator<?,?>> getBeginProcess() {
+        ArrayList<TaskActuator<?,?>> beginsWith = new ArrayList<>(1);
+        for (TaskActuator<?,?> process : processMap.values()) {
             if (!process.hasUnsatisfiedDependcies()) {
                 beginsWith.add(process);
             }
@@ -250,7 +250,7 @@ public class TaskLoader<Param,Result> {
      *
      * @param errorCallback Exception parameter encapsulation
      */
-    public void error(ErrorCallback errorCallback) {
+    public void error(ErrorCallback<Param> errorCallback) {
         if (!excludeInterceptException(errorCallback.getThrowable())) {
             return;
         }
@@ -262,7 +262,7 @@ public class TaskLoader<Param,Result> {
      *
      * @param errorCallback the error com.gobrs.async.callback
      */
-    public void errorInterrupted(ErrorCallback errorCallback) {
+    public void errorInterrupted(ErrorCallback<Param> errorCallback) {
         this.error = errorCallback.getThrowable();
 
         cancel();
@@ -288,7 +288,7 @@ public class TaskLoader<Param,Result> {
      * @param p        task parameter
      * @param taskName taskName
      */
-    public void preInterceptor(Object p, String taskName) {
+    public void preInterceptor(Param p, String taskName) {
         asyncTaskPreInterceptor.preProcess(p, taskName);
     }
 
@@ -298,7 +298,7 @@ public class TaskLoader<Param,Result> {
      * @param param    task Result
      * @param taskName taskName
      */
-    public void postInterceptor(Object param, String taskName) {
+    public void postInterceptor(Result param, String taskName) {
         asyncTaskPostInterceptor.postProcess(param, taskName);
     }
 
@@ -355,7 +355,7 @@ public class TaskLoader<Param,Result> {
      * @param asyncTask the async task
      * @return the process
      */
-    TaskActuator getProcess(AsyncTask<?,?> asyncTask) {
+    TaskActuator<?,?> getProcess(AsyncTask<?,?> asyncTask) {
         return processMap.get(asyncTask);
     }
 
@@ -442,7 +442,7 @@ public class TaskLoader<Param,Result> {
         return future;
     }
 
-    private Future<?> start(TaskActuator taskActuator) {
+    private Future<?> start(TaskActuator<?,?> taskActuator) {
         Callable<?> callable = threadAdapterSPI(taskActuator);
         Future<?> future = executorService.submit(callable);
         futureTasksMap.put(taskActuator.task, future);
@@ -468,7 +468,7 @@ public class TaskLoader<Param,Result> {
      * @throws Exception the exception
      */
     public void stopSingleTaskLine(List<AsyncTask<?,?>> subtasks) throws Exception {
-        TaskActuator<Param,Result> taskActuator = processMap.get(assistantTask);
+        TaskActuator<?,?> taskActuator = processMap.get(assistantTask);
         for (AsyncTask<?,?> subtask : subtasks) {
             rtDept(subtask, taskActuator);
         }
@@ -500,7 +500,7 @@ public class TaskLoader<Param,Result> {
      * @param begins Collection of subtask processes
      * @return
      */
-    private TaskSupport getSupport(List<TaskActuator> begins) {
+    private TaskSupport getSupport(List<TaskActuator<?,?>> begins) {
         return begins.get(0).getTaskSupport();
     }
 
@@ -510,7 +510,7 @@ public class TaskLoader<Param,Result> {
      * @param begins
      * @return
      */
-    private AsyncResult back(List<TaskActuator> begins) {
+    private AsyncResult back(List<TaskActuator<?,?>> begins) {
         TaskSupport support = getSupport(begins);
         AsyncResult asyncResult = new AsyncResult();
         asyncResult.setResultMap(support.getResultMap());

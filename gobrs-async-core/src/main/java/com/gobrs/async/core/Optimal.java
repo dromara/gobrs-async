@@ -29,9 +29,9 @@ public class Optimal {
      * @param process       the process
      * @return the boolean
      */
-    public static boolean ifContinue(Set<AsyncTask<?, ?>> optionalTasks, TaskLoader taskLoader, TaskActuator process) throws Exception {
+    public static boolean ifContinue(Set<AsyncTask<?, ?>> optionalTasks, TaskLoader<?,?> taskLoader, TaskActuator<?,?> process) throws Exception {
         if (optionalTasks != null && taskLoader.oplCount.get() == taskLoader.getOptionalTasks().size()) {
-            ((TaskActuator) (taskLoader.processMap.get(taskLoader.assistantTask))).call();
+            ((TaskActuator<?,?>) (taskLoader.processMap.get(taskLoader.assistantTask))).call();
             return false;
         }
         return true;
@@ -55,7 +55,7 @@ public class Optimal {
      * @param processMap    the process map
      * @param assistantTask the assistant com.gobrs.async.com.gobrs.async.test.task
      */
-    public static void ifOptimal(Set<AsyncTask<?, ?>> optionalTasks, Map<AsyncTask<?, ?>, TaskActuator> processMap, TaskTrigger.AssistantTask assistantTask) {
+    public static void ifOptimal(Set<AsyncTask<?, ?>> optionalTasks, Map<AsyncTask<?, ?>, TaskActuator<?,?>> processMap, TaskTrigger.AssistantTask assistantTask) {
         processMap.get(assistantTask).setUpstreamDepdends(optionalTasks.size());
     }
 
