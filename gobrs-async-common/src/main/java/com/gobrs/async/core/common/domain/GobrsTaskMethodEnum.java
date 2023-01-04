@@ -30,6 +30,7 @@ public enum GobrsTaskMethodEnum {
      * Rollback gobrs task method enum.
      */
     ROLLBACK("rollback", "事务回滚"),
+
     PREPARE("prepare", "前置调用");
 
     private String method;

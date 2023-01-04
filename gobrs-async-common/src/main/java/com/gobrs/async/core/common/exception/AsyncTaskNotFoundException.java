@@ -9,13 +9,13 @@ package com.gobrs.async.core.common.exception;
  * @author: sizegang
  * @create: 2023 -01-04
  */
-public class MethodTaskNotFoundException extends RuntimeException{
+public class AsyncTaskNotFoundException extends RuntimeException{
     /**
      * Instantiates a new Method task not found exception.
      *
      * @param message the message
      */
-    public MethodTaskNotFoundException(String message) {
+    public AsyncTaskNotFoundException(String message) {
         super(message);
     }
 
@@ -25,7 +25,7 @@ public class MethodTaskNotFoundException extends RuntimeException{
      * @param message the message
      * @param cause   the cause
      */
-    public MethodTaskNotFoundException(String message, Throwable cause) {
+    public AsyncTaskNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 

@@ -4,7 +4,7 @@ import com.gobrs.async.core.TaskSupport;
 import com.gobrs.async.core.anno.MethodTask;
 import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.MethodTaskMatch;
-import com.gobrs.async.core.common.exception.MethodTaskNotFoundException;
+import com.gobrs.async.core.common.exception.AsyncTaskNotFoundException;
 import com.gobrs.async.core.common.util.ProxyUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,6 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
 
     private Map<String, MethodTaskMatch> PARAMETERS_CACHE;
 
-
     private Object proxy;
 
     /**
@@ -41,7 +40,7 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
     public Object task(Object o, TaskSupport support) {
         MethodTaskMatch match = PARAMETERS_CACHE.get(TASK.getMethod());
         if (Objects.isNull(match)) {
-            throw new MethodTaskNotFoundException(String.format(" MethodTask not found %s", getName()));
+            throw new AsyncTaskNotFoundException(String.format(" MethodTask not found %s", getName()));
         }
         return ProxyUtil.invokeMethod(match.getMethod(), proxy, match.getParameters());
     }
@@ -52,7 +51,7 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
         if (Objects.isNull(match)) {
             return DefaultConfig.TASK_NECESSARY;
         }
-        return (boolean) doProxy(match);
+        return (Boolean) doProxy(match);
     }
 
     @Override

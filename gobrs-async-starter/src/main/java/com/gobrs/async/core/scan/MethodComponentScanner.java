@@ -2,12 +2,12 @@ package com.gobrs.async.core.scan;
 
 import com.gobrs.async.core.anno.Invoke;
 import com.gobrs.async.core.anno.MethodComponent;
+import com.gobrs.async.core.anno.MethodConfig;
 import com.gobrs.async.core.anno.MethodTask;
 import com.gobrs.async.core.cache.GCache;
 import com.gobrs.async.core.cache.GCacheManager;
 import com.gobrs.async.core.common.domain.GobrsTaskMethodEnum;
 import com.gobrs.async.core.common.domain.MethodTaskMatch;
-import com.gobrs.async.core.common.enums.GCacheEnum;
 import com.gobrs.async.core.common.enums.TaskEnum;
 import com.gobrs.async.core.common.exception.DuplicateMethodTaskException;
 import com.gobrs.async.core.property.GobrsAsyncProperties;
@@ -24,7 +24,6 @@ import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -44,11 +43,11 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
 
     private GobrsAsyncProperties gobrsAsyncProperties;
 
-    private AtomicBoolean cousor = new AtomicBoolean(false);
+    private final AtomicBoolean cousor = new AtomicBoolean(false);
 
     private ApplicationContext applicationContext;
 
-    private static List<String> filterMethods = Arrays.asList("equals", "hashCode", "toString", "annotationType");
+    private static final List<String> filterMethods = Arrays.asList("equals", "hashCode", "toString", "annotationType");
 
     /**
      * Instantiates a new Method component scanner.
@@ -91,23 +90,46 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
 
         methodTaskAdaptation.setProxy(v);
 
+        String customizeName = methodTask.name();
+
+        if (StringUtils.isBlank(customizeName)) {
+            customizeName = targetMethod.getName();
+        }
+
         Invoke invoke = methodTask.invoke();
+
+        MethodConfig config = methodTask.config();
 
         Map<String, MethodTaskMatch> PARAMETERS_CACHE = new HashMap<>();
 
         extracted(methodsWith, invoke, PARAMETERS_CACHE, targetMethod);
 
+        setter(methodTaskAdaptation, config, PARAMETERS_CACHE);
+
+        MethodTaskAdapter existed = instance.get(customizeName);
+
+        if (Objects.nonNull(existed)) {
+            throw new DuplicateMethodTaskException(customizeName);
+        }
+
+        instance.put(customizeName, methodTaskAdaptation);
+    }
+
+
+    private void setter(MethodTaskAdapter methodTaskAdaptation, MethodConfig config, Map<String, MethodTaskMatch> PARAMETERS_CACHE) {
         methodTaskAdaptation.setPARAMETERS_CACHE(PARAMETERS_CACHE);
 
         methodTaskAdaptation.setType(TaskEnum.METHOD.getType());
 
-        MethodTaskAdapter existed = instance.get(targetMethod.getName());
+        methodTaskAdaptation.setRetryCount(config.retryCount());
 
-        if (Objects.nonNull(existed)) {
-            throw new DuplicateMethodTaskException(targetMethod.getName());
-        }
+        methodTaskAdaptation.setCallback(config.callback());
 
-        instance.put(targetMethod.getName(), methodTaskAdaptation);
+        methodTaskAdaptation.setTimeoutInMilliseconds(config.timeoutInMilliseconds());
+
+        methodTaskAdaptation.setFailSubExec(config.failSubExec());
+
+        methodTaskAdaptation.setExclusive(config.failSubExec());
     }
 
 

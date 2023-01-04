@@ -3,7 +3,6 @@ package com.gobrs.async.test;
 import com.gobrs.async.core.anno.EnabledMethodTask;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
 
 /**
  * @program: gobrs-async

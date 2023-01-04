@@ -2,6 +2,7 @@ package com.gobrs.async.test.task.methodtask;
 
 import com.gobrs.async.core.anno.Invoke;
 import com.gobrs.async.core.anno.MethodComponent;
+import com.gobrs.async.core.anno.MethodConfig;
 import com.gobrs.async.core.anno.MethodTask;
 import lombok.SneakyThrows;
 
@@ -28,9 +29,13 @@ public class CaseMethodTaskOne {
 
     /**
      * Case 2.
+     *  MethodConfig 中包含当前方法任务所有的可配置项
+     *  Invoke 中包含 方法任务中的 方法回调用（成功、失败、前置 ）
+     *
+     *
      */
     @SneakyThrows
-    @MethodTask(name = "task2", invoke = @Invoke(onFail = "task2Fail"))
+    @MethodTask(name = "task3", invoke = @Invoke(onFail = "task2Fail", rollback = ""), config = @MethodConfig(retryCount = 1))
     public void task2() {
         System.out.println("task2");
         System.out.println(1/0);

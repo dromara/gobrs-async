@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Configuration;
  * @author: sizegang
  * @create: 2023 -01-03
  */
-@Configuration
 public class GobrsMethodTaskConfiguration {
 
 

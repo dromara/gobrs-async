@@ -2,6 +2,7 @@ package com.gobrs.async.core;
 
 import com.gobrs.async.core.anno.Task;
 import com.gobrs.async.core.callback.ErrorCallback;
+import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.TaskResult;
@@ -268,7 +269,7 @@ public class TaskActuator<Param, Result> implements Callable, Cloneable {
     }
 
     private void change() {
-        support.getStatus(task.getClass()).compareAndSet(TASK_INITIALIZE, TASK_FINISH);
+        support.getStatus(task.getName()).compareAndSet(TASK_INITIALIZE, TASK_FINISH);
     }
 
 
@@ -441,14 +442,14 @@ public class TaskActuator<Param, Result> implements Callable, Cloneable {
      */
     private boolean retryTask(Param parameter, TaskLoader taskLoader) {
         try {
-            AtomicInteger retryCounts = support.getStatus(task.getClass()).getRetryCounts();
+            AtomicInteger retryCounts = support.getStatus(task.getName()).getRetryCounts();
 
             /**
              * 单任务超时判断
              */
-            TaskStatus status = getTaskSupport().getStatus(task.getClass());
+            TaskStatus status = getTaskSupport().getStatus(task.getName());
 
-            if ((status.getStatus().get() == TASK_INITIALIZE) && task.getRetryCount() > 1 && task.getRetryCount() > retryCounts.get()) {
+            if ((status.getStatus().get() == TASK_INITIALIZE) && task.getRetryCount() > RETRY_COUNT && task.getRetryCount() > retryCounts.get()) {
 
                 retryCounts.incrementAndGet();
 
@@ -735,7 +736,7 @@ public class TaskActuator<Param, Result> implements Callable, Cloneable {
      * @return the task status
      */
     public TaskStatus taskStatus() {
-        return support.getStatus(task.getClass());
+        return support.getStatus(task.getName());
     }
 
 

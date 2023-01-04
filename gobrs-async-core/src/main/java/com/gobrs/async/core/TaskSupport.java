@@ -62,16 +62,16 @@ public class TaskSupport {
 
     private Map<String, TaskResult> resultMethodMap = new ConcurrentHashMap<>();
 
-    private Map<Class, TaskStatus> taskStatus = new ConcurrentHashMap<>();
+    private Map<String, TaskStatus> taskStatus = new ConcurrentHashMap<>();
 
     /**
      * Gets status.
      *
-     * @param clazz the clazz
+     * @param taskName the task name
      * @return the status
      */
-    public TaskStatus getStatus(Class clazz) {
-        return taskStatus.computeIfAbsent(clazz, TaskStatus::new);
+    public TaskStatus getStatus(String  taskName) {
+        return taskStatus.computeIfAbsent(taskName, TaskStatus::new);
     }
 
 

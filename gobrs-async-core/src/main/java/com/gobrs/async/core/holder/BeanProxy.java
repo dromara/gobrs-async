@@ -2,7 +2,8 @@ package com.gobrs.async.core.holder;
 
 import com.gobrs.async.core.cache.GCacheManager;
 import com.gobrs.async.core.common.enums.TaskEnum;
-import org.springframework.beans.BeanUtils;
+import com.gobrs.async.core.common.exception.AsyncTaskNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The type Bean proxy.
@@ -13,6 +14,7 @@ import org.springframework.beans.BeanUtils;
  * @author: sizegang
  * @create: 2023 -01-04
  */
+@Slf4j
 public class BeanProxy {
 
     private static GCacheManager gCacheManage = BeanHolder.getBean(GCacheManager.class);
@@ -25,11 +27,18 @@ public class BeanProxy {
      * @return the bean
      */
     public static Object getBean(String name, Integer type) {
-        Object bean;
+        Object bean = null;
         try {
             bean = BeanHolder.getBean(name);
         } catch (Exception exception) {
-            bean = gCacheManage.getGCache(type).getCache(name);
+            try {
+                bean = gCacheManage.getGCache(type).getCache(name);
+            } catch (Exception e) {
+            }
+        } finally {
+            if (bean == null) {
+                throw new AsyncTaskNotFoundException(String.format("%s tips:%s", name, "Please check whether the configuration is correct."));
+            }
         }
         return bean;
     }

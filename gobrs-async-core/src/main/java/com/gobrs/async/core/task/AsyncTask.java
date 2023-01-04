@@ -125,7 +125,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param> {
             task = task(param, support);
         } catch (Exception exception) {
             exeError = exception;
-            exeError = transferException(exeError, support.getStatus(getClass()).getStatus().get());
+            exeError = transferException(exeError, support.getStatus(getName()).getStatus().get());
             throw exeError;
         } finally {
 
@@ -166,7 +166,6 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param> {
         }
         return e;
     }
-
 
 
     /**
