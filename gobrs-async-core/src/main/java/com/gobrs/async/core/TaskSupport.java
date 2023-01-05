@@ -3,6 +3,7 @@ package com.gobrs.async.core;
 import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.core.common.domain.TaskStatus;
 import com.gobrs.async.core.log.LogWrapper;
+import com.gobrs.async.core.task.AsyncTask;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -58,9 +59,7 @@ public class TaskSupport {
      * Task result encapsulation
      * 任务结果
      */
-    private Map<Class, TaskResult> resultMap = new ConcurrentHashMap<>();
-
-    private Map<String, TaskResult> resultMethodMap = new ConcurrentHashMap<>();
+    private Map<String, TaskResult> resultMap = new ConcurrentHashMap<>();
 
     private Map<String, TaskStatus> taskStatus = new ConcurrentHashMap<>();
 

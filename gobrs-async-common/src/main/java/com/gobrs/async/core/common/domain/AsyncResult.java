@@ -36,5 +36,5 @@ public class AsyncResult implements Serializable {
      * key com.gobrs.async.test.task 类
      * value 执行结果 （单任务）
      */
-    private Map<Class, TaskResult> resultMap = new HashMap();
+    private Map<String, TaskResult> resultMap = new HashMap();
 }

@@ -47,7 +47,7 @@ public class MTaskContext<Param> {
      * @return the task result
      */
     public <T> T getTaskResult(String taskName, Class<T> clazz) {
-        return (T) support.getResultMethodMap().get(taskName).getResult();
+        return (T) support.getResultMap().get(taskName).getResult();
     }
 
 }

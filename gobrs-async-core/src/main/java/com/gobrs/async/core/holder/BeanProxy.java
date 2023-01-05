@@ -37,7 +37,7 @@ public class BeanProxy {
             }
         } finally {
             if (bean == null) {
-                throw new AsyncTaskNotFoundException(String.format("%s tips:%s", name, "Please check whether the configuration is correct."));
+                throw new AsyncTaskNotFoundException(String.format("task %s %s", name, "Please check whether the configuration is correct."));
             }
         }
         return bean;

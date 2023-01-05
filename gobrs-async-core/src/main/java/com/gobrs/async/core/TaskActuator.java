@@ -213,11 +213,7 @@ public class TaskActuator<Param, Result> implements Callable, Cloneable {
     }
 
     private void result(Result result) {
-        if (TaskEnum.CLASS.getType().equals(task.getType())) {
-            support.getResultMap().put(task.getClass(), buildSuccessResult(result));
-        } else if (TaskEnum.METHOD.getType().equals(task.getType())) {
-            support.getResultMethodMap().put(task.getName(), buildSuccessResult(result));
-        }
+        support.getResultMap().put(task.getName(), buildSuccessResult(result));
     }
 
     private void stopAsync0(Object parameter, TaskSupport support) {
@@ -229,7 +225,7 @@ public class TaskActuator<Param, Result> implements Callable, Cloneable {
                 logWrapper.setStopTaskName(task.getName());
             }
             support.taskLoader.setExpCode(new AtomicInteger(ExpState.STOP_ASYNC.getCode()));
-            support.getResultMap().put(task.getClass(), buildErrorResult(null, new ManualStopException("Manually executing stopAsync Exception")));
+            support.getResultMap().put(task.getName(), buildErrorResult(null, new ManualStopException("Manually executing stopAsync Exception")));
             support.getTaskLoader().isRunning().set(false);
             support.getTaskLoader().errorInterrupted(errorCallback);
         }
@@ -292,7 +288,7 @@ public class TaskActuator<Param, Result> implements Callable, Cloneable {
 
     private boolean executeNecessary(Param parameter, AsyncTask<Param, ?> task) {
         return (TaskEnum.CLASS.getType().equals(task.getType()) && task.necessary(parameter, support) && (Objects.isNull(support.getResultMap().get(task.getClass())))
-                || (TaskEnum.METHOD.getType().equals(task.getType()) && Objects.isNull(support.getResultMethodMap().get(task.getName()))));
+                || (TaskEnum.METHOD.getType().equals(task.getType()) && Objects.isNull(support.getResultMap().get(task.getName()))));
     }
 
     /**
@@ -318,7 +314,7 @@ public class TaskActuator<Param, Result> implements Callable, Cloneable {
         setExpCode(ExpState.ERROR.getCode());
         if (!retryTask(parameter, taskLoader)) {
 
-            support.getResultMap().put(task.getClass(), buildErrorResult(null, e));
+            support.getResultMap().put(task.getName(), buildErrorResult(null, e));
             /**
              * transaction com.gobrs.async.com.gobrs.async.test.task
              * 事物任务

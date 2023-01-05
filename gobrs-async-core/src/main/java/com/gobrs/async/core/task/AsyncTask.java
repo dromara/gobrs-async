@@ -221,8 +221,8 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param> {
      * @return com.gobrs.async.com.gobrs.async.test.task result
      */
     public TaskResult<Result> getTaskResult(TaskSupport support) {
-        Map<Class, TaskResult> resultMap = support.getResultMap();
-        return resultMap.get(this.getClass()) != null ? resultMap.get(this.getClass()) : resultMap.get(depKey(this.getClass()));
+        Map<String, TaskResult> resultMap = support.getResultMap();
+        return resultMap.get(getName());
     }
 
     /**
@@ -235,8 +235,8 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param> {
      * @return com.gobrs.async.com.gobrs.async.test.task result
      */
     public <Result> TaskResult<Result> getTaskResult(TaskSupport support, Class<? extends ITask> clazz, Class<Result> type) {
-        Map<Class, TaskResult> resultMap = support.getResultMap();
-        return resultMap.get(clazz) != null ? resultMap.get(clazz) : resultMap.get(depKey(clazz));
+        Map<String, TaskResult> resultMap = support.getResultMap();
+        return resultMap.get(getName()) != null ? (TaskResult<Result>) resultMap.get(getName()) : null;
     }
 
     /**

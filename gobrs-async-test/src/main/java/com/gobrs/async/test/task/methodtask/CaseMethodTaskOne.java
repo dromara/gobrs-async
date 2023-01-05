@@ -23,7 +23,7 @@ public class CaseMethodTaskOne {
      * Case 1.
      */
     @MethodTask(name = "task1")
-    public String task1(String s) throws InterruptedException {
+    public String task1(MTaskContext<String> context) throws InterruptedException {
         Thread.sleep(1000);
         System.out.println("task1");
         String result = "task1";
