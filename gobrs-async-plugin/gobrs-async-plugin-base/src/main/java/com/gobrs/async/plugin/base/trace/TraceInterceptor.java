@@ -1,4 +1,4 @@
-package com.gobrs.async.plugin.base.wrapper.trace;
+package com.gobrs.async.plugin.base.trace;
 
 import com.gobrs.async.spi.SPI;
 

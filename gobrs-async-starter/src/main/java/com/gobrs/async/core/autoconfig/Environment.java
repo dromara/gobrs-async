@@ -1,7 +1,7 @@
 package com.gobrs.async.core.autoconfig;
 
 import com.gobrs.async.core.common.def.FixSave;
-import com.gobrs.async.plugin.base.wrapper.trace.TraceInterceptor;
+import com.gobrs.async.plugin.base.trace.TraceInterceptor;
 import com.gobrs.async.spi.ExtensionLoader;
 
 /**

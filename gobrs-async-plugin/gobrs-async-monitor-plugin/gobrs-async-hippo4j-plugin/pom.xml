@@ -4,30 +4,20 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <artifactId>gobrs-async-plugin</artifactId>
+        <artifactId>gobrs-async-monitor-plugin</artifactId>
         <groupId>io.github.memorydoc</groupId>
         <version>${revision}</version>
     </parent>
-    <artifactId>gobrs-async-trace-plugin</artifactId>
-
+    <artifactId>gobrs-async-hippo4j-plugin</artifactId>
     <dependencies>
-        <dependency>
-            <groupId>com.yomahub</groupId>
-            <artifactId>tlog-all-spring-boot-starter</artifactId>
-        </dependency>
         <dependency>
             <groupId>io.github.memorydoc</groupId>
             <artifactId>gobrs-async-plugin-base</artifactId>
         </dependency>
+        <dependency>
+            <groupId>cn.hippo4j</groupId>
+            <artifactId>hippo4j-config-spring-boot-starter</artifactId>
+        </dependency>
     </dependencies>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.github.memorydoc</groupId>
-                <artifactId>gobrs-async-trace-plugin</artifactId>
-                <version>${revision}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 </project>

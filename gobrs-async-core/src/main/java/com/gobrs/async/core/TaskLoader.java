@@ -18,7 +18,7 @@ import com.gobrs.async.core.common.exception.GobrsAsyncException;
 import com.gobrs.async.core.common.exception.AsyncTaskTimeoutException;
 import com.gobrs.async.core.timer.GobrsFutureTask;
 import com.gobrs.async.core.timer.GobrsTimer;
-import com.gobrs.async.plugin.base.wrapper.ThreadWapper;
+import com.gobrs.async.plugin.base.ThreadWapper;
 import com.gobrs.async.spi.ExtensionLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
