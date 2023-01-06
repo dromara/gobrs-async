@@ -6,6 +6,8 @@ import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.MethodTaskMatch;
 import com.gobrs.async.core.common.exception.AsyncTaskNotFoundException;
 import com.gobrs.async.core.common.exception.MethodTaskArgumentException;
+import com.gobrs.async.core.common.util.ArrayUtil;
+import com.gobrs.async.core.common.util.ExceptionUtil;
 import com.gobrs.async.core.common.util.ProxyUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -130,11 +132,11 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
     private Object[] createParam(Object parameter, TaskSupport support, MethodTaskMatch match, boolean argumentCheck) {
         Object[] params = match.getParams();
 
-        if (!argumentCheck && params == null || params.length == 0) {
+        if (!argumentCheck && ArrayUtil.empty(params)) {
             return params;
         }
 
-        if (argumentCheck && params == null || params.length == 0) {
+        if (argumentCheck && ArrayUtil.empty(params)) {
             throwCustomException();
         }
 
@@ -176,5 +178,10 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
     private void throwCustomException() {
         throw new MethodTaskArgumentException(String.format("%s  The last argument to a method annotated with @MethodTask must be of type MTaskContext", getName()));
     }
+
+    private void arrayEmpty() {
+
+    }
+
 
 }
