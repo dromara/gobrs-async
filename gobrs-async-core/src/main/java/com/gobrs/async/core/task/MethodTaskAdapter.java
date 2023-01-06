@@ -130,6 +130,7 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
      * @return
      */
     private Object[] createParam(Object parameter, TaskSupport support, MethodTaskMatch match, boolean argumentCheck) {
+
         Object[] params = match.getParams();
 
         if (!argumentCheck && ArrayUtil.empty(params)) {
@@ -139,8 +140,6 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
         if (argumentCheck && ArrayUtil.empty(params)) {
             throwCustomException();
         }
-
-        MTaskContext<Object> context = MTaskContext.builder().param(parameter).support(support).build();
 
         List<Object> newParams = new ArrayList<>(Arrays.asList(params));
 
@@ -154,6 +153,7 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
             newParams.set(i, null);
         }
 
+        MTaskContext<Object> context = MTaskContext.builder().param(parameter).support(support).build();
         newParams.set(params.length - 1, context);
 
         return newParams.toArray();
@@ -178,10 +178,4 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
     private void throwCustomException() {
         throw new MethodTaskArgumentException(String.format("%s  The last argument to a method annotated with @MethodTask must be of type MTaskContext", getName()));
     }
-
-    private void arrayEmpty() {
-
-    }
-
-
 }
