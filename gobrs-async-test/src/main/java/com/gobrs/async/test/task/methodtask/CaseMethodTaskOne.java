@@ -54,7 +54,7 @@ public class CaseMethodTaskOne {
     }
 
 
-    public void task2Fail(MTaskContext context) {
+    public void task2Fail() {
         System.out.println("task2 execute fail");
     }
 

@@ -47,7 +47,7 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
         if (Objects.isNull(match)) {
             throw new AsyncTaskNotFoundException(String.format(" MethodTask not found %s", getName()));
         }
-        Object[] param = createParam(parameter, support, match);
+        Object[] param = createParam(parameter, support, match, Boolean.TRUE);
         return ProxyUtil.invokeMethod(match.getMethod(), proxy, param);
     }
 
@@ -115,19 +115,26 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
         doProxy(match, param);
     }
 
+    private Object[] createParam(Object parameter, TaskSupport support, MethodTaskMatch match) {
+        return createParam(parameter, support, match, false);
+    }
 
     /**
      * 创建请求参数
+     *
      * @param parameter
      * @param support
      * @param match
      * @return
      */
-    private Object[] createParam(Object parameter, TaskSupport support, MethodTaskMatch match) {
-
+    private Object[] createParam(Object parameter, TaskSupport support, MethodTaskMatch match, boolean argumentCheck) {
         Object[] params = match.getParams();
 
-        if (params == null || params.length == 0) {
+        if (!argumentCheck && params == null || params.length == 0) {
+            return params;
+        }
+
+        if (argumentCheck && params == null || params.length == 0) {
             throwCustomException();
         }
 
@@ -137,7 +144,9 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
 
         Object lastParam = newParams.get(params.length - 1);
 
-        argumentCheck((Parameter) lastParam);
+        if (argumentCheck) {
+            argumentCheck((Parameter) lastParam);
+        }
 
         for (int i = newParams.size() - 2; i >= 0; i--) {
             newParams.set(i, null);
@@ -150,6 +159,7 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
 
     /**
      * 参数验证
+     *
      * @param lastParam
      */
     private void argumentCheck(Parameter lastParam) {
