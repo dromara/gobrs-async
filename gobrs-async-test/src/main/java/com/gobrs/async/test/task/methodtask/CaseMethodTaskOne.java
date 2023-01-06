@@ -39,8 +39,6 @@ public class CaseMethodTaskOne {
     @MethodTask(invoke = @Invoke(onFail = "task2Fail", rollback = ""), config = @MethodConfig(retryCount = 1))
     public String task2(String text, MTaskContext<String> context) {
         String param = context.getParam();
-
-        System.out.println(1/0);
         System.out.println("task2 的参数是 " + param);
 
         /**
