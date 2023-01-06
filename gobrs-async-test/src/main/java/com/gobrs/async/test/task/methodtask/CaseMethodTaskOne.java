@@ -8,6 +8,8 @@ import com.gobrs.async.core.anno.MethodTask;
 import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 
+import java.util.HashMap;
+
 /**
  * The type Case method task one.
  *
@@ -24,41 +26,35 @@ public class CaseMethodTaskOne {
      * The constant TASK_1_RESULT.
      */
     public static final String TASK_1_RESULT = "task1_result";
-    /**
-     * The constant CONTEXT.
-     */
-    public static final String CONTEXT = "context";
 
     /**
      * Case 1.
      *
-     * @param context the context
      * @return the string
      * @throws InterruptedException the interrupted exception
      */
-    @MethodTask(name = "normal")
-    public String normal(String context) throws InterruptedException {
+    @SneakyThrows
+    @MethodTask(name = "normal", config = @MethodConfig(failSubExec = true))
+    public String normal(TaskSupport taskSupport) {
+        HashMap normal = taskSupport.getParam("normal", HashMap.class);
         Thread.sleep(1000);
-        Assertions.assertThat(context).isEqualTo(CONTEXT);
+        Assertions.assertThat(normal).isEqualTo("context");
         return TASK_1_RESULT;
     }
 
     /**
      * Normal 2 string.
      *
-     * @param taskSupport the task support
-     * @param context     the context
      * @return the string
      */
     @SneakyThrows
     @MethodTask
-    public String normal2(TaskSupport taskSupport, String context) {
-        Assertions.assertThat(context).isEqualTo(CONTEXT);
-
+    public String normal2(String param1, String param2, TaskSupport support) {
+        Assertions.assertThat(param1).isEqualTo("context");
         /**
          * 获取 task1 的返回结果
          */
-        String task1Result = taskSupport.getResult("normal", String.class);
+        String task1Result = support.getResult("normal", String.class);
         Assertions.assertThat(task1Result).isEqualTo(TASK_1_RESULT);
         Thread.sleep(1000);
         return "task2";

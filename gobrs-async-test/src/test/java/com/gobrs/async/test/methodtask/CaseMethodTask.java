@@ -3,6 +3,7 @@ package com.gobrs.async.test.methodtask;
 import com.gobrs.async.core.GobrsAsync;
 import com.gobrs.async.core.common.domain.AsyncResult;
 import com.gobrs.async.core.common.domain.TaskResult;
+import com.gobrs.async.core.common.util.ParamsTool;
 import com.gobrs.async.test.GobrsAsyncTestApplication;
 import com.gobrs.async.test.task.methodtask.CaseMethodTaskOne;
 import lombok.SneakyThrows;
@@ -34,9 +35,14 @@ public class CaseMethodTask {
     @Test
     public void launcher() {
         Map<String, Object> params = new HashMap<>();
-
-        params.put("normal", Lists.newArrayList(CaseMethodTaskOne.CONTEXT));
-        params.put("normal2", Lists.newArrayList("support seize a seat", CaseMethodTaskOne.CONTEXT));
+        /**
+         * normal 任务参数 无法进行参数映射 需要在方法任务参数中注入 TaskSupport 从 TaskSupport中 获取参数值
+         */
+        params.put("normal", new HashMap<>());
+        /**
+         * normal2 可以直接通过参数映射进行匹配取值。 需要注意的是 参数类型需要匹配正确， 否则参数获取为空
+         */
+        params.put("normal2", ParamsTool.asParams("support seize a seat", "context"));
 
         AsyncResult asyncResult = gobrsAsync.go("launcher", () -> params, 300000);
         final Map<String, TaskResult> resultMap = asyncResult.getResultMap();

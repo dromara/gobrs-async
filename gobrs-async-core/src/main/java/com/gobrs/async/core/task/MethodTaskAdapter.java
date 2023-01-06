@@ -7,6 +7,7 @@ import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.MethodTaskMatch;
 import com.gobrs.async.core.common.exception.AsyncTaskNotFoundException;
 import com.gobrs.async.core.common.exception.MethodTaskArgumentException;
+import com.gobrs.async.core.common.util.ParamsTool;
 import com.gobrs.async.core.common.util.ProxyUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -73,7 +74,6 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
     }
 
 
-
     @Override
     public void onSuccess(TaskSupport support) {
         MethodTaskMatch match = PARAMETERS_CACHE.get(ONSUCCESS.getMethod());
@@ -83,8 +83,6 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
         }
         doProxy(match, createParams(support.getParam(), support, match));
     }
-
-
 
 
     @Override
@@ -110,6 +108,7 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
 
     /**
      * 构建参数
+     *
      * @param parameter
      * @param support
      * @param match
@@ -121,14 +120,24 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
         }
 
         final Parameter[] parameters = match.getMethod().getParameters();
-        parameter = parameterTransfer(parameter);
-        List<Object> req =
-                Optional.ofNullable(parameter)
-                        .map(p -> (List<Object>) p)
-                        .orElse(Lists.newArrayList());
 
-        if (parameters.length != req.size()) {
+        parameter = parameterTransfer(parameter);
+
+        List<Object> req;
+
+        if (!(parameter instanceof List)) {
+            req = ParamsTool.asParams(parameter);
+        } else {
+            req = Optional.ofNullable(parameter)
+                    .map(p -> (List<Object>) p)
+                    .orElse(Lists.newArrayList());
+        }
+
+        if (parameters.length != req.size() && parameter instanceof List) {
             log.error(String.format(" Parameter mismatch %s", getName()));
+            /**
+             * Alarm only
+             */
             // throw new MethodTaskArgumentException(String.format(" Parameter mismatch %s", getName()));
         }
 
@@ -142,8 +151,14 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
                 continue;
             }
             try {
-                params[i] = req.get(i);
+                if (!parameters[1].getType().isAssignableFrom(req.get(i).getClass())) {
+                    log.error(String.format(" Parameter type mismatch %s", getName()));
+                    params[i] = null;
+                } else {
+                    params[i] = req.get(i);
+                }
             } catch (Exception exception) {
+                log.error(String.format(" Parameter numbers of mismatch %s", getName()));
                 params[i] = null;
             }
         }
@@ -153,6 +168,7 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
 
     /**
      * invoke
+     *
      * @param match
      * @param parameter
      * @return
@@ -163,6 +179,7 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
 
     /**
      * 参数解析
+     *
      * @param parameter
      * @return
      */
@@ -174,6 +191,7 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
 
     /**
      * 参数转换
+     *
      * @param parameter
      * @return
      */
