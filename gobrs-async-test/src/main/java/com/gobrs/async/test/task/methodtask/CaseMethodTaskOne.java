@@ -23,7 +23,7 @@ public class CaseMethodTaskOne {
      * Case 1.
      */
     @MethodTask(name = "task1")
-    public String task1(MTaskContext<String> context) throws InterruptedException {
+    public String task1(String text, MTaskContext<String> context) throws InterruptedException {
         Thread.sleep(1000);
         System.out.println("task1");
         String result = "task1";
@@ -37,7 +37,7 @@ public class CaseMethodTaskOne {
      */
     @SneakyThrows
     @MethodTask(invoke = @Invoke(onFail = "task2Fail", rollback = ""), config = @MethodConfig(retryCount = 1))
-    public String task2(MTaskContext<String> context) {
+    public String task2(String text, MTaskContext<String> context) {
         String param = context.getParam();
 
         System.out.println("task2 的参数是 " + param);

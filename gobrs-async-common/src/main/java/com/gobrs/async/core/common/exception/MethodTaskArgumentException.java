@@ -29,4 +29,13 @@ public class MethodTaskArgumentException extends RuntimeException{
     public MethodTaskArgumentException(Throwable cause) {
         super(cause);
     }
+
+    /**
+     * Instantiates a new Method task argument exception.
+     *
+     * @param message the message
+     */
+    public MethodTaskArgumentException(String message) {
+        super(message);
+    }
 }

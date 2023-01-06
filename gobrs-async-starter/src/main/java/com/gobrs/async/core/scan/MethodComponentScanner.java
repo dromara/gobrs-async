@@ -69,18 +69,16 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
 
         values.forEach((k, v) -> {
             Method[] methods = v.getClass().getMethods();
-            Map<String, List<Method>> methodsWith =
-                    Arrays.stream(methods).collect(Collectors.groupingBy(Method::getName));
             for (Method targetMethod : methods) {
                 MethodTask methodTask = AnnotationUtils.getAnnotation(targetMethod, MethodTask.class);
                 if (Objects.nonNull(methodTask)) {
-                    analysis(k, v, targetMethod, methodTask, instance, methodsWith);
+                    analysis(k, v, targetMethod, methodTask, instance);
                 }
             }
         });
     }
 
-    private void analysis(String k, Object v, Method targetMethod, MethodTask methodTask, Map<String, MethodTaskAdapter> instance, Map<String, List<Method>> methodsWith) {
+    private void analysis(String k, Object v, Method targetMethod, MethodTask methodTask, Map<String, MethodTaskAdapter> instance) {
 
         MethodTaskAdapter methodTaskAdaptation = applicationContext.getBean(MethodTaskAdapter.class);
 
@@ -102,7 +100,7 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
 
         Map<String, MethodTaskMatch> PARAMETERS_CACHE = new HashMap<>();
 
-        extracted(methodsWith, invoke, PARAMETERS_CACHE, targetMethod);
+        extracted(invoke, PARAMETERS_CACHE, targetMethod);
 
         setter(methodTaskAdaptation, config, PARAMETERS_CACHE, customizeName);
 
@@ -117,6 +115,7 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
 
 
     private void setter(MethodTaskAdapter methodTaskAdaptation, MethodConfig config, Map<String, MethodTaskMatch> PARAMETERS_CACHE, String customizeName) {
+
         methodTaskAdaptation.setPARAMETERS_CACHE(PARAMETERS_CACHE);
 
         methodTaskAdaptation.setType(TaskEnum.METHOD.getType());
@@ -137,7 +136,7 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
     }
 
 
-    private void extracted(Map<String, List<Method>> methodsWith, Invoke invoke, Map<String, MethodTaskMatch> PARAMETERS_CACHE, Method targetMethod) {
+    private void extracted(Invoke invoke, Map<String, MethodTaskMatch> PARAMETERS_CACHE, Method targetMethod) {
 
         Method[] annoMethods = invoke.getClass().getDeclaredMethods();
 
@@ -148,18 +147,13 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
             Object value = ReflectionUtils.invokeMethod(annoMethod, invoke);
 
             if (GobrsTaskMethodEnum.TASK.getMethod().equals(annoMethod.getName())) {
-                MethodTaskMatch match = MethodTaskMatch.builder().method(targetMethod).build();
+                MethodTaskMatch match = MethodTaskMatch.builder().method(targetMethod).params(targetMethod.getParameters()).build();
                 PARAMETERS_CACHE.put(annoMethod.getName(), match);
                 continue;
             }
 
             if (value != null && StringUtils.isNotBlank(value.toString()) && !filterMethods.equals(annoMethod.getName()) && value instanceof String) {
-                List<Method> methods = methodsWith.get(value);
-                if (CollectionUtils.isEmpty(methods)) {
-                    continue;
-                }
-                Method m = methods.get(0);
-                MethodTaskMatch match = MethodTaskMatch.builder().method(m).build();
+                MethodTaskMatch match = MethodTaskMatch.builder().method(targetMethod).params(targetMethod.getParameters()).build();
                 PARAMETERS_CACHE.put(annoMethod.getName(), match);
             }
         }

@@ -5,13 +5,14 @@ import com.gobrs.async.core.anno.MethodTask;
 import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.MethodTaskMatch;
 import com.gobrs.async.core.common.exception.AsyncTaskNotFoundException;
+import com.gobrs.async.core.common.exception.MethodTaskArgumentException;
 import com.gobrs.async.core.common.util.ProxyUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.lang.reflect.Parameter;
+import java.util.*;
 
 import static com.gobrs.async.core.common.domain.GobrsTaskMethodEnum.*;
 
@@ -32,6 +33,7 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
 
     private Object proxy;
 
+    private static final String MTASKCONTEXT = MTaskContext.class.getSimpleName();
     /**
      * The Method task.
      */
@@ -43,7 +45,33 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
         if (Objects.isNull(match)) {
             throw new AsyncTaskNotFoundException(String.format(" MethodTask not found %s", getName()));
         }
-        return ProxyUtil.invokeMethod(match.getMethod(), proxy, MTaskContext.builder().param(parameter).support(support).build());
+        Object[] param = createParam(parameter, support, match);
+        return ProxyUtil.invokeMethod(match.getMethod(), proxy, param);
+    }
+
+    private Object[] createParam(Object parameter, TaskSupport support, MethodTaskMatch match) {
+
+        Object[] params = match.getParams();
+
+        MTaskContext<Object> context = MTaskContext.builder().param(parameter).support(support).build();
+
+        List<Object> newParams = new ArrayList<>(Arrays.asList(params));
+
+        Object lastParam = newParams.get(params.length - 1);
+
+        String simpleName = ((ParameterizedTypeImpl) ((Parameter) lastParam).getParameterizedType()).getRawType().getSimpleName();
+
+        if (!MTASKCONTEXT.equals(simpleName)) {
+            throw new MethodTaskArgumentException(String.format("%s  The last argument to a method annotated with @MethodTask must be of type MTaskContext", getName()));
+        }
+
+        for (int i = newParams.size() - 2; i >= 0; i--) {
+            newParams.set(i, null);
+        }
+
+        newParams.set(params.length - 1, context);
+
+        return newParams.toArray();
     }
 
     @Override
@@ -52,7 +80,8 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
         if (Objects.isNull(match)) {
             return DefaultConfig.TASK_NECESSARY;
         }
-        Optional<Object> o = Optional.ofNullable(doProxy(match, parameter));
+        Object[] param = createParam(support.getParam(), support, match);
+        Optional<Object> o = Optional.ofNullable(doProxy(match, param));
         if (o.isPresent()) {
             return (Boolean) o.get();
         }
@@ -67,10 +96,11 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
             super.onFail(support, exception);
             return;
         }
-        doProxy(match, support.getParam());
+        Object[] param = createParam(support.getParam(), support, match);
+        doProxy(match, param);
     }
 
-    private Object doProxy(MethodTaskMatch match, Object parameter) {
+    private Object doProxy(MethodTaskMatch match, Object[] parameter) {
         return ProxyUtil.invokeMethod(match.getMethod(), proxy, parameter);
     }
 
@@ -81,7 +111,8 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
             super.onSuccess(support);
             return;
         }
-        doProxy(match, support.getParam());
+        Object[] param = createParam(support.getParam(), support, match);
+        doProxy(match, param);
     }
 
     @Override
@@ -91,7 +122,8 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
             super.prepare(parameter);
             return;
         }
-        doProxy(match, parameter);
+        Object[] param = createParam(parameter, null, match);
+        doProxy(match, param);
     }
 
     @Override
@@ -101,6 +133,7 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
             super.rollback(parameter);
             return;
         }
-        doProxy(match, parameter);
+        Object[] param = createParam(parameter, null, match);
+        doProxy(match, param);
     }
 }

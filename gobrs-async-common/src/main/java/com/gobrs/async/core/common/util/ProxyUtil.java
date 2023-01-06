@@ -26,7 +26,7 @@ public class ProxyUtil {
      * @param parameters the parameters
      * @return the object
      */
-    public static Object invokeMethod(Method method, Object target, Object parameters) {
+    public static Object invokeMethod(Method method, Object target, Object[] parameters) {
         try {
             return ReflectionUtils.invokeMethod(method, target, parameters);
         } catch (IllegalArgumentException exception) {

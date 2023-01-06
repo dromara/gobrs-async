@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 /**
  * The type Method task match.
@@ -19,6 +20,8 @@ import java.lang.reflect.Method;
 public class MethodTaskMatch {
 
     private Method method;
+
+    private Object[] params;
 
 
 }
