@@ -52,4 +52,10 @@ public class CaseMethodTask {
     void timoutTest() {
         gobrsAsync.go("methodTimeout", () -> new HashMap<>(), 30);
     }
+
+
+    @Test
+    void rollbackTest() {
+        gobrsAsync.go("rollback", () -> new HashMap<>(), 10000);
+    }
 }

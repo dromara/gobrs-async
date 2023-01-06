@@ -48,7 +48,6 @@ public class TaskSupport {
     private volatile LogWrapper logWrapper;
 
 
-
     /**
      * 任务参数封装
      * The com.gobrs.async.com.gobrs.async.test.task parameters
@@ -69,8 +68,20 @@ public class TaskSupport {
      * @param taskName the task name
      * @return the status
      */
-    public TaskStatus getStatus(String  taskName) {
+    public TaskStatus getStatus(String taskName) {
         return taskStatus.computeIfAbsent(taskName, TaskStatus::new);
+    }
+
+    /**
+     * Gets result.
+     *
+     * @param <T>      the type parameter
+     * @param taskName the task name
+     * @param clazz    the clazz
+     * @return the result
+     */
+    public <T> T getResult(String taskName, Class<T> clazz) {
+        return (T) resultMap.get(taskName).getResult();
     }
 
 

@@ -21,7 +21,4 @@ public class MethodTaskMatch {
 
     private Method method;
 
-    private Object[] params;
-
-
 }
