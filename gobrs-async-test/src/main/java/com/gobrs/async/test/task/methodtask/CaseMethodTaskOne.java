@@ -40,6 +40,7 @@ public class CaseMethodTaskOne {
     public String task2(String text, MTaskContext<String> context) {
         String param = context.getParam();
 
+        System.out.println(1/0);
         System.out.println("task2 的参数是 " + param);
 
         /**
@@ -53,7 +54,7 @@ public class CaseMethodTaskOne {
     }
 
 
-    public void task2Fail() {
+    public void task2Fail(MTaskContext context) {
         System.out.println("task2 execute fail");
     }
 
