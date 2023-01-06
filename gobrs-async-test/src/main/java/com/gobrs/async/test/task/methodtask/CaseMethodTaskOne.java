@@ -74,7 +74,7 @@ public class CaseMethodTaskOne {
      */
     @SneakyThrows
     @MethodTask(name = "task4")
-    public void task4(MTaskContext<String> context) {
+    public void task4(String s, String y, MTaskContext context) {
         Thread.sleep(3000);
         System.out.println("task4");
     }
