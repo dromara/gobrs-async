@@ -4,7 +4,7 @@ import com.gobrs.async.core.anno.Invoke;
 import com.gobrs.async.core.anno.MethodComponent;
 import com.gobrs.async.core.anno.MethodConfig;
 import com.gobrs.async.core.anno.MethodTask;
-import com.gobrs.async.core.task.MTaskContext;
+import com.gobrs.async.core.task.MTaskSupport;
 import lombok.SneakyThrows;
 
 /**
@@ -23,7 +23,7 @@ public class CaseMethodTaskOne {
      * Case 1.
      */
     @MethodTask(name = "task1")
-    public String task1(String text, MTaskContext<String> context) throws InterruptedException {
+    public String task1(String text, MTaskSupport<String> context) throws InterruptedException {
         Thread.sleep(1000);
         System.out.println("task1");
         String result = "task1";
@@ -37,7 +37,7 @@ public class CaseMethodTaskOne {
      */
     @SneakyThrows
     @MethodTask(invoke = @Invoke(onFail = "task2Fail", rollback = ""), config = @MethodConfig(retryCount = 1))
-    public String task2(String text, MTaskContext<String> context) {
+    public String task2(String text, MTaskSupport<String> context) {
         String param = context.getParam();
         System.out.println("task2 的参数是 " + param);
 
@@ -62,7 +62,7 @@ public class CaseMethodTaskOne {
      */
     @SneakyThrows
     @MethodTask(name = "task3")
-    public void task3(MTaskContext<String> context) {
+    public void task3(MTaskSupport<String> context) {
         System.out.println("task3");
         Thread.sleep(2000);
 
@@ -73,7 +73,7 @@ public class CaseMethodTaskOne {
      */
     @SneakyThrows
     @MethodTask(name = "task4")
-    public void task4(String s, String y, MTaskContext context) {
+    public void task4(String s, String y, MTaskSupport context) {
         Thread.sleep(3000);
         System.out.println("task4");
     }

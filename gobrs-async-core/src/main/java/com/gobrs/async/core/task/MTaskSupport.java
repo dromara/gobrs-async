@@ -4,8 +4,6 @@ import com.gobrs.async.core.TaskSupport;
 import lombok.Builder;
 import lombok.Data;
 
-import java.lang.reflect.Parameter;
-
 /**
  * The type M task context.
  *
@@ -18,7 +16,7 @@ import java.lang.reflect.Parameter;
  */
 @Builder
 @Data
-public class MTaskContext<Param> {
+public class MTaskSupport<Param> {
 
     /**
      * The Support.

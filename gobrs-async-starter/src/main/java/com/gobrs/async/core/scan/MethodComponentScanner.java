@@ -149,7 +149,7 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
             Object value = ReflectionUtils.invokeMethod(annoMethod, invoke);
 
             if (GobrsTaskMethodEnum.TASK.getMethod().equals(annoMethod.getName())) {
-                MethodTaskMatch match = MethodTaskMatch.builder().method(targetMethod).params(targetMethod.getParameters()).build();
+                MethodTaskMatch match = MethodTaskMatch.builder().method(targetMethod).build();
                 PARAMETERS_CACHE.put(annoMethod.getName(), match);
                 continue;
             }
@@ -160,7 +160,7 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
                     continue;
                 }
                 Method m = methods.get(0);
-                MethodTaskMatch match = MethodTaskMatch.builder().method(m).params(m.getParameters()).build();
+                MethodTaskMatch match = MethodTaskMatch.builder().method(m).build();
                 PARAMETERS_CACHE.put(annoMethod.getName(), match);
             }
         }

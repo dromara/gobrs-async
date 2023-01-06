@@ -6,15 +6,12 @@ import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.MethodTaskMatch;
 import com.gobrs.async.core.common.exception.AsyncTaskNotFoundException;
 import com.gobrs.async.core.common.exception.MethodTaskArgumentException;
-import com.gobrs.async.core.common.util.ArrayUtil;
-import com.gobrs.async.core.common.util.ExceptionUtil;
 import com.gobrs.async.core.common.util.ProxyUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.CollectionUtils;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
+import org.assertj.core.util.Lists;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.*;
 
@@ -37,7 +34,6 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
 
     private Object proxy;
 
-    private static final String MTASKCONTEXT = MTaskContext.class.getName();
     /**
      * The Method task.
      */
@@ -49,7 +45,7 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
         if (Objects.isNull(match)) {
             throw new AsyncTaskNotFoundException(String.format(" MethodTask not found %s", getName()));
         }
-        Object[] param = createParam(parameter, support, match, Boolean.TRUE);
+        Object[] param = createParam(parameter, support, match);
         return ProxyUtil.invokeMethod(match.getMethod(), proxy, param);
     }
 
@@ -117,9 +113,6 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
         doProxy(match, param);
     }
 
-    private Object[] createParam(Object parameter, TaskSupport support, MethodTaskMatch match) {
-        return createParam(parameter, support, match, false);
-    }
 
     /**
      * 创建请求参数
@@ -129,53 +122,19 @@ public class MethodTaskAdapter extends AsyncTask<Object, Object> {
      * @param match
      * @return
      */
-    private Object[] createParam(Object parameter, TaskSupport support, MethodTaskMatch match, boolean argumentCheck) {
-
-        Object[] params = match.getParams();
-
-        if (!argumentCheck && ArrayUtil.empty(params)) {
-            return params;
-        }
-
-        if (argumentCheck && ArrayUtil.empty(params)) {
-            throwCustomException();
-        }
-
-        List<Object> newParams = new ArrayList<>(Arrays.asList(params));
-
-        Object lastParam = newParams.get(params.length - 1);
-
-        if (argumentCheck) {
-            argumentCheck((Parameter) lastParam);
-        }
-
-        for (int i = newParams.size() - 2; i >= 0; i--) {
-            newParams.set(i, null);
-        }
-
-        MTaskContext<Object> context = MTaskContext.builder().param(parameter).support(support).build();
-        newParams.set(params.length - 1, context);
-
-        return newParams.toArray();
-    }
-
-    /**
-     * 参数验证
-     *
-     * @param lastParam
-     */
-    private void argumentCheck(Parameter lastParam) {
-        try {
-            String classReference = lastParam.getParameterizedType().getTypeName();
-            if (StringUtils.isNotBlank(classReference) && !classReference.contains(MTASKCONTEXT)) {
-                throwCustomException();
+    private Object[] createParam(Object parameter, TaskSupport support, MethodTaskMatch match) {
+        Method method = match.getMethod();
+        Parameter[] parameters = method.getParameters();
+        List<Parameter> req = Arrays.asList(parameters);
+        Object[] params = new Object[parameters.length];
+        for (int i = 0; i < parameters.length; i++) {
+            if (MTaskSupport.class.isAssignableFrom(parameters[i].getType())) {
+                params[i] = MTaskSupport.builder().support(support).param(parameter).build();
+                continue;
             }
-        } catch (Exception exception) {
-            throwCustomException();
+            params[i] = req.get(i);
         }
+        return params;
     }
 
-    private void throwCustomException() {
-        throw new MethodTaskArgumentException(String.format("%s  The last argument to a method annotated with @MethodTask must be of type MTaskContext", getName()));
-    }
 }
