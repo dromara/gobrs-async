@@ -35,4 +35,5 @@ public class ProxyUtil {
             throw new InvokeMethodTaskException(String.format("task: %s invoke exception", method.getName()), exception);
         }
     }
+
 }

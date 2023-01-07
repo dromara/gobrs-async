@@ -86,8 +86,6 @@ public class MethodComponentScanner extends BaseScannner implements ApplicationC
 
         methodTaskAdaptation.setName(methodTask.name());
 
-        methodTaskAdaptation.setMethodTask(methodTask);
-
         methodTaskAdaptation.setProxy(v);
 
         String customizeName = methodTask.name();

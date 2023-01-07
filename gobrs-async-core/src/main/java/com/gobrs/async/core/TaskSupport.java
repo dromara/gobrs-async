@@ -1,5 +1,6 @@
 package com.gobrs.async.core;
 
+import com.gobrs.async.core.common.domain.AsyncParam;
 import com.gobrs.async.core.common.domain.TaskResult;
 import com.gobrs.async.core.common.domain.TaskStatus;
 import com.gobrs.async.core.log.LogWrapper;
@@ -7,6 +8,7 @@ import com.gobrs.async.core.task.AsyncTask;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -48,12 +50,11 @@ public class TaskSupport {
     private volatile LogWrapper logWrapper;
 
 
-
     /**
      * 任务参数封装
      * The com.gobrs.async.com.gobrs.async.test.task parameters
      */
-    private Object param;
+    private AsyncParam param;
 
     /**
      * Task result encapsulation
@@ -69,8 +70,36 @@ public class TaskSupport {
      * @param taskName the task name
      * @return the status
      */
-    public TaskStatus getStatus(String  taskName) {
+    public TaskStatus getStatus(String taskName) {
         return taskStatus.computeIfAbsent(taskName, TaskStatus::new);
+    }
+
+    /**
+     * Gets result.
+     *
+     * @param <T>      the type parameter
+     * @param taskName the task name
+     * @param clazz    the clazz
+     * @return the result
+     */
+    public <T> T getResult(String taskName, Class<T> clazz) {
+        return (T) resultMap.get(taskName).getResult();
+    }
+
+    /**
+     * Gets param.
+     *
+     * @param <T>      the type parameter
+     * @param taskName the task name
+     * @param clazz    the clazz
+     * @return the param
+     */
+    public <T> T getParam(String taskName, Class<T> clazz) {
+        Object o = param.get();
+        if (o instanceof HashMap) {
+            return (T) ((HashMap) o).get(taskName);
+        }
+        return (T) o;
     }
 
 

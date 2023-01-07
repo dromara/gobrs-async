@@ -1,11 +1,14 @@
 package com.gobrs.async.test.task.methodtask;
 
+import com.gobrs.async.core.TaskSupport;
 import com.gobrs.async.core.anno.Invoke;
 import com.gobrs.async.core.anno.MethodComponent;
 import com.gobrs.async.core.anno.MethodConfig;
 import com.gobrs.async.core.anno.MethodTask;
-import com.gobrs.async.core.task.MTaskSupport;
 import lombok.SneakyThrows;
+import org.assertj.core.api.Assertions;
+
+import java.util.HashMap;
 
 /**
  * The type Case method task one.
@@ -20,61 +23,118 @@ import lombok.SneakyThrows;
 public class CaseMethodTaskOne {
 
     /**
-     * Case 1.
+     * The constant TASK_1_RESULT.
      */
-    @MethodTask(name = "task1")
-    public String task1(String text, MTaskSupport<String> context) throws InterruptedException {
+    public static final String TASK_1_RESULT = "task1_result";
+
+    /**
+     * Case 1.
+     *
+     * @return the string
+     * @throws InterruptedException the interrupted exception
+     */
+    @SneakyThrows
+    @MethodTask(name = "normal", config = @MethodConfig(failSubExec = true))
+    public String normal(TaskSupport taskSupport) {
+        HashMap normal = taskSupport.getParam("normal", HashMap.class);
         Thread.sleep(1000);
-        System.out.println("task1");
-        String result = "task1";
-        return result;
+        Assertions.assertThat(normal).isEqualTo("context");
+        return TASK_1_RESULT;
     }
 
     /**
-     * Case 2.
-     * MethodConfig 中包含当前方法任务所有的可配置项
-     * Invoke 中包含 方法任务中的 方法回调用（成功、失败、前置 ）
+     * Normal 2 string.
+     *
+     * @return the string
      */
     @SneakyThrows
-    @MethodTask(invoke = @Invoke(onFail = "task2Fail", rollback = ""), config = @MethodConfig(retryCount = 1))
-    public String task2(String text, MTaskSupport<String> context) {
-        String param = context.getParam();
-        System.out.println("task2 的参数是 " + param);
-
+    @MethodTask
+    public String normal2(String param1, String param2, TaskSupport support) {
+        Assertions.assertThat(param1).isEqualTo("context");
         /**
          * 获取 task1 的返回结果
          */
-        String task1Result = context.getTaskResult("task1", String.class);
-        System.out.println("task1 的结果是 " + task1Result);
-        System.out.println("task2");
+        String task1Result = support.getResult("normal", String.class);
+        Assertions.assertThat(task1Result).isEqualTo(TASK_1_RESULT);
         Thread.sleep(1000);
         return "task2";
     }
 
+    /**
+     * Throw exception.
+     */
+    @SneakyThrows
+    @MethodTask(invoke = @Invoke(onFail = "demote", rollback = "Exception"), config = @MethodConfig(retryCount = 10))
+    public void throwException() {
+        System.out.println("will throwException");
+        throw new RuntimeException("throwException test");
+    }
 
-    public void task2Fail() {
+    /**
+     * Demote.
+     */
+    public void demote() {
         System.out.println("task2 execute fail");
     }
 
-
     /**
-     * Task 3.
+     * Timeout.
      */
     @SneakyThrows
-    @MethodTask(name = "task3")
-    public void task3(MTaskSupport<String> context) {
-        System.out.println("task3");
-        Thread.sleep(2000);
+    @MethodTask
+    public void timeout() {
+        Thread.sleep(30000);
+    }
+
+
+    /**
+     * Rollback 1.
+     */
+    @SneakyThrows
+    @MethodTask(invoke = @Invoke(rollback = "rool1"))
+    public void rollback1() {
+        System.out.println("rooback1");
+        Thread.sleep(1000);
+    }
+
+
+    /**
+     * Rollback 2.
+     */
+    @SneakyThrows
+    @MethodTask(invoke = @Invoke(rollback = "rool2"))
+    public void rollback2() {
+        System.out.println("rollback2");
+        Thread.sleep(1000);
+    }
+
+
+    /**
+     * Rollback 3.
+     */
+    @SneakyThrows
+    @MethodTask(invoke = @Invoke(rollback = "rool1"), config = @MethodConfig(callback = true))
+    public void rollback3() {
+        System.out.println("rollback3");
+        Thread.sleep(1000);
+        System.out.println(1 / 0);
 
     }
 
     /**
-     * Task 4.
+     * Roo 1.
      */
-    @SneakyThrows
-    @MethodTask(name = "task4")
-    public void task4(String s, String y, MTaskSupport context) {
-        Thread.sleep(3000);
-        System.out.println("task4");
+    public void rool1() {
+        System.out.println("rool1 start ....");
     }
+
+
+    /**
+     * Roo 2.
+     */
+    public void rool2() {
+        System.out.println("rool2 start ....");
+    }
+
+
 }
