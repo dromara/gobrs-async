@@ -41,7 +41,7 @@ import static com.gobrs.async.core.common.util.ExceptionUtil.excludeInterceptExc
 @Slf4j
 public abstract class AsyncTask<Param, Result> implements GobrsTask<Param> {
 
-    /**
+    /**da
      * 任务名称
      */
     private String name;
