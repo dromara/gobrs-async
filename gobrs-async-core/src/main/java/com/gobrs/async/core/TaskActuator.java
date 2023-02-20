@@ -693,7 +693,7 @@ public class TaskActuator<Param, Result> implements Callable, Cloneable {
                 if (support.getParam() instanceof Map) {
                     asyncTask.rollback(((Map<?, ?>) support.getParam()).get(this.getClass()));
                 } else {
-                    asyncTask.rollback(support.getParam());
+                    asyncTask.rollback(support.getParam().get());
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
