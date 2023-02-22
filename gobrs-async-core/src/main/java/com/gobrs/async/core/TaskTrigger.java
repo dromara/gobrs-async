@@ -31,11 +31,6 @@ import static com.gobrs.async.core.common.def.FixSave.LOGGER_PLUGIN;
  */
 class TaskTrigger<P> {
 
-    /**
-     * The Logger.
-     */
-    Logger logger = LoggerFactory.getLogger(TaskTrigger.class);
-
     private final TaskFlow taskFlow;
 
     private GobrsAsyncThreadPoolFactory threadPoolFactory = BeanHolder.getBean(GobrsAsyncThreadPoolFactory.class);
