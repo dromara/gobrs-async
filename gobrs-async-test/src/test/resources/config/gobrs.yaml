@@ -6,6 +6,8 @@ gobrs:
         core-pool-size: 1000
         max-pool-size: 2000
       rules:
+        - name: "param"
+          content: "caskParamTask"
         - name: "performance"
           content: "taskA->taskB,TaskC->taskD->taskE,taskF"
         - name: "launcher"
