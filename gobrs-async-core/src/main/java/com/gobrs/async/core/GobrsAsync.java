@@ -35,8 +35,8 @@ public class GobrsAsync {
      * Begin com.gobrs.async.com.gobrs.async.test.task receive.
      *
      * @param ruleName the com.gobrs.async.com.gobrs.async.test.task name
-     * @param pioneer
-     * @param reload
+     * @param pioneer  the pioneer
+     * @param reload   the reload
      * @param tasks    the tasks
      * @return the com.gobrs.async.com.gobrs.async.test.task receive
      */
@@ -114,10 +114,20 @@ public class GobrsAsync {
         if (check(ruleName).isPresent()) {
             TaskLoader taskLoader = this.trigger.get(ruleName).trigger(param, timeout, optionalTasks);
             AsyncResult result = taskLoader.load();
-            taskLoader = null;
+            clear(taskLoader);
             return result;
         }
         throw new NotFoundGobrsRuleException("Gobrs Rule Name Is Error!!!");
+    }
+
+    /**
+     * clear for GC
+     *
+     * @param taskLoader
+     */
+    private void clear(TaskLoader taskLoader) {
+        taskLoader.taskSupport = null;
+        taskLoader = null;
     }
 
 

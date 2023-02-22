@@ -41,6 +41,8 @@ import static com.gobrs.async.core.task.ReUsing.reusing;
 /**
  * The type Task loader.
  *
+ * @param <Param>  the type parameter
+ * @param <Result> the type parameter
  * @program: gobrs -async-starter
  * @ClassName
  * @description:
@@ -93,6 +95,8 @@ public class TaskLoader<Param,Result> {
     private static final Lock taskLock = new ReentrantLock();
 
     private volatile boolean canceled = false;
+
+    public TaskSupport taskSupport;
 
     /**
      * The constant INTERRUPTFLAG.
@@ -670,4 +674,5 @@ public class TaskLoader<Param,Result> {
     public void setCusCode(Integer cusCode) {
         this.cusCode = cusCode;
     }
+
 }
