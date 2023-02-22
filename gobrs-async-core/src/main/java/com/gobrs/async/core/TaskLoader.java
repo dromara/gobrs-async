@@ -111,8 +111,6 @@ public class TaskLoader<Param,Result> {
 
     private LogWrapper logWrapper;
 
-    private final static ArrayList<Future<?>> EmptyFutures = new ArrayList<>(0);
-
     /**
      * 可选择的任务执行
      * 1、整个任务流程中 假如有 A->B->C
@@ -187,6 +185,8 @@ public class TaskLoader<Param,Result> {
             if (excludeInterceptException(exception)) {
                 throw exception;
             }
+        }finally {
+            release();
         }
         return null;
     }
@@ -338,8 +338,6 @@ public class TaskLoader<Param,Result> {
             }
         } catch (InterruptedException e) {
             throw new GobrsAsyncException(e);
-        } finally {
-            release();
         }
     }
 
