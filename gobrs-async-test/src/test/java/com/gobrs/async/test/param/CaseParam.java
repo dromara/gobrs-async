@@ -39,7 +39,8 @@ public class CaseParam {
     @Test
     public void caseParams1() {
         DataContext dataContext = DataContext.builder().userName("sizegang").password("1234").address("Beijing").build();
-        gobrsAsync.go("param", () -> dataContext);
+        long timeOut = 3000; //流程超时时间
+        gobrsAsync.go("param", () -> dataContext, timeOut);
     }
 
     @Test
