@@ -35,8 +35,8 @@ public class GobrsAsync {
      * Begin com.gobrs.async.com.gobrs.async.test.task receive.
      *
      * @param ruleName the com.gobrs.async.com.gobrs.async.test.task name
-     * @param pioneer
-     * @param reload
+     * @param pioneer  the pioneer
+     * @param reload   the reload
      * @param tasks    the tasks
      * @return the com.gobrs.async.com.gobrs.async.test.task receive
      */
@@ -84,7 +84,7 @@ public class GobrsAsync {
      * @param tasks    the tasks
      * @return com.gobrs.async.com.gobrs.async.test.task receive
      */
-    public TaskReceive after(String ruleName, AsyncTask... tasks) {
+    public TaskReceive after(String ruleName, AsyncTask<?, ?>... tasks) {
         return taskFlow.get(ruleName).after(tasks);
     }
 
@@ -112,9 +112,22 @@ public class GobrsAsync {
     @SneakyThrows
     public AsyncResult go(String ruleName, AsyncParam param, Set<String> optionalTasks, long timeout) {
         if (check(ruleName).isPresent()) {
-            return trigger.get(ruleName).trigger(param, timeout, optionalTasks).load();
+            TaskLoader taskLoader = this.trigger.get(ruleName).trigger(param, timeout, optionalTasks);
+            AsyncResult result = taskLoader.load();
+            clear(taskLoader);
+            return result;
         }
         throw new NotFoundGobrsRuleException("Gobrs Rule Name Is Error!!!");
+    }
+
+    /**
+     * clear for GC
+     *
+     * @param taskLoader
+     */
+    private void clear(TaskLoader taskLoader) {
+        taskLoader.taskSupport = null;
+        taskLoader = null;
     }
 
 

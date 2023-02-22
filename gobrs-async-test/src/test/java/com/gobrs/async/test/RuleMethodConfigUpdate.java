@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author: sizegang
  * @create: 2022 -09-28
  */
-public class RuleConfigUpdate {
+public class RuleMethodConfigUpdate {
 
     @Autowired(required = false)
     private RuleThermalLoad ruleThermalLoad;

@@ -28,14 +28,15 @@ public class BServiceCondition extends AsyncTask {
     int i = 10000;
     @Override
     public AnyConditionResult<String> task(Object o, TaskSupport support) {
-        AnyConditionResult.Builder<String> builder = AnyConditionResult.builder();
+        AnyConditionResult.AnyConditionResultBuilder<String> builder = AnyConditionResult.builder();
+
         System.out.println("BServiceCondition Begin");
         for (int i1 = 0; i1 < i; i1++) {
             i1 += i1;
         }
 //        System.out.println(1 / 0);
         System.out.println("BServiceCondition Finish");
-        builder.setState(false);
+        builder.state(false);
         return builder.build();
     }
 }

@@ -24,15 +24,22 @@ public class TaskStatus {
     /**
      * the class type of currentTask
      */
-    private final Class<?> taskClass;
+    private final String taskName;
 
 
-    public TaskStatus(Class<?> taskCls) {
-        this.taskClass = taskCls;
+    /**
+     * Instantiates a new Task status.
+     *
+     * @param taskName the task name
+     */
+    public TaskStatus(String taskName) {
+        this.taskName = taskName;
     }
 
     /**
      * the status of currentTask (TASK_INITIALIZE,TASK_FINISH,TASK_TIMEOUT)
+     *
+     * @return the status
      */
     public AtomicInteger getStatus() {
         return status;
@@ -40,6 +47,8 @@ public class TaskStatus {
 
     /**
      * the retryCounts of currentTask
+     *
+     * @return the retry counts
      */
     public AtomicInteger getRetryCounts() {
         return retryCounts;
@@ -47,6 +56,10 @@ public class TaskStatus {
 
     /**
      * change task status
+     *
+     * @param expect the expect
+     * @param update the update
+     * @return the boolean
      */
     public boolean compareAndSet(int expect, int update) {
         return getStatus().compareAndSet(expect, update);
@@ -54,6 +67,6 @@ public class TaskStatus {
 
     @Override
     public String toString() {
-        return taskClass.getSimpleName() + "{" + "status=" + status + ", retryCounts=" + retryCounts + '}';
+        return taskName + "{" + "status=" + status + ", retryCounts=" + retryCounts + '}';
     }
 }

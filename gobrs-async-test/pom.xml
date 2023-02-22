@@ -35,6 +35,10 @@
             <groupId>io.github.memorydoc</groupId>
             <artifactId>gobrs-async-skywalking-plugin</artifactId>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.github.memorydoc</groupId>-->
+<!--            <artifactId>gobrs-async-hippo4j-plugin</artifactId>-->
+<!--        </dependency>-->
     </dependencies>
 
 </project>

@@ -59,7 +59,7 @@ public class BeanHolder implements ApplicationContextAware, BeanFactoryPostProce
             }
             return getApplicationContext().getBean(lowerFirstChar(name));
         } catch (Exception ex) {
-            logger.error("Gobrs-Spring genBean error{}", ex);
+            logger.error("Gobrs-Spring genBean error ", ex);
         }
         return null;
     }
@@ -79,11 +79,16 @@ public class BeanHolder implements ApplicationContextAware, BeanFactoryPostProce
      * @return the bean
      */
     public static <T> T getBean(Class<T> clazz) {
-        ApplicationContext applicationContext = getApplicationContext();
-        if (applicationContext == null) {
-            return cf.getBean(clazz);
+        try {
+            ApplicationContext applicationContext = getApplicationContext();
+            if (applicationContext == null) {
+                return cf.getBean(clazz);
+            }
+            return applicationContext.getBean(clazz);
+        } catch (Exception exception) {
+            logger.warn(" class {} getBean error{}", clazz, exception);
+            return null;
         }
-        return applicationContext.getBean(clazz);
     }
 
     /**

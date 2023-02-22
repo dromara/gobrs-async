@@ -22,7 +22,7 @@ public class TaskFlow {
     /**
      * Task tree
      */
-    private final IdentityHashMap<AsyncTask, List<AsyncTask>> denpendedTasks = new IdentityHashMap<>();
+    private final IdentityHashMap<AsyncTask<?,?>, List<AsyncTask<?,?>>> denpendedTasks = new IdentityHashMap<>();
 
     /**
      * After com.gobrs.async.com.gobrs.async.test.task receive.
@@ -30,9 +30,9 @@ public class TaskFlow {
      * @param asyncTasks the async tasks
      * @return the com.gobrs.async.com.gobrs.async.test.task receive
      */
-    synchronized TaskReceive after(final AsyncTask... asyncTasks) {
+    synchronized TaskReceive after(final AsyncTask<?,?>... asyncTasks) {
 
-        for (AsyncTask handler : asyncTasks) {
+        for (AsyncTask<?,?> handler : asyncTasks) {
             if (!denpendedTasks.containsKey(handler)) {
                 throw new IllegalStateException(
                         "asyncTask not begin command");
@@ -47,7 +47,7 @@ public class TaskFlow {
      * @param asyncTasks the async tasks
      * @return the com.gobrs.async.com.gobrs.async.test.task receive
      */
-    synchronized TaskReceive start(AsyncTask... asyncTasks) {
+    synchronized TaskReceive start(AsyncTask<?,?>... asyncTasks) {
         /**
          * Building com.gobrs.async.com.gobrs.async.test.task groups
          */
@@ -61,7 +61,7 @@ public class TaskFlow {
      * @param asyncTasks the async tasks
      * @return the com.gobrs.async.com.gobrs.async.test.task receive
      */
-    synchronized TaskReceive start(List<AsyncTask<?, ?>> asyncTasks) {
+    synchronized TaskReceive start(List<AsyncTask<?,?>> asyncTasks) {
         /**
          * Building com.gobrs.async.com.gobrs.async.test.task groups
          */
@@ -74,7 +74,7 @@ public class TaskFlow {
      *
      * @return the depends tasks
      */
-    synchronized Map<AsyncTask, List<AsyncTask>> getDependsTasks() {
+    synchronized Map<AsyncTask<?,?>, List<AsyncTask<?,?>>> getDependsTasks() {
         return denpendedTasks;
     }
 
@@ -85,7 +85,7 @@ public class TaskFlow {
      * @param from the from
      * @param to   the to
      */
-    void addDependency(AsyncTask from, AsyncTask to) {
+    void addDependency(AsyncTask<?,?> from, AsyncTask<?,?> to) {
         // create
         if (!denpendedTasks.containsKey(from)) {
             denpendedTasks.put(from, new ArrayList<>(0));

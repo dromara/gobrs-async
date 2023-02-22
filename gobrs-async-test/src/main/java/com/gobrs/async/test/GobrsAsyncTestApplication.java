@@ -1,8 +1,8 @@
 package com.gobrs.async.test;
 
+import com.gobrs.async.core.anno.EnabledMethodTask;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
 
 /**
  * @program: gobrs-async
@@ -11,6 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @author: sizegang
  * @create: 2022-10-30
  **/
+@EnabledMethodTask
 @SpringBootApplication
 public class GobrsAsyncTestApplication {
 

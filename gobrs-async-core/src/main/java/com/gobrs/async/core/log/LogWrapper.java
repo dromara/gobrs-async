@@ -2,6 +2,7 @@ package com.gobrs.async.core.log;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.util.concurrent.LinkedBlockingQueue;
@@ -48,20 +49,11 @@ public class LogWrapper {
      */
     @Builder
     @Data
+    @ToString
     public static class TimeCollector {
 
         private Long startTime;
 
         private Long endTime;
-    }
-
-    @Override
-    public String toString() {
-        return "LogWrapper{" +
-                "traceId=" + traceId +
-                ", tracerQueue=" + tracerQueue +
-                ", timeCollector=" + timeCollector +
-                ", processCost=" + processCost +
-                '}';
     }
 }

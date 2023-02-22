@@ -2,17 +2,18 @@ package com.gobrs.async.core.task;
 
 import com.gobrs.async.core.TaskSupport;
 
+import static com.gobrs.async.core.common.def.DefaultConfig.TASK_NECESSARY;
+
 /**
  * The interface Gobrs com.gobrs.async.com.gobrs.async.test.task.
  *
- * @param <Param>  the type parameter
- * @param <Result> the type parameter
+ * @param <Param> the type parameter
  * @program: gobrs -async-core
  * @description:
  * @author: sizegang
  * @create: 2022 -03-23 23:31
  */
-public interface GobrsTask<Param, Result> extends ITask {
+public interface GobrsTask<Param> extends ITask {
     /**
      * Before the mission begins
      *
@@ -20,7 +21,6 @@ public interface GobrsTask<Param, Result> extends ITask {
      */
     default void prepare(Param param) {
     }
-
 
 
     /**
@@ -34,7 +34,7 @@ public interface GobrsTask<Param, Result> extends ITask {
      * @return boolean boolean
      */
     default boolean necessary(Param param, TaskSupport support) {
-        return true;
+        return TASK_NECESSARY;
     }
 
     /**

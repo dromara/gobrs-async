@@ -9,10 +9,12 @@ package com.gobrs.async.core.property;
  **/
 
 import com.gobrs.async.core.common.def.DefaultConfig;
+import lombok.Data;
 
 /**
  * The type Log config.
  */
+@Data
 public class LogConfig {
     /**
      * 执行异常trace log打印
@@ -22,40 +24,4 @@ public class LogConfig {
      * 任务执行过程中耗时打印
      */
     private Boolean costLogabled = DefaultConfig.COST_LOGABLED;
-
-    /**
-     * Gets err logabled.
-     *
-     * @return the err logabled
-     */
-    public Boolean getErrLogabled() {
-        return errLogabled;
-    }
-
-    /**
-     * Sets err logabled.
-     *
-     * @param errLogabled the err logabled
-     */
-    public void setErrLogabled(Boolean errLogabled) {
-        this.errLogabled = errLogabled;
-    }
-
-    /**
-     * Gets cost logabled.
-     *
-     * @return the cost logabled
-     */
-    public Boolean getCostLogabled() {
-        return costLogabled;
-    }
-
-    /**
-     * Sets cost logabled.
-     *
-     * @param costLogabled the cost logabled
-     */
-    public void setCostLogabled(Boolean costLogabled) {
-        this.costLogabled = costLogabled;
-    }
 }

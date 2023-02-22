@@ -12,10 +12,12 @@
 
     <modules>
         <module>gobrs-async-skywalking-plugin</module>
+        <module>gobrs-async-hippo4j-plugin</module>
     </modules>
 
     <properties>
         <skywalking.version>8.4.0</skywalking.version>
+        <hippo4j.version>1.4.3-upgrade</hippo4j.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -24,6 +26,22 @@
                 <artifactId>apm-toolkit-trace</artifactId>
                 <version>${skywalking.version}</version>
             </dependency>
+            <dependency>
+                <groupId>cn.hippo4j</groupId>
+                <artifactId>hippo4j-config-spring-boot-starter</artifactId>
+                <version>${hippo4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.memorydoc</groupId>
+                <artifactId>gobrs-async-skywalking-plugin</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.memorydoc</groupId>
+                <artifactId>gobrs-async-hippo4j-plugin</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
         </dependencies>
 
     </dependencyManagement>

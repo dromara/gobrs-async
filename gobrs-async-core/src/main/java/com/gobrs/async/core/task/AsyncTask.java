@@ -2,6 +2,7 @@ package com.gobrs.async.core.task;
 
 
 import com.gobrs.async.core.TaskSupport;
+import com.gobrs.async.core.common.enums.TaskEnum;
 import com.gobrs.async.core.common.exception.AsyncTaskTimeoutException;
 import com.gobrs.async.core.common.util.SystemClock;
 import com.gobrs.async.core.config.ConfigManager;
@@ -11,14 +12,12 @@ import com.gobrs.async.core.log.TraceUtil;
 import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.domain.AnyConditionResult;
 import com.gobrs.async.core.common.domain.TaskResult;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.gobrs.async.core.common.def.DefaultConfig.TASK_TIMEOUT;
 import static com.gobrs.async.core.common.def.FixSave.LOGGER_PLUGIN;
@@ -33,15 +32,16 @@ import static com.gobrs.async.core.common.util.ExceptionUtil.excludeInterceptExc
  * @param <Param>  the type parameter
  * @param <Result> the type parameter
  * @program: gobrs -async-starter
- * @ClassName AsyncTask
+ * @ClassName AsyncTask<?, ?>
  * @description:
  * @author: sizegang
  * @create: 2022 -03-16
  */
+@Data
 @Slf4j
-public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Result> {
+public abstract class AsyncTask<Param, Result> implements GobrsTask<Param> {
 
-    /**
+    /**da
      * 任务名称
      */
     private String name;
@@ -77,6 +77,11 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
     private boolean exclusive = false;
 
     /**
+     * 任务类型 class method 默认 class
+     */
+    private Integer type = TaskEnum.CLASS.getType();
+
+    /**
      * get result of current com.gobrs.async.com.gobrs.async.test.task
      *
      * @param support the support
@@ -96,7 +101,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
     public Result getResult(TaskSupport support, boolean anyCondition) {
         TaskResult<Result> taskResult = getTaskResult(support);
         if (anyCondition == true && taskResult != null) {
-            return (Result) AnyConditionResult.builder().setResult(taskResult.getResult()).build();
+            return (Result) AnyConditionResult.builder().result(taskResult.getResult()).build();
         }
         if (taskResult != null) {
             return taskResult.getResult();
@@ -110,6 +115,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * @param param   the param
      * @param support the support
      * @return the result
+     * @throws Exception the exception
      */
     public Result taskAdapter(Param param, TaskSupport support) throws Exception {
         Long startTime = SystemClock.now();
@@ -119,7 +125,7 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
             task = task(param, support);
         } catch (Exception exception) {
             exeError = exception;
-            exeError = transferException(exeError, support.getStatus(getClass()).getStatus().get());
+            exeError = transferException(exeError, support.getStatus(getName()).getStatus().get());
             throw exeError;
         } finally {
 
@@ -150,8 +156,9 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
     /**
      * 异常转换
      *
-     * @param e
-     * @param state
+     * @param e     the e
+     * @param state the state
+     * @return the exception
      */
     protected Exception transferException(Exception e, Integer state) {
         if (TASK_TIMEOUT == state) {
@@ -214,8 +221,8 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * @return com.gobrs.async.com.gobrs.async.test.task result
      */
     public TaskResult<Result> getTaskResult(TaskSupport support) {
-        Map<Class, TaskResult> resultMap = support.getResultMap();
-        return resultMap.get(this.getClass()) != null ? resultMap.get(this.getClass()) : resultMap.get(depKey(this.getClass()));
+        Map<String, TaskResult> resultMap = support.getResultMap();
+        return resultMap.get(getName());
     }
 
     /**
@@ -228,8 +235,8 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
      * @return com.gobrs.async.com.gobrs.async.test.task result
      */
     public <Result> TaskResult<Result> getTaskResult(TaskSupport support, Class<? extends ITask> clazz, Class<Result> type) {
-        Map<Class, TaskResult> resultMap = support.getResultMap();
-        return resultMap.get(clazz) != null ? resultMap.get(clazz) : resultMap.get(depKey(clazz));
+        Map<String, TaskResult> resultMap = support.getResultMap();
+        return resultMap.get(getName()) != null ? (TaskResult<Result>) resultMap.get(getName()) : null;
     }
 
     /**
@@ -318,153 +325,6 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
     }
 
 
-    /**
-     * Gets name.
-     *
-     * @return the name
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets name.
-     *
-     * @param name the name
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Is com.gobrs.async.callback boolean.
-     *
-     * @return the boolean
-     */
-    public boolean isCallback() {
-        return callback;
-    }
-
-    /**
-     * Sets com.gobrs.async.callback.
-     *
-     * @param callback the com.gobrs.async.callback
-     */
-    public void setCallback(boolean callback) {
-        this.callback = callback;
-    }
-
-
-    /**
-     * Gets retry count.
-     *
-     * @return the retry count
-     */
-    public int getRetryCount() {
-        return retryCount;
-    }
-
-    /**
-     * Sets retry count.
-     *
-     * @param retryCount the retry count
-     */
-    public void setRetryCount(int retryCount) {
-        this.retryCount = retryCount;
-    }
-
-    /**
-     * Is fail sub exec boolean.
-     *
-     * @return the boolean
-     */
-    public boolean isFailSubExec() {
-        return failSubExec;
-    }
-
-    /**
-     * Sets fail sub exec.
-     *
-     * @param failSubExec the fail sub exec
-     */
-    public void setFailSubExec(boolean failSubExec) {
-        this.failSubExec = failSubExec;
-    }
-
-
-    /**
-     * Is any boolean.
-     *
-     * @return the boolean
-     */
-    public boolean isAny() {
-        return any;
-    }
-
-    /**
-     * Sets any.
-     *
-     * @param any the any
-     */
-    public void setAny(boolean any) {
-        this.any = any;
-    }
-
-    /**
-     * Is exclusive boolean.
-     *
-     * @return the boolean
-     */
-    public boolean isExclusive() {
-        return exclusive;
-    }
-
-    /**
-     * Sets exclusive.
-     *
-     * @param exclusive the exclusive
-     */
-    public void setExclusive(boolean exclusive) {
-        this.exclusive = exclusive;
-    }
-
-    /**
-     * Gets desc.
-     *
-     * @return the desc
-     */
-    public String getDesc() {
-        return desc;
-    }
-
-    /**
-     * Sets desc.
-     *
-     * @param desc the desc
-     */
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
-
-
-    /**
-     * Is any condition boolean.
-     *
-     * @return the boolean
-     */
-    public boolean isAnyCondition() {
-        return anyCondition;
-    }
-
-    /**
-     * Sets any condition.
-     *
-     * @param anyCondition the any condition
-     */
-    public void setAnyCondition(boolean anyCondition) {
-        this.anyCondition = anyCondition;
-    }
-
     @Override
     public int hashCode() {
         return super.hashCode();
@@ -475,21 +335,4 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param, Resul
         return super.equals(obj);
     }
 
-    /**
-     * Gets timeout in milliseconds.
-     *
-     * @return the timeout in milliseconds
-     */
-    public int getTimeoutInMilliseconds() {
-        return timeoutInMilliseconds;
-    }
-
-    /**
-     * Sets timeout in milliseconds.
-     *
-     * @param timeoutInMilliseconds the timeout in milliseconds
-     */
-    public void setTimeoutInMilliseconds(int timeoutInMilliseconds) {
-        this.timeoutInMilliseconds = timeoutInMilliseconds;
-    }
 }

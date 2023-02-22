@@ -6,8 +6,19 @@ gobrs:
         core-pool-size: 1000
         max-pool-size: 2000
       rules:
+        - name: "param"
+          content: "caskParamTask"
         - name: "performance"
           content: "taskA->taskB,TaskC->taskD->taskE,taskF"
+        - name: "launcher"
+          content: "normal->normal2"
+        - name: "methodRetry"
+          content: "throwException"
+        - name: "methodTimeout"
+          content: "timeout"
+        - name: "rollback"
+          content: "rollback1->rollback2->rollback3"
+          transaction: true
 
         # 规则 是数组类型的 多组规则
         - name: "general" # 猜想下面的流程 gobrs 会开启几个线程？ 注意看打印的日志哦～
@@ -43,7 +54,6 @@ gobrs:
         - name: "transactionRule"
           content: "transactionTaskA->transactionTaskB->transactionTaskC->transactionTaskD"
           transaction: true
-
 
         ## 单一任务超时时间
         - name: "timeoutRule"

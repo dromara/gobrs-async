@@ -1,6 +1,6 @@
 package com.gobrs.async.plugin.skywalking.wrapper;
 
-import com.gobrs.async.plugin.base.wrapper.ThreadWapper;
+import com.gobrs.async.plugin.base.ThreadWapper;
 import com.gobrs.async.spi.Realize;
 import org.apache.skywalking.apm.toolkit.trace.CallableWrapper;
 

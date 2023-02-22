@@ -18,7 +18,7 @@ import java.util.concurrent.Future;
  * @author: sizegang
  * @create: 2022 -09-28
  */
-public class TaskUtil {
+public class TaskUtil<Param,Result> {
 
     /**
      * Multiple dependencies boolean.
@@ -27,8 +27,8 @@ public class TaskUtil {
      * @param subTasks       the sub tasks
      * @return the boolean
      */
-    public static boolean multipleDependencies(Map<AsyncTask, List<AsyncTask>> upwardTasksMap, List<AsyncTask> subTasks) {
-        for (AsyncTask subTask : subTasks) {
+    public static boolean multipleDependencies(Map<AsyncTask<?,?>, List<AsyncTask<?,?>>> upwardTasksMap, List<AsyncTask<?,?>> subTasks) {
+        for (AsyncTask<?,?> subTask : subTasks) {
             if (!CollectionUtils.isEmpty(upwardTasksMap.get(subTask)) && upwardTasksMap.get(subTask).size() > 1) {
                 return true;
             }
@@ -42,7 +42,7 @@ public class TaskUtil {
      * @return the any condition
      */
     public static AnyConditionResult defaultAnyCondition() {
-        return AnyConditionResult.builder().setState(false).build();
+        return AnyConditionResult.builder().state(false).build();
     }
 
     /**
@@ -52,7 +52,7 @@ public class TaskUtil {
      * @return the any condition
      */
     public static AnyConditionResult defaultAnyCondition(boolean state) {
-        return AnyConditionResult.builder().setState(state).build();
+        return AnyConditionResult.builder().state(state).build();
     }
 
     public static TaskResult buildFutureTaskResult(Future result) {

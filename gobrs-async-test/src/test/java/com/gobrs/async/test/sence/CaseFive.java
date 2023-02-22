@@ -1,7 +1,9 @@
 package com.gobrs.async.test.sence;
 
 import com.gobrs.async.core.GobrsAsync;
+import com.gobrs.async.core.common.domain.GobrsParamSupport;
 import com.gobrs.async.test.GobrsAsyncTestApplication;
+import com.gobrs.async.test.task.sence.casefive.CaseFiveTaskA;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +31,9 @@ public class CaseFive {
 
     @Test
     public void caseFive() {
-        Map<String, Object> params = new HashMap<>();
+        GobrsParamSupport.create().putNext(CaseFiveTaskA.class, "CaseFiveTaskA的参数");
+        Map<Class<?>, Object> params = new HashMap<>();
+        params.put(CaseFiveTaskA.class, "CaseFiveTaskA的参数");
         gobrsAsync.go("caseFive", () -> params);
     }
 

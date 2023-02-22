@@ -36,7 +36,7 @@ public class CServiceCondition extends AsyncTask<String, AnyConditionResult<Stri
     @SneakyThrows
     @Override
     public AnyConditionResult<String> task(String o, TaskSupport support) {
-        AnyConditionResult.Builder<String> condition = AnyConditionResult.builder();
+        AnyConditionResult.AnyConditionResultBuilder<String> condition = AnyConditionResult.builder();
 
         System.out.println("CServiceCondition Begin");
         /**
@@ -57,9 +57,9 @@ public class CServiceCondition extends AsyncTask<String, AnyConditionResult<Stri
          *  设置任务返回结果
          */
         if (taskResult != null) {
-            condition.setResult(taskResult.getResult());
+            condition.result(taskResult.getResult());
         } else {
-            condition.setResult("Mock CServiceCondition Result ");
+            condition.result("Mock CServiceCondition Result ");
         }
 
         Thread.sleep(2000);

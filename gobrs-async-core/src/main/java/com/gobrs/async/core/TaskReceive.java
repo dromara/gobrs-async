@@ -21,7 +21,7 @@ public class TaskReceive {
     /**
      * cache taskList
      */
-    private List<AsyncTask> cacheTaskList;
+    private List<AsyncTask<?,?>> cacheTaskList;
 
     /**
      * Instantiates a new Task receive.
@@ -29,7 +29,7 @@ public class TaskReceive {
      * @param taskFlow the com.gobrs.async.com.gobrs.async.test.task flow
      * @param taskList the com.gobrs.async.com.gobrs.async.test.task list
      */
-    TaskReceive(TaskFlow taskFlow, List<AsyncTask<?, ?>> taskList) {
+    TaskReceive(TaskFlow taskFlow, List<AsyncTask<?,?>> taskList) {
         synchronized (taskFlow) {
             this.taskFlow = taskFlow;
             this.cacheTaskList = new ArrayList<>(taskList.size());
@@ -37,7 +37,7 @@ public class TaskReceive {
              *  src -> dest
              */
             copyList(taskList, this.cacheTaskList);
-            for (AsyncTask task : taskList) {
+            for (AsyncTask<?,?> task : taskList) {
                 taskFlow.addDependency(task, null);
             }
         }
@@ -50,21 +50,21 @@ public class TaskReceive {
      * @param asyncTasks the async tasks
      * @return the com.gobrs.async.com.gobrs.async.test.task receive
      */
-    public TaskReceive then(boolean clear, AsyncTask... asyncTasks) {
+    public TaskReceive then(boolean clear, AsyncTask<?,?>... asyncTasks) {
         synchronized (taskFlow) {
-            for (AsyncTask from : this.cacheTaskList) {
-                for (AsyncTask to : asyncTasks) {
+            for (AsyncTask<?,?> from : this.cacheTaskList) {
+                for (AsyncTask<?,?> to : asyncTasks) {
                     taskFlow.addDependency(from, to);
                 }
             }
-            for (AsyncTask to : asyncTasks) {
+            for (AsyncTask<?,?> to : asyncTasks) {
                 taskFlow.addDependency(to, null);
             }
             /**
              *     for Compatible with regular commas so note
              */
             if (clear) {
-                this.cacheTaskList = new ArrayList<AsyncTask>(
+                this.cacheTaskList = new ArrayList<AsyncTask<?,?>>(
                         asyncTasks.length);
                 copyList(Arrays.asList(asyncTasks), this.cacheTaskList);
             }
@@ -78,14 +78,14 @@ public class TaskReceive {
      *
      * @param cacheTaskList the cache com.gobrs.async.com.gobrs.async.test.task list
      */
-    public void refresh(List<AsyncTask<?, ?>> cacheTaskList) {
+    public void refresh(List<AsyncTask<?,?>> cacheTaskList) {
         this.cacheTaskList.clear();
         this.cacheTaskList.addAll(cacheTaskList);
     }
 
 
-    private void copyList(List<AsyncTask<?, ?>> src,
-                          List<AsyncTask> dest) {
+    private void copyList(List<AsyncTask<?,?>> src,
+                          List<AsyncTask<?,?>> dest) {
         dest.addAll(src);
     }
 

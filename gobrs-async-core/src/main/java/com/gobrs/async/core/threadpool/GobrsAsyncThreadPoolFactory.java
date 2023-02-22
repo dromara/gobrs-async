@@ -1,8 +1,13 @@
 package com.gobrs.async.core.threadpool;
 
 import com.alibaba.ttl.threadpool.TtlExecutors;
+import com.gobrs.async.core.common.exception.GobrsConfigException;
+import com.gobrs.async.core.common.util.JsonUtil;
 import com.gobrs.async.core.config.GobrsAsyncRule;
 import com.gobrs.async.core.config.GobrsConfig;
+import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONUtil;
+import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +27,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @create: 2022 -02-20
  * @Version 1.0
  */
+@Slf4j
 public class GobrsAsyncThreadPoolFactory {
 
     private GobrsConfig gobrsConfig;
@@ -53,6 +59,9 @@ public class GobrsAsyncThreadPoolFactory {
     private void rulelThreadPool() {
         List<GobrsAsyncRule> rules = gobrsConfig.getRules();
         for (GobrsAsyncRule rule : rules) {
+            if (Objects.isNull(rule)) {
+                throw new GobrsConfigException("gobrs config exception rule is  " + JsonUtil.obj2String(rule));
+            }
             cachedExecutors.put(rule.getName(), defaultThreadPool(rule.getThreadPool()));
         }
     }

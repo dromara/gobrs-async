@@ -1,4 +1,4 @@
-package com.gobrs.async.plugin.base.wrapper;
+package com.gobrs.async.plugin.base;
 
 import com.gobrs.async.spi.SPI;
 
