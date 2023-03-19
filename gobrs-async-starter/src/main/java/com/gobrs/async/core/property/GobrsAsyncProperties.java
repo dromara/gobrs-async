@@ -4,7 +4,6 @@ package com.gobrs.async.core.property;
 import com.gobrs.async.core.common.constant.ConfigPropertiesConstant;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
@@ -102,7 +101,7 @@ public class GobrsAsyncProperties {
         /**
          * thread survival time
          */
-        private Long keepAliveTime = KEEPALIVETIME;
+        private Long keepAliveTime = KEEP_ALIVE_TIME;
 
         /**
          * thread survival time unit
@@ -112,12 +111,12 @@ public class GobrsAsyncProperties {
         /**
          * Thread execution timeout
          */
-        private Long executeTimeOut = EXECUTETIMEOUT;
+        private Long executeTimeOut = EXECUTE_TIMEOUT;
 
         /**
          * queue maximum capacity
          */
-        private Integer capacity = THREADPOOLQUEUESIZE;
+        private Integer capacity = THREAD_POOL_QUEUE_SIZE;
 
 
         /**

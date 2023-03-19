@@ -11,17 +11,17 @@ public interface DefaultConfig {
     /**
      * The constant THREADPOOLQUEUESIZE.
      */
-    Integer THREADPOOLQUEUESIZE = 10000;
+    Integer THREAD_POOL_QUEUE_SIZE = 10000;
 
     /**
      * The constant KEEPALIVETIME.
      */
-    Long KEEPALIVETIME = 30000L;
+    Long KEEP_ALIVE_TIME = 30000L;
 
     /**
      * The constant EXECUTETIMEOUT.
      */
-    Long EXECUTETIMEOUT = 10000L;
+    Long EXECUTE_TIMEOUT = 10000L;
 
     /**
      * The constant RULE_ANY.
@@ -47,11 +47,11 @@ public interface DefaultConfig {
     /**
      * Whether to execute a subtask if it fails
      */
-    boolean failSubExec = false;
+    boolean FAIL_SUB_EXEC = false;
     /**
      * Transaction com.gobrs.async.com.gobrs.async.test.task
      */
-    boolean transaction = false;
+    boolean TRANSACTION = false;
 
 
     /**

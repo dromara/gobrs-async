@@ -90,7 +90,7 @@ public class GobrsConfig {
         /**
          * thread survival time
          */
-        private Long keepAliveTime = KEEPALIVETIME;
+        private Long keepAliveTime = KEEP_ALIVE_TIME;
 
         /**
          * thread survival time unit
@@ -100,12 +100,12 @@ public class GobrsConfig {
         /**
          * Thread execution timeout
          */
-        private Long executeTimeOut = EXECUTETIMEOUT;
+        private Long executeTimeOut = EXECUTE_TIMEOUT;
 
         /**
          * queue maximum capacity
          */
-        private Integer capacity = THREADPOOLQUEUESIZE;
+        private Integer capacity = THREAD_POOL_QUEUE_SIZE;
 
 
         /**

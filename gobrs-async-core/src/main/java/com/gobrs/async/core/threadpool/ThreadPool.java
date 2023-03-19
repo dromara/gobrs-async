@@ -30,7 +30,7 @@ public class ThreadPool {
     /**
      * thread survival time
      */
-    private Long keepAliveTime = DefaultConfig.KEEPALIVETIME;
+    private Long keepAliveTime = DefaultConfig.KEEP_ALIVE_TIME;
 
     /**
      * thread survival time unit
@@ -40,12 +40,12 @@ public class ThreadPool {
     /**
      * Thread execution timeout
      */
-    private Long executeTimeOut = DefaultConfig.EXECUTETIMEOUT;
+    private Long executeTimeOut = DefaultConfig.EXECUTE_TIMEOUT;
 
     /**
      * queue maximum capacity
      */
-    private Integer capacity = DefaultConfig.THREADPOOLQUEUESIZE;
+    private Integer capacity = DefaultConfig.THREAD_POOL_QUEUE_SIZE;
 
 
     /**

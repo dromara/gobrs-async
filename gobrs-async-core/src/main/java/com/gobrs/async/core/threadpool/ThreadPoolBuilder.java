@@ -4,7 +4,6 @@ import com.gobrs.async.core.common.constant.RejectedExecutionHandlerConstant;
 import com.gobrs.async.core.common.def.DefaultConfig;
 import com.gobrs.async.core.common.exception.GobrsAsyncException;
 
-import java.math.BigDecimal;
 import java.util.concurrent.*;
 
 import static com.gobrs.async.core.common.util.ThreadPoolUtil.calculateCoreNum;
@@ -345,7 +344,7 @@ public class ThreadPoolBuilder {
             throw new GobrsAsyncException("thread pool keepAliveTime size empty");
         }
         if (pool.getCapacity() == null) {
-            pool.setCapacity(DefaultConfig.THREADPOOLQUEUESIZE);
+            pool.setCapacity(DefaultConfig.THREAD_POOL_QUEUE_SIZE);
         }
     }
 

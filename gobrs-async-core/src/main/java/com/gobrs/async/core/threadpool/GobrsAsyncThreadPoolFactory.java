@@ -6,8 +6,6 @@ import com.gobrs.async.core.common.util.JsonUtil;
 import com.gobrs.async.core.config.GobrsAsyncRule;
 import com.gobrs.async.core.config.GobrsConfig;
 import lombok.extern.slf4j.Slf4j;
-import net.minidev.json.JSONUtil;
-import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
@@ -46,7 +44,7 @@ public class GobrsAsyncThreadPoolFactory {
     public GobrsAsyncThreadPoolFactory(GobrsConfig gobrsConfig) {
         this.gobrsConfig = gobrsConfig;
         this.COMMON_POOL = defaultThreadPool(gobrsConfig.getThreadPool());
-        rulelThreadPool();
+        ruleThreadPool();
     }
 
     private ExecutorService defaultThreadPool(GobrsConfig.ThreadPool threadPool) {
@@ -56,7 +54,7 @@ public class GobrsAsyncThreadPoolFactory {
     /**
      * 创建规则的线程池 隔离
      */
-    private void rulelThreadPool() {
+    private void ruleThreadPool() {
         List<GobrsAsyncRule> rules = gobrsConfig.getRules();
         for (GobrsAsyncRule rule : rules) {
             if (Objects.isNull(rule)) {
@@ -98,7 +96,7 @@ public class GobrsAsyncThreadPoolFactory {
      */
     public void setDefaultThreadPoolExecutor(ExecutorService threadPoolExecutor) {
         this.COMMON_POOL = TtlExecutors.getTtlExecutorService(threadPoolExecutor);
-        rulelThreadPool();
+        ruleThreadPool();
     }
 
     /**

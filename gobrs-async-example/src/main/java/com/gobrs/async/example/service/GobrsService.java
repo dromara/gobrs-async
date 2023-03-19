@@ -41,7 +41,7 @@ public class GobrsService {
      * Performance test.
      */
     public void performanceTest() {
-        gobrsAsync.go("performanceRule", () -> "");
+        gobrsAsync.go("performance", () -> "");
     }
 
 

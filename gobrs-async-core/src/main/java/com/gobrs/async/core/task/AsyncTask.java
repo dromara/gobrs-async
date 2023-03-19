@@ -52,14 +52,14 @@ public abstract class AsyncTask<Param, Result> implements GobrsTask<Param> {
     /**
      * Transaction com.gobrs.async.com.gobrs.async.test.task
      */
-    private boolean callback = DefaultConfig.transaction;
+    private boolean callback = DefaultConfig.TRANSACTION;
 
     private int retryCount = DefaultConfig.RETRY_COUNT;
 
     /**
      * Whether to execute a subtask if it fails
      */
-    private boolean failSubExec = DefaultConfig.failSubExec;
+    private boolean failSubExec = DefaultConfig.FAIL_SUB_EXEC;
 
     private int timeoutInMilliseconds = DefaultConfig.TASK_TIME_OUT;
 
